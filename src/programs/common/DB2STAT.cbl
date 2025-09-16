@@ -29,6 +29,19 @@
                05  WS-ELAPSED-TIME    PIC S9(9)V99 COMP-3.
            EXEC SQL END DECLARE SECTION END-EXEC.
            
+           01  WS-PERF-METRICS.
+               05  WS-PLAN-NAME        PIC X(8).
+               05  WS-CONNECT-TIME     PIC X(26).
+               05  WS-RESPONSE-TIME    PIC S9(6)V999 COMP-3.
+               05  WS-THREAD-ID        PIC X(8).
+               05  WS-PROGRAM-NAME     PIC X(8).
+               05  WS-MAINT-USER       PIC X(8) VALUE 'DB2STAT'.
+           
+           01  WS-TIMING-FIELDS.
+               05  WS-START-CONNECT    PIC X(26).
+               05  WS-END-CONNECT      PIC X(26).
+               05  WS-CALC-RESPONSE    PIC S9(6)V999 COMP-3.
+           
            COPY SQLCA.
            COPY DBPROC.
            COPY ERRHAND.
@@ -83,6 +96,7 @@
            
            PERFORM 1100-CREATE-STATS-TABLE
            PERFORM 1200-INSERT-INITIAL
+           PERFORM 1250-INSERT-PERF-METRICS
            .
            
        1100-CREATE-STATS-TABLE.
@@ -127,6 +141,30 @@
            END-IF
            .
            
+       1250-INSERT-PERF-METRICS.
+           MOVE LS-PROGRAM-ID TO WS-PROGRAM-NAME
+           MOVE WS-START-TIME TO WS-CONNECT-TIME
+           ACCEPT WS-THREAD-ID FROM THREAD-ID
+           MOVE 'POSMVP' TO WS-PLAN-NAME
+           MOVE 0 TO WS-RESPONSE-TIME
+           
+           EXEC SQL
+               INSERT INTO DB2_PERF_METRICS
+               (PLAN_NAME, CONNECT_TIME, RESPONSE_TIME,
+                THREAD_ID, PROGRAM_NAME, LAST_MAINT_DATE,
+                LAST_MAINT_USER)
+               VALUES
+               (:WS-PLAN-NAME, :WS-CONNECT-TIME, :WS-RESPONSE-TIME,
+                :WS-THREAD-ID, :WS-PROGRAM-NAME, CURRENT TIMESTAMP,
+                :WS-MAINT-USER)
+           END-EXEC
+           
+           IF SQLCODE NOT = 0
+               MOVE 'Error inserting performance metrics' TO ERR-TEXT
+               PERFORM 9000-ERROR-ROUTINE
+           END-IF
+           .
+           
        2000-UPDATE-STATS.
            MOVE LS-ROWS-READ  TO WS-ROWS-READ
            MOVE LS-ROWS-INSRT TO WS-ROWS-INSERTED
@@ -159,6 +197,7 @@
            MOVE WS-CURRENT-TIMESTAMP TO WS-END-TIME
            
            PERFORM 3100-CALC-TIMES
+           PERFORM 3200-UPDATE-PERF-METRICS
            
            EXEC SQL
                UPDATE SESSION.DBSTATS
@@ -184,6 +223,28 @@
            
            MOVE WS-ELAPSED-TIME TO WS-CPU-TIME
            MULTIPLY 0.65 BY WS-CPU-TIME
+           .
+           
+       3200-UPDATE-PERF-METRICS.
+           COMPUTE WS-CALC-RESPONSE = FUNCTION
+               NUMVAL(WS-END-TIME(1:15)) -
+               NUMVAL(WS-START-TIME(1:15))
+           MOVE WS-CALC-RESPONSE TO WS-RESPONSE-TIME
+           
+           EXEC SQL
+               UPDATE DB2_PERF_METRICS
+               SET RESPONSE_TIME = :WS-RESPONSE-TIME,
+                   LAST_MAINT_DATE = CURRENT TIMESTAMP
+               WHERE PLAN_NAME = :WS-PLAN-NAME
+                 AND CONNECT_TIME = :WS-CONNECT-TIME
+                 AND THREAD_ID = :WS-THREAD-ID
+                 AND PROGRAM_NAME = :WS-PROGRAM-NAME
+           END-EXEC
+           
+           IF SQLCODE NOT = 0
+               MOVE 'Error updating performance metrics' TO ERR-TEXT
+               PERFORM 9000-ERROR-ROUTINE
+           END-IF
            .
            
        4000-DISPLAY-STATS.

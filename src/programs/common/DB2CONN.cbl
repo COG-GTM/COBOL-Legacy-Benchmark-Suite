@@ -30,6 +30,12 @@
        01  WS-RETRY-COUNT          PIC S9(4) COMP VALUE 0.
        01  WS-MAX-RETRIES          PIC S9(4) COMP VALUE 3.
        
+       01  WS-TIMING-DATA.
+           05  WS-CONNECT-START    PIC X(26).
+           05  WS-CONNECT-END      PIC X(26).
+           05  WS-CONNECT-TIME     PIC S9(6)V999 COMP-3.
+           05  WS-THREAD-ID        PIC X(8).
+       
        LINKAGE SECTION.
        01  LS-DB2-REQUEST.
            05  LS-FUNCTION         PIC X(4).
@@ -66,6 +72,9 @@
            MOVE LS-DB-NAME TO WS-DB-NAME
            MOVE LS-PLAN-NAME TO WS-PLAN-NAME
            
+           ACCEPT WS-CONNECT-START FROM TIME STAMP
+           ACCEPT WS-THREAD-ID FROM THREAD-ID
+           
            PERFORM UNTIL WS-CONNECTED
                       OR WS-RETRY-COUNT >= WS-MAX-RETRIES
                
@@ -75,6 +84,9 @@
                
                IF SQLCODE = 0
                    SET WS-CONNECTED TO TRUE
+                   ACCEPT WS-CONNECT-END FROM TIME STAMP
+                   PERFORM 1200-CALC-CONNECT-TIME
+                   PERFORM 1300-LOG-PERF-METRICS
                    MOVE 0 TO LS-RETURN-CODE
                ELSE
                    ADD 1 TO WS-RETRY-COUNT
@@ -104,6 +116,30 @@
            END-EVALUATE
            
            MOVE 12 TO LS-RETURN-CODE
+           .
+           
+       1200-CALC-CONNECT-TIME.
+           COMPUTE WS-CONNECT-TIME = FUNCTION
+               NUMVAL(WS-CONNECT-END(1:15)) -
+               NUMVAL(WS-CONNECT-START(1:15))
+           .
+           
+       1300-LOG-PERF-METRICS.
+           EXEC SQL
+               INSERT INTO DB2_PERF_METRICS
+               (PLAN_NAME, CONNECT_TIME, RESPONSE_TIME,
+                THREAD_ID, PROGRAM_NAME, LAST_MAINT_DATE,
+                LAST_MAINT_USER)
+               VALUES
+               (:WS-PLAN-NAME, :WS-CONNECT-START, :WS-CONNECT-TIME,
+                :WS-THREAD-ID, 'DB2CONN', CURRENT TIMESTAMP,
+                'DB2CONN')
+           END-EXEC
+           
+           IF SQLCODE NOT = 0
+               MOVE 'Error logging performance metrics' TO ERR-TEXT
+               PERFORM 9000-ERROR-ROUTINE
+           END-IF
            .
            
        2000-DISCONNECT.
