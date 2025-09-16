@@ -112,6 +112,17 @@
            05  WS-DB2-RESP          PIC 9(5)V99.
            05  WS-DB2-QUEUE         PIC 9(5).
            05  WS-DB2-ERRORS        PIC 9(5).
+           
+       01  WS-DB2-PERF-METRICS.
+           05  WS-AVG-CONNECT-TIME  PIC 9(5)V99.
+           05  WS-MAX-CONNECT-TIME  PIC 9(5)V99.
+           05  WS-AVG-RESPONSE-TIME PIC 9(5)V99.
+           05  WS-MAX-RESPONSE-TIME PIC 9(5)V99.
+           05  WS-SLOW-QUERIES      PIC 9(5).
+           
+       01  WS-PERF-THRESHOLDS.
+           05  WS-CONNECT-THRESHOLD PIC 9(5)V99 VALUE 5.00.
+           05  WS-RESPONSE-THRESHOLD PIC 9(5)V99 VALUE 10.00.
 
        01  WS-TIMESTAMP.
            05  WS-DATE.
@@ -190,18 +201,59 @@
            PERFORM 2110-GET-CPU-METRICS
            PERFORM 2120-GET-MEMORY-METRICS
            PERFORM 2130-GET-DASD-METRICS
-           PERFORM 2140-GET-DB2-METRICS.
+           PERFORM 2140-GET-DB2-METRICS
+           PERFORM 2150-GET-DB2-PERF-METRICS.
 
        2200-CHECK-THRESHOLDS.
            PERFORM 2210-CHECK-UTILIZATION
            PERFORM 2220-CHECK-RESPONSE
            PERFORM 2230-CHECK-QUEUES
-           PERFORM 2240-CHECK-ERRORS.
+           PERFORM 2240-CHECK-ERRORS
+           PERFORM 2250-CHECK-DB2-PERFORMANCE.
 
        2300-LOG-STATUS.
            MOVE WS-TIMESTAMP TO LOG-TIMESTAMP
            PERFORM 2310-LOG-RESOURCES
            PERFORM 2320-LOG-PERFORMANCE.
+
+       2150-GET-DB2-PERF-METRICS.
+           EXEC SQL
+               SELECT AVG(RESPONSE_TIME),
+                      MAX(RESPONSE_TIME),
+                      COUNT(*)
+               INTO :WS-AVG-RESPONSE-TIME,
+                    :WS-MAX-RESPONSE-TIME,
+                    :WS-SLOW-QUERIES
+               FROM DB2_PERF_METRICS
+               WHERE CONNECT_TIME >= CURRENT TIMESTAMP - 1 HOUR
+                 AND RESPONSE_TIME > :WS-RESPONSE-THRESHOLD
+           END-EXEC
+           
+           EXEC SQL
+               SELECT AVG(DECIMAL(RESPONSE_TIME,9,3)),
+                      MAX(DECIMAL(RESPONSE_TIME,9,3))
+               INTO :WS-AVG-CONNECT-TIME,
+                    :WS-MAX-CONNECT-TIME
+               FROM DB2_PERF_METRICS
+               WHERE CONNECT_TIME >= CURRENT TIMESTAMP - 1 HOUR
+           END-EXEC
+           .
+           
+       2250-CHECK-DB2-PERFORMANCE.
+           IF WS-AVG-RESPONSE-TIME > WS-RESPONSE-THRESHOLD
+               SET THRESHOLD-MET TO TRUE
+               MOVE WS-CRITICAL TO ALERT-LEVEL
+               MOVE 'DB2 average response time exceeded threshold'
+                 TO ALERT-MESSAGE
+           END-IF
+           
+           IF WS-MAX-CONNECT-TIME > WS-CONNECT-THRESHOLD
+               SET THRESHOLD-MET TO TRUE
+               MOVE WS-WARNING TO ALERT-LEVEL
+               MOVE 'DB2 connection time threshold exceeded'
+                 TO ALERT-MESSAGE
+           END-IF
+           .
 
        2400-GENERATE-ALERTS.
            IF THRESHOLD-MET
@@ -218,4 +270,4 @@
        9999-ERROR-HANDLER.
            DISPLAY WS-ERROR-MESSAGE UPON CONS
            MOVE 12 TO RETURN-CODE
-           GOBACK. 
+           GOBACK.  
