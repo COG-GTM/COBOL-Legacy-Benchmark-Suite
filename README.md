@@ -44,42 +44,65 @@ While it is not intended for actual deployment, it mirrors the complexity and st
 
 ## Project Structure
 
+This repository is organized to support both the original COBOL implementation and the Java migration:
+
 ```
 project-root/
-├── documentation/          # Project documentation
-│   ├── technical/         # Technical documentation and architecture
-│   ├── operations/        # Operational guides and specifications
-│   ├── user/              # User documentation and guides
-│   └── assets/            # Shared documentation assets
+├── cobol/                  # Original COBOL implementation
+│   ├── src/               # COBOL source code
+│   │   ├── programs/     # COBOL source programs
+│   │   │   ├── batch/   # Batch processing programs
+│   │   │   ├── online/  # Online transaction programs
+│   │   │   ├── utility/ # Utility programs
+│   │   │   ├── test/    # Test programs
+│   │   │   ├── common/  # Shared utility programs
+│   │   │   └── portfolio/ # Portfolio management programs
+│   │   │
+│   │   ├── copybook/     # COBOL copybooks
+│   │   │   ├── batch/   # Batch processing copybooks
+│   │   │   ├── online/  # Online processing copybooks
+│   │   │   ├── db2/     # Database-related copybooks
+│   │   │   └── common/  # Shared system copybooks
+│   │   │
+│   │   ├── database/     # Database definitions
+│   │   │   ├── vsam/    # VSAM file definitions
+│   │   │   └── db2/     # DB2 table and index definitions
+│   │   │
+│   │   ├── jcl/          # Job Control Language scripts
+│   │   │   ├── batch/   # Batch processing jobs
+│   │   │   ├── utility/ # Utility and maintenance jobs
+│   │   │   ├── test/    # Test execution jobs
+│   │   │   └── portfolio/ # Portfolio management jobs
+│   │   │
+│   │   ├── maps/         # BMS screen definitions
+│   │   ├── cics/         # CICS resource definitions
+│   │   └── templates/    # Code templates and standards
+│   │
+│   └── documentation/     # COBOL-specific documentation
+│       ├── technical/    # Technical documentation and architecture
+│       ├── operations/   # Operational guides and specifications
+│       ├── user/         # User documentation and guides
+│       └── assets/       # Shared documentation assets
 │
-└── src/                   # Source code root
-    ├── programs/         # COBOL source programs
-    │   ├── batch/       # Batch processing programs
-    │   ├── online/      # Online transaction programs
-    │   ├── utility/     # Utility programs
-    │   ├── test/        # Test programs
-    │   ├── common/      # Shared utility programs
-    │   └── portfolio/   # Portfolio management programs
-    │
-    ├── copybook/         # COBOL copybooks
-    │   ├── batch/       # Batch processing copybooks
-    │   ├── online/      # Online processing copybooks
-    │   ├── db2/         # Database-related copybooks
-    │   └── common/      # Shared system copybooks
-    │
-    ├── database/         # Database definitions
-    │   ├── vsam/        # VSAM file definitions
-    │   └── db2/         # DB2 table and index definitions
-    │
-    ├── jcl/              # Job Control Language scripts
-    │   ├── batch/       # Batch processing jobs
-    │   ├── utility/     # Utility and maintenance jobs
-    │   ├── test/        # Test execution jobs
-    │   └── portfolio/   # Portfolio management jobs
-    │
-    ├── maps/             # BMS screen definitions
-    ├── cics/             # CICS resource definitions
-    └── templates/        # Code templates and standards
+├── java/                  # Java implementation (Sprint-based migration)
+│   ├── pom.xml           # Parent POM for multi-module project
+│   ├── domain-model/     # JPA entities and domain model
+│   ├── data-access/      # Repository layer
+│   ├── batch-processing/ # Spring Batch jobs
+│   ├── online-services/  # REST API services
+│   ├── reporting/        # Report generation
+│   ├── utilities/        # Utility classes
+│   └── infrastructure/   # Database migrations and configuration
+│
+├── shared/                # Shared resources
+│   ├── documentation/    # Migration guides and cross-implementation docs
+│   ├── test-data/        # Common test data
+│   └── schemas/          # Data schemas
+│
+└── .github/
+    └── workflows/
+        ├── cobol-ci.yml  # COBOL CI/CD pipeline
+        └── java-ci.yml   # Java CI/CD pipeline
 ```
 
 ## System Architecture Overview
@@ -100,7 +123,9 @@ The system comprises several key components:
 
 ## Development Status
 
-Currently implemented components:
+### COBOL Implementation
+
+All COBOL components are complete and production-ready:
 
 - ✅ Core Batch Processing Programs
 - ✅ Online Inquiry System
@@ -109,6 +134,31 @@ Currently implemented components:
 - ✅ Test Components
 - ✅ System Monitoring Tools
 - ✅ Security Framework
+
+### Java Migration Status
+
+The Java migration is organized into 10 sprints (2 weeks each) following a systematic modernization approach:
+
+#### Sprint 0: Foundation & Infrastructure (Complete ✅)
+- ✅ Repository restructuring for dual COBOL/Java support
+- ✅ Multi-module Maven project setup with Spring Boot 3.2.0
+- ✅ JPA domain entities (TransactionRecord, PositionRecord, HistoryRecord)
+- ✅ Database migration scripts (Flyway) for PostgreSQL
+- ✅ Testing infrastructure with H2 embedded database
+- ✅ CI/CD pipeline (GitHub Actions) for automated builds and tests
+
+#### Sprint 1-9: Planned
+- Sprint 1: Data Access Layer (JPA repositories and services)
+- Sprint 2: Batch Processing Framework (Spring Batch jobs)
+- Sprint 3: Transaction Validation & Processing
+- Sprint 4: Position Update Services
+- Sprint 5: Online REST APIs
+- Sprint 6: Reporting Services
+- Sprint 7: Security & Authentication
+- Sprint 8: Integration Testing & Performance Tuning
+- Sprint 9: Deployment & Documentation
+
+For detailed migration information, see the [Migration Guide](shared/documentation/migration-guide.md).
 
 ## Documentation
 
