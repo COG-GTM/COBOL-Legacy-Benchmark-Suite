@@ -1,11 +1,13 @@
 # COBOL Legacy Benchmark Suite: Investment Portfolio Management System
 
-![Project Diagram](documentation/assets/CLBS-logo.png)
+![Project Diagram](cobol/documentation/assets/CLBS-logo.png)
 
 [![Project Status: Active](https://img.shields.io/badge/Project%20Status-Active-green.svg)]()
 [![COBOL](https://img.shields.io/badge/COBOL-Enterprise-blue.svg)]()
+[![Java](https://img.shields.io/badge/Java-17-orange.svg)]()
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-brightgreen.svg)]()
 
-A production-grade implementation of an Investment Portfolio Management System designed to challenge and benchmark Large Language Model (LLM) translation tools, specifically for COBOL modernization efforts.
+A production-grade implementation of an Investment Portfolio Management System designed to challenge and benchmark Large Language Model (LLM) translation tools, specifically for COBOL modernization efforts. This repository contains both the original Enterprise COBOL implementation and a parallel Java implementation to demonstrate the migration path.
 
 ## Project Overview
 
@@ -42,44 +44,46 @@ While it is not intended for actual deployment, it mirrors the complexity and st
 - **Best Practices Implementation**: Adheres to standard mainframe development patterns and COBOL coding standards.
 - **Comprehensive Documentation**: Includes detailed documentation to aid understanding and facilitate translation efforts.
 
-## Project Structure
+## Repository Structure
+
+This repository is organized to support both COBOL and Java implementations side-by-side:
 
 ```
 project-root/
-├── documentation/          # Project documentation
-│   ├── technical/         # Technical documentation and architecture
-│   ├── operations/        # Operational guides and specifications
-│   ├── user/              # User documentation and guides
-│   └── assets/            # Shared documentation assets
+├── cobol/                  # Original Enterprise COBOL implementation
+│   ├── documentation/      # COBOL system documentation
+│   │   ├── technical/      # Technical documentation and architecture
+│   │   ├── operations/     # Operational guides and specifications
+│   │   ├── user/           # User documentation and guides
+│   │   └── assets/         # Shared documentation assets
+│   │
+│   └── src/                # COBOL source code root
+│       ├── programs/       # COBOL source programs
+│       │   ├── batch/      # Batch processing programs
+│       │   ├── online/     # Online transaction programs
+│       │   ├── utility/    # Utility programs
+│       │   └── test/       # Test programs
+│       │
+│       ├── copybook/       # COBOL copybooks (data definitions)
+│       ├── database/       # Database definitions (VSAM and DB2)
+│       ├── jcl/            # Job Control Language scripts
+│       ├── maps/           # BMS screen definitions
+│       ├── cics/           # CICS resource definitions
+│       └── templates/      # Code templates and standards
 │
-└── src/                   # Source code root
-    ├── programs/         # COBOL source programs
-    │   ├── batch/       # Batch processing programs
-    │   ├── online/      # Online transaction programs
-    │   ├── utility/     # Utility programs
-    │   ├── test/        # Test programs
-    │   ├── common/      # Shared utility programs
-    │   └── portfolio/   # Portfolio management programs
-    │
-    ├── copybook/         # COBOL copybooks
-    │   ├── batch/       # Batch processing copybooks
-    │   ├── online/      # Online processing copybooks
-    │   ├── db2/         # Database-related copybooks
-    │   └── common/      # Shared system copybooks
-    │
-    ├── database/         # Database definitions
-    │   ├── vsam/        # VSAM file definitions
-    │   └── db2/         # DB2 table and index definitions
-    │
-    ├── jcl/              # Job Control Language scripts
-    │   ├── batch/       # Batch processing jobs
-    │   ├── utility/     # Utility and maintenance jobs
-    │   ├── test/        # Test execution jobs
-    │   └── portfolio/   # Portfolio management jobs
-    │
-    ├── maps/             # BMS screen definitions
-    ├── cics/             # CICS resource definitions
-    └── templates/        # Code templates and standards
+├── java/                   # Java implementation (Spring Boot)
+│   ├── common/             # Domain models and shared utilities
+│   ├── data-access/        # Repository layer for database access
+│   ├── batch-processing/   # Spring Batch jobs
+│   ├── online-services/    # Spring Boot REST APIs
+│   ├── reporting/          # Reporting engine
+│   ├── utilities/          # Maintenance tools
+│   └── pom.xml             # Parent Maven configuration
+│
+└── shared/                 # Cross-version resources
+    ├── test-data/          # Test data for both implementations
+    ├── migration-docs/     # COBOL-to-Java mapping documentation
+    └── comparison-reports/ # Validation reports comparing outputs
 ```
 
 ## System Architecture Overview
@@ -100,7 +104,7 @@ The system comprises several key components:
 
 ## Development Status
 
-Currently implemented components:
+### COBOL Implementation (Complete)
 
 - ✅ Core Batch Processing Programs
 - ✅ Online Inquiry System
@@ -110,14 +114,85 @@ Currently implemented components:
 - ✅ System Monitoring Tools
 - ✅ Security Framework
 
+### Java Implementation (In Progress)
+
+**Sprint 0 - Foundation & Repository Setup** ✅
+- ✅ Multi-module Maven project structure
+- ✅ Spring Boot 3.x configuration
+- ✅ Base exception hierarchy
+- ✅ CI/CD pipeline (GitHub Actions)
+- ✅ Testing framework setup (JUnit 5, Mockito, TestContainers)
+
+**Upcoming Sprints**
+- 📋 Sprint 1: Core domain models and data access layer
+- 📋 Sprint 2: Batch processing implementation
+- 📋 Sprint 3: Online services (REST APIs)
+- 📋 Sprint 4: Reporting engine
+- 📋 Sprint 5: Integration testing and validation
+
+## Getting Started
+
+### Building the Java Application
+
+The Java implementation uses Maven as the build tool and requires Java 17.
+
+**Prerequisites:**
+- Java Development Kit (JDK) 17 or higher
+- Apache Maven 3.8+ (or use the Maven wrapper included)
+- Git
+
+**Build Instructions:**
+
+```bash
+# Clone the repository
+git clone https://github.com/COG-GTM/COBOL-Legacy-Benchmark-Suite.git
+cd COBOL-Legacy-Benchmark-Suite
+
+# Navigate to the Java directory
+cd java
+
+# Build all modules
+mvn clean install
+
+# Run tests
+mvn test
+
+# Build without running tests
+mvn clean install -DskipTests
+```
+
+**Running Individual Modules:**
+
+```bash
+# Run the online services (REST API)
+cd online-services
+mvn spring-boot:run
+
+# The API will be available at http://localhost:8080/api
+# H2 console available at http://localhost:8080/api/h2-console
+
+# Run batch processing jobs
+cd batch-processing
+mvn spring-boot:run
+```
+
+### COBOL Implementation
+
+The COBOL implementation requires a z/OS or compatible mainframe environment. See the [COBOL Operations Guide](cobol/documentation/operations/README.md) for detailed setup instructions.
+
 ## Documentation
 
 Comprehensive documentation is provided to facilitate understanding and translation:
 
-- [System Architecture Document (SAD)](documentation/technical/system-architecture.md)
-- [Data Dictionary](documentation/technical/data-dictionary.md)
-- [Operations Guide](documentation/operations/README.md)
-- [Test Data Specifications](documentation/operations/test-data-specs.md)
+**COBOL Documentation:**
+- [System Architecture Document (SAD)](cobol/documentation/technical/system-architecture.md)
+- [Data Dictionary](cobol/documentation/technical/data-dictionary.md)
+- [Operations Guide](cobol/documentation/operations/README.md)
+- [Test Data Specifications](cobol/documentation/operations/test-data-specs.md)
+
+**Java Documentation:**
+- Java API documentation (generated via Javadoc)
+- Module-specific README files (coming in future sprints)
 
 ## Technical Standards
 

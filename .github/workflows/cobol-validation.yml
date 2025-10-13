@@ -1,0 +1,49 @@
+name: COBOL Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'cobol/**'
+      - '.github/workflows/cobol-validation.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'cobol/**'
+      - '.github/workflows/cobol-validation.yml'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Validate COBOL Structure
+      run: |
+        echo "Validating COBOL directory structure..."
+        
+        if [ ! -d "cobol/src" ]; then
+          echo "Error: cobol/src directory not found"
+          exit 1
+        fi
+        
+        if [ ! -d "cobol/documentation" ]; then
+          echo "Error: cobol/documentation directory not found"
+          exit 1
+        fi
+        
+        echo "COBOL directory structure validation passed"
+        
+    - name: List COBOL Programs
+      run: |
+        echo "Listing COBOL programs:"
+        find cobol/src/programs -type f -name "*.cbl" -o -name "*.CBL" | wc -l
+        echo "programs found"
+        
+    - name: List COBOL Copybooks
+      run: |
+        echo "Listing COBOL copybooks:"
+        find cobol/src/copybook -type f -name "*.cpy" -o -name "*.CPY" | wc -l
+        echo "copybooks found"
