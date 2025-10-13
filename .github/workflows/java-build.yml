@@ -1,0 +1,54 @@
+name: Java Build and Test
+
+on:
+  push:
+    branches: [ main, develop ]
+    paths:
+      - 'java/**'
+      - '.github/workflows/java-build.yml'
+  pull_request:
+    branches: [ main, develop ]
+    paths:
+      - 'java/**'
+      - '.github/workflows/java-build.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        cache: 'maven'
+        
+    - name: Build with Maven
+      working-directory: ./java
+      run: mvn clean install -DskipTests
+      
+    - name: Run Tests
+      working-directory: ./java
+      run: mvn test
+      
+    - name: Generate Test Report
+      if: always()
+      uses: dorny/test-reporter@v1
+      with:
+        name: Maven Tests
+        path: java/**/target/surefire-reports/*.xml
+        reporter: java-junit
+        fail-on-error: true
+        fail-on-empty: false
+        
+    - name: Upload Build Artifacts
+      if: success()
+      uses: actions/upload-artifact@v4
+      with:
+        name: java-build-artifacts
+        path: java/**/target/*.jar
+        retention-days: 7
