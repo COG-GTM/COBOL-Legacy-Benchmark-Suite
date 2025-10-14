@@ -45,41 +45,51 @@ While it is not intended for actual deployment, it mirrors the complexity and st
 ## Project Structure
 
 ```
-project-root/
-├── documentation/          # Project documentation
-│   ├── technical/         # Technical documentation and architecture
-│   ├── operations/        # Operational guides and specifications
-│   ├── user/              # User documentation and guides
-│   └── assets/            # Shared documentation assets
+portfolio-management-system/
+├── cobol/                        # Original COBOL implementation
+│   ├── src/
+│   │   ├── programs/            # COBOL source programs
+│   │   │   ├── batch/          # Batch processing programs
+│   │   │   ├── online/         # Online transaction programs
+│   │   │   ├── utility/        # Utility programs
+│   │   │   ├── test/           # Test programs
+│   │   │   ├── common/         # Shared utility programs
+│   │   │   └── portfolio/      # Portfolio management programs
+│   │   ├── copybook/           # COBOL copybooks
+│   │   │   ├── batch/          # Batch processing copybooks
+│   │   │   ├── online/         # Online processing copybooks
+│   │   │   ├── db2/            # Database-related copybooks
+│   │   │   └── common/         # Shared system copybooks
+│   │   ├── database/           # Database definitions
+│   │   │   ├── vsam/           # VSAM file definitions
+│   │   │   └── db2/            # DB2 table and index definitions
+│   │   ├── jcl/                # Job Control Language scripts
+│   │   │   ├── batch/          # Batch processing jobs
+│   │   │   ├── utility/        # Utility and maintenance jobs
+│   │   │   ├── test/           # Test execution jobs
+│   │   │   └── portfolio/      # Portfolio management jobs
+│   │   ├── maps/               # BMS screen definitions
+│   │   ├── cics/               # CICS resource definitions
+│   │   └── templates/          # Code templates and standards
+│   └── documentation/          # COBOL-specific documentation
+│       ├── technical/          # Technical documentation and architecture
+│       ├── operations/         # Operational guides and specifications
+│       ├── user/               # User documentation and guides
+│       └── assets/             # Shared documentation assets
 │
-└── src/                   # Source code root
-    ├── programs/         # COBOL source programs
-    │   ├── batch/       # Batch processing programs
-    │   ├── online/      # Online transaction programs
-    │   ├── utility/     # Utility programs
-    │   ├── test/        # Test programs
-    │   ├── common/      # Shared utility programs
-    │   └── portfolio/   # Portfolio management programs
-    │
-    ├── copybook/         # COBOL copybooks
-    │   ├── batch/       # Batch processing copybooks
-    │   ├── online/      # Online processing copybooks
-    │   ├── db2/         # Database-related copybooks
-    │   └── common/      # Shared system copybooks
-    │
-    ├── database/         # Database definitions
-    │   ├── vsam/        # VSAM file definitions
-    │   └── db2/         # DB2 table and index definitions
-    │
-    ├── jcl/              # Job Control Language scripts
-    │   ├── batch/       # Batch processing jobs
-    │   ├── utility/     # Utility and maintenance jobs
-    │   ├── test/        # Test execution jobs
-    │   └── portfolio/   # Portfolio management jobs
-    │
-    ├── maps/             # BMS screen definitions
-    ├── cics/             # CICS resource definitions
-    └── templates/        # Code templates and standards
+├── java/                         # Java implementation
+│   ├── portfolio-core/          # Shared domain module
+│   ├── portfolio-batch/         # Batch processing module
+│   ├── portfolio-api/           # REST API module
+│   ├── portfolio-reporting/     # Reporting module
+│   └── portfolio-utilities/     # Utility module
+│
+├── shared/
+│   ├── documentation/           # Cross-platform architecture docs
+│   ├── test-data/              # Test datasets for both platforms
+│   └── migration-mapping/       # COBOL→Java component mappings
+│
+└── README.md
 ```
 
 ## System Architecture Overview
@@ -134,8 +144,19 @@ Comprehensive documentation is provided to facilitate understanding and translat
 - **Documentation**: Provides detailed documentation for all components.
 - **Testing**: Contains test programs and data for validation purposes.
 
+## Migration Status
+
+This repository now supports both COBOL and Java implementations side-by-side to enable incremental modernization:
+
+- ✅ **Sprint 0 Complete**: Foundation & Setup
+  - Repository restructured with `cobol/`, `java/`, and `shared/` directories
+  - Java Maven multi-module project initialized
+  - CI/CD pipelines configured for both platforms
+  - Testing framework ready (JUnit 5, Mockito)
+
 ## Future Plans
 
+- **Sprint 1-5**: Incremental migration of COBOL components to Java
 - **LLM Translation Training Pairs**: Create benchmark translations to modern languages like Java or C#.
 - **Fine-Tuning LLMs**: Use the project to enhance the capabilities of LLM translation tools in handling complex legacy codebases.
 - **Community Contribution**: Encourage collaboration within the COBOL modernization community to improve and expand the benchmark.

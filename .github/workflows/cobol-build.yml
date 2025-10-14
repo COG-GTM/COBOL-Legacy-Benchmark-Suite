@@ -1,0 +1,32 @@
+name: COBOL Build
+
+on:
+  push:
+    branches: [ main, 'devin/**' ]
+    paths:
+      - 'cobol/**'
+      - '.github/workflows/cobol-build.yml'
+  pull_request:
+    branches: [ main ]
+    paths:
+      - 'cobol/**'
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Validate COBOL Structure
+        run: |
+          echo "Validating COBOL directory structure..."
+          test -d cobol/src/programs
+          test -d cobol/src/copybook
+          test -d cobol/src/database
+          test -d cobol/src/jcl
+          test -d cobol/documentation
+          
+      - name: Count COBOL Files
+        run: |
+          echo "Counting COBOL files..."
+          find cobol/src -type f \( -name "*.cbl" -o -name "*.cpy" -o -name "*.jcl" -o -name "*.sql" \) | wc -l
