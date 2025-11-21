@@ -147,3 +147,5 @@ Comprehensive documentation is provided to facilitate understanding and translat
 ## Contributing
 
 Contributions are welcome, especially from those interested in COBOL modernization and LLM development. Please see the [Contributing Guidelines](CONTRIBUTING.md) for more information.
+
+<!-- Verification comment: Testing PR workflow -->
