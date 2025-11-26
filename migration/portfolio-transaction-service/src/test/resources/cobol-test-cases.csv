@@ -1,0 +1,11 @@
+portfolioId,type,quantity,price,amount,expectedStatus,expectedError
+PORT001,BU,100,50.00,5000.00,PROCESSED,
+PORT001,SL,50,100.00,5000.00,PROCESSED,
+PORT001,FE,1,50.00,50.00,PROCESSED,
+PORT001,TR,50,,,REJECTED,not implemented
+INVALID,BU,100,50.00,5000.00,REJECTED,Invalid Portfolio ID
+PORT001,XX,100,50.00,5000.00,REJECTED,Invalid Transaction Type
+PORT001,BU,0,50.00,5000.00,REJECTED,Quantity must be greater than zero
+PORT001,BU,100,0,5000.00,REJECTED,Price must be greater than zero
+PORT001,BU,100,50.00,0,REJECTED,Amount must be greater than zero
+,BU,100,50.00,5000.00,REJECTED,Portfolio ID is required
