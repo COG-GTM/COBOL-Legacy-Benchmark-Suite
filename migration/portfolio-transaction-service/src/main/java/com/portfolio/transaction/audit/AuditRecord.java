@@ -1,0 +1,139 @@
+package com.portfolio.transaction.audit;
+
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "audit_record")
+public class AuditRecord {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(name = "timestamp")
+    private LocalDateTime timestamp;
+
+    @Column(name = "program", length = 8)
+    private String program;
+
+    @Column(name = "audit_type", length = 4)
+    private String auditType;
+
+    @Column(name = "action", length = 8)
+    private String action;
+
+    @Column(name = "status", length = 4)
+    private String status;
+
+    @Column(name = "portfolio_id", length = 10)
+    private String portfolioId;
+
+    @Column(name = "account_no", length = 15)
+    private String accountNo;
+
+    @Column(name = "before_image", length = 500)
+    private String beforeImage;
+
+    @Column(name = "after_image", length = 500)
+    private String afterImage;
+
+    @Column(name = "message", length = 200)
+    private String message;
+
+    public AuditRecord() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public LocalDateTime getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(LocalDateTime timestamp) {
+        this.timestamp = timestamp;
+    }
+
+    public String getProgram() {
+        return program;
+    }
+
+    public void setProgram(String program) {
+        this.program = program;
+    }
+
+    public String getAuditType() {
+        return auditType;
+    }
+
+    public void setAuditType(String auditType) {
+        this.auditType = auditType;
+    }
+
+    public String getAction() {
+        return action;
+    }
+
+    public void setAction(String action) {
+        this.action = action;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getPortfolioId() {
+        return portfolioId;
+    }
+
+    public void setPortfolioId(String portfolioId) {
+        this.portfolioId = portfolioId;
+    }
+
+    public String getAccountNo() {
+        return accountNo;
+    }
+
+    public void setAccountNo(String accountNo) {
+        this.accountNo = accountNo;
+    }
+
+    public String getBeforeImage() {
+        return beforeImage;
+    }
+
+    public void setBeforeImage(String beforeImage) {
+        this.beforeImage = beforeImage;
+    }
+
+    public String getAfterImage() {
+        return afterImage;
+    }
+
+    public void setAfterImage(String afterImage) {
+        this.afterImage = afterImage;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+}

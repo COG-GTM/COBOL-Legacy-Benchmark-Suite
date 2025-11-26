@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:portfoliodb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    username: sa
+    password:
+    driver-class-name: org.h2.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+    show-sql: true
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+portfolio:
+  transaction:
+    max-errors: 100
+    batch-size: 1000
+
+logging:
+  level:
+    com.portfolio.transaction: INFO
+    org.hibernate.SQL: DEBUG
+
+server:
+  port: 8080
