@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: portfolio-modernization
+  labels:
+    app.kubernetes.io/name: portfolio-modernization
+    app.kubernetes.io/part-of: cobol-modernization
