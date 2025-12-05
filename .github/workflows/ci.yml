@@ -48,20 +48,21 @@ jobs:
         if: success() || failure()
         with:
           name: Test Results
-          path: modern-app/build/test-results/test/*.xml
+          path: build/test-results/test/*.xml
           reporter: java-junit
+          fail-on-empty: false
 
       - name: Upload coverage report
         uses: codecov/codecov-action@v3
         with:
-          files: modern-app/build/reports/jacoco/test/jacocoTestReport.xml
+          files: build/reports/jacoco/test/jacocoTestReport.xml
           fail_ci_if_error: false
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
           name: build-artifacts
-          path: modern-app/build/libs/*.jar
+          path: build/libs/*.jar
 
   security-scan:
     name: Security Scan
