@@ -1,0 +1,76 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: portfolio-config
+  namespace: portfolio-system
+  labels:
+    app: portfolio-management
+data:
+  SPRING_PROFILES_ACTIVE: "production"
+  SERVER_PORT: "8080"
+  MANAGEMENT_SERVER_PORT: "8081"
+  LOGGING_LEVEL_ROOT: "INFO"
+  LOGGING_LEVEL_COM_PORTFOLIO: "DEBUG"
+  SPRING_DATASOURCE_HIKARI_MAXIMUM_POOL_SIZE: "20"
+  SPRING_DATASOURCE_HIKARI_MINIMUM_IDLE: "5"
+  SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT: "30000"
+  SPRING_REDIS_TIMEOUT: "5000"
+  SPRING_BATCH_JOB_ENABLED: "false"
+  SPRING_JPA_HIBERNATE_DDL_AUTO: "validate"
+  SPRING_JPA_SHOW_SQL: "false"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: postgresql-config
+  namespace: portfolio-system
+  labels:
+    app: postgresql
+data:
+  POSTGRES_DB: "portfolio_db"
+  POSTGRES_USER: "portfolio_app"
+  PGDATA: "/var/lib/postgresql/data/pgdata"
+  postgresql.conf: |
+    listen_addresses = '*'
+    max_connections = 200
+    shared_buffers = 256MB
+    effective_cache_size = 768MB
+    maintenance_work_mem = 64MB
+    checkpoint_completion_target = 0.9
+    wal_buffers = 16MB
+    default_statistics_target = 100
+    random_page_cost = 1.1
+    effective_io_concurrency = 200
+    work_mem = 6553kB
+    min_wal_size = 1GB
+    max_wal_size = 4GB
+    max_worker_processes = 4
+    max_parallel_workers_per_gather = 2
+    max_parallel_workers = 4
+    max_parallel_maintenance_workers = 2
+    log_statement = 'mod'
+    log_duration = on
+    log_min_duration_statement = 1000
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: redis-config
+  namespace: portfolio-system
+  labels:
+    app: redis
+data:
+  redis.conf: |
+    maxmemory 512mb
+    maxmemory-policy allkeys-lru
+    appendonly yes
+    appendfsync everysec
+    tcp-keepalive 300
+    timeout 0
+    tcp-backlog 511
+    databases 16
+    save 900 1
+    save 300 10
+    save 60 10000
+    rdbcompression yes
+    rdbchecksum yes

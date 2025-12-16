@@ -1,0 +1,150 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: portfolio-service
+  namespace: portfolio-system
+  labels:
+    app: portfolio-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: portfolio-service
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app: portfolio-service
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8081"
+        prometheus.io/path: "/actuator/prometheus"
+    spec:
+      serviceAccountName: portfolio-service-account
+      containers:
+      - name: portfolio-service
+        image: portfolio-service:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 8081
+          name: management
+        envFrom:
+        - configMapRef:
+            name: portfolio-config
+        - secretRef:
+            name: portfolio-secrets
+        resources:
+          requests:
+            cpu: "500m"
+            memory: 1Gi
+          limits:
+            cpu: "2"
+            memory: 2Gi
+        livenessProbe:
+          httpGet:
+            path: /actuator/health/liveness
+            port: 8081
+          initialDelaySeconds: 60
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /actuator/health/readiness
+            port: 8081
+          initialDelaySeconds: 30
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: logs
+          mountPath: /var/log/portfolio
+      volumes:
+      - name: logs
+        emptyDir: {}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: portfolio-service
+  namespace: portfolio-system
+  labels:
+    app: portfolio-service
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  - port: 8081
+    targetPort: 8081
+    protocol: TCP
+    name: management
+  selector:
+    app: portfolio-service
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: portfolio-service-account
+  namespace: portfolio-system
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: portfolio-service-hpa
+  namespace: portfolio-system
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: portfolio-service
+  minReplicas: 3
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 70
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: portfolio-service-ingress
+  namespace: portfolio-system
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: "10m"
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  tls:
+  - hosts:
+    - portfolio-api.example.com
+    secretName: portfolio-tls
+  rules:
+  - host: portfolio-api.example.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: portfolio-service
+            port:
+              number: 8080

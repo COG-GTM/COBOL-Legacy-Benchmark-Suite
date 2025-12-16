@@ -1,0 +1,172 @@
+# ETL Pipeline Configuration
+# Phase 1: VSAM/DB2 to PostgreSQL Migration
+# Version: 1.0.0
+
+database:
+  postgresql:
+    host: ${POSTGRES_HOST:localhost}
+    port: ${POSTGRES_PORT:5432}
+    database: ${POSTGRES_DB:portfolio_db}
+    user: ${POSTGRES_USER:portfolio_app}
+    password: ${POSTGRES_PASSWORD}
+    schema: portfolio
+    pool_size: 10
+    max_overflow: 20
+
+  redis:
+    host: ${REDIS_HOST:localhost}
+    port: ${REDIS_PORT:6379}
+    password: ${REDIS_PASSWORD}
+    db: 0
+
+migration:
+  batch_size: 1000
+  checkpoint_interval: 5000
+  parallel_workers: 4
+  retry_attempts: 3
+  retry_delay_seconds: 5
+
+sources:
+  vsam:
+    posfile:
+      name: "POSFILE"
+      description: "Portfolio Position VSAM File"
+      source_path: "${VSAM_DATA_PATH}/PORTFOLIO.POSITION.VSAM"
+      record_length: 200
+      key_length: 26
+      target_table: "positions"
+      
+    tranhist:
+      name: "TRANHIST"
+      description: "Transaction History VSAM File"
+      source_path: "${VSAM_DATA_PATH}/PORTFOLIO.TRANHIST.VSAM"
+      record_length: 300
+      key_length: 28
+      target_table: "transactions"
+      
+    portmstr:
+      name: "PORTMSTR"
+      description: "Portfolio Master VSAM File"
+      source_path: "${VSAM_DATA_PATH}/PORTFOLIO.MASTER.FILE"
+      record_length: 400
+      key_length: 12
+      target_table: "portfolios"
+      
+    bchctl:
+      name: "BCHCTL"
+      description: "Batch Control VSAM File"
+      source_path: "${VSAM_DATA_PATH}/PORTFOLIO.BCHCTL.VSAM"
+      record_length: 200
+      key_length: 16
+      target_table: "batch_control"
+
+  db2:
+    poshist:
+      name: "POSHIST"
+      description: "Position History DB2 Table"
+      source_query: "SELECT * FROM POSHIST"
+      target_table: "position_history"
+      
+    errlog:
+      name: "ERRLOG"
+      description: "Error Log DB2 Table"
+      source_query: "SELECT * FROM ERRLOG"
+      target_table: "error_log"
+      
+    authfile:
+      name: "AUTHFILE"
+      description: "User Authorization DB2 Table"
+      source_query: "SELECT * FROM AUTHFILE"
+      target_table: "user_authorizations"
+      
+    auditlog:
+      name: "AUDITLOG"
+      description: "Audit Log DB2 Table"
+      source_query: "SELECT * FROM AUDITLOG"
+      target_table: "audit_log"
+
+field_mappings:
+  positions:
+    POS-PORTFOLIO-ID: portfolio_id
+    POS-DATE: position_date
+    POS-INVESTMENT-ID: investment_id
+    POS-QUANTITY: quantity
+    POS-COST-BASIS: cost_basis
+    POS-MARKET-VALUE: market_value
+    POS-CURRENCY: currency_code
+    POS-STATUS: status
+    POS-LAST-MAINT-DATE: updated_at
+    POS-LAST-MAINT-USER: updated_by
+
+  transactions:
+    TRN-DATE: transaction_date
+    TRN-TIME: transaction_time
+    TRN-PORTFOLIO-ID: portfolio_id
+    TRN-SEQUENCE-NO: sequence_no
+    TRN-INVESTMENT-ID: investment_id
+    TRN-TYPE: transaction_type
+    TRN-QUANTITY: quantity
+    TRN-PRICE: price
+    TRN-AMOUNT: amount
+    TRN-CURRENCY: currency_code
+    TRN-STATUS: status
+    TRN-PROCESS-DATE: process_date
+    TRN-PROCESS-USER: process_user
+
+  portfolios:
+    PORTFOLIO-ID: portfolio_id
+    ACCOUNT-TYPE: account_type
+    BRANCH-ID: branch_id
+    CLIENT-ID: client_id
+    PORTFOLIO-NAME: portfolio_name
+    CURRENCY-CODE: currency_code
+    RISK-LEVEL: risk_level
+    STATUS: status
+    OPEN-DATE: open_date
+    CLOSE-DATE: close_date
+
+  position_history:
+    ACCOUNT_NO: account_no
+    PORTFOLIO_ID: portfolio_id
+    TRANS_DATE: trans_date
+    TRANS_TIME: trans_time
+    TRANS_TYPE: trans_type
+    SECURITY_ID: security_id
+    QUANTITY: quantity
+    PRICE: price
+    AMOUNT: amount
+    FEES: fees
+    TOTAL_AMOUNT: total_amount
+    COST_BASIS: cost_basis
+    GAIN_LOSS: gain_loss
+    PROCESS_DATE: process_date
+    PROCESS_TIME: process_time
+    PROGRAM_ID: program_id
+    USER_ID: user_id
+    AUDIT_TIMESTAMP: audit_timestamp
+
+value_transformations:
+  status:
+    A: ACTIVE
+    C: CLOSED
+    P: PENDING
+    S: SUSPENDED
+    
+  transaction_type:
+    BU: BUY
+    SL: SELL
+    TR: TRANSFER
+    FE: FEE
+    
+  transaction_status:
+    P: PENDING
+    D: COMPLETED
+    F: FAILED
+    R: REVERSED
+
+logging:
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "${LOG_PATH}/etl_migration.log"
+  max_size_mb: 100
+  backup_count: 5

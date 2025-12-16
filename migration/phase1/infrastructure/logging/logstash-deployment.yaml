@@ -1,0 +1,206 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: logstash-config
+  namespace: portfolio-system
+  labels:
+    app: logstash
+data:
+  logstash.yml: |
+    http.host: "0.0.0.0"
+    xpack.monitoring.enabled: false
+    pipeline.workers: 2
+    pipeline.batch.size: 125
+    pipeline.batch.delay: 50
+
+  logstash.conf: |
+    input {
+      beats {
+        port => 5044
+      }
+      tcp {
+        port => 5000
+        codec => json_lines
+      }
+    }
+
+    filter {
+      if [type] == "portfolio-service" {
+        grok {
+          match => { "message" => "%{TIMESTAMP_ISO8601:timestamp} %{LOGLEVEL:level} \[%{DATA:thread}\] %{DATA:logger} - %{GREEDYDATA:log_message}" }
+        }
+        date {
+          match => [ "timestamp", "ISO8601" ]
+          target => "@timestamp"
+        }
+        if [level] == "ERROR" {
+          mutate {
+            add_tag => ["error"]
+          }
+        }
+      }
+
+      if [type] == "postgresql" {
+        grok {
+          match => { "message" => "%{TIMESTAMP_ISO8601:timestamp} %{WORD:timezone} \[%{NUMBER:pid}\] %{WORD:user}@%{WORD:database} %{LOGLEVEL:level}:  %{GREEDYDATA:log_message}" }
+        }
+        date {
+          match => [ "timestamp", "ISO8601" ]
+          target => "@timestamp"
+        }
+      }
+
+      if [type] == "batch-job" {
+        grok {
+          match => { "message" => "%{TIMESTAMP_ISO8601:timestamp} \[%{DATA:job_name}\] %{LOGLEVEL:level} - %{GREEDYDATA:log_message}" }
+        }
+        date {
+          match => [ "timestamp", "ISO8601" ]
+          target => "@timestamp"
+        }
+        mutate {
+          add_field => { "job_execution_id" => "%{[fields][job_execution_id]}" }
+        }
+      }
+
+      if [type] == "etl-pipeline" {
+        grok {
+          match => { "message" => "%{TIMESTAMP_ISO8601:timestamp} \[%{DATA:pipeline_name}\] %{LOGLEVEL:level} - Records: %{NUMBER:records_processed:int}, Errors: %{NUMBER:error_count:int} - %{GREEDYDATA:log_message}" }
+        }
+        date {
+          match => [ "timestamp", "ISO8601" ]
+          target => "@timestamp"
+        }
+      }
+
+      mutate {
+        remove_field => [ "host", "agent" ]
+      }
+    }
+
+    output {
+      elasticsearch {
+        hosts => ["elasticsearch:9200"]
+        index => "portfolio-logs-%{+YYYY.MM.dd}"
+        template_name => "portfolio-logs"
+        template_overwrite => true
+      }
+
+      if "error" in [tags] {
+        elasticsearch {
+          hosts => ["elasticsearch:9200"]
+          index => "portfolio-errors-%{+YYYY.MM.dd}"
+        }
+      }
+    }
+
+  index-template.json: |
+    {
+      "index_patterns": ["portfolio-logs-*"],
+      "settings": {
+        "number_of_shards": 1,
+        "number_of_replicas": 0,
+        "index.lifecycle.name": "portfolio-logs-policy",
+        "index.lifecycle.rollover_alias": "portfolio-logs"
+      },
+      "mappings": {
+        "properties": {
+          "@timestamp": { "type": "date" },
+          "level": { "type": "keyword" },
+          "logger": { "type": "keyword" },
+          "thread": { "type": "keyword" },
+          "log_message": { "type": "text" },
+          "job_name": { "type": "keyword" },
+          "job_execution_id": { "type": "keyword" },
+          "pipeline_name": { "type": "keyword" },
+          "records_processed": { "type": "integer" },
+          "error_count": { "type": "integer" }
+        }
+      }
+    }
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: logstash
+  namespace: portfolio-system
+  labels:
+    app: logstash
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: logstash
+  template:
+    metadata:
+      labels:
+        app: logstash
+    spec:
+      containers:
+      - name: logstash
+        image: docker.elastic.co/logstash/logstash:8.10.0
+        ports:
+        - containerPort: 5044
+          name: beats
+        - containerPort: 5000
+          name: tcp
+        - containerPort: 9600
+          name: http
+        env:
+        - name: LS_JAVA_OPTS
+          value: "-Xms512m -Xmx512m"
+        resources:
+          requests:
+            cpu: "250m"
+            memory: 1Gi
+          limits:
+            cpu: "1"
+            memory: 2Gi
+        volumeMounts:
+        - name: logstash-config
+          mountPath: /usr/share/logstash/config/logstash.yml
+          subPath: logstash.yml
+        - name: logstash-config
+          mountPath: /usr/share/logstash/pipeline/logstash.conf
+          subPath: logstash.conf
+        livenessProbe:
+          httpGet:
+            path: /
+            port: 9600
+          initialDelaySeconds: 60
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 9600
+          initialDelaySeconds: 30
+          periodSeconds: 5
+      volumes:
+      - name: logstash-config
+        configMap:
+          name: logstash-config
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: logstash
+  namespace: portfolio-system
+  labels:
+    app: logstash
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5044
+    targetPort: 5044
+    protocol: TCP
+    name: beats
+  - port: 5000
+    targetPort: 5000
+    protocol: TCP
+    name: tcp
+  - port: 9600
+    targetPort: 9600
+    protocol: TCP
+    name: http
+  selector:
+    app: logstash

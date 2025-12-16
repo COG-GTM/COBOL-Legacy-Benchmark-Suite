@@ -1,0 +1,273 @@
+pipeline {
+    agent {
+        kubernetes {
+            yaml '''
+                apiVersion: v1
+                kind: Pod
+                spec:
+                  containers:
+                  - name: maven
+                    image: maven:3.9-eclipse-temurin-21
+                    command:
+                    - cat
+                    tty: true
+                    volumeMounts:
+                    - name: maven-cache
+                      mountPath: /root/.m2
+                  - name: docker
+                    image: docker:24-dind
+                    securityContext:
+                      privileged: true
+                    volumeMounts:
+                    - name: docker-socket
+                      mountPath: /var/run/docker.sock
+                  - name: kubectl
+                    image: bitnami/kubectl:1.28
+                    command:
+                    - cat
+                    tty: true
+                  volumes:
+                  - name: maven-cache
+                    persistentVolumeClaim:
+                      claimName: maven-cache-pvc
+                  - name: docker-socket
+                    hostPath:
+                      path: /var/run/docker.sock
+            '''
+        }
+    }
+
+    environment {
+        DOCKER_REGISTRY = 'registry.example.com'
+        IMAGE_NAME = 'portfolio-service'
+        SONAR_HOST_URL = 'https://sonarqube.example.com'
+        KUBERNETES_NAMESPACE = 'portfolio-system'
+    }
+
+    options {
+        timeout(time: 60, unit: 'MINUTES')
+        disableConcurrentBuilds()
+        buildDiscarder(logRotator(numToKeepStr: '10'))
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                checkout scm
+                script {
+                    env.GIT_COMMIT_SHORT = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                    env.IMAGE_TAG = "${env.BUILD_NUMBER}-${env.GIT_COMMIT_SHORT}"
+                }
+            }
+        }
+
+        stage('Build') {
+            steps {
+                container('maven') {
+                    dir('migration/phase1/application/portfolio-service') {
+                        sh 'mvn clean compile -DskipTests'
+                    }
+                }
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                container('maven') {
+                    dir('migration/phase1/application/portfolio-service') {
+                        sh 'mvn test'
+                    }
+                }
+            }
+            post {
+                always {
+                    junit '**/target/surefire-reports/*.xml'
+                    jacoco(
+                        execPattern: '**/target/jacoco.exec',
+                        classPattern: '**/target/classes',
+                        sourcePattern: '**/src/main/java',
+                        exclusionPattern: '**/test/**'
+                    )
+                }
+            }
+        }
+
+        stage('Integration Tests') {
+            steps {
+                container('maven') {
+                    dir('migration/phase1/application/portfolio-service') {
+                        sh 'mvn verify -DskipUnitTests -Pintegration-tests'
+                    }
+                }
+            }
+            post {
+                always {
+                    junit '**/target/failsafe-reports/*.xml'
+                }
+            }
+        }
+
+        stage('Code Quality Analysis') {
+            steps {
+                container('maven') {
+                    dir('migration/phase1/application/portfolio-service') {
+                        withSonarQubeEnv('SonarQube') {
+                            sh '''
+                                mvn sonar:sonar \
+                                    -Dsonar.projectKey=portfolio-service \
+                                    -Dsonar.projectName="Portfolio Service" \
+                                    -Dsonar.java.coveragePlugin=jacoco \
+                                    -Dsonar.coverage.jacoco.xmlReportPaths=target/site/jacoco/jacoco.xml
+                            '''
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Quality Gate') {
+            steps {
+                timeout(time: 10, unit: 'MINUTES') {
+                    waitForQualityGate abortPipeline: true
+                }
+            }
+        }
+
+        stage('Package') {
+            steps {
+                container('maven') {
+                    dir('migration/phase1/application/portfolio-service') {
+                        sh 'mvn package -DskipTests'
+                    }
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                container('docker') {
+                    dir('migration/phase1/application/portfolio-service') {
+                        sh """
+                            docker build -t ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} .
+                            docker tag ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Security Scan') {
+            parallel {
+                stage('Container Scan') {
+                    steps {
+                        container('docker') {
+                            sh """
+                                docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
+                                    aquasec/trivy:latest image \
+                                    --severity HIGH,CRITICAL \
+                                    --exit-code 1 \
+                                    ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
+                            """
+                        }
+                    }
+                }
+                stage('Dependency Check') {
+                    steps {
+                        container('maven') {
+                            dir('migration/phase1/application/portfolio-service') {
+                                sh 'mvn org.owasp:dependency-check-maven:check'
+                            }
+                        }
+                    }
+                    post {
+                        always {
+                            dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+                        }
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            when {
+                anyOf {
+                    branch 'main'
+                    branch 'develop'
+                    branch pattern: 'release/*', comparator: 'GLOB'
+                }
+            }
+            steps {
+                container('docker') {
+                    withCredentials([usernamePassword(credentialsId: 'docker-registry', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
+                        sh """
+                            echo \$DOCKER_PASS | docker login ${DOCKER_REGISTRY} -u \$DOCKER_USER --password-stdin
+                            docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG}
+                            docker push ${DOCKER_REGISTRY}/${IMAGE_NAME}:latest
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Staging') {
+            when {
+                branch 'develop'
+            }
+            steps {
+                container('kubectl') {
+                    withCredentials([file(credentialsId: 'kubeconfig-staging', variable: 'KUBECONFIG')]) {
+                        sh """
+                            kubectl set image deployment/portfolio-service \
+                                portfolio-service=${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} \
+                                -n ${KUBERNETES_NAMESPACE}-staging
+                            kubectl rollout status deployment/portfolio-service \
+                                -n ${KUBERNETES_NAMESPACE}-staging \
+                                --timeout=300s
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Deploy to Production') {
+            when {
+                branch 'main'
+            }
+            steps {
+                input message: 'Deploy to Production?', ok: 'Deploy'
+                container('kubectl') {
+                    withCredentials([file(credentialsId: 'kubeconfig-production', variable: 'KUBECONFIG')]) {
+                        sh """
+                            kubectl set image deployment/portfolio-service \
+                                portfolio-service=${DOCKER_REGISTRY}/${IMAGE_NAME}:${IMAGE_TAG} \
+                                -n ${KUBERNETES_NAMESPACE}
+                            kubectl rollout status deployment/portfolio-service \
+                                -n ${KUBERNETES_NAMESPACE} \
+                                --timeout=300s
+                        """
+                    }
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+        success {
+            slackSend(
+                channel: '#portfolio-deployments',
+                color: 'good',
+                message: "Build Successful: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+            )
+        }
+        failure {
+            slackSend(
+                channel: '#portfolio-deployments',
+                color: 'danger',
+                message: "Build Failed: ${env.JOB_NAME} #${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+            )
+        }
+    }
+}
