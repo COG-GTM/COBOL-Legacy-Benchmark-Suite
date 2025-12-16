@@ -1,0 +1,83 @@
+# Redis Cache Configuration for Portfolio Management System
+# Phase 1: Cache Layer Setup
+# Version: 1.0.0
+
+# Cache key prefixes and TTL configuration
+cache:
+  # Portfolio cache settings
+  portfolio:
+    key_prefix: "portfolio:"
+    ttl_seconds: 3600  # 1 hour
+    max_entries: 10000
+    
+  # Position cache settings  
+  position:
+    key_prefix: "position:"
+    ttl_seconds: 300   # 5 minutes (positions change frequently)
+    max_entries: 50000
+    
+  # Transaction cache settings
+  transaction:
+    key_prefix: "transaction:"
+    ttl_seconds: 600   # 10 minutes
+    max_entries: 100000
+    
+  # User session cache
+  session:
+    key_prefix: "session:"
+    ttl_seconds: 1800  # 30 minutes
+    max_entries: 5000
+    
+  # User authorization cache
+  authorization:
+    key_prefix: "auth:"
+    ttl_seconds: 300   # 5 minutes
+    max_entries: 10000
+    
+  # Report cache (for expensive queries)
+  report:
+    key_prefix: "report:"
+    ttl_seconds: 900   # 15 minutes
+    max_entries: 1000
+    
+  # Batch job status cache
+  batch:
+    key_prefix: "batch:"
+    ttl_seconds: 86400 # 24 hours
+    max_entries: 500
+
+# Rate limiting configuration
+rate_limiting:
+  enabled: true
+  window_seconds: 60
+  max_requests:
+    default: 100
+    authenticated: 1000
+    batch_service: 10000
+
+# Cache eviction policies
+eviction:
+  policy: "allkeys-lru"
+  max_memory: "512mb"
+  max_memory_samples: 5
+
+# Persistence settings
+persistence:
+  rdb:
+    enabled: true
+    save_intervals:
+      - seconds: 900
+        changes: 1
+      - seconds: 300
+        changes: 10
+      - seconds: 60
+        changes: 10000
+  aof:
+    enabled: true
+    fsync: "everysec"
+
+# Cluster configuration (for production scaling)
+cluster:
+  enabled: false  # Enable for production multi-node setup
+  replicas: 1
+  nodes: 3
