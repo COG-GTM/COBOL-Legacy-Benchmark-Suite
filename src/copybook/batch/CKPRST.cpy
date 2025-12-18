@@ -38,7 +38,7 @@
                    15  CK-FILE-STATUS  PIC X(2).
            
            05  CK-CONTROL-INFO.
-               10  CK-COMMIT-FREQ      PIC 9(5) COMP VALUE 1000.
+               10  CK-COMMIT-FREQ      PIC 9(5) COMP VALUE 5000.
                10  CK-MAX-ERRORS       PIC 9(3) COMP VALUE 100.
                10  CK-MAX-RESTARTS     PIC 9(2) COMP VALUE 3.
                10  CK-RESTART-MODE     PIC X(1).
