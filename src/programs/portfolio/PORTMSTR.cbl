@@ -39,6 +39,7 @@
            05  FILLER              PIC X(24).
        
        WORKING-STORAGE SECTION.
+           COPY DATECNV.
       *----------------------------------------------------------------*
       * Constants and switches
       *----------------------------------------------------------------*
@@ -109,7 +110,10 @@
                PERFORM 9000-ERROR
            END-IF
            
-           ACCEPT WS-CURRENT-DATE FROM DATE YYYYMMDD
+           ACCEPT DC-INPUT-DATE-8 FROM DATE YYYYMMDD
+           MOVE '1' TO DC-FUNCTION-CODE
+           CALL 'DATECNV' USING DATE-CONVERSION-AREA
+           MOVE DC-OUTPUT-DATE-10 TO WS-CURRENT-DATE
            .
            
        2000-CREATE-PORTFOLIO.

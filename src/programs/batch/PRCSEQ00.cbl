@@ -66,7 +66,7 @@
                88  FUNC-NEXT          VALUE 'NEXT'.
                88  FUNC-STAT          VALUE 'STAT'.
                88  FUNC-TERM          VALUE 'TERM'.
-           05  LS-PROCESS-DATE     PIC X(8).
+           05  LS-PROCESS-DATE     PIC X(10).
            05  LS-SEQUENCE-TYPE    PIC X(3).
            05  LS-NEXT-PROCESS     PIC X(8).
            05  LS-RETURN-CODE      PIC S9(4) COMP.

@@ -6,7 +6,7 @@
        01  HISTORY-RECORD.
            05  HIST-KEY.
                10  HIST-PORTFOLIO-ID  PIC X(08).
-               10  HIST-DATE         PIC X(08).
+               10  HIST-DATE         PIC X(10).
                10  HIST-TIME         PIC X(06).
                10  HIST-SEQ-NO       PIC X(04).
            05  HIST-DATA.
@@ -28,7 +28,7 @@
       *****************************************************************
       * FIELD DESCRIPTIONS:
       * HIST-PORTFOLIO-ID: PORTFOLIO IDENTIFIER
-      * HIST-DATE        : HISTORY DATE (YYYYMMDD)
+      * HIST-DATE        : HISTORY DATE (YYYY-MM-DD)
       * HIST-TIME        : HISTORY TIME (HHMMSS)
       * HIST-SEQ-NO      : SEQUENCE NUMBER
       * HIST-RECORD-TYPE : PT=PORTFOLIO, PS=POSITION, TR=TRANSACTION
@@ -36,4 +36,4 @@
       * HIST-BEFORE-IMAGE: RECORD IMAGE BEFORE CHANGE
       * HIST-AFTER-IMAGE : RECORD IMAGE AFTER CHANGE
       * HIST-REASON-CODE : REASON FOR CHANGE
-      ***************************************************************** 
+      *****************************************************************  

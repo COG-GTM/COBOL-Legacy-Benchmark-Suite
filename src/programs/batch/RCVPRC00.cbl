@@ -61,7 +61,7 @@
                88  FUNC-INIT          VALUE 'INIT'.
                88  FUNC-RECV          VALUE 'RECV'.
                88  FUNC-TERM          VALUE 'TERM'.
-           05  LS-PROCESS-DATE     PIC X(8).
+           05  LS-PROCESS-DATE     PIC X(10).
            05  LS-PROCESS-ID       PIC X(8).
            05  LS-RECOVERY-TYPE    PIC X(1).
            05  LS-RECOVERY-PARM    PIC X(50).

@@ -26,12 +26,13 @@
        
        WORKING-STORAGE SECTION.
            COPY ERRHAND.
+           COPY DATECNV.
            
        01  WS-VARIABLES.
            05  WS-FILE-STATUS      PIC X(2).
            05  WS-RECORD-COUNT     PIC 9(5) VALUE 0.
            05  WS-MAX-RECORDS      PIC 9(5) VALUE 100.
-           05  WS-CURRENT-DATE     PIC 9(8).
+           05  WS-CURRENT-DATE     PIC X(10).
            
        01  WS-TEST-VALUES.
            05  WS-CLIENT-TYPES     PIC X(3) VALUE 'ICT'.
@@ -52,7 +53,10 @@
            .
            
        1000-INITIALIZE.
-           ACCEPT WS-CURRENT-DATE FROM DATE YYYYMMDD
+           ACCEPT DC-INPUT-DATE-8 FROM DATE YYYYMMDD
+           MOVE '1' TO DC-FUNCTION-CODE
+           CALL 'DATECNV' USING DATE-CONVERSION-AREA
+           MOVE DC-OUTPUT-DATE-10 TO WS-CURRENT-DATE
            
            OPEN OUTPUT TEST-FILE
            IF WS-FILE-STATUS NOT = '00'
@@ -116,4 +120,4 @@
            CLOSE TEST-FILE
            
            DISPLAY 'Records generated: ' WS-RECORD-COUNT
-           . 
+           .  
