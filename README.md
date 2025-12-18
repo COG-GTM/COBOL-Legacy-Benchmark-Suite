@@ -140,9 +140,21 @@ Comprehensive documentation is provided to facilitate understanding and translat
 - **Fine-Tuning LLMs**: Use the project to enhance the capabilities of LLM translation tools in handling complex legacy codebases.
 - **Community Contribution**: Encourage collaboration within the COBOL modernization community to improve and expand the benchmark.
 
+## Getting Started
+
+This project is designed as a benchmark suite for LLM translation tools. To explore the codebase:
+
+1. Clone the repository
+2. Review the [System Architecture Document](documentation/technical/system-architecture.md) for an overview
+3. Explore the `src/programs/` directory for COBOL source code
+4. Check the `src/jcl/` directory for Job Control Language scripts
+5. Review the `src/copybook/` directory for shared data definitions
+
+Note: This is a reference implementation and is not intended for direct execution on a mainframe system without appropriate environment setup.
+
 ## License
 
-[Appropriate License]
+This project is available for educational and research purposes. Please contact the maintainers for licensing inquiries.
 
 ## Contributing
 
