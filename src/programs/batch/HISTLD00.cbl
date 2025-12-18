@@ -56,7 +56,7 @@
            05  WS-ERROR-COUNT        PIC S9(9) COMP VALUE 0.
            05  WS-COMMIT-COUNT       PIC S9(4) COMP VALUE 0.
            
-       01  WS-COMMIT-THRESHOLD       PIC S9(4) COMP VALUE 1000.
+       01  WS-COMMIT-THRESHOLD       PIC S9(4) COMP VALUE 250.
        
        01  WS-SWITCHES.
            05  WS-END-OF-FILE-SW     PIC X(1) VALUE 'N'.
