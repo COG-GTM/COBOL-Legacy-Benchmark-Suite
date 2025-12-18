@@ -5,7 +5,7 @@
       *****************************************************************
        01  TRANSACTION-RECORD.
            05  TRN-KEY.
-               10  TRN-DATE           PIC X(08).
+               10  TRN-DATE           PIC X(10).
                10  TRN-TIME           PIC X(06).
                10  TRN-PORTFOLIO-ID   PIC X(08).
                10  TRN-SEQUENCE-NO    PIC X(06).
@@ -31,10 +31,10 @@
            05  TRN-FILLER           PIC X(50).
       *****************************************************************
       * FIELD DESCRIPTIONS:
-      * TRN-DATE        : TRANSACTION DATE (YYYYMMDD)
+      * TRN-DATE        : TRANSACTION DATE (YYYY-MM-DD)
       * TRN-TIME        : TRANSACTION TIME (HHMMSS)
       * TRN-PORTFOLIO-ID: PORTFOLIO IDENTIFIER
       * TRN-SEQUENCE-NO : SEQUENCE NUMBER FOR MULTIPLE TRANS
       * TRN-TYPE        : BU=BUY, SL=SELL, TR=TRANSFER, FE=FEE
       * TRN-STATUS      : P=PENDING, D=DONE, F=FAILED, R=REVERSED
-      ***************************************************************** 
+      *****************************************************************  

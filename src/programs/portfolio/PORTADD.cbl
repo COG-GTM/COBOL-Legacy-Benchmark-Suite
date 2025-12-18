@@ -40,6 +40,7 @@
            COPY PORTFLIO.
        
        WORKING-STORAGE SECTION.
+           COPY DATECNV.
       *----------------------------------------------------------------*
       * Constants and switches
       *----------------------------------------------------------------*
@@ -70,7 +71,7 @@
            05  WS-ERROR-COUNT      PIC 9(7) VALUE ZERO.
            05  WS-DUP-COUNT        PIC 9(7) VALUE ZERO.
            05  WS-RETURN-CODE      PIC S9(4) VALUE +0.
-           05  WS-CURRENT-DATE     PIC 9(8).
+           05  WS-CURRENT-DATE     PIC X(10).
            
        PROCEDURE DIVISION.
        0000-MAIN.
@@ -86,7 +87,10 @@
        1000-INITIALIZE.
            INITIALIZE WS-WORK-AREAS
            
-           ACCEPT WS-CURRENT-DATE FROM DATE YYYYMMDD
+           ACCEPT DC-INPUT-DATE-8 FROM DATE YYYYMMDD
+           MOVE '1' TO DC-FUNCTION-CODE
+           CALL 'DATECNV' USING DATE-CONVERSION-AREA
+           MOVE DC-OUTPUT-DATE-10 TO WS-CURRENT-DATE
            
            OPEN I-O   PORTFOLIO-FILE
            OPEN INPUT INPUT-FILE

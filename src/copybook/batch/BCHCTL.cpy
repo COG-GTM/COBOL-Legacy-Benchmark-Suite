@@ -9,7 +9,7 @@
        01  BATCH-CONTROL-RECORD.
            05  BCT-KEY.
                10  BCT-JOB-NAME      PIC X(8).
-               10  BCT-PROCESS-DATE  PIC X(8).
+               10  BCT-PROCESS-DATE  PIC X(10).
                10  BCT-SEQUENCE-NO   PIC 9(4).
            05  BCT-DATA.
                10  BCT-STATUS        PIC X(1).
@@ -46,4 +46,4 @@
       * 2. Job step checks prerequisites using BCT-PREREQ-JOBS
       * 3. Program uses CKPRST for checkpointing during execution
       * 4. Job completion updates BCT status and return info
-      *================================================================* 
+      *================================================================*  

@@ -19,8 +19,8 @@
                    88  PORT-CORPORATE     VALUE 'C'.
                    88  PORT-TRUST         VALUE 'T'.
            05  PORT-PORTFOLIO-INFO.
-               10  PORT-CREATE-DATE    PIC 9(8).
-               10  PORT-LAST-MAINT     PIC 9(8).
+               10  PORT-CREATE-DATE    PIC X(10).
+               10  PORT-LAST-MAINT     PIC X(10).
                10  PORT-STATUS         PIC X(1).
                    88  PORT-ACTIVE       VALUE 'A'.
                    88  PORT-CLOSED       VALUE 'C'.
@@ -30,5 +30,5 @@
                10  PORT-CASH-BALANCE   PIC S9(13)V99 COMP-3.
            05  PORT-AUDIT-INFO.
                10  PORT-LAST-USER      PIC X(8).
-               10  PORT-LAST-TRANS     PIC 9(8).
-           05  PORT-FILLER            PIC X(50). 
+               10  PORT-LAST-TRANS     PIC X(10).
+           05  PORT-FILLER            PIC X(50).  

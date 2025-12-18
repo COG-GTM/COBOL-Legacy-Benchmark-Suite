@@ -6,7 +6,7 @@
        01  POSITION-RECORD.
            05  POS-KEY.
                10  POS-PORTFOLIO-ID   PIC X(08).
-               10  POS-DATE           PIC X(08).
+               10  POS-DATE           PIC X(10).
                10  POS-INVESTMENT-ID  PIC X(10).
            05  POS-DATA.
                10  POS-QUANTITY       PIC S9(11)V9(4) COMP-3.
@@ -24,10 +24,10 @@
       *****************************************************************
       * FIELD DESCRIPTIONS:
       * POS-PORTFOLIO-ID : PORTFOLIO IDENTIFIER
-      * POS-DATE         : POSITION DATE (YYYYMMDD)
+      * POS-DATE         : POSITION DATE (YYYY-MM-DD)
       * POS-INVESTMENT-ID: INVESTMENT IDENTIFIER
       * POS-QUANTITY     : HOLDING QUANTITY
       * POS-COST-BASIS   : TOTAL COST BASIS
       * POS-MARKET-VALUE : CURRENT MARKET VALUE
       * POS-STATUS       : A=ACTIVE, C=CLOSED, P=PENDING
-      ***************************************************************** 
+      *****************************************************************  

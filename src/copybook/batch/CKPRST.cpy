@@ -6,7 +6,7 @@
        01  CHECKPOINT-CONTROL.
            05  CK-HEADER.
                10  CK-PROGRAM-ID       PIC X(8).
-               10  CK-RUN-DATE         PIC X(8).
+               10  CK-RUN-DATE         PIC X(10).
                10  CK-RUN-TIME         PIC X(6).
                10  CK-STATUS           PIC X(1).
                    88  CK-INITIAL      VALUE 'I'.
@@ -52,7 +52,7 @@
        01  CHECKPOINT-RECORD.
            05  CKR-KEY.
                10  CKR-PROGRAM-ID      PIC X(8).
-               10  CKR-RUN-DATE        PIC X(8).
+               10  CKR-RUN-DATE        PIC X(10).
            05  CKR-DATA                PIC X(400).
            
       *****************************************************************

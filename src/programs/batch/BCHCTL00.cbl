@@ -52,7 +52,7 @@
                88  FUNC-UPDT          VALUE 'UPDT'.
                88  FUNC-TERM          VALUE 'TERM'.
            05  LS-JOB-NAME         PIC X(8).
-           05  LS-PROCESS-DATE     PIC X(8).
+           05  LS-PROCESS-DATE     PIC X(10).
            05  LS-SEQUENCE-NO      PIC 9(4).
            05  LS-RETURN-CODE      PIC S9(4) COMP.
        
