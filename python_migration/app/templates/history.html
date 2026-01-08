@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History - {{ portfolio_id }}</title>
+    <style>
+        /* Terminal-style CSS - converted from BMS INQHIST map */
+        :root {
+            --terminal-green: #00ff00;
+            --terminal-bg: #000000;
+            --terminal-border: #333333;
+            --highlight-yellow: #ffff00;
+            --error-red: #ff0000;
+            --info-blue: #00ffff;
+        }
+        
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--terminal-bg);
+            color: var(--terminal-green);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            border: 2px solid var(--terminal-border);
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 1px solid var(--terminal-border);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 1.3rem;
+            color: var(--highlight-yellow);
+        }
+        
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid var(--terminal-border);
+        }
+        
+        .section-title {
+            color: var(--highlight-yellow);
+            margin-bottom: 15px;
+            text-decoration: underline;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .summary-item {
+            padding: 10px;
+            border: 1px solid var(--terminal-border);
+        }
+        
+        .summary-label {
+            color: var(--terminal-green);
+            font-size: 0.85rem;
+        }
+        
+        .summary-value {
+            color: var(--highlight-yellow);
+            font-size: 1.2rem;
+            margin-top: 5px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+            font-size: 0.9rem;
+        }
+        
+        th {
+            color: var(--highlight-yellow);
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid var(--terminal-border);
+        }
+        
+        td {
+            padding: 8px;
+            border-bottom: 1px solid var(--terminal-border);
+        }
+        
+        .amount {
+            text-align: right;
+        }
+        
+        .type-buy {
+            color: var(--terminal-green);
+        }
+        
+        .type-sell {
+            color: var(--error-red);
+        }
+        
+        .type-transfer {
+            color: var(--info-blue);
+        }
+        
+        .type-fee {
+            color: var(--highlight-yellow);
+        }
+        
+        .status-done {
+            color: var(--terminal-green);
+        }
+        
+        .status-pending {
+            color: var(--highlight-yellow);
+        }
+        
+        .status-failed {
+            color: var(--error-red);
+        }
+        
+        .pagination {
+            margin-top: 20px;
+            text-align: center;
+        }
+        
+        .pagination a {
+            color: var(--terminal-green);
+            padding: 5px 10px;
+            margin: 0 5px;
+            border: 1px solid var(--terminal-border);
+            text-decoration: none;
+        }
+        
+        .pagination a:hover {
+            background-color: var(--terminal-green);
+            color: var(--terminal-bg);
+        }
+        
+        .nav-links {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--terminal-border);
+        }
+        
+        .nav-links a {
+            color: var(--terminal-green);
+            margin-right: 20px;
+            text-decoration: none;
+        }
+        
+        .nav-links a:hover {
+            color: var(--highlight-yellow);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>TRANSACTION HISTORY - INQHIST</h1>
+            <div>Portfolio: {{ portfolio_id }}</div>
+        </div>
+        
+        {% if summary %}
+        <div class="section">
+            <div class="section-title">SUMMARY</div>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <div class="summary-label">Total Transactions</div>
+                    <div class="summary-value">{{ summary.total_transactions }}</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Total Buys</div>
+                    <div class="summary-value type-buy">{{ summary.total_buys }}</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Total Sells</div>
+                    <div class="summary-value type-sell">{{ summary.total_sells }}</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Buy Amount</div>
+                    <div class="summary-value">{{ summary.total_buy_amount }}</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Sell Amount</div>
+                    <div class="summary-value">{{ summary.total_sell_amount }}</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-label">Net Amount</div>
+                    <div class="summary-value">{{ summary.net_amount }}</div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        
+        <div class="section">
+            <div class="section-title">TRANSACTIONS</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Type</th>
+                        <th>Investment</th>
+                        <th class="amount">Quantity</th>
+                        <th class="amount">Price</th>
+                        <th class="amount">Amount</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for trans in transactions %}
+                    <tr>
+                        <td>{{ trans.transaction_date }}</td>
+                        <td>{{ trans.transaction_time }}</td>
+                        <td class="type-{{ trans.transaction_type|lower }}">
+                            {% if trans.transaction_type == 'BU' %}BUY
+                            {% elif trans.transaction_type == 'SL' %}SELL
+                            {% elif trans.transaction_type == 'TR' %}TRANSFER
+                            {% elif trans.transaction_type == 'FE' %}FEE
+                            {% else %}{{ trans.transaction_type }}{% endif %}
+                        </td>
+                        <td>{{ trans.investment_id }}</td>
+                        <td class="amount">{{ trans.quantity }}</td>
+                        <td class="amount">{{ trans.price }}</td>
+                        <td class="amount">{{ trans.amount }}</td>
+                        <td class="status-{{ trans.status|lower }}">
+                            {% if trans.status == 'D' %}DONE
+                            {% elif trans.status == 'P' %}PENDING
+                            {% elif trans.status == 'F' %}FAILED
+                            {% else %}{{ trans.status }}{% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <div class="pagination">
+                <span>Total: {{ total_count }} transactions</span>
+            </div>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/">Main Menu</a>
+            <a href="/api/v1/portfolio/{{ portfolio_id }}">Portfolio Details</a>
+            <a href="/docs">API Documentation</a>
+        </div>
+    </div>
+</body>
+</html>
