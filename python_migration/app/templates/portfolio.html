@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Inquiry - {{ portfolio_id }}</title>
+    <style>
+        /* Terminal-style CSS - converted from BMS INQPORT map */
+        :root {
+            --terminal-green: #00ff00;
+            --terminal-bg: #000000;
+            --terminal-border: #333333;
+            --highlight-yellow: #ffff00;
+            --error-red: #ff0000;
+        }
+        
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            background-color: var(--terminal-bg);
+            color: var(--terminal-green);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            border: 2px solid var(--terminal-border);
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            border-bottom: 1px solid var(--terminal-border);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .header h1 {
+            font-size: 1.3rem;
+            color: var(--highlight-yellow);
+        }
+        
+        .field-row {
+            display: flex;
+            margin: 8px 0;
+            align-items: center;
+        }
+        
+        .field-label {
+            width: 180px;
+            color: var(--terminal-green);
+        }
+        
+        .field-value {
+            color: var(--highlight-yellow);
+            flex: 1;
+        }
+        
+        .section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid var(--terminal-border);
+        }
+        
+        .section-title {
+            color: var(--highlight-yellow);
+            margin-bottom: 15px;
+            text-decoration: underline;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        
+        th {
+            color: var(--highlight-yellow);
+            text-align: left;
+            padding: 8px;
+            border-bottom: 1px solid var(--terminal-border);
+        }
+        
+        td {
+            padding: 8px;
+            border-bottom: 1px solid var(--terminal-border);
+        }
+        
+        .amount {
+            text-align: right;
+        }
+        
+        .positive {
+            color: var(--terminal-green);
+        }
+        
+        .negative {
+            color: var(--error-red);
+        }
+        
+        .totals {
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 2px solid var(--terminal-border);
+        }
+        
+        .nav-links {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid var(--terminal-border);
+        }
+        
+        .nav-links a {
+            color: var(--terminal-green);
+            margin-right: 20px;
+            text-decoration: none;
+        }
+        
+        .nav-links a:hover {
+            color: var(--highlight-yellow);
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>PORTFOLIO INQUIRY - INQPORT</h1>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">PORTFOLIO DETAILS</div>
+            <div class="field-row">
+                <span class="field-label">Portfolio ID:</span>
+                <span class="field-value">{{ portfolio.portfolio_id }}</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">Portfolio Name:</span>
+                <span class="field-value">{{ portfolio.portfolio_name }}</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">Client ID:</span>
+                <span class="field-value">{{ portfolio.client_id }}</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">Account Type:</span>
+                <span class="field-value">{{ portfolio.account_type }}</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">Currency:</span>
+                <span class="field-value">{{ portfolio.currency_code }}</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">Status:</span>
+                <span class="field-value">{{ portfolio.status }}</span>
+            </div>
+            <div class="field-row">
+                <span class="field-label">Open Date:</span>
+                <span class="field-value">{{ portfolio.open_date }}</span>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-title">POSITIONS</div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Investment ID</th>
+                        <th>Date</th>
+                        <th class="amount">Quantity</th>
+                        <th class="amount">Cost Basis</th>
+                        <th class="amount">Market Value</th>
+                        <th class="amount">Gain/Loss</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for position in positions %}
+                    <tr>
+                        <td>{{ position.investment_id }}</td>
+                        <td>{{ position.position_date }}</td>
+                        <td class="amount">{{ position.quantity }}</td>
+                        <td class="amount">{{ position.cost_basis }}</td>
+                        <td class="amount">{{ position.market_value }}</td>
+                        <td class="amount {% if position.unrealized_gain_loss >= 0 %}positive{% else %}negative{% endif %}">
+                            {{ position.unrealized_gain_loss }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            
+            <div class="totals">
+                <div class="field-row">
+                    <span class="field-label">Total Positions:</span>
+                    <span class="field-value">{{ summary.total_positions }}</span>
+                </div>
+                <div class="field-row">
+                    <span class="field-label">Total Cost Basis:</span>
+                    <span class="field-value">{{ summary.total_cost_basis }}</span>
+                </div>
+                <div class="field-row">
+                    <span class="field-label">Total Market Value:</span>
+                    <span class="field-value">{{ summary.total_market_value }}</span>
+                </div>
+                <div class="field-row">
+                    <span class="field-label">Total Gain/Loss:</span>
+                    <span class="field-value {% if summary.total_unrealized_gain_loss >= 0 %}positive{% else %}negative{% endif %}">
+                        {{ summary.total_unrealized_gain_loss }}
+                    </span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="nav-links">
+            <a href="/">Main Menu</a>
+            <a href="/api/v1/history/transactions/{{ portfolio.portfolio_id }}">Transaction History</a>
+            <a href="/docs">API Documentation</a>
+        </div>
+    </div>
+</body>
+</html>
