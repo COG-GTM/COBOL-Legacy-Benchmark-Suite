@@ -7,6 +7,10 @@
 
 A production-grade implementation of an Investment Portfolio Management System designed to challenge and benchmark Large Language Model (LLM) translation tools, specifically for COBOL modernization efforts.
 
+## Overview
+
+The COBOL Legacy Benchmark Suite is a production-grade Investment Portfolio Management System built entirely in COBOL that simulates real-world mainframe applications found in financial institutions. It handles portfolio tracking, transaction processing (buys, sells, transfers, fees), online inquiries through terminal screens, and generates comprehensive reports and audit trails. The system's primary purpose is to serve as a benchmark for testing and developing AI translation tools that modernize legacy COBOL code to modern languages like Java or C#, providing the COBOL modernization community with a publicly available, complex reference implementation that exercises real mainframe features including VSAM files, DB2 databases, CICS transactions, and batch processing patterns. While written to production standards and ready for z/OS deployment, it is intentionally designed as a reference architecture rather than an actual production system.
+
 ## Project Overview
 
 This project presents a comprehensive COBOL-based system that simulates the complexity of real-world legacy applications. Developed using Anthropic Claude 3.5 Sonnet over five sprints, it serves as a robust test case for evaluating and fine-tuning LLM translation tools aimed at modernizing COBOL codebases.
