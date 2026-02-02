@@ -29,8 +29,8 @@ graph TB
     end
 
     subgraph "Batch Processing Layer"
-        BP --> TRN[TRNMAIN]
-        BP --> POS[POSUPDT]
+        BP --> TRN[PORTTRAN]
+        BP --> POS[PORTUPDT]
         BP --> HST[HISTLD00]
         BP --> RPP[RPTPOS00]
         BP --> RPA[RPTAUD00]
@@ -86,15 +86,15 @@ graph TB
 
 #### 1.2.2 Processing Components
 
-- **TRNMAIN (TRNVAL00)**
+- **PORTTRAN**
 
   - Validates input transactions
   - Performs initial error checking
-  - Prepares transactions for processing
+  - Processes buy, sell, transfer, and fee transactions
 
-- **POSUPDT (POSUPD00)**
+- **PORTUPDT**
 
-  - Updates position records
+  - Updates portfolio position records
   - Maintains cost basis
   - Records transaction history
 
@@ -282,8 +282,8 @@ sequenceDiagram
 ```mermaid
 sequenceDiagram
     participant TF as TRANFILE
-    participant TV as TRNVAL00
-    participant PU as POSUPD00
+    participant TV as PORTTRAN
+    participant PU as PORTUPDT
     participant HL as HISTLD00
     participant DC as DB2CONN
     participant CM as DB2CMT
@@ -468,8 +468,8 @@ graph TB
 
 ```mermaid
 graph TD
-    A[Start of Day] -->|1800| B[TRNVAL00]
-    B -->|RC ≤ 4| C[POSUPD00]
+    A[Start of Day] -->|1800| B[PORTTRAN]
+    B -->|RC ≤ 4| C[PORTUPDT]
     C -->|RC ≤ 4| D[HISTLD00]
     D -->|RC ≤ 4| E[RPP]
     E --> F[End of Day]
@@ -499,7 +499,7 @@ graph TD
 | Program  | Dependencies     | Input Files         | Output Files       | DB2 Access |
 | -------- | ---------------- | ------------------- | ------------------ | ---------- |
 | BCHCTL00 | ERRPROC          | Control File        | Status Updates     | Write      |
-| POSUPDT  | DB2CONN, ERRPROC | Transaction File    | Position Master    | Read/Write |
+| PORTUPDT | DB2CONN, ERRPROC | Transaction File    | Position Master    | Read/Write |
 | HISTLD00 | DB2CONN, ERRPROC | Transaction History | DB2 Tables         | Write      |
 | RPTPOS00 | DB2CONN, ERRPROC | Position Master     | Position Reports   | Read       |
 | RPTAUD00 | DB2CONN, ERRPROC | Audit Log           | Audit Reports      | Read       |
@@ -540,7 +540,7 @@ graph TD
 ```mermaid
 graph TB
     subgraph "Control Flow"
-        BCH[BCHCTL00] --> POS[POSUPDT]
+        BCH[BCHCTL00] --> POS[PORTUPDT]
         BCH --> HST[HISTLD00]
         BCH --> RPT[Reports]
     end
@@ -896,7 +896,7 @@ sequenceDiagram
 - Error rate tracking
 - User session management
 
-## Sprint 4 (Online Integration) - Planning
+## Sprint 4 (Online Integration) - Complete
 
 **Goal**: Implement CICS online inquiry functionality
 
@@ -904,48 +904,48 @@ sequenceDiagram
 
 1. INQONLN (Main Online Handler)
 
-   - [ ] Basic CICS infrastructure
-   - [ ] Screen mapping
-   - [ ] Portfolio position inquiry
-   - [ ] Transaction history lookup
-   - [ ] Error handling integration
+   - [x] Basic CICS infrastructure
+   - [x] Screen mapping
+   - [x] Portfolio position inquiry
+   - [x] Transaction history lookup
+   - [x] Error handling integration
 
 2. Online DB2 Support
 
-   - [ ] Connection pooling
-   - [ ] Read-only access patterns
-   - [ ] Response time optimization
-   - [ ] Error recovery procedures
+   - [x] Connection pooling
+   - [x] Read-only access patterns
+   - [x] Response time optimization
+   - [x] Error recovery procedures
 
 3. Security Integration
 
-   - [ ] CICS security definitions
-   - [ ] DB2 authorization
-   - [ ] Access logging
-   - [ ] Audit trail integration
+   - [x] CICS security definitions
+   - [x] DB2 authorization
+   - [x] Access logging
+   - [x] Audit trail integration
 
 4. BMS Screen Definitions
-   - [ ] Main menu
-   - [ ] Portfolio inquiry screen
-   - [ ] Transaction history screen
-   - [ ] Error messages screen
+   - [x] Main menu
+   - [x] Portfolio inquiry screen
+   - [x] Transaction history screen
+   - [x] Error messages screen
 
 ### Infrastructure
 
 1. CICS Resources
 
-   - [ ] Transaction definitions
-   - [ ] Program definitions
-   - [ ] File definitions
-   - [ ] DB2 entry definitions
+   - [x] Transaction definitions
+   - [x] Program definitions
+   - [x] File definitions
+   - [x] DB2 entry definitions
 
 2. Documentation
-   - [ ] Online user guide
-   - [ ] Operations manual updates
-   - [ ] Security documentation
-   - [ ] Performance guidelines
+   - [x] Online user guide
+   - [x] Operations manual updates
+   - [x] Security documentation
+   - [x] Performance guidelines
 
-### Exit Criteria
+### Exit Criteria - All Complete
 
 - Complete INQONLN implementation
 - Working CICS transactions
