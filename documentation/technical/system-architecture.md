@@ -24,13 +24,15 @@ This implementation represents what would be found in a running z/OS system, tho
 graph TB
     subgraph "Batch Control Layer"
         BC[Batch Control VSAM] --> S[z/OS Scheduler]
-        S --> PRF[Process Control File]
+        S --> BCHCTL00[BCHCTL00]
+        BCHCTL00 --> PRCSEQ00[PRCSEQ00]
+        PRCSEQ00 --> PRF[Process Control File]
         PRF --> |Triggers| BP[Batch Programs]
     end
 
     subgraph "Batch Processing Layer"
-        BP --> TRN[TRNMAIN]
-        BP --> POS[POSUPDT]
+        BP --> TRN[TRNVAL00]
+        BP --> POS[POSUPD00]
         BP --> HST[HISTLD00]
         BP --> RPP[RPTPOS00]
         BP --> RPA[RPTAUD00]
@@ -38,10 +40,10 @@ graph TB
     end
 
     subgraph "DB2 Support Layer"
-        DBC[DB2CONN] --> DCM[DB2CMT]
-        DBC --> DER[DB2ERR]
-        DBC --> DST[DB2STAT]
-        HST --> DBC
+        DB2CONN[DB2CONN] --> DB2CMT[DB2CMT]
+        DB2CONN --> DB2ERR[DB2ERR]
+        DB2CONN --> DB2STAT[DB2STAT]
+        HST --> DB2CONN
     end
 
     subgraph "Online Layer"
@@ -86,13 +88,13 @@ graph TB
 
 #### 1.2.2 Processing Components
 
-- **TRNMAIN (TRNVAL00)**
+- **TRNVAL00**
 
   - Validates input transactions
   - Performs initial error checking
   - Prepares transactions for processing
 
-- **POSUPDT (POSUPD00)**
+- **POSUPD00**
 
   - Updates position records
   - Maintains cost basis
@@ -471,8 +473,10 @@ graph TD
     A[Start of Day] -->|1800| B[TRNVAL00]
     B -->|RC ≤ 4| C[POSUPD00]
     C -->|RC ≤ 4| D[HISTLD00]
-    D -->|RC ≤ 4| E[RPP]
-    E --> F[End of Day]
+    D -->|RC ≤ 4| E[RPTPOS00]
+    E -->|RC ≤ 4| F[RPTAUD00]
+    F -->|RC ≤ 4| G[RPTSTA00]
+    G --> H[End of Day]
 ```
 
 ### 4.2 Checkpoint/Restart Framework
@@ -530,7 +534,7 @@ graph TD
 | CURSMGR | None             | BMS Maps           | None           |
 | SECMGR  | DB2ONLN          | Security Tables    | System         |
 | DB2ONLN | DB2RECV          | DB2 Connection     | Database       |
-| DB2RECV | ERRHNDL          | DB2 Connection     | Database       |
+| DB2RECV | None             | DB2 Connection     | Database       |
 | ERRHNDL | None             | Error Log          | None           |
 
 ### 5.2 Interface Flow Diagrams
