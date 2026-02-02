@@ -4,6 +4,17 @@
 
 Thank you for considering contributing to CLBS. This project serves as a benchmark suite for testing COBOL modernization and translation solutions, so contributions should focus on enhancing its effectiveness in this role while maintaining realistic mainframe patterns.
 
+## Development Setup
+
+To get started with contributing, follow these steps:
+
+```bash
+$ git clone https://github.com/COG-GTM/COBOL-Legacy-Benchmark-Suite.git
+$ cd COBOL-Legacy-Benchmark-Suite
+```
+
+Review the README for project overview and the system architecture document at `documentation/technical/system-architecture.md` for detailed component information. Since this is a COBOL reference implementation, no build or runtime environment is required for code contributions, though a COBOL-aware editor (VS Code with COBOL extension, Micro Focus, or similar) is recommended.
+
 ## Ways to Contribute
 
 ### 1. Enhancing Test Coverage
