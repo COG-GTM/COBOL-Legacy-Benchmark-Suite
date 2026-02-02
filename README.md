@@ -86,7 +86,7 @@ project-root/
 
 The system comprises several key components:
 
-- **Batch Processing Layer**: Handles transaction validation (`TRNVAL00`), position updates (`POSUPD00`), and history loading (`HISTLD00`).
+- **Batch Processing Layer**: Handles transaction validation and processing (`PORTTRAN`), position updates (`PORTUPDT`), and history loading (`HISTLD00`).
 - **Online Layer**: Provides inquiry capabilities through `INQONLN`, allowing users to view portfolio positions and transaction histories.
 - **Utility Programs**: Include file maintenance (`UTLMNT00`), system monitoring (`UTLMON00`), and data validation (`UTLVAL00`).
 - **Reporting System**: Generates reports on positions (`RPTPOS00`), audits (`RPTAUD00`), and system statistics (`RPTSTA00`).
@@ -118,6 +118,29 @@ Comprehensive documentation is provided to facilitate understanding and translat
 - [Data Dictionary](documentation/technical/data-dictionary.md)
 - [Operations Guide](documentation/operations/README.md)
 - [Test Data Specifications](documentation/operations/test-data-specs.md)
+
+## Program Glossary
+
+The following table provides the official naming conventions for the main programs in this system:
+
+| Program Name | Location | Description |
+|-------------|----------|-------------|
+| **PORTTRAN** | src/programs/portfolio/ | Transaction validation and processing (buy, sell, transfer, fee) |
+| **PORTUPDT** | src/programs/portfolio/ | Portfolio position updates |
+| **HISTLD00** | src/programs/batch/ | History loading to DB2 |
+| **INQONLN** | src/programs/online/ | Main online inquiry controller |
+| **INQPORT** | src/programs/online/ | Portfolio position inquiry |
+| **INQHIST** | src/programs/online/ | Transaction history inquiry |
+| **RPTPOS00** | src/programs/batch/ | Position report generator |
+| **RPTAUD00** | src/programs/batch/ | Audit report generator |
+| **RPTSTA00** | src/programs/batch/ | Statistics report generator |
+| **UTLMNT00** | src/programs/utility/ | File maintenance utility |
+| **UTLMON00** | src/programs/utility/ | System monitoring utility |
+| **UTLVAL00** | src/programs/utility/ | Data validation utility |
+| **TSTGEN00** | src/programs/test/ | Test data generator |
+| **TSTVAL00** | src/programs/test/ | Test validation suite |
+| **BCHCTL00** | src/programs/batch/ | Batch control processor |
+| **SECMGR** | src/programs/online/ | Security manager |
 
 ## Technical Standards
 
