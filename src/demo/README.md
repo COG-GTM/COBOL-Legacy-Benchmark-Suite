@@ -186,14 +186,75 @@ private void checkCommit() throws BatchProcessingException {
 }
 ```
 
-## Running the Demo
+## Running the Demo on Your Mac
 
-This is a reference implementation demonstrating migration patterns. To use in a real project:
+### Prerequisites
+- Java 17 or higher (`java -version`)
+- Maven 3.6+ (`mvn -version`)
 
-1. Add JDBC driver dependency for your database
-2. Configure database connection
-3. Implement file reader for VSAM-equivalent input
-4. Run the `HistoryLoadProcessor.execute()` method
+Install if needed:
+```bash
+# macOS with Homebrew
+brew install openjdk@17
+brew install maven
+
+# Add Java to PATH (if needed)
+export JAVA_HOME=/opt/homebrew/opt/openjdk@17
+export PATH="$JAVA_HOME/bin:$PATH"
+```
+
+### Quick Start
+
+```bash
+# Navigate to the demo directory
+cd src/demo/java
+
+# Build the executable JAR
+mvn clean package
+
+# Run with default 100 records
+java -jar target/cobol-migration-demo-1.0.0.jar
+
+# Or specify record count (e.g., 1000 records)
+java -jar target/cobol-migration-demo-1.0.0.jar 1000
+```
+
+### What the Demo Does
+
+1. **Creates an H2 in-memory database** (simulating DB2 on mainframe)
+2. **Generates sample transaction records** (simulating VSAM input file)
+3. **Runs the batch processor** (Java translation of HISTLD00.cbl)
+4. **Displays results** (records loaded, statistics by portfolio)
+
+### Expected Output
+
+```
+╔════════════════════════════════════════════════════════════════╗
+║     COBOL to Java Migration Demo - HISTLD00 Batch Program      ║
+║     Position History DB2 Load Program                          ║
+╚════════════════════════════════════════════════════════════════╝
+
+┌────────────────────────────────────────────────────────────────┐
+│ PHASE 1: Generating Test Data (simulating VSAM input file)    │
+└────────────────────────────────────────────────────────────────┘
+  Generated 100 transaction history records
+
+┌────────────────────────────────────────────────────────────────┐
+│ PHASE 2: Running HISTLD00 Batch Process                       │
+│ (This is the Java translation of the COBOL program)           │
+└────────────────────────────────────────────────────────────────┘
+
+HISTLD00 Processing Statistics:
+  Records Read:    100
+  Records Written: 100
+  Errors:          0
+
+┌────────────────────────────────────────────────────────────────┐
+│ PHASE 3: Verifying Results (querying DB2/H2 database)         │
+└────────────────────────────────────────────────────────────────┘
+  Total records in POSHIST table: 100
+  ...
+```
 
 ## Migration Challenges Highlighted
 
