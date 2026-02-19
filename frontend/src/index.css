@@ -1,0 +1,260 @@
+:root {
+  --bg-primary: #1a1a2e;
+  --bg-secondary: #16213e;
+  --bg-card: #0f3460;
+  --text-primary: #e0e0e0;
+  --text-highlight: #00d4aa;
+  --text-label: #a0a0b0;
+  --accent: #00d4aa;
+  --accent-hover: #00b894;
+  --error: #e74c3c;
+  --error-bg: #2c1010;
+  --border: #2a2a4a;
+  --input-bg: #0d1b2a;
+  --btn-bg: #1b2838;
+  --btn-hover: #263850;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "IBM Plex Mono", "Courier New", Courier, monospace;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  padding: 2rem;
+}
+
+.screen {
+  max-width: 800px;
+  width: 100%;
+  padding: 2rem;
+}
+
+.screen-title {
+  font-size: 1.4rem;
+  color: var(--accent);
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 0.75rem;
+}
+
+.welcome-text {
+  color: var(--text-label);
+  margin-bottom: 1.5rem;
+}
+
+.menu-label {
+  color: var(--text-label);
+  margin-bottom: 1rem;
+}
+
+.menu-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.menu-item {
+  background: var(--btn-bg);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 0.75rem 1rem;
+  text-align: left;
+  font-family: inherit;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.menu-item:hover {
+  background: var(--btn-hover);
+  border-color: var(--accent);
+}
+
+.login-panel {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  padding: 2rem;
+  max-width: 400px;
+}
+
+.login-panel h2 {
+  font-size: 1.1rem;
+  color: var(--text-highlight);
+  margin-bottom: 1.5rem;
+}
+
+.field-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.field-row label {
+  color: var(--text-label);
+  min-width: 80px;
+  font-size: 0.9rem;
+}
+
+.field-row input {
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 0.5rem 0.75rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  flex: 1;
+}
+
+.field-row input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.btn {
+  background: var(--btn-bg);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  padding: 0.5rem 1rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.btn:hover:not(:disabled) {
+  background: var(--btn-hover);
+  border-color: var(--accent);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: var(--bg-primary);
+  border-color: var(--accent);
+  font-weight: 600;
+}
+
+.btn-primary:hover:not(:disabled) {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
+
+.btn-dismiss {
+  background: none;
+  border: none;
+  color: var(--text-label);
+  cursor: pointer;
+  margin-left: 1rem;
+  font-family: inherit;
+  font-size: 0.8rem;
+  text-decoration: underline;
+}
+
+.search-form {
+  margin-bottom: 1.5rem;
+}
+
+.position-details {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.detail-label {
+  color: var(--text-label);
+  min-width: 100px;
+  font-size: 0.9rem;
+}
+
+.detail-value {
+  font-size: 0.9rem;
+}
+
+.detail-value.highlight {
+  color: var(--text-highlight);
+}
+
+.history-table-container {
+  margin-bottom: 1.5rem;
+}
+
+.history-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.history-table thead th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  color: var(--text-primary);
+  font-weight: 700;
+  border-bottom: 2px solid var(--border);
+}
+
+.history-table tbody td {
+  padding: 0.4rem 0.75rem;
+  color: var(--text-highlight);
+  border-bottom: 1px solid var(--border);
+}
+
+.history-table tbody tr:hover {
+  background: var(--bg-secondary);
+}
+
+.empty-row {
+  text-align: center;
+  color: var(--text-label);
+  padding: 2rem !important;
+}
+
+.page-info {
+  color: var(--text-label);
+  font-size: 0.85rem;
+  margin-top: 0.75rem;
+}
+
+.action-bar {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--border);
+}
+
+.error-bar {
+  background: var(--error-bg);
+  border: 1px solid var(--error);
+  color: var(--error);
+  padding: 0.75rem 1rem;
+  margin-top: 1.5rem;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
