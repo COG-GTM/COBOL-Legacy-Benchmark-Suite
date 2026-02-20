@@ -5,6 +5,7 @@ for status, value, and name changes.
 """
 
 import logging
+from datetime import datetime
 from decimal import Decimal
 from typing import Optional
 
@@ -102,6 +103,9 @@ class PortfolioUpdateProcessor:
             logger.warning("Unknown update action: %s", action)
             return ReturnCode.ERROR
 
+        portfolio.last_maint = datetime.now().strftime("%Y%m%d")
+        portfolio.audit_timestamp = datetime.now().strftime("%Y-%m-%d-%H.%M.%S.%f")
+        portfolio.audit_user = PROGRAM_ID
         self._update_count += 1
         return ReturnCode.SUCCESS
 
