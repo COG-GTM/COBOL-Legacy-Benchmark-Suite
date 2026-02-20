@@ -46,7 +46,8 @@ class PortfolioTestDataGenerator:
                         f"{record.client_name}|{record.client_type}|"
                         f"{record.create_date}|{record.last_maint}|"
                         f"{record.status}|{record.total_value}|"
-                        f"{record.cash_balance}\n"
+                        f"{record.cash_balance}|{record.audit_timestamp}|"
+                        f"{record.audit_user}\n"
                     )
                     self._record_count += 1
 
@@ -84,6 +85,8 @@ class PortfolioTestDataGenerator:
             status=status,
             total_value=total_value,
             cash_balance=cash_balance,
+            audit_timestamp=datetime.now().strftime("%Y-%m-%d-%H.%M.%S.%f"),
+            audit_user="PORTTEST",
         )
 
     @property

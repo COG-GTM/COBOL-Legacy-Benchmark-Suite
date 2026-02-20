@@ -86,9 +86,9 @@ class OnlineErrorHandler:
         if error_info.severity == ErrorSeverity.FATAL:
             return ErrorAction.ABEND
         elif error_info.severity == ErrorSeverity.WARNING:
-            return ErrorAction.CONTINUE
-        else:
             return ErrorAction.RETURN
+        else:
+            return ErrorAction.CONTINUE
 
     def get_error_log(self) -> list[ErrorLogEntry]:
         return list(self._error_log)
