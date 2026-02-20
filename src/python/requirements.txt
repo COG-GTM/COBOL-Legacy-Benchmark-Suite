@@ -1,0 +1,17 @@
+# Core dependencies for the Portfolio Management System
+# Python 3.10+ required
+
+# No external dependencies required for core functionality.
+# The migration uses only Python standard library modules:
+#   - dataclasses (data models)
+#   - decimal (financial calculations)
+#   - enum (status codes, types)
+#   - logging (application logging)
+#   - datetime (timestamps)
+#   - os, shutil (file operations)
+#   - json (serialization)
+#   - sqlite3 (local database, stdlib)
+
+# Optional dependencies for production use:
+# psycopg2-binary>=2.9.0    # PostgreSQL adapter (production DB)
+# ibm_db>=3.1.0             # IBM DB2 adapter (mainframe compatibility)
