@@ -72,16 +72,16 @@ class PortfolioUpdateProcessor:
 
     def _process_update(
         self, port_id: str, account_no: str, action: str, new_value: str
-    ) -> None:
+    ) -> int:
         key = f"{port_id}{account_no}"
 
         portfolio = self._portfolios.get(key)
         if portfolio is None:
             self._error_count += 1
             logger.warning("Record not found: %s", key)
-            return
+            return ReturnCode.ERROR
 
-        self._apply_update(portfolio, action, new_value)
+        return self._apply_update(portfolio, action, new_value)
 
     def _apply_update(
         self, portfolio: PortfolioRecord, action: str, new_value: str

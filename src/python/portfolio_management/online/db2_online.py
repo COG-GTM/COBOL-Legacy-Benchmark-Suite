@@ -31,13 +31,15 @@ class DB2OnlineManager:
         self._connections: dict[str, ConnectionInfo] = {}
         self._max_connections = max_connections
         self._active_count = 0
+        self._token_counter = 0
 
     def connect(self, user_id: str) -> tuple[int, str]:
         if self._active_count >= self._max_connections:
             logger.error("Connection pool exhausted (%d/%d)", self._active_count, self._max_connections)
             return ReturnCode.ERROR, ""
 
-        token = f"CONN-{user_id}-{datetime.now().strftime('%H%M%S%f')}"
+        self._token_counter += 1
+        token = f"CONN-{user_id}-{datetime.now().strftime('%H%M%S%f')}-{self._token_counter}"
         now = datetime.now().strftime("%Y-%m-%d-%H.%M.%S.%f")
 
         info = ConnectionInfo(
