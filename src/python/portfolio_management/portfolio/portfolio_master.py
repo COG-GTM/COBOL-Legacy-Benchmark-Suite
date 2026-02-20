@@ -31,7 +31,8 @@ class PortfolioMasterManager:
         if command == "CREATE":
             return self.create_portfolio(record)
         elif command == "READ":
-            return self.read_portfolio(record)
+            found = self.read_portfolio(record)
+            return ReturnCode.SUCCESS if found is not None else ReturnCode.ERROR
         elif command == "UPDATE":
             return self.update_portfolio(record)
         elif command == "DELETE":

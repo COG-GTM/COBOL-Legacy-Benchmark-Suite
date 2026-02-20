@@ -94,7 +94,6 @@ class PortfolioTransactionProcessor:
             return ReturnCode.ERROR
 
         portfolio.cash_balance -= transaction.amount
-        portfolio.total_value = portfolio.total_value
         logger.info(
             "Buy processed: %s qty=%s amt=%s",
             portfolio.port_id,

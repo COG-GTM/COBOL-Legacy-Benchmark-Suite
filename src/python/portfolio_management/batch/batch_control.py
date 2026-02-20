@@ -138,6 +138,8 @@ class BatchControlProcessor:
                             sequence_no=int(parts[2].strip()),
                             status=parts[3].strip(),
                             program_name=parts[4].strip(),
+                            return_code=int(parts[5].strip()) if len(parts) > 5 else 0,
+                            error_desc=parts[6].strip() if len(parts) > 6 else "",
                         )
                         self._control_records[record.batch_key] = record
             return ReturnCode.SUCCESS
