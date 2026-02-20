@@ -76,6 +76,8 @@ class PortfolioInquiryHandler:
                             quantity=Decimal(parts[3].strip()),
                             cost_basis=Decimal(parts[4].strip()),
                             market_value=Decimal(parts[5].strip()),
+                            audit_timestamp=parts[6].strip() if len(parts) > 6 else "",
+                            audit_user=parts[7].strip() if len(parts) > 7 else "",
                         )
                         self._positions[record.position_key] = record
             logger.info("Loaded %d positions", len(self._positions))

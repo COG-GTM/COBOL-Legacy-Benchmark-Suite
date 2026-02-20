@@ -185,14 +185,16 @@ class TestDataGenerator:
                     f.write(
                         f"{r.port_id}|{r.account_no}|{r.client_name}|"
                         f"{r.client_type}|{r.create_date}|{r.last_maint}|"
-                        f"{r.status}|{r.total_value}|{r.cash_balance}\n"
+                        f"{r.status}|{r.total_value}|{r.cash_balance}|"
+                        f"{r.audit_timestamp}|{r.audit_user}\n"
                     )
 
             with open(os.path.join(output_dir, "positions.dat"), "w") as f:
                 for r in self._positions:
                     f.write(
                         f"{r.portfolio_id}|{r.position_date}|{r.investment_id}|"
-                        f"{r.quantity}|{r.cost_basis}|{r.market_value}\n"
+                        f"{r.quantity}|{r.cost_basis}|{r.market_value}|"
+                        f"{r.audit_timestamp}|{r.audit_user}\n"
                     )
 
             with open(os.path.join(output_dir, "transactions.dat"), "w") as f:
