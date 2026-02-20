@@ -25,7 +25,17 @@ class PortfolioTransactionProcessor:
         self._audit_records: list[AuditLogRecord] = []
 
     def initialize(self, portfolios: dict[str, PortfolioRecord]) -> int:
-        self._portfolios = {v.port_id: v for v in portfolios.values()}
+        rekeyed: dict[str, PortfolioRecord] = {}
+        for v in portfolios.values():
+            if v.port_id in rekeyed:
+                logger.warning(
+                    "Duplicate port_id %s (accounts %s and %s), keeping latest",
+                    v.port_id,
+                    rekeyed[v.port_id].account_no,
+                    v.account_no,
+                )
+            rekeyed[v.port_id] = v
+        self._portfolios = rekeyed
         self._transactions_processed = 0
         self._transactions_failed = 0
         self._audit_records = []

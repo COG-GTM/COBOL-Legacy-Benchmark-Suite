@@ -61,6 +61,7 @@ class DB2OnlineManager:
 
         if info.active:
             info.active = False
+            info.last_used = datetime.now().strftime("%Y-%m-%d-%H.%M.%S.%f")
             self._active_count -= 1
 
         logger.debug("DB2 online connection closed: %s (active: %d)", token, self._active_count)
