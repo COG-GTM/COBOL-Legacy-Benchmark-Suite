@@ -84,7 +84,7 @@ class DB2OnlineManager:
                     if idle_seconds < max_idle_seconds:
                         continue
                 except (ValueError, TypeError):
-                    pass
+                    continue
                 del self._connections[token]
                 cleaned += 1
 

@@ -5,6 +5,7 @@ and savepoint restoration.
 """
 
 import logging
+import re
 from dataclasses import dataclass
 from typing import Optional, Protocol
 
@@ -71,6 +72,10 @@ class DB2CommitController:
             logger.error("Commit controller not initialized")
             return 8
 
+        if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
+            logger.error("Invalid savepoint name: %s", name)
+            return 8
+
         try:
             self._connection.execute(f"SAVEPOINT {name} ON ROLLBACK RETAIN CURSORS")
             self._stats.savepoint_count += 1
@@ -83,6 +88,10 @@ class DB2CommitController:
     def restore_savepoint(self, name: str) -> int:
         if not self._initialized or self._connection is None:
             logger.error("Commit controller not initialized")
+            return 8
+
+        if not re.fullmatch(r"[A-Za-z_][A-Za-z0-9_]*", name):
+            logger.error("Invalid savepoint name: %s", name)
             return 8
 
         try:
