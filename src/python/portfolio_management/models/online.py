@@ -40,7 +40,7 @@ class OnlineErrorHandling:
     cics_resp2: int = 0
     severity: str = ErrorSeverity.INFO
     message: str = ""
-    action: str = ErrorAction.CONTINUE
+    action: str = ""
     trace_id: str = ""
     timestamp: str = ""
 

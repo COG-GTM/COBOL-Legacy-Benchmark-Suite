@@ -30,8 +30,9 @@ class CheckpointRestartHandler:
     def initialize(self, control: CheckpointControl, file_path: Optional[str] = None) -> int:
         self._file_path = file_path
         control.status = CheckpointStatus.ACTIVE
-        control.run_date = datetime.now().strftime("%Y%m%d")
-        control.run_time = datetime.now().strftime("%H%M%S")
+        if control.restart_mode != RestartMode.RESTART:
+            control.run_date = datetime.now().strftime("%Y%m%d")
+            control.run_time = datetime.now().strftime("%H%M%S")
         control.records_read = 0
         control.records_processed = 0
         control.records_error = 0
