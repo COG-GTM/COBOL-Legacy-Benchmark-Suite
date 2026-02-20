@@ -74,6 +74,8 @@ class PortfolioTransactionProcessor:
                 portfolio, transaction, str(before_value), str(portfolio.total_value)
             )
             portfolio.last_maint = datetime.now().strftime("%Y%m%d")
+            portfolio.audit_timestamp = datetime.now().strftime("%Y-%m-%d-%H.%M.%S.%f")
+            portfolio.audit_user = PROGRAM_ID
         else:
             self._transactions_failed += 1
 

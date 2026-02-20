@@ -54,6 +54,7 @@ class PortfolioMasterManager:
         record.create_date = datetime.now().strftime("%Y%m%d")
         record.last_maint = datetime.now().strftime("%Y%m%d")
         record.audit_timestamp = datetime.now().strftime("%Y-%m-%d-%H.%M.%S.%f")
+        record.audit_user = PROGRAM_ID
 
         self._portfolios[key] = record
         logger.info("Portfolio created: %s", key)
@@ -79,6 +80,7 @@ class PortfolioMasterManager:
 
         record.last_maint = datetime.now().strftime("%Y%m%d")
         record.audit_timestamp = datetime.now().strftime("%Y-%m-%d-%H.%M.%S.%f")
+        record.audit_user = PROGRAM_ID
 
         self._portfolios[key] = record
         logger.info("Portfolio updated: %s", key)
