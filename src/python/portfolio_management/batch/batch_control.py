@@ -140,6 +140,7 @@ class BatchControlProcessor:
                             program_name=parts[4].strip(),
                             return_code=int(parts[5].strip()) if len(parts) > 5 else 0,
                             error_desc=parts[6].strip() if len(parts) > 6 else "",
+                            restart_count=int(parts[7].strip()) if len(parts) > 7 else 0,
                         )
                         self._control_records[record.batch_key] = record
             return ReturnCode.SUCCESS
@@ -157,7 +158,7 @@ class BatchControlProcessor:
                         f"{record.job_name}|{record.process_date}|"
                         f"{record.sequence_no}|{record.status}|"
                         f"{record.program_name}|{record.return_code}|"
-                        f"{record.error_desc}\n"
+                        f"{record.error_desc}|{record.restart_count}\n"
                     )
             return ReturnCode.SUCCESS
         except Exception as e:
