@@ -85,7 +85,7 @@ class PortfolioUpdateProcessor:
 
     def _apply_update(
         self, portfolio: PortfolioRecord, action: str, new_value: str
-    ) -> None:
+    ) -> int:
         if action == UpdateAction.STATUS:
             portfolio.status = new_value
         elif action == UpdateAction.NAME:
@@ -96,13 +96,14 @@ class PortfolioUpdateProcessor:
             except Exception:
                 self._error_count += 1
                 logger.warning("Invalid numeric value: %s", new_value)
-                return
+                return ReturnCode.ERROR
         else:
             self._error_count += 1
             logger.warning("Unknown update action: %s", action)
-            return
+            return ReturnCode.ERROR
 
         self._update_count += 1
+        return ReturnCode.SUCCESS
 
     def update_single(
         self, port_id: str, account_no: str, action: str, new_value: str
@@ -112,8 +113,8 @@ class PortfolioUpdateProcessor:
         if portfolio is None:
             return ReturnCode.ERROR
 
-        self._apply_update(portfolio, action, new_value)
-        return ReturnCode.SUCCESS
+        rc = self._apply_update(portfolio, action, new_value)
+        return rc
 
     def get_statistics(self) -> dict:
         return {

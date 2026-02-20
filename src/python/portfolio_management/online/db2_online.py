@@ -74,8 +74,16 @@ class DB2OnlineManager:
 
     def cleanup_idle(self, max_idle_seconds: int = 300) -> int:
         cleaned = 0
+        now = datetime.now()
         for token, info in list(self._connections.items()):
             if not info.active:
+                try:
+                    last_used_time = datetime.strptime(info.last_used, "%Y-%m-%d-%H.%M.%S.%f")
+                    idle_seconds = (now - last_used_time).total_seconds()
+                    if idle_seconds < max_idle_seconds:
+                        continue
+                except (ValueError, TypeError):
+                    pass
                 del self._connections[token]
                 cleaned += 1
 
