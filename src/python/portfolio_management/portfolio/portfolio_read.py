@@ -87,6 +87,8 @@ class PortfolioReader:
                 status=parts[6].strip(),
                 total_value=Decimal(parts[7].strip()) if len(parts) > 7 else Decimal("0"),
                 cash_balance=Decimal(parts[8].strip()) if len(parts) > 8 else Decimal("0"),
+                audit_timestamp=parts[9].strip() if len(parts) > 9 else "",
+                audit_user=parts[10].strip() if len(parts) > 10 else "",
             )
         except (ValueError, IndexError):
             return None
