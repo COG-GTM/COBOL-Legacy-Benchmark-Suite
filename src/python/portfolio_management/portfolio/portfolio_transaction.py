@@ -25,7 +25,7 @@ class PortfolioTransactionProcessor:
         self._audit_records: list[AuditLogRecord] = []
 
     def initialize(self, portfolios: dict[str, PortfolioRecord]) -> int:
-        self._portfolios = portfolios
+        self._portfolios = {v.port_id: v for v in portfolios.values()}
         self._transactions_processed = 0
         self._transactions_failed = 0
         self._audit_records = []
