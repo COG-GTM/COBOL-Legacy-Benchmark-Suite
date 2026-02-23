@@ -1,0 +1,30 @@
+/* Global Reset and Base Styles */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  font-family: 'Courier New', Courier, monospace;
+  background-color: #1a1a2e;
+  color: #00ff00;
+}
+
+a {
+  color: #00ced1;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
