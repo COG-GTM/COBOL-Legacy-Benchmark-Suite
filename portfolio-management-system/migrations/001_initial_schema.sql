@@ -89,7 +89,7 @@ CREATE TABLE IF NOT EXISTS transaction_history (
 
 COMMENT ON TABLE transaction_history IS 'Transaction History - Migrated from VSAM TRANHIST and DB2 TRANSACTION_HISTORY';
 COMMENT ON COLUMN transaction_history.transaction_type IS 'Type: BU=Buy, SL=Sell, TR=Transfer, FE=Fee';
-COMMENT ON COLUMN transaction_history.status IS 'Status: P=Processed, F=Failed, R=Reversed';
+COMMENT ON COLUMN transaction_history.status IS 'Status: P=Pending, D=Done, F=Failed, R=Reversed';
 
 CREATE INDEX idx_trans_hist_portfolio ON transaction_history (portfolio_id, transaction_date);
 CREATE INDEX idx_trans_hist_date ON transaction_history (transaction_date, portfolio_id);

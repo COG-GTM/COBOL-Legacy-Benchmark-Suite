@@ -16,16 +16,17 @@ Original COBOL structure:
   - ERR-TRACE: Trace information (ID and timestamp)
 
 This copybook is used for centralized error handling across all programs.
+
+Note: This module contains Pydantic models that faithfully represent the COBOL
+copybook structure for validation and data transfer. For database ORM operations,
+use the ErrorLog model from src/models/database.py which matches the actual
+PostgreSQL error_log table schema.
 """
 
 from datetime import datetime
 from enum import Enum
 from typing import Optional
 from pydantic import BaseModel, Field, field_validator
-from sqlalchemy import Column, String, Integer, DateTime, Text, Index
-from sqlalchemy.orm import declarative_base
-
-Base = declarative_base()
 
 
 class ErrorSeverity(str, Enum):
@@ -154,88 +155,6 @@ class ErrorRecord(BaseModel):
         json_encoders = {
             datetime: lambda v: v.isoformat(),
         }
-
-
-class ErrorHandling(Base):
-    """
-    SQLAlchemy ORM model for error log records.
-    
-    Maps to PostgreSQL table: error_log
-    Replaces DB2 ERRLOG table for centralized error logging.
-    """
-    __tablename__ = "error_log"
-
-    # Primary key (auto-generated)
-    id = Column(Integer, primary_key=True, autoincrement=True)
-
-    # Error location fields
-    err_program = Column(String(8), nullable=False)
-    err_paragraph = Column(String(30), nullable=True)
-
-    # Error code fields
-    err_sqlcode = Column(Integer, nullable=True, default=0)
-    err_cics_resp = Column(Integer, nullable=True, default=0)
-    err_cics_resp2 = Column(Integer, nullable=True, default=0)
-
-    # Error details
-    err_severity = Column(String(1), nullable=False, default="I")
-    err_message = Column(Text, nullable=False)
-    err_action = Column(String(1), nullable=False, default="C")
-
-    # Trace information
-    err_trace_id = Column(String(16), nullable=True)
-    err_timestamp = Column(DateTime, nullable=False, default=datetime.utcnow)
-
-    # Additional fields for PostgreSQL (not in original COBOL)
-    err_user_id = Column(String(8), nullable=True)
-    err_additional_info = Column(Text, nullable=True)
-
-    # Indexes for common access patterns
-    __table_args__ = (
-        Index("idx_err_program", "err_program", "err_timestamp"),
-        Index("idx_err_severity", "err_severity", "err_timestamp"),
-        Index("idx_err_timestamp", "err_timestamp"),
-    )
-
-    def __repr__(self) -> str:
-        return (
-            f"<ErrorHandling(program={self.err_program}, "
-            f"severity={self.err_severity}, "
-            f"message={self.err_message[:30]}...)>"
-        )
-
-    def to_pydantic(self) -> ErrorRecord:
-        """Convert SQLAlchemy model to Pydantic model for validation/serialization."""
-        return ErrorRecord(
-            err_program=self.err_program,
-            err_paragraph=self.err_paragraph,
-            err_sqlcode=self.err_sqlcode or 0,
-            err_cics_resp=self.err_cics_resp or 0,
-            err_cics_resp2=self.err_cics_resp2 or 0,
-            err_severity=ErrorSeverity(self.err_severity),
-            err_message=self.err_message,
-            err_action=ErrorAction(self.err_action),
-            err_trace_id=self.err_trace_id,
-            err_timestamp=self.err_timestamp,
-        )
-
-    @classmethod
-    def from_pydantic(cls, record: ErrorRecord, user_id: Optional[str] = None, additional_info: Optional[str] = None) -> "ErrorHandling":
-        """Create SQLAlchemy model from Pydantic model."""
-        return cls(
-            err_program=record.err_program,
-            err_paragraph=record.err_paragraph,
-            err_sqlcode=record.err_sqlcode,
-            err_cics_resp=record.err_cics_resp,
-            err_cics_resp2=record.err_cics_resp2,
-            err_severity=record.err_severity.value,
-            err_message=record.err_message,
-            err_action=record.err_action.value,
-            err_trace_id=record.err_trace_id,
-            err_timestamp=record.err_timestamp or datetime.utcnow(),
-            err_user_id=user_id,
-            err_additional_info=additional_info,
-        )
 
 
 class ErrorArea(BaseModel):

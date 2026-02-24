@@ -36,7 +36,7 @@ from src.models.error import (
     ErrorSeverity,
     ErrorAction,
     ErrorRecord,
-    ErrorHandling,
+    ErrorArea,
 )
 
 __all__ = [
@@ -66,5 +66,5 @@ __all__ = [
     "ErrorSeverity",
     "ErrorAction",
     "ErrorRecord",
-    "ErrorHandling",
+    "ErrorArea",
 ]

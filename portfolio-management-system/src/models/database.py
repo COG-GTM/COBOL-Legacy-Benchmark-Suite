@@ -141,7 +141,7 @@ class TransactionHistory(Base):
         Index("idx_trans_hist_date", "transaction_date", "portfolio_id"),
         Index("idx_trans_hist_investment", "investment_id", "transaction_date"),
         CheckConstraint("transaction_type IN ('BU', 'SL', 'TR', 'FE')", name="chk_trans_type"),
-        CheckConstraint("status IN ('P', 'F', 'R')", name="chk_trans_status"),
+        CheckConstraint("status IN ('P', 'D', 'F', 'R')", name="chk_trans_status"),
     )
 
     def __repr__(self) -> str:
