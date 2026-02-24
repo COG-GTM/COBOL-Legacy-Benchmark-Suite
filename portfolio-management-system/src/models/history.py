@@ -191,16 +191,16 @@ class HistoryRecord(BaseModel):
                 portfolio_id="PORT0001",
                 date="20240115",
                 time="143022",
-                seq_no="000001",
+                seq_no="0001",
             ),
             data=HistoryData(
                 record_type=HistoryRecordType.POSITION,
                 action_code=HistoryActionCode.CHANGE,
                 before_image="... original record data ...",
                 after_image="... modified record data ...",
+                reason_code="UPDT",
             ),
             audit=HistoryAudit(
-                reason_code="UPDT",
                 process_date="20240115",
                 process_user="BATCH001",
             ),
