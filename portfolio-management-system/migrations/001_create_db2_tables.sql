@@ -153,6 +153,7 @@ CREATE TABLE IF NOT EXISTS audit_log (
     system_id         VARCHAR(8)          NOT NULL,
     user_id           VARCHAR(8)          NOT NULL,
     terminal_id       VARCHAR(8),
+    trans_id          VARCHAR(4),
     program_id        VARCHAR(8)          NOT NULL,
     audit_type        VARCHAR(4)          NOT NULL,
     action_code       VARCHAR(8)          NOT NULL,

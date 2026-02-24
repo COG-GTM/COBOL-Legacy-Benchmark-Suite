@@ -273,6 +273,7 @@ class AuditLog(Base):
     system_id: str = Column(String(8), nullable=False)
     user_id: str = Column(String(8), primary_key=True)
     terminal_id: str = Column(String(8), nullable=True)
+    trans_id: str = Column(String(4), nullable=True)
     program_id: str = Column(String(8), primary_key=True)
     audit_type: str = Column(String(4), nullable=False)
     action_code: str = Column(String(8), nullable=False)

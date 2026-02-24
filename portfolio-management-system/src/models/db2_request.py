@@ -140,7 +140,7 @@ class DB2Request(BaseModel):
     @property
     def is_success(self) -> bool:
         """Check if the response indicates success."""
-        return self.response_code == 0 and self.sqlcode >= 0
+        return self.response_code == 0 and self.sqlcode == 0
 
     @property
     def is_not_found(self) -> bool:
