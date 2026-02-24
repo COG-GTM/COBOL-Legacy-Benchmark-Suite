@@ -18,9 +18,8 @@ from enum import Enum
 from typing import Optional
 from pydantic import BaseModel, Field, field_validator
 from sqlalchemy import Column, String, Date, Time, DateTime, Text, Index
-from sqlalchemy.orm import declarative_base
 
-Base = declarative_base()
+from src.models.base import Base
 
 
 class HistoryRecordType(str, Enum):

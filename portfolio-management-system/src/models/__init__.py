@@ -5,6 +5,7 @@ This module contains all data models migrated from COBOL copybooks.
 Models are implemented using both Pydantic (for validation) and SQLAlchemy (for ORM).
 """
 
+from src.models.base import Base
 from src.models.transaction import (
     Transaction,
     TransactionType,
@@ -67,4 +68,6 @@ __all__ = [
     "ErrorAction",
     "ErrorRecord",
     "ErrorArea",
+    # Base
+    "Base",
 ]

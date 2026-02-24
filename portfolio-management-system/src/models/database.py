@@ -21,9 +21,9 @@ from sqlalchemy import (
     Column, String, Date, Time, Numeric, DateTime, Integer, Text,
     ForeignKey, Index, CheckConstraint
 )
-from sqlalchemy.orm import declarative_base, relationship
+from sqlalchemy.orm import relationship
 
-Base = declarative_base()
+from src.models.base import Base
 
 
 class PortfolioMaster(Base):
