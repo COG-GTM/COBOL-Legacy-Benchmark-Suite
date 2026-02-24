@@ -120,8 +120,8 @@ function TransactionHistory() {
                           <td className="amount">{formatCurrency(txn.price)}</td>
                           <td className="amount">{formatCurrency(txn.amount)}</td>
                           <td>
-                            <span className={`badge ${txn.status === 'P' ? 'badge-active' : txn.status === 'F' ? 'badge-closed' : 'badge-suspended'}`}>
-                              {txn.status === 'P' ? 'Processed' : txn.status === 'F' ? 'Failed' : txn.status === 'D' ? 'Done' : txn.status}
+                            <span className={`badge ${txn.status === 'C' ? 'badge-active' : txn.status === 'P' ? 'badge-active' : txn.status === 'F' ? 'badge-closed' : 'badge-suspended'}`}>
+                              {txn.status === 'C' ? 'Completed' : txn.status === 'P' ? 'Processed' : txn.status === 'F' ? 'Failed' : txn.status === 'D' ? 'Draft' : txn.status === 'U' ? 'Updated' : txn.status}
                             </span>
                           </td>
                         </tr>
