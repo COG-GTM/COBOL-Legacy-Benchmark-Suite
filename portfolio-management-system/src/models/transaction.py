@@ -27,7 +27,7 @@ COBOL Source Structure:
              88 TRN-FAILED      VALUE 'F'.
              88 TRN-REVERSED    VALUE 'R'.
        05 TRN-AUDIT.
-          10 TRN-PROCESS-DATE   PIC X(8).       -> str (YYYYMMDD)
+          10 TRN-PROCESS-DATE   PIC X(26).      -> str (IBM timestamp)
           10 TRN-PROCESS-USER   PIC X(8).       -> str
 
 Data Type Mapping Notes:
@@ -175,8 +175,8 @@ class TransactionAudit(BaseModel):
 
     process_date: Optional[str] = Field(
         default=None,
-        max_length=8,
-        description="Processing date (YYYYMMDD). COBOL: TRN-PROCESS-DATE PIC X(8).",
+        max_length=26,
+        description="Processing timestamp. COBOL: TRN-PROCESS-DATE PIC X(26). IBM format: YYYY-MM-DD-HH.MM.SS.FFFFFF.",
     )
     process_user: Optional[str] = Field(
         default=None,

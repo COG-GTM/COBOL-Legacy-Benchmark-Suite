@@ -12,7 +12,7 @@ COBOL Source Structure:
           88 INQCOM-EXIT        VALUE 'EXIT'.
        05 INQCOM-ACCOUNT-NO     PIC X(10).      -> str
        05 INQCOM-RESPONSE-CODE  PIC S9(8) COMP. -> int
-       05 INQCOM-ERROR-MSG      PIC X(79).      -> str
+       05 INQCOM-ERROR-MSG      PIC X(80).      -> str
 
 Data Type Mapping Notes:
     PIC S9(8) COMP -> int
@@ -22,9 +22,8 @@ Data Type Mapping Notes:
     PIC X(4) -> str with max_length=4
         Used with 88-level conditions to define valid function codes.
         Mapped to an Enum in Python for type safety.
-    PIC X(79) -> str with max_length=79
-        Error message field sized for 80-column terminal display
-        minus 1 for attribute byte.
+    PIC X(80) -> str with max_length=80
+        Error message field sized for 80-column terminal display.
 
 This copybook defines the CICS COMMAREA (Communication Area) used to
 pass data between the main inquiry program (INQONLN) and its sub-programs
@@ -111,10 +110,10 @@ class InquiryCommunication(BaseModel):
     )
     error_msg: Optional[str] = Field(
         default=None,
-        max_length=79,
+        max_length=80,
         description=(
             "Error message text. "
-            "COBOL: INQCOM-ERROR-MSG PIC X(79). "
+            "COBOL: INQCOM-ERROR-MSG PIC X(80). "
             "Sized for 80-column terminal display."
         ),
     )

@@ -19,7 +19,7 @@ COBOL Source Structure:
              88 POS-CLOSED      VALUE 'C'.
              88 POS-PENDING     VALUE 'P'.
        05 POS-AUDIT.
-          10 POS-LAST-MAINT-DATE PIC X(8).      -> str (YYYYMMDD)
+          10 POS-LAST-MAINT-DATE PIC X(26).     -> str (IBM timestamp)
           10 POS-LAST-MAINT-USER PIC X(8).      -> str
 
 Data Type Mapping Notes:
@@ -129,10 +129,11 @@ class PositionAudit(BaseModel):
 
     last_maint_date: Optional[str] = Field(
         default=None,
-        max_length=8,
+        max_length=26,
         description=(
-            "Last maintenance date (YYYYMMDD). "
-            "COBOL: POS-LAST-MAINT-DATE PIC X(8)."
+            "Last maintenance timestamp. "
+            "COBOL: POS-LAST-MAINT-DATE PIC X(26). "
+            "IBM format: YYYY-MM-DD-HH.MM.SS.FFFFFF."
         ),
     )
     last_maint_user: Optional[str] = Field(

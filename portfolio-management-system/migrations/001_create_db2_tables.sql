@@ -80,14 +80,14 @@ COMMENT ON COLUMN transaction_history.transaction_id IS 'Format: YYYYMMDDHHMMSS 
 -- Source: DB2 POSHIST from DBTBLS copybook
 -- ====================================================================
 CREATE TABLE IF NOT EXISTS position_history (
-    account_no        VARCHAR(10)         NOT NULL,
-    portfolio_id      VARCHAR(8)          NOT NULL,
+    account_no        VARCHAR(8)          NOT NULL,
+    portfolio_id      VARCHAR(10)         NOT NULL,
     trans_date        DATE                NOT NULL,
     trans_time        TIME                NOT NULL,
     trans_type        VARCHAR(2)          NOT NULL,
-    security_id       VARCHAR(10)         NOT NULL,
-    quantity          NUMERIC(18,4)       NOT NULL,
-    price             NUMERIC(18,4)       NOT NULL,
+    security_id       VARCHAR(12)         NOT NULL,
+    quantity          NUMERIC(15,3)       NOT NULL,
+    price             NUMERIC(15,3)       NOT NULL,
     amount            NUMERIC(18,2)       NOT NULL,
     fees              NUMERIC(18,2)       NOT NULL DEFAULT 0,
     total_amount      NUMERIC(18,2)       NOT NULL,
@@ -113,12 +113,12 @@ CREATE TABLE IF NOT EXISTS error_log (
     program_id        VARCHAR(8)          NOT NULL,
     error_type        VARCHAR(1)          NOT NULL,
     error_severity    INTEGER             NOT NULL,
-    error_code        VARCHAR(10)         NOT NULL,
-    error_message     VARCHAR(80)         NOT NULL,
+    error_code        VARCHAR(8)          NOT NULL,
+    error_message     VARCHAR(200)        NOT NULL,
     process_date      DATE                NOT NULL DEFAULT CURRENT_DATE,
     process_time      TIME                NOT NULL DEFAULT CURRENT_TIME,
     user_id           VARCHAR(8)          NOT NULL,
-    additional_info   VARCHAR(200),
+    additional_info   VARCHAR(500),
     PRIMARY KEY (error_timestamp, program_id)
 );
 

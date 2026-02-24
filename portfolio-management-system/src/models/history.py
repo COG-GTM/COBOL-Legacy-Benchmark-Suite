@@ -9,7 +9,7 @@ COBOL Source Structure:
           10 HIST-PORTFOLIO-ID  PIC X(8).       -> str
           10 HIST-DATE          PIC X(8).       -> str (YYYYMMDD)
           10 HIST-TIME          PIC X(6).       -> str (HHMMSS)
-          10 HIST-SEQ-NO        PIC X(6).       -> str
+          10 HIST-SEQ-NO        PIC X(4).       -> str
        05 HIST-DATA.
           10 HIST-RECORD-TYPE   PIC X(2).       -> HistoryRecordType enum
              88 HIST-PORTFOLIO  VALUE 'PT'.
@@ -23,7 +23,7 @@ COBOL Source Structure:
           10 HIST-AFTER-IMAGE   PIC X(400).     -> str (up to 400 chars)
        05 HIST-AUDIT.
           10 HIST-REASON-CODE   PIC X(4).       -> str
-          10 HIST-PROCESS-DATE  PIC X(8).       -> str (YYYYMMDD)
+          10 HIST-PROCESS-DATE  PIC X(26).      -> str (IBM timestamp)
           10 HIST-PROCESS-USER  PIC X(8).       -> str
 
 Data Type Mapping Notes:
@@ -71,7 +71,7 @@ class HistoryKey(BaseModel):
     """History key structure (HIST-KEY group).
 
     Composite key: portfolio_id + date + time + seq_no
-    Total key length: 28 bytes
+    Total key length: 26 bytes
     """
 
     portfolio_id: str = Field(
@@ -91,8 +91,8 @@ class HistoryKey(BaseModel):
     )
     seq_no: str = Field(
         ...,
-        max_length=6,
-        description="Sequence number. COBOL: HIST-SEQ-NO PIC X(6).",
+        max_length=4,
+        description="Sequence number. COBOL: HIST-SEQ-NO PIC X(4).",
     )
 
     @field_validator("date")
@@ -151,22 +151,23 @@ class HistoryData(BaseModel):
             "None for DELETE operations."
         ),
     )
-
-
-class HistoryAudit(BaseModel):
-    """History audit fields (HIST-AUDIT group)."""
-
     reason_code: Optional[str] = Field(
         default=None,
         max_length=4,
         description="Reason code for the change. COBOL: HIST-REASON-CODE PIC X(4).",
     )
+
+
+class HistoryAudit(BaseModel):
+    """History audit fields (HIST-AUDIT group)."""
+
     process_date: Optional[str] = Field(
         default=None,
-        max_length=8,
+        max_length=26,
         description=(
-            "Processing date (YYYYMMDD). "
-            "COBOL: HIST-PROCESS-DATE PIC X(8)."
+            "Processing timestamp. "
+            "COBOL: HIST-PROCESS-DATE PIC X(26). "
+            "IBM format: YYYY-MM-DD-HH.MM.SS.FFFFFF."
         ),
     )
     process_user: Optional[str] = Field(

@@ -168,14 +168,14 @@ class PositionHistory(Base):
 
     __tablename__ = "position_history"
 
-    account_no: str = Column(String(10), primary_key=True)
-    portfolio_id: str = Column(String(8), primary_key=True)
+    account_no: str = Column(String(8), primary_key=True)
+    portfolio_id: str = Column(String(10), primary_key=True)
     trans_date: date = Column(Date, primary_key=True)
     trans_time: time = Column(Time, primary_key=True)
     trans_type: str = Column(String(2), nullable=False)
-    security_id: str = Column(String(10), nullable=False)
-    quantity = Column(Numeric(18, 4), nullable=False)
-    price = Column(Numeric(18, 4), nullable=False)
+    security_id: str = Column(String(12), nullable=False)
+    quantity = Column(Numeric(15, 3), nullable=False)
+    price = Column(Numeric(15, 3), nullable=False)
     amount = Column(Numeric(18, 2), nullable=False)
     fees = Column(Numeric(18, 2), nullable=False, default=0)
     total_amount = Column(Numeric(18, 2), nullable=False)
@@ -214,12 +214,12 @@ class ErrorLog(Base):
     program_id: str = Column(String(8), primary_key=True)
     error_type: str = Column(String(1), nullable=False)
     error_severity: int = Column(Integer, nullable=False)
-    error_code: str = Column(String(10), nullable=False)
-    error_message: str = Column(String(80), nullable=False)
+    error_code: str = Column(String(8), nullable=False)
+    error_message: str = Column(String(200), nullable=False)
     process_date: date = Column(Date, nullable=False)
     process_time: time = Column(Time, nullable=False)
     user_id: str = Column(String(8), nullable=False)
-    additional_info: str = Column(String(200), nullable=True)
+    additional_info: str = Column(String(500), nullable=True)
 
     __table_args__ = (
         Index("idx_errlog_program", "program_id", "error_timestamp"),
@@ -419,7 +419,7 @@ class VSAMPositionHistory(Base):
     market_value = Column(Numeric(15, 2), nullable=False, default=0)
     currency_code: str = Column(String(3), nullable=False, default="USD")
     status: str = Column(String(1), nullable=False, default="A")
-    last_maint_date: str = Column(String(8), nullable=True)
+    last_maint_date: str = Column(String(26), nullable=True)
     last_maint_user: str = Column(String(8), nullable=True)
 
     __table_args__ = (
