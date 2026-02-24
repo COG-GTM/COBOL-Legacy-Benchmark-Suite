@@ -105,7 +105,7 @@ CREATE TABLE IF NOT EXISTS vsam_position_history (
     market_value      NUMERIC(15,2)       NOT NULL DEFAULT 0,
     currency_code     VARCHAR(3)          NOT NULL DEFAULT 'USD',
     status            VARCHAR(1)          NOT NULL DEFAULT 'A',
-    last_maint_date   VARCHAR(8),
+    last_maint_date   VARCHAR(26),
     last_maint_user   VARCHAR(8),
 
     PRIMARY KEY (portfolio_id, position_date, investment_id)
