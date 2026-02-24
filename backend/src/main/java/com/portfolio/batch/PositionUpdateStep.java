@@ -48,12 +48,16 @@ public class PositionUpdateStep implements Tasklet {
         int updateCount = 0;
 
         for (TransactionHistory txn : processedTransactions) {
-            updatePosition(txn);
-            // Mark as 'U' (Updated) so HistoryLoadStep can pick it up
-            // and subsequent runs don't reprocess the same transactions
-            txn.setStatus("U");
+            boolean updated = updatePosition(txn);
+            if (updated) {
+                // Mark as 'U' (Updated) so HistoryLoadStep can pick it up
+                txn.setStatus("U");
+                updateCount++;
+            } else {
+                // Position update was skipped (e.g. Fee/Transfer on non-existent position)
+                txn.setStatus("F");
+            }
             transactionRepository.save(txn);
-            updateCount++;
         }
 
         log.info("POSUPD00: Completed. Positions updated={}", updateCount);
@@ -64,7 +68,7 @@ public class PositionUpdateStep implements Tasklet {
     /**
      * Update position based on transaction - replaces P200-UPDATE-POSITION.
      */
-    private void updatePosition(TransactionHistory txn) {
+    private boolean updatePosition(TransactionHistory txn) {
         // Look up existing active position by portfolioId + investmentId (date-independent)
         // This matches the COBOL VSAM keyed lookup which finds the current position record
         List<InvestmentPosition> existing = positionRepository.findActiveByPortfolioAndInvestment(
@@ -81,7 +85,7 @@ public class PositionUpdateStep implements Tasklet {
             if (!"BU".equals(txn.getTransactionType())) {
                 log.warn("POSUPD00: Skipping {} transaction for non-existent position: portfolio={}, investment={}",
                         txn.getTransactionType(), txn.getPortfolioId(), txn.getInvestmentId());
-                return;
+                return false;
             }
             position = new InvestmentPosition();
             position.setPortfolioId(txn.getPortfolioId());
@@ -123,5 +127,6 @@ public class PositionUpdateStep implements Tasklet {
         position.setLastMaintDate(LocalDateTime.now());
         position.setLastMaintUser("BATCH");
         positionRepository.save(position);
+        return true;
     }
 }
