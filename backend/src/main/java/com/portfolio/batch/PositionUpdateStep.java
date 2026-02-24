@@ -118,8 +118,10 @@ public class PositionUpdateStep implements Tasklet {
                 BigDecimal costReduction = position.getCostBasis().multiply(ratio)
                         .setScale(2, RoundingMode.HALF_UP);
                 position.setCostBasis(position.getCostBasis().subtract(costReduction));
+                BigDecimal marketValueReduction = position.getMarketValue().multiply(ratio)
+                        .setScale(2, RoundingMode.HALF_UP);
                 position.setQuantity(currentQty.subtract(txn.getQuantity()));
-                position.setMarketValue(position.getMarketValue().subtract(txn.getAmount()));
+                position.setMarketValue(position.getMarketValue().subtract(marketValueReduction));
             }
             default -> {
                 // Transfer or Fee - no position quantity change
