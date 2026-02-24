@@ -72,7 +72,7 @@ public class TransactionValidationStep implements Tasklet {
         if (!List.of("BU", "SL", "TR", "FE").contains(txn.getTransactionType())) {
             return false;
         }
-        if (txn.getAmount() == null || txn.getAmount().signum() < 0) {
+        if (txn.getAmount() == null || txn.getAmount().signum() <= 0) {
             return false;
         }
         if (txn.getPortfolioId() == null || txn.getPortfolioId().isBlank()) {

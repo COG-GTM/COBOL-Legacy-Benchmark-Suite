@@ -58,7 +58,7 @@ CREATE TABLE IF NOT EXISTS transaction_history (
     price             DECIMAL(18,4)   NOT NULL DEFAULT 0,
     amount            DECIMAL(18,2)   NOT NULL DEFAULT 0,
     currency_code     VARCHAR(3)      NOT NULL DEFAULT 'USD',
-    status            VARCHAR(1)      NOT NULL DEFAULT 'P',
+    status            VARCHAR(1)      NOT NULL DEFAULT 'D',
     process_date      TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     process_user      VARCHAR(8)      NOT NULL,
     PRIMARY KEY (transaction_id),

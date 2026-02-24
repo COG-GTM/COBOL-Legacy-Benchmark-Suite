@@ -19,7 +19,7 @@ import java.time.LocalTime;
  * Source: TRNREC copybook, src/database/db2/db2-definitions.sql
  *
  * Transaction types: 'BU'=Buy, 'SL'=Sell, 'TR'=Transfer, 'FE'=Fee
- * Status: 'P'=Processed, 'F'=Failed, 'R'=Reversed, 'D'=Done
+ * Status: 'D'=Draft, 'P'=Processed/Validated, 'U'=Updated, 'C'=Completed, 'F'=Failed
  */
 @Entity
 @Table(name = "transaction_history")
@@ -68,7 +68,7 @@ public class TransactionHistory {
 
     @Column(name = "status", length = 1, nullable = false)
     @NotBlank
-    private String status = "P";
+    private String status = "D";
 
     @Column(name = "process_date", nullable = false)
     private LocalDateTime processDate = LocalDateTime.now();

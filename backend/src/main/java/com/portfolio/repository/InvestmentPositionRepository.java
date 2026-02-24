@@ -27,4 +27,11 @@ public interface InvestmentPositionRepository extends JpaRepository<InvestmentPo
     List<InvestmentPosition> findActivePositions(@Param("portfolioId") String portfolioId);
 
     List<InvestmentPosition> findByPositionDateAndPortfolioId(LocalDate positionDate, String portfolioId);
+
+    /**
+     * Find active position by portfolio and investment ID regardless of date.
+     * Used by PositionUpdateStep to find existing positions to update.
+     */
+    @Query("SELECT ip FROM InvestmentPosition ip WHERE ip.portfolioId = :portfolioId AND ip.investmentId = :investmentId AND ip.status = 'A' ORDER BY ip.positionDate DESC")
+    List<InvestmentPosition> findActiveByPortfolioAndInvestment(@Param("portfolioId") String portfolioId, @Param("investmentId") String investmentId);
 }

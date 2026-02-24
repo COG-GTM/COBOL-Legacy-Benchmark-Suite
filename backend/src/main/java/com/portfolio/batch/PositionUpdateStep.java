@@ -1,7 +1,6 @@
 package com.portfolio.batch;
 
 import com.portfolio.entity.InvestmentPosition;
-import com.portfolio.entity.InvestmentPositionId;
 import com.portfolio.entity.TransactionHistory;
 import com.portfolio.repository.InvestmentPositionRepository;
 import com.portfolio.repository.TransactionHistoryRepository;
@@ -13,10 +12,8 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Position Update Step - replaces POSUPD00.cbl (also referenced as POSUPDT).
@@ -67,21 +64,20 @@ public class PositionUpdateStep implements Tasklet {
      * Update position based on transaction - replaces P200-UPDATE-POSITION.
      */
     private void updatePosition(TransactionHistory txn) {
-        InvestmentPositionId positionId = new InvestmentPositionId();
-        positionId.setPortfolioId(txn.getPortfolioId());
-        positionId.setInvestmentId(txn.getInvestmentId());
-        positionId.setPositionDate(LocalDate.now());
-
-        Optional<InvestmentPosition> existingOpt = positionRepository.findById(positionId);
+        // Look up existing active position by portfolioId + investmentId (date-independent)
+        // This matches the COBOL VSAM keyed lookup which finds the current position record
+        List<InvestmentPosition> existing = positionRepository.findActiveByPortfolioAndInvestment(
+                txn.getPortfolioId(), txn.getInvestmentId());
 
         InvestmentPosition position;
-        if (existingOpt.isPresent()) {
-            position = existingOpt.get();
+        if (!existing.isEmpty()) {
+            // Use the most recent active position
+            position = existing.get(0);
         } else {
             position = new InvestmentPosition();
             position.setPortfolioId(txn.getPortfolioId());
             position.setInvestmentId(txn.getInvestmentId());
-            position.setPositionDate(LocalDate.now());
+            position.setPositionDate(txn.getTransactionDate());
             position.setQuantity(BigDecimal.ZERO);
             position.setCostBasis(BigDecimal.ZERO);
             position.setMarketValue(BigDecimal.ZERO);
