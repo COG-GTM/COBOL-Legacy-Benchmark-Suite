@@ -45,6 +45,7 @@ public class TransactionResponse {
     }
 
     private static String mapTransactionType(String type) {
+        if (type == null) return "Unknown";
         return switch (type) {
             case "BU" -> "Buy";
             case "SL" -> "Sell";
