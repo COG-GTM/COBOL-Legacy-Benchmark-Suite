@@ -44,12 +44,16 @@ public class HistoryLoadStep implements Tasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
         log.info("HISTLD00: Starting history load to DB2 (position_history)");
 
-        List<TransactionHistory> processedTransactions = transactionRepository.findByStatus("P");
+        // Query for 'U' (Updated) status - set by PositionUpdateStep after position processing
+        List<TransactionHistory> updatedTransactions = transactionRepository.findByStatus("U");
         int loadCount = 0;
 
-        for (TransactionHistory txn : processedTransactions) {
+        for (TransactionHistory txn : updatedTransactions) {
             PositionHistory history = mapToHistory(txn);
             historyRepository.save(history);
+            // Mark as 'C' (Completed) to prevent reprocessing on subsequent runs
+            txn.setStatus("C");
+            transactionRepository.save(txn);
             loadCount++;
         }
 
@@ -63,6 +67,7 @@ public class HistoryLoadStep implements Tasklet {
      */
     private PositionHistory mapToHistory(TransactionHistory txn) {
         PositionHistory history = new PositionHistory();
+        history.setAccountNo(txn.getPortfolioId());
         history.setPortfolioId(txn.getPortfolioId());
         history.setTransDate(txn.getTransactionDate());
         history.setTransTime(txn.getTransactionTime());

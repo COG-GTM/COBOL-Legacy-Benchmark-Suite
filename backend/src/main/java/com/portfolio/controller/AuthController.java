@@ -12,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,18 +29,15 @@ public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final JwtTokenProvider tokenProvider;
     private final AppUserRepository userRepository;
-    private final PasswordEncoder passwordEncoder;
     private final AuditService auditService;
 
     public AuthController(AuthenticationManager authenticationManager,
                           JwtTokenProvider tokenProvider,
                           AppUserRepository userRepository,
-                          PasswordEncoder passwordEncoder,
                           AuditService auditService) {
         this.authenticationManager = authenticationManager;
         this.tokenProvider = tokenProvider;
         this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
         this.auditService = auditService;
     }
 
@@ -62,23 +58,9 @@ public class AuthController {
         return ResponseEntity.ok(new AuthResponse(token, user.getUsername(), user.getRole()));
     }
 
-    @PostMapping("/register")
-    public ResponseEntity<AuthResponse> register(@Valid @RequestBody AuthRequest request,
-                                                  HttpServletRequest httpRequest) {
-        if (userRepository.existsByUsername(request.getUsername())) {
-            return ResponseEntity.badRequest().build();
-        }
-
-        AppUser user = new AppUser();
-        user.setUsername(request.getUsername());
-        user.setPassword(passwordEncoder.encode(request.getPassword()));
-        user.setRole("USER");
-        user.setEnabled(true);
-        userRepository.save(user);
-
-        String token = tokenProvider.generateToken(user.getUsername(), user.getRole());
-        auditService.logLogin(user.getUsername(), httpRequest.getRemoteAddr(), true);
-
-        return ResponseEntity.ok(new AuthResponse(token, user.getUsername(), user.getRole()));
-    }
+    /**
+     * Admin-only user registration - replaces RACF user provisioning which required
+     * administrator action. Only users with ADMIN role can create new accounts.
+     * Moved out of /api/auth/** path to require authentication.
+     */
 }

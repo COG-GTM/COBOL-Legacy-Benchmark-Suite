@@ -51,6 +51,10 @@ public class PositionUpdateStep implements Tasklet {
 
         for (TransactionHistory txn : processedTransactions) {
             updatePosition(txn);
+            // Mark as 'U' (Updated) so HistoryLoadStep can pick it up
+            // and subsequent runs don't reprocess the same transactions
+            txn.setStatus("U");
+            transactionRepository.save(txn);
             updateCount++;
         }
 
