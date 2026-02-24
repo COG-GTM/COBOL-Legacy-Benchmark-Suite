@@ -16,7 +16,7 @@ import java.time.LocalTime;
  * Error Log entity - migrated from DB2 ERRLOG table.
  * Source: src/database/db2/ERRLOG.sql
  *
- * Error types: 'S'=System, 'A'=Application, 'D'=Data
+ * Error types: 'S'=System, 'A'=Application, 'D'=Data, 'E'=Security
  * Severity: 1=Info, 2=Warning, 3=Error, 4=Severe
  */
 @Entity

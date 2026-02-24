@@ -109,12 +109,15 @@ public class PositionUpdateStep implements Tasklet {
                 // P220-CALC-SELL: SUBTRACT TXN-QUANTITY FROM POS-QUANTITY
                 // Cost basis reduction is proportional to quantity sold
                 BigDecimal currentQty = position.getQuantity();
-                if (currentQty.signum() > 0) {
-                    BigDecimal ratio = txn.getQuantity().divide(currentQty, 10, RoundingMode.HALF_UP);
-                    BigDecimal costReduction = position.getCostBasis().multiply(ratio)
-                            .setScale(2, RoundingMode.HALF_UP);
-                    position.setCostBasis(position.getCostBasis().subtract(costReduction));
+                if (currentQty.signum() <= 0 || txn.getQuantity().compareTo(currentQty) > 0) {
+                    log.warn("POSUPD00: Sell quantity {} exceeds position quantity {} for portfolio={}, investment={}",
+                            txn.getQuantity(), currentQty, txn.getPortfolioId(), txn.getInvestmentId());
+                    return false;
                 }
+                BigDecimal ratio = txn.getQuantity().divide(currentQty, 10, RoundingMode.HALF_UP);
+                BigDecimal costReduction = position.getCostBasis().multiply(ratio)
+                        .setScale(2, RoundingMode.HALF_UP);
+                position.setCostBasis(position.getCostBasis().subtract(costReduction));
                 position.setQuantity(currentQty.subtract(txn.getQuantity()));
                 position.setMarketValue(position.getMarketValue().subtract(txn.getAmount()));
             }
