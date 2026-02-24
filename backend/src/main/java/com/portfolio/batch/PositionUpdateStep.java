@@ -12,6 +12,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.stereotype.Component;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -69,11 +70,19 @@ public class PositionUpdateStep implements Tasklet {
         List<InvestmentPosition> existing = positionRepository.findActiveByPortfolioAndInvestment(
                 txn.getPortfolioId(), txn.getInvestmentId());
 
+        boolean isNewPosition = existing.isEmpty();
         InvestmentPosition position;
-        if (!existing.isEmpty()) {
+        if (!isNewPosition) {
             // Use the most recent active position
             position = existing.get(0);
         } else {
+            // Only create new positions for Buy transactions;
+            // Sell/Fee/Transfer on non-existent positions is invalid
+            if (!"BU".equals(txn.getTransactionType())) {
+                log.warn("POSUPD00: Skipping {} transaction for non-existent position: portfolio={}, investment={}",
+                        txn.getTransactionType(), txn.getPortfolioId(), txn.getInvestmentId());
+                return;
+            }
             position = new InvestmentPosition();
             position.setPortfolioId(txn.getPortfolioId());
             position.setInvestmentId(txn.getInvestmentId());
@@ -94,12 +103,20 @@ public class PositionUpdateStep implements Tasklet {
             }
             case "SL" -> {
                 // P220-CALC-SELL: SUBTRACT TXN-QUANTITY FROM POS-QUANTITY
-                position.setQuantity(position.getQuantity().subtract(txn.getQuantity()));
-                position.setCostBasis(position.getCostBasis().subtract(txn.getAmount()));
+                // Cost basis reduction is proportional to quantity sold
+                BigDecimal currentQty = position.getQuantity();
+                if (currentQty.signum() > 0) {
+                    BigDecimal ratio = txn.getQuantity().divide(currentQty, 10, RoundingMode.HALF_UP);
+                    BigDecimal costReduction = position.getCostBasis().multiply(ratio)
+                            .setScale(2, RoundingMode.HALF_UP);
+                    position.setCostBasis(position.getCostBasis().subtract(costReduction));
+                }
+                position.setQuantity(currentQty.subtract(txn.getQuantity()));
                 position.setMarketValue(position.getMarketValue().subtract(txn.getAmount()));
             }
             default -> {
                 // Transfer or Fee - no position quantity change
+                // Only update timestamp on existing positions
             }
         }
 

@@ -23,7 +23,7 @@ public class AuditLog {
     @Column(name = "audit_timestamp", nullable = false)
     private LocalDateTime auditTimestamp = LocalDateTime.now();
 
-    @Column(name = "user_id", length = 8, nullable = false)
+    @Column(name = "user_id", length = 50, nullable = false)
     private String userId;
 
     @Column(name = "terminal_id", length = 4)
