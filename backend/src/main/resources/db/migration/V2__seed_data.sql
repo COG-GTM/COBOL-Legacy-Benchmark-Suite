@@ -29,19 +29,19 @@ VALUES ('PORT0003', 'AAPL000001', '2024-03-20', 75.0000, 13125.00, 14250.00, 'US
 
 -- Transaction History (from test-data-specs.md sample records)
 INSERT INTO transaction_history (transaction_id, portfolio_id, transaction_date, transaction_time, investment_id, transaction_type, quantity, price, amount, currency_code, status, process_user)
-VALUES ('20240320153045000001', 'PORT0001', '2024-03-20', '15:30:45', 'IBM0000001', 'BU', 100.0000, 125.0000, 12500.00, 'USD', 'P', 'SYSTEM');
+VALUES ('20240320153045000001', 'PORT0001', '2024-03-20', '15:30:45', 'IBM0000001', 'BU', 100.0000, 125.0000, 12500.00, 'USD', 'C', 'SYSTEM');
 
 INSERT INTO transaction_history (transaction_id, portfolio_id, transaction_date, transaction_time, investment_id, transaction_type, quantity, price, amount, currency_code, status, process_user)
-VALUES ('20240320153112000002', 'PORT0002', '2024-03-20', '15:31:12', 'MSFT000001', 'SL', 50.0000, 100.0000, 5000.00, 'USD', 'P', 'SYSTEM');
+VALUES ('20240320153112000002', 'PORT0002', '2024-03-20', '15:31:12', 'MSFT000001', 'SL', 50.0000, 100.0000, 5000.00, 'USD', 'C', 'SYSTEM');
 
 INSERT INTO transaction_history (transaction_id, portfolio_id, transaction_date, transaction_time, investment_id, transaction_type, quantity, price, amount, currency_code, status, process_user)
-VALUES ('20240320153201000003', 'PORT0003', '2024-03-20', '15:32:01', 'AAPL000001', 'BU', 75.0000, 175.0000, 13125.00, 'USD', 'P', 'SYSTEM');
+VALUES ('20240320153201000003', 'PORT0003', '2024-03-20', '15:32:01', 'AAPL000001', 'BU', 75.0000, 175.0000, 13125.00, 'USD', 'C', 'SYSTEM');
 
 INSERT INTO transaction_history (transaction_id, portfolio_id, transaction_date, transaction_time, investment_id, transaction_type, quantity, price, amount, currency_code, status, process_user)
-VALUES ('20240321100000000004', 'PORT0001', '2024-03-21', '10:00:00', 'AAPL000001', 'BU', 50.0000, 175.0000, 8750.00, 'USD', 'P', 'SYSTEM');
+VALUES ('20240321100000000004', 'PORT0001', '2024-03-21', '10:00:00', 'AAPL000001', 'BU', 50.0000, 175.0000, 8750.00, 'USD', 'C', 'SYSTEM');
 
 INSERT INTO transaction_history (transaction_id, portfolio_id, transaction_date, transaction_time, investment_id, transaction_type, quantity, price, amount, currency_code, status, process_user)
-VALUES ('20240321110000000005', 'PORT0002', '2024-03-21', '11:00:00', 'MSFT000001', 'BU', 200.0000, 150.0000, 30000.00, 'USD', 'P', 'SYSTEM');
+VALUES ('20240321110000000005', 'PORT0002', '2024-03-21', '11:00:00', 'MSFT000001', 'BU', 200.0000, 150.0000, 30000.00, 'USD', 'C', 'SYSTEM');
 
 INSERT INTO transaction_history (transaction_id, portfolio_id, transaction_date, transaction_time, investment_id, transaction_type, quantity, price, amount, currency_code, status, process_user)
-VALUES ('20240322090000000006', 'PORT0001', '2024-03-22', '09:00:00', 'IBM0000001', 'FE', 0.0000, 0.0000, 25.00, 'USD', 'P', 'SYSTEM');
+VALUES ('20240322090000000006', 'PORT0001', '2024-03-22', '09:00:00', 'IBM0000001', 'FE', 0.0000, 0.0000, 25.00, 'USD', 'C', 'SYSTEM');

@@ -38,25 +38,25 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<Map<String, Object>> handleResourceNotFound(ResourceNotFoundException ex) {
-        logError("APP", 2, "E004", ex.getMessage(), "ResourceNotFound");
+        logError("APP", 2, "E004", ex.getMessage(), "RESNFND");
         return buildResponse(HttpStatus.NOT_FOUND, ex.getMessage());
     }
 
     @ExceptionHandler(BatchProcessingException.class)
     public ResponseEntity<Map<String, Object>> handleBatchProcessing(BatchProcessingException ex) {
-        logError("APP", 3, "E008", ex.getMessage(), "BatchProcessing");
+        logError("APP", 3, "E008", ex.getMessage(), "BCHPROC");
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, ex.getMessage());
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Map<String, Object>> handleBadCredentials(BadCredentialsException ex) {
-        logError("SEC", 2, "E001", "Authentication failed", "Security");
+        logError("SEC", 2, "E001", "Authentication failed", "SECMGR");
         return buildResponse(HttpStatus.UNAUTHORIZED, "Invalid username or password");
     }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<Map<String, Object>> handleAccessDenied(AccessDeniedException ex) {
-        logError("SEC", 3, "E002", "Access denied", "Security");
+        logError("SEC", 3, "E002", "Access denied", "SECMGR");
         return buildResponse(HttpStatus.FORBIDDEN, "Access denied");
     }
 
@@ -66,14 +66,14 @@ public class GlobalExceptionHandler {
                 .map(e -> e.getField() + ": " + e.getDefaultMessage())
                 .reduce((a, b) -> a + "; " + b)
                 .orElse("Validation failed");
-        logError("APP", 2, "E003", message, "Validation");
+        logError("APP", 2, "E003", message, "VALIDTN");
         return buildResponse(HttpStatus.BAD_REQUEST, message);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGeneral(Exception ex) {
         log.error("Unhandled exception", ex);
-        logError("SYS", 4, "E999", ex.getMessage(), "System");
+        logError("SYS", 4, "E999", ex.getMessage(), "SYSTEM");
         return buildResponse(HttpStatus.INTERNAL_SERVER_ERROR, "An internal error occurred");
     }
 
