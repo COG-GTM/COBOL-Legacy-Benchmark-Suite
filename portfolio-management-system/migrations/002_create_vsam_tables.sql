@@ -65,7 +65,7 @@ CREATE TABLE IF NOT EXISTS vsam_transaction_history (
     amount            NUMERIC(15,2)       NOT NULL,
     currency_code     VARCHAR(3)          NOT NULL DEFAULT 'USD',
     status            VARCHAR(1)          NOT NULL DEFAULT 'P',
-    process_date      VARCHAR(8),
+    process_date      VARCHAR(26),
     process_user      VARCHAR(8),
 
     PRIMARY KEY (transaction_date, transaction_time, portfolio_id, sequence_no)

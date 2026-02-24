@@ -386,7 +386,7 @@ class VSAMTransactionHistory(Base):
     amount = Column(Numeric(15, 2), nullable=False)
     currency_code: str = Column(String(3), nullable=False, default="USD")
     status: str = Column(String(1), nullable=False, default="P")
-    process_date: str = Column(String(8), nullable=True)
+    process_date: str = Column(String(26), nullable=True)
     process_user: str = Column(String(8), nullable=True)
 
     __table_args__ = (
