@@ -77,6 +77,8 @@ export default function HistoryPage() {
             onExit={handleExit}
             message={message}
           />
+        ) : message ? (
+          <p style={{ color: "#F87171", fontSize: 14 }}>{message}</p>
         ) : null}
       </div>
     </div>
@@ -90,36 +92,36 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "flex-start",
     minHeight: "100vh",
     padding: "40px 16px",
-    background: "#1a1a2e",
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    background: "#0F172A",
+    fontFamily: "Inter, Roboto, 'Segoe UI', system-ui, sans-serif",
   },
   card: {
-    background: "#16213e",
-    borderRadius: 8,
+    background: "#1E293B",
+    borderRadius: 12,
     padding: "32px 40px",
     boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
     width: "100%",
     maxWidth: 750,
-    color: "#e0e0e0",
+    color: "#FFFFFF",
   },
   title: {
     margin: "0 0 20px",
     fontSize: 20,
-    color: "#00d4ff",
+    color: "#22D3EE",
   },
   accountRow: {
     marginBottom: 20,
     fontSize: 14,
   },
   label: {
-    color: "#aabbcc",
+    color: "#94A3B8",
     marginRight: 8,
   },
   value: {
-    color: "#00d4ff",
+    color: "#22D3EE",
   },
   loading: {
-    color: "#8899aa",
+    color: "#94A3B8",
     fontSize: 14,
   },
 };

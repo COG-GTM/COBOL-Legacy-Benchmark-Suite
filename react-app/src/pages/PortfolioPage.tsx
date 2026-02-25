@@ -87,7 +87,6 @@ export default function PortfolioPage() {
           </button>
         </div>
 
-        {error && <div style={styles.msgArea}>{error}</div>}
       </div>
     </div>
   );
@@ -100,36 +99,36 @@ const styles: Record<string, React.CSSProperties> = {
     alignItems: "flex-start",
     minHeight: "100vh",
     padding: "40px 16px",
-    background: "#1a1a2e",
-    fontFamily: "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif",
+    background: "#0F172A",
+    fontFamily: "Inter, Roboto, 'Segoe UI', system-ui, sans-serif",
   },
   card: {
-    background: "#16213e",
-    borderRadius: 8,
+    background: "#1E293B",
+    borderRadius: 12,
     padding: "32px 40px",
     boxShadow: "0 4px 24px rgba(0,0,0,0.4)",
     width: "100%",
     maxWidth: 800,
-    color: "#e0e0e0",
+    color: "#FFFFFF",
   },
   title: {
     margin: "0 0 20px",
     fontSize: 20,
-    color: "#00d4ff",
+    color: "#22D3EE",
   },
   accountRow: {
     marginBottom: 20,
     fontSize: 14,
   },
   label: {
-    color: "#aabbcc",
+    color: "#94A3B8",
     marginRight: 8,
   },
   value: {
-    color: "#00d4ff",
+    color: "#22D3EE",
   },
   loading: {
-    color: "#8899aa",
+    color: "#94A3B8",
     fontSize: 14,
   },
   table: {
@@ -140,16 +139,16 @@ const styles: Record<string, React.CSSProperties> = {
   th: {
     textAlign: "left" as const,
     padding: "10px 12px",
-    borderBottom: "2px solid #334455",
-    color: "#aabbcc",
+    borderBottom: "2px solid #334155",
+    color: "#E2E8F0",
     fontSize: 13,
     fontWeight: 600,
   },
   td: {
     padding: "10px 12px",
-    borderBottom: "1px solid #222e44",
+    borderBottom: "1px solid #243449",
     fontSize: 14,
-    color: "#40e0d0",
+    color: "#22D3EE",
   },
   nav: {
     display: "flex",
@@ -158,20 +157,15 @@ const styles: Record<string, React.CSSProperties> = {
   },
   navHint: {
     fontSize: 12,
-    color: "#556677",
+    color: "#94A3B8",
   },
   btn: {
     padding: "8px 20px",
-    borderRadius: 4,
-    border: "1px solid #334455",
-    background: "#0f3460",
-    color: "#e0e0e0",
+    borderRadius: 12,
+    border: "1px solid #334155",
+    background: "#243449",
+    color: "#FFFFFF",
     fontSize: 13,
     cursor: "pointer",
-  },
-  msgArea: {
-    marginTop: 16,
-    color: "#ff6b6b",
-    fontSize: 13,
   },
 };

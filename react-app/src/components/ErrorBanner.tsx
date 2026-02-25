@@ -21,9 +21,9 @@ const styles: Record<string, React.CSSProperties> = {
   banner: {
     padding: "10px 16px",
     borderRadius: 4,
-    background: "#2a1a2e",
+    background: "#1E293B",
     border: "1px solid #553333",
-    color: "#ff6b6b",
+    color: "#F87171",
     fontSize: 14,
     marginBottom: 16,
   },

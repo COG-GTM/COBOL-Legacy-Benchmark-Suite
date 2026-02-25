@@ -129,18 +129,18 @@ const styles: Record<string, React.CSSProperties> = {
   th: {
     textAlign: "left" as const,
     padding: "10px 12px",
-    borderBottom: "2px solid #334455",
-    color: "#aabbcc",
+    borderBottom: "2px solid #334155",
+    color: "#E2E8F0",
     fontSize: 13,
     fontWeight: 600,
   },
   row: {
-    borderBottom: "1px solid #222e44",
+    borderBottom: "1px solid #243449",
   },
   td: {
     padding: "8px 12px",
     fontSize: 14,
-    color: "#40e0d0",
+    color: "#22D3EE",
     height: 20,
   },
   nav: {
@@ -156,22 +156,22 @@ const styles: Record<string, React.CSSProperties> = {
   btn: {
     padding: "8px 16px",
     borderRadius: 4,
-    border: "1px solid #334455",
-    background: "#0f3460",
-    color: "#e0e0e0",
+    border: "1px solid #334155",
+    background: "#243449",
+    color: "#FFFFFF",
     fontSize: 13,
     cursor: "pointer",
   },
   pageInfo: {
     fontSize: 13,
-    color: "#556677",
+    color: "#94A3B8",
   },
   message: {
     marginTop: 12,
     padding: "8px 12px",
     borderRadius: 4,
-    background: "#2a1a2e",
-    color: "#ff6b6b",
+    background: "#1E293B",
+    color: "#F87171",
     fontSize: 13,
   },
 };

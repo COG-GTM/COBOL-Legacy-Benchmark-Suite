@@ -1,4 +1,4 @@
-/* Global reset */
+/* Global reset — Enterprise color scheme */
 *,
 *::before,
 *::after {
@@ -8,11 +8,11 @@
 }
 
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-family: Inter, Roboto, 'Segoe UI', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #1a1a2e;
-  color: #e0e0e0;
+  background: #0F172A;
+  color: #FFFFFF;
 }
 
 button:disabled {
