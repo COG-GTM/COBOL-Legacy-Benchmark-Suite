@@ -102,7 +102,7 @@ CREATE INDEX idx_trans_hist_investment ON transaction_history (investment_id, tr
 -- ====================================================================
 CREATE TABLE IF NOT EXISTS position_history (
     account_no        CHAR(8)         NOT NULL,
-    portfolio_id      CHAR(10)        NOT NULL,
+    portfolio_id      CHAR(8)         NOT NULL,
     trans_date        DATE            NOT NULL,
     trans_time        TIME            NOT NULL,
     trans_type        CHAR(2)         NOT NULL,

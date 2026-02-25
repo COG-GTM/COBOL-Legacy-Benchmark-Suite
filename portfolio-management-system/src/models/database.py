@@ -166,7 +166,7 @@ class PositionHistory(Base):
     __tablename__ = "position_history"
 
     account_no = Column(String(8), primary_key=True, nullable=False)
-    portfolio_id = Column(String(10), primary_key=True, nullable=False)
+    portfolio_id = Column(String(8), primary_key=True, nullable=False)
     trans_date = Column(Date, primary_key=True, nullable=False)
     trans_time = Column(Time, primary_key=True, nullable=False)
     trans_type = Column(String(2), nullable=False)
