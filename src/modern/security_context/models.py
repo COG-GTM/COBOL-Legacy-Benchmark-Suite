@@ -262,8 +262,8 @@ class AuditLogEntry:
             self.trace_id or "",
             self.session_id or "",
             self.user_agent or "",
-            str(self.response_code) if self.response_code else "",
-            str(self.duration_ms) if self.duration_ms else "",
+            str(self.response_code) if self.response_code is not None else "",
+            str(self.duration_ms) if self.duration_ms is not None else "",
             self.ip_address or "",
             self.error_message or "",
         )
