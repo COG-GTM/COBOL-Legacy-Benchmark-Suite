@@ -94,13 +94,18 @@ class HistoryLoader:
             result.records_read += 1
 
             try:
-                # 2200-INSERT-DB2
-                self._insert_history(txn, now, user_id)
+                # Use SAVEPOINT so only the failing record is rolled
+                # back, not the entire transaction.  This matches the
+                # COBOL behaviour where a duplicate key (SQLCODE -803)
+                # skips only the current record.
+                with self._session.begin_nested():
+                    # 2200-INSERT-DB2
+                    self._insert_history(txn, now, user_id)
                 result.records_inserted += 1
 
             except IntegrityError:
-                # Handle duplicate key (SQLCODE -803 in original)
-                self._session.rollback()
+                # SAVEPOINT is automatically rolled back by
+                # begin_nested() — outer transaction stays intact.
                 result.records_duplicate += 1
                 logger.warning(
                     "%s: Duplicate key for %s/%s/%s — skipping",
@@ -111,20 +116,29 @@ class HistoryLoader:
                 )
 
             except Exception as exc:
-                self._session.rollback()
+                # SAVEPOINT is automatically rolled back.
                 result.records_error += 1
-                error_msg = f"Error inserting history for {txn.portfolio_id}: {exc}"
+                error_msg = (
+                    f"Error inserting history for "
+                    f"{txn.portfolio_id}: {exc}"
+                )
                 result.error_messages.append(error_msg)
                 logger.error("%s: %s", self.PROGRAM_ID, error_msg)
 
-                self._error_processor.process_error(
-                    program_id=self.PROGRAM_ID,
-                    category="PR",
-                    error_code="E005",
-                    severity=3,
-                    error_text=str(exc)[:200],
-                    details=f"portfolio={txn.portfolio_id}",
-                )
+                try:
+                    self._error_processor.process_error(
+                        program_id=self.PROGRAM_ID,
+                        category="PR",
+                        error_code="E005",
+                        severity=3,
+                        error_text=str(exc)[:200],
+                        details=f"portfolio={txn.portfolio_id}",
+                    )
+                except Exception:
+                    logger.exception(
+                        "%s: Failed to log error",
+                        self.PROGRAM_ID,
+                    )
 
             # 2300-CHECK-COMMIT
             if i % self.COMMIT_THRESHOLD == 0:
@@ -199,7 +213,6 @@ class HistoryLoader:
             user_id=user_id,
         )
         self._session.add(history)
-        self._session.flush()
 
 
 def _parse_date(date_str: str) -> date:
