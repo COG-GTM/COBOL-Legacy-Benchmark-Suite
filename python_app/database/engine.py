@@ -32,16 +32,25 @@ def get_engine(database_url: str = DEFAULT_DATABASE_URL) -> Engine:
     DB2ONLN connection pool management.
     """
     global _engine
-    if _engine is None:
-        _engine = create_engine(
-            database_url,
-            pool_size=20,
-            max_overflow=MAX_POOL_SIZE - 20,
-            pool_pre_ping=True,
-            pool_recycle=3600,
-            echo=False,
-        )
-        logger.info("Database engine created: pool_size=20, max_overflow=%d", MAX_POOL_SIZE - 20)
+    if _engine is not None:
+        existing_url = str(_engine.url)
+        if existing_url != database_url:
+            logger.warning(
+                "Engine already initialized with URL '%s', ignoring requested URL '%s'. "
+                "Call dispose_engine() first to reinitialize with a different URL.",
+                existing_url, database_url,
+            )
+        return _engine
+
+    _engine = create_engine(
+        database_url,
+        pool_size=20,
+        max_overflow=MAX_POOL_SIZE - 20,
+        pool_pre_ping=True,
+        pool_recycle=3600,
+        echo=False,
+    )
+    logger.info("Database engine created: pool_size=20, max_overflow=%d", MAX_POOL_SIZE - 20)
     return _engine
 
 

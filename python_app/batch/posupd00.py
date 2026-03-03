@@ -77,6 +77,18 @@ class PositionUpdater:
 
         try:
             if position is None:
+                # SELL/FEE on non-existent position is an error
+                if transaction.type in (TransactionType.SELL, TransactionType.FEE):
+                    self.error_handler.log_error(
+                        f"No existing position for {transaction.type}: "
+                        f"portfolio={transaction.portfolio_id}, investment={transaction.investment_id}",
+                        severity=ErrorSeverity.WARNING,
+                        error_code="PNEX",
+                    )
+                    self.records_error += 1
+                    self.stats.update("errors")
+                    return False
+
                 # 2200-INSERT-POSITION: Create new position
                 position = PositionRecord(
                     portfolio_id=transaction.portfolio_id,

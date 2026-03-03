@@ -161,7 +161,7 @@ class TestDataGenerator:
         Creates deliberately invalid records for error handling testing.
         """
         error_records: list[TransactionRecord] = []
-        error_types = ["bad_date", "bad_currency", "zero_amount", "bad_type", "empty_portfolio"]
+        error_types = ["bad_date", "bad_currency", "zero_amount", "negative_qty", "empty_portfolio"]
 
         for i in range(count):
             error_type = self.rng.choice(error_types)
@@ -172,7 +172,7 @@ class TestDataGenerator:
                 sequence_no=f"{i + 1:06d}",
                 investment_id=f"ERR{i + 1:07d}"[:10],
                 type=TransactionType.BUY,
-                quantity=Decimal("100.0000"),
+                quantity=Decimal("-100.0000") if error_type == "negative_qty" else Decimal("100.0000"),
                 price=Decimal("50.0000"),
                 amount=Decimal("0") if error_type == "zero_amount" else Decimal("5000.00"),
                 currency="XX" if error_type == "bad_currency" else "USD",
