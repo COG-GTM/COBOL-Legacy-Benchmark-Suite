@@ -171,8 +171,8 @@ class ErrorProcessor:
                     user_id=user_id,
                     additional_info=details[:500] if details else None,
                 )
-                self._session.add(error_record)
-                self._session.flush()
+                with self._session.begin_nested():
+                    self._session.add(error_record)
             except Exception as exc:
                 logger.error("Failed to write error log to database: %s", exc)
 
