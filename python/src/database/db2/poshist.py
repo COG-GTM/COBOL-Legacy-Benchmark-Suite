@@ -7,7 +7,7 @@ Transaction types: BU=Buy, SL=Sell, TR=Transfer
 
 from datetime import date, datetime, time
 
-from sqlalchemy import Date, DateTime, Index, Numeric, String, Time
+from sqlalchemy import Date, DateTime, Index, Numeric, String, Time, text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Base
@@ -50,7 +50,7 @@ class PosHist(Base):
     program_id: Mapped[str] = mapped_column(String(8), nullable=False)
     user_id: Mapped[str] = mapped_column(String(8), nullable=False)
     audit_timestamp: Mapped[datetime] = mapped_column(
-        DateTime, nullable=False, server_default="now()"
+        DateTime, nullable=False, server_default=text("now()")
     )
 
     __table_args__ = (
