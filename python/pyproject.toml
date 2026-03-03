@@ -1,0 +1,56 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "portfolio-manager"
+version = "1.0.0"
+description = "Investment Portfolio Management System - migrated from Enterprise COBOL (z/OS) to Python"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+
+dependencies = [
+    "sqlalchemy>=2.0,<3.0",
+    "psycopg2-binary>=2.9,<3.0",
+    "fastapi>=0.100,<1.0",
+    "uvicorn>=0.23,<1.0",
+    "pydantic>=2.0,<3.0",
+    "prefect>=2.0,<3.0",
+    "tenacity>=8.0,<9.0",
+    "pandas>=2.0,<3.0",
+    "jinja2>=3.1,<4.0",
+    "PyJWT>=2.8,<3.0",
+    "faker>=20.0,<30.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0,<9.0",
+    "pytest-cov>=4.0,<6.0",
+    "ruff>=0.1,<1.0",
+    "mypy>=1.0,<2.0",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["portfolio_manager*"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+
+[tool.pytest.ini_options]
+testpaths = ["portfolio_manager/tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
