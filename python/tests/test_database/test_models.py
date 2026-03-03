@@ -281,10 +281,15 @@ class TestErrLog(_SchemaTestBase):
 
     def test_index(self):
         self.assertIn("errlog_ix1", self._index_names(self.model))
-        self.assertEqual(
-            self._index_columns(self.model, "errlog_ix1"),
-            ["process_date", "error_severity"],
-        )
+        # error_severity uses desc() so it's an expression, not a plain column
+        for idx in self.model.__table__.indexes:
+            if idx.name == "errlog_ix1":
+                exprs = list(idx.expressions)
+                self.assertEqual(len(exprs), 2)
+                # First element is process_date column
+                self.assertEqual(exprs[0].name, "process_date")
+                # Second element is desc(error_severity) expression
+                self.assertIn("DESC", str(exprs[1]).upper())
 
     def test_column_count(self):
         self.assertEqual(len(self.model.__table__.columns), 10)

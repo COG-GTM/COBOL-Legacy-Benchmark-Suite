@@ -6,6 +6,7 @@ Transaction types: BU=Buy, SL=Sell, TR=Transfer
 """
 
 from datetime import date, datetime, time
+from decimal import Decimal
 
 from sqlalchemy import Date, DateTime, Index, Numeric, String, Time, text
 from sqlalchemy.orm import Mapped, mapped_column
@@ -24,25 +25,25 @@ class PosHist(Base):
     trans_time: Mapped[time] = mapped_column(Time, primary_key=True)
     trans_type: Mapped[str] = mapped_column(String(2), nullable=False)
     security_id: Mapped[str] = mapped_column(String(12), nullable=False)
-    quantity: Mapped[float] = mapped_column(
+    quantity: Mapped[Decimal] = mapped_column(
         Numeric(precision=15, scale=3), nullable=False
     )
-    price: Mapped[float] = mapped_column(
+    price: Mapped[Decimal] = mapped_column(
         Numeric(precision=15, scale=3), nullable=False
     )
-    amount: Mapped[float] = mapped_column(
+    amount: Mapped[Decimal] = mapped_column(
         Numeric(precision=15, scale=2), nullable=False
     )
-    fees: Mapped[float] = mapped_column(
+    fees: Mapped[Decimal] = mapped_column(
         Numeric(precision=15, scale=2), nullable=False, server_default="0"
     )
-    total_amount: Mapped[float] = mapped_column(
+    total_amount: Mapped[Decimal] = mapped_column(
         Numeric(precision=15, scale=2), nullable=False
     )
-    cost_basis: Mapped[float] = mapped_column(
+    cost_basis: Mapped[Decimal] = mapped_column(
         Numeric(precision=15, scale=2), nullable=False
     )
-    gain_loss: Mapped[float] = mapped_column(
+    gain_loss: Mapped[Decimal] = mapped_column(
         Numeric(precision=15, scale=2), nullable=False
     )
     process_date: Mapped[date] = mapped_column(Date, nullable=False)

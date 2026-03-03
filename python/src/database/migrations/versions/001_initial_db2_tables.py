@@ -176,7 +176,7 @@ def upgrade() -> None:
         sa.Column("additional_info", sa.String(500), nullable=True),
     )
     op.create_index(
-        "errlog_ix1", "errlog", ["process_date", "error_severity"]
+        "errlog_ix1", "errlog", ["process_date", sa.text("error_severity DESC")]
     )
 
     # --- rtncodes ---

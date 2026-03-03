@@ -10,6 +10,7 @@ TRANSACTION_ID format: YYYYMMDDHHMMSS + 6-digit sequence
 from __future__ import annotations
 
 from datetime import date, datetime, time
+from decimal import Decimal
 
 from sqlalchemy import Date, DateTime, ForeignKey, Index, Numeric, String, Time
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -32,13 +33,13 @@ class TransactionHistory(Base):
     transaction_time: Mapped[time] = mapped_column(Time, nullable=False)
     investment_id: Mapped[str] = mapped_column(String(10), nullable=False)
     transaction_type: Mapped[str] = mapped_column(String(2), nullable=False)
-    quantity: Mapped[float] = mapped_column(
+    quantity: Mapped[Decimal] = mapped_column(
         Numeric(precision=18, scale=4), nullable=False
     )
-    price: Mapped[float] = mapped_column(
+    price: Mapped[Decimal] = mapped_column(
         Numeric(precision=18, scale=4), nullable=False
     )
-    amount: Mapped[float] = mapped_column(
+    amount: Mapped[Decimal] = mapped_column(
         Numeric(precision=18, scale=2), nullable=False
     )
     currency_code: Mapped[str] = mapped_column(String(3), nullable=False)

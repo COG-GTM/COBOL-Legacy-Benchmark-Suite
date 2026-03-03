@@ -8,7 +8,7 @@ Severity levels: 1=Info, 2=Warning, 3=Error, 4=Severe
 
 from datetime import date, datetime, time
 
-from sqlalchemy import Date, DateTime, Index, Integer, String, Time
+from sqlalchemy import Date, DateTime, Index, Integer, String, Time, desc
 from sqlalchemy.orm import Mapped, mapped_column
 
 from .base import Base
@@ -35,5 +35,5 @@ class ErrLog(Base):
     )
 
     __table_args__ = (
-        Index("errlog_ix1", "process_date", "error_severity"),
+        Index("errlog_ix1", "process_date", desc("error_severity")),
     )

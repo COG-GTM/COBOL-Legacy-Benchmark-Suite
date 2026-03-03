@@ -4,6 +4,7 @@ Migrated from: src/database/db2/db2-definitions.sql
 """
 
 from datetime import date, datetime
+from decimal import Decimal
 
 from sqlalchemy import Date, DateTime, ForeignKey, Index, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -57,13 +58,13 @@ class InvestmentPositions(Base):
     )
     investment_id: Mapped[str] = mapped_column(String(10), primary_key=True)
     position_date: Mapped[date] = mapped_column(Date, primary_key=True)
-    quantity: Mapped[float] = mapped_column(
+    quantity: Mapped[Decimal] = mapped_column(
         Numeric(precision=18, scale=4), nullable=False
     )
-    cost_basis: Mapped[float] = mapped_column(
+    cost_basis: Mapped[Decimal] = mapped_column(
         Numeric(precision=18, scale=2), nullable=False
     )
-    market_value: Mapped[float] = mapped_column(
+    market_value: Mapped[Decimal] = mapped_column(
         Numeric(precision=18, scale=2), nullable=False
     )
     currency_code: Mapped[str] = mapped_column(String(3), nullable=False)
