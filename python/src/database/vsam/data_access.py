@@ -243,7 +243,7 @@ class VSAMDataAccess(Generic[T]):
             VSAMError: With status '22' if a duplicate key exists.
         """
         key_values = self._extract_key(record)
-        with Session(self.engine) as session:
+        with Session(self.engine, expire_on_commit=False) as session:
             # Check for duplicate key (VSAM would reject duplicates)
             existing = self._find_by_key(session, key_values)
             if existing is not None:
@@ -253,6 +253,7 @@ class VSAMDataAccess(Generic[T]):
                 )
             session.add(record)
             session.commit()
+            session.expunge(record)
         return VSAMStatus.SUCCESS
 
     # -------------------------------------------------------------------
@@ -276,7 +277,7 @@ class VSAMDataAccess(Generic[T]):
             VSAMError: With status '23' if the record does not exist.
         """
         key_values = self._extract_key(record)
-        with Session(self.engine) as session:
+        with Session(self.engine, expire_on_commit=False) as session:
             existing = self._find_by_key(session, key_values)
             if existing is None:
                 raise VSAMError(
