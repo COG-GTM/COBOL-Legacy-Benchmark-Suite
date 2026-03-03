@@ -104,14 +104,23 @@ class PositionUpdater:
                 result.error_messages.append(error_msg)
                 logger.error("%s: %s", self.PROGRAM_ID, error_msg)
 
-                self._error_processor.process_error(
-                    program_id=self.PROGRAM_ID,
-                    category="PR",
-                    error_code="E007",
-                    severity=3,
-                    error_text=str(exc)[:200],
-                    details=f"portfolio={txn.portfolio_id} investment={txn.investment_id}",
-                )
+                try:
+                    self._error_processor.process_error(
+                        program_id=self.PROGRAM_ID,
+                        category="PR",
+                        error_code="E007",
+                        severity=3,
+                        error_text=str(exc)[:200],
+                        details=(
+                            f"portfolio={txn.portfolio_id} "
+                            f"investment={txn.investment_id}"
+                        ),
+                    )
+                except Exception:
+                    logger.exception(
+                        "%s: Failed to log error",
+                        self.PROGRAM_ID,
+                    )
 
             # Periodic commit (replaces COBOL COMMIT-THRESHOLD logic)
             if i % self.COMMIT_THRESHOLD == 0:
@@ -167,10 +176,16 @@ class PositionUpdater:
             # 2300-UPDATE-POSITION
             self._update_position(position, txn, user_id)
             result.positions_updated += 1
-        else:
-            # 2400-CREATE-POSITION
+        elif txn.transaction_type == TransactionType.BUY:
+            # 2400-CREATE-POSITION (only for BUY transactions)
             self._create_position(txn, proc_date, user_id)
             result.positions_created += 1
+        else:
+            raise ValueError(
+                f"Cannot process {txn.transaction_type.value} "
+                f"without existing position for "
+                f"{txn.portfolio_id}/{txn.investment_id}"
+            )
 
     def _update_position(
         self,
