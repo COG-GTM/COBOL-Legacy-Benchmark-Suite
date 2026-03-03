@@ -176,8 +176,11 @@ class PositionUpdater:
             # 2300-UPDATE-POSITION
             self._update_position(position, txn, user_id)
             result.positions_updated += 1
-        elif txn.transaction_type == TransactionType.BUY:
-            # 2400-CREATE-POSITION (only for BUY transactions)
+        elif txn.transaction_type in (
+            TransactionType.BUY,
+            TransactionType.TRANSFER,
+        ):
+            # 2400-CREATE-POSITION (BUY and TRANSFER-in can create)
             self._create_position(txn, proc_date, user_id)
             result.positions_created += 1
         else:
@@ -197,15 +200,23 @@ class PositionUpdater:
 
         Replaces POSUPD00 paragraph 2300-UPDATE-POSITION.
         """
-        if txn.transaction_type == TransactionType.BUY:
+        if txn.transaction_type in (
+            TransactionType.BUY,
+            TransactionType.TRANSFER,
+        ):
+            # BUY and TRANSFER-in both add quantity and cost
             position.quantity += txn.quantity
             position.cost_basis += txn.amount
         elif txn.transaction_type == TransactionType.SELL:
             position.quantity -= txn.quantity
             # Proportional cost basis reduction
             if position.quantity > 0:
-                ratio = txn.quantity / (position.quantity + txn.quantity)
-                position.cost_basis -= position.cost_basis * ratio
+                ratio = txn.quantity / (
+                    position.quantity + txn.quantity
+                )
+                position.cost_basis -= (
+                    position.cost_basis * ratio
+                )
             else:
                 position.cost_basis = Decimal("0")
         elif txn.transaction_type == TransactionType.FEE:
