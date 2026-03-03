@@ -290,6 +290,41 @@ class TestReadNext:
         dates = [r.transaction_date for r in records]
         assert dates == sorted(dates)
 
+    def test_multi_column_start_key_composite_comparison(self, engine):
+        """Verify composite tuple comparison for multi-column start_key.
+
+        Regression test: per-column >= filters would incorrectly exclude
+        records like ("20240316", "080000") when start_key is
+        {"transaction_date": "20240315", "transaction_time": "120000"}
+        because "080000" < "120000" even though the composite key is greater.
+        """
+        dao = create_transaction_history_dao(engine)
+        # Record BEFORE the start key (should be excluded)
+        dao.write(_make_transaction(date="20240314", time="180000", seq="000010"))
+        # Record AT the start key (should be included)
+        dao.write(_make_transaction(date="20240315", time="120000", seq="000011"))
+        # Record with later date but earlier time (should be included
+        # with correct composite comparison, was excluded by the old bug)
+        dao.write(_make_transaction(date="20240316", time="080000", seq="000012"))
+        # Record clearly after (should be included)
+        dao.write(_make_transaction(date="20240317", time="140000", seq="000013"))
+
+        records = dao.read_all(
+            start_key={
+                "transaction_date": "20240315",
+                "transaction_time": "120000",
+            }
+        )
+        dates_times = [
+            (r.transaction_date, r.transaction_time) for r in records
+        ]
+        # The record before start_key must be excluded
+        assert ("20240314", "180000") not in dates_times
+        # All three records at or after the composite start key must appear
+        assert ("20240315", "120000") in dates_times
+        assert ("20240316", "080000") in dates_times  # This was the bug
+        assert ("20240317", "140000") in dates_times
+
 
 # -----------------------------------------------------------------------
 # REWRITE operation tests

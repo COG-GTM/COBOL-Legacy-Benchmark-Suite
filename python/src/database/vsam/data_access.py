@@ -17,7 +17,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Generic, Iterator, Optional, Sequence, Type, TypeVar
 
-from sqlalchemy import inspect, select
+from sqlalchemy import inspect, select, tuple_
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session
 
@@ -355,15 +355,32 @@ class VSAMDataAccess(Generic[T]):
 
             # Apply partial key filter if start_key is provided
             if cursor.start_key:
-                for col_name, value in cursor.start_key.items():
-                    if col_name in self._pk_columns:
-                        stmt = stmt.where(
-                            getattr(self.model, col_name) >= value
-                        )
-                    else:
-                        stmt = stmt.where(
-                            getattr(self.model, col_name) == value
-                        )
+                # Separate PK columns from non-PK columns
+                pk_cols_in_key = [
+                    col for col in self._pk_columns
+                    if col in cursor.start_key
+                ]
+                non_pk_cols = [
+                    col for col in cursor.start_key
+                    if col not in self._pk_columns
+                ]
+
+                # Use composite tuple comparison for PK columns
+                # to correctly implement VSAM START semantics
+                if pk_cols_in_key:
+                    lhs = tuple_(
+                        *[getattr(self.model, c) for c in pk_cols_in_key]
+                    )
+                    rhs = tuple_(
+                        *[cursor.start_key[c] for c in pk_cols_in_key]
+                    )
+                    stmt = stmt.where(lhs >= rhs)
+
+                # Non-PK columns use exact match
+                for col_name in non_pk_cols:
+                    stmt = stmt.where(
+                        getattr(self.model, col_name) == cursor.start_key[col_name]
+                    )
 
             # Order by PK columns for KSDS key-sequenced access
             for col_name in self._pk_columns:
