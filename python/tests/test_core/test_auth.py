@@ -143,6 +143,28 @@ class TestTokenManager:
         payload = token_manager.validate_token(token)
         assert payload["department"] == "finance"
 
+    def test_extra_claims_cannot_override_reserved_fields(self, token_manager):
+        """Ensure extra_claims cannot override security-critical JWT fields."""
+        token = token_manager.create_access_token(
+            user_id="USER001",
+            username="testuser",
+            roles=["viewer"],
+            extra_claims={
+                "sub": "ADMIN",
+                "roles": ["admin"],
+                "type": "refresh",
+                "exp": 9999999999,
+                "department": "finance",
+            },
+        )
+        payload = token_manager.validate_token(token)
+        # Reserved fields must NOT be overridden
+        assert payload["sub"] == "USER001"
+        assert payload["roles"] == ["viewer"]
+        assert payload["type"] == "access"
+        # Non-reserved extra claims should still work
+        assert payload["department"] == "finance"
+
 
 # --- Models Tests ---
 

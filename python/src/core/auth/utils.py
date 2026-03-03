@@ -107,7 +107,9 @@ class TokenManager:
         }
 
         if extra_claims:
-            payload.update(extra_claims)
+            reserved = {"sub", "username", "roles", "type", "iat", "exp"}
+            safe_claims = {k: v for k, v in extra_claims.items() if k not in reserved}
+            payload.update(safe_claims)
 
         token = jwt.encode(payload, self._secret_key, algorithm=self._algorithm)
         logger.debug(

@@ -5,6 +5,9 @@ from unittest.mock import MagicMock, patch
 import pytest
 from tenacity import RetryError
 
+from python.src.core.error_handling.exceptions import (
+    ConnectionError as CLBSConnectionError,
+)
 from python.src.core.error_handling.recovery import (
     RecoveryManager,
     RetryConfig,
@@ -115,7 +118,7 @@ class TestRetryDatabaseOperation:
             nonlocal call_count
             call_count += 1
             if call_count < 2:
-                raise ConnectionError("DB connection lost")
+                raise CLBSConnectionError("DB connection lost")
             return {"data": "result"}
 
         result = db_query()
