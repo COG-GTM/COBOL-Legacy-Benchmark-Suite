@@ -76,6 +76,7 @@ class PositionUpdater:
         position = self.positions.get(key)
 
         try:
+            is_new = False
             if position is None:
                 # SELL/FEE on non-existent position is an error
                 if transaction.type in (TransactionType.SELL, TransactionType.FEE):
@@ -103,6 +104,7 @@ class PositionUpdater:
                 self.positions[key] = position
                 self.records_inserted += 1
                 self.stats.update("inserts")
+                is_new = True
 
             # Apply transaction based on type
             if transaction.type == TransactionType.BUY:
@@ -143,8 +145,9 @@ class PositionUpdater:
 
             # Update position date
             position.date = transaction.date
-            self.records_updated += 1
-            self.stats.update("updates")
+            if not is_new:
+                self.records_updated += 1
+                self.stats.update("updates")
             return True
 
         except Exception as exc:

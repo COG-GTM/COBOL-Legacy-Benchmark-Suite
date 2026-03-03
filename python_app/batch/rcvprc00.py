@@ -154,7 +154,7 @@ class RecoveryProcessor:
 
         elif action == RecoveryAction.BYPASS:
             self.sequence_manager.update_status(
-                process_name, ProcessStatus.SKIPPED, return_code=0,
+                process_name, ProcessStatus.BYPASSED, return_code=0,
             )
             logger.info("RCVPRC00: Process %s bypassed", process_name)
             return RecoveryResult(process_name, action, True, "Process bypassed")
