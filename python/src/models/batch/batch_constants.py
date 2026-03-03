@@ -70,7 +70,7 @@ class BatchProcessNames(BaseModel):
 
     bct_start_of_day: str = Field(default="STARTDAY", max_length=8, description="Start of day process. COBOL: BCT-START-OF-DAY PIC X(8) VALUE 'STARTDAY'.")
     bct_end_of_day: str = Field(default="ENDDAY", max_length=8, description="End of day process. COBOL: BCT-END-OF-DAY PIC X(8) VALUE 'ENDDAY  '.")
-    bct_emergency: str = Field(default="EMERGENCY", max_length=9, description="Emergency process. COBOL: BCT-EMERGENCY PIC X(8) VALUE 'EMERGENCY'.")
+    bct_emergency: str = Field(default="EMERGENC", max_length=8, description="Emergency process. COBOL: BCT-EMERGENCY PIC X(8) VALUE 'EMERGENCY'.")
 
 
 class BatchRecordTypes(BaseModel):
