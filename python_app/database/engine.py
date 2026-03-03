@@ -33,7 +33,7 @@ def get_engine(database_url: str = DEFAULT_DATABASE_URL) -> Engine:
     """
     global _engine
     if _engine is not None:
-        existing_url = str(_engine.url)
+        existing_url = _engine.url.render_as_string(hide_password=False)
         if existing_url != database_url:
             logger.warning(
                 "Engine already initialized with URL '%s', ignoring requested URL '%s'. "

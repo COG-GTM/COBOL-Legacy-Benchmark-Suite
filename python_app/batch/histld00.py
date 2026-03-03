@@ -102,6 +102,7 @@ class HistoryLoader:
             self.records_loaded, self.records_error,
         )
         self.commit_ctrl.commit_count += 1
+        self.commit_ctrl.records_since_commit = 0
 
     def process_batch(self, positions: list[PositionRecord]) -> int:
         """Process a batch of positions - replaces 0000-MAIN.
