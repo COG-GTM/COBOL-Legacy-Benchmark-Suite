@@ -106,6 +106,8 @@ class PositionUpdater:
                         severity=ErrorSeverity.WARNING,
                         error_code="PQTY",
                     )
+                    self.records_error += 1
+                    self.stats.update("errors")
                     return False
 
                 # Proportional cost basis reduction

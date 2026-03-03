@@ -66,6 +66,9 @@ class DailyBatchJob:
         # Initialize batch control
         self.batch_ctrl.init_job("DAILYBCH", process_date, "TRNVAL00")
 
+        # Clear any steps from previous executions
+        self.pipeline.steps.clear()
+
         # Step 1: Validate transactions (STEP010)
         self.pipeline.add_step(
             "TRNVAL00",
@@ -135,6 +138,9 @@ class ReportJob:
             report_date = datetime.now().strftime("%Y%m%d")
 
         logger.info("RPTJOB starting for date %s", report_date)
+
+        # Clear any steps from previous executions
+        self.pipeline.steps.clear()
 
         self.pipeline.add_step(
             "RPTPOS00",

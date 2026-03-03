@@ -154,6 +154,8 @@ class HistoryLoader:
             rc = RC_SUCCESS
         elif rc <= 4:
             rc = RC_WARNING
+        else:
+            rc = RC_ERROR
 
         logger.info("HISTLD00 return code: %d", rc)
         return rc

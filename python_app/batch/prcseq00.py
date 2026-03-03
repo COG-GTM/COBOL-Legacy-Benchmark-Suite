@@ -125,6 +125,8 @@ class ProcessSequenceManager:
                 failed_deps.append(f"{dep_name}(RC={dep.return_code})")
             elif dep.status == ProcessStatus.ERROR:
                 failed_deps.append(f"{dep_name}(ERROR)")
+            elif dep.status in (ProcessStatus.SKIPPED, ProcessStatus.BYPASSED):
+                continue  # Dependency bypassed, treat as satisfied
             else:
                 pending_deps.append(dep_name)
 
