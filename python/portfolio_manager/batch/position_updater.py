@@ -97,7 +97,8 @@ class PositionUpdater:
             result.records_read += 1
 
             try:
-                self._process_transaction(txn, proc_date, user_id, result)
+                with self._session.begin_nested():
+                    self._process_transaction(txn, proc_date, user_id, result)
             except Exception as exc:
                 result.records_error += 1
                 error_msg = f"Error processing txn {txn.portfolio_id}/{txn.investment_id}: {exc}"

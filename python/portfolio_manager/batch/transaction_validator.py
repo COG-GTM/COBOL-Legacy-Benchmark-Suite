@@ -104,6 +104,15 @@ def validate_transaction(record: TransactionRecord) -> ValidationResult:
         result.valid = False
         result.errors.append("Investment ID is required")
 
+    # 2215-VALIDATE-TIME
+    if not record.trn_time or len(record.trn_time) < 4:
+        result.valid = False
+        result.errors.append(
+            "Transaction time must be at least 4 characters (HHMM or HHMMSS)"
+        )
+    else:
+        _validate_time(record.trn_time, "Transaction time", result)
+
     # 2220-VALIDATE-TYPE
     if record.transaction_type.value not in VALID_TRANSACTION_TYPES:
         result.valid = False
@@ -165,6 +174,26 @@ def _validate_date(date_str: str, field_name: str, result: ValidationResult) -> 
     if not (1900 <= year <= 2099):
         result.valid = False
         result.errors.append(f"{field_name} has invalid date components: {date_str}")
+
+
+def _validate_time(
+    time_str: str, field_name: str, result: ValidationResult,
+) -> None:
+    """Validate a time string in HHMM or HHMMSS format."""
+    try:
+        hour = int(time_str[:2])
+        minute = int(time_str[2:4])
+        second = int(time_str[4:6]) if len(time_str) >= 6 else 0
+    except (ValueError, IndexError):
+        result.valid = False
+        result.errors.append(f"{field_name} is not a valid time: {time_str}")
+        return
+
+    if not (0 <= hour <= 23 and 0 <= minute <= 59 and 0 <= second <= 59):
+        result.valid = False
+        result.errors.append(
+            f"{field_name} has invalid time components: {time_str}"
+        )
 
 
 # ---------------------------------------------------------------------------
