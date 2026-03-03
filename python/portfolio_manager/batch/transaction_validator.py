@@ -143,16 +143,28 @@ def validate_transaction(record: TransactionRecord) -> ValidationResult:
 
 def _validate_date(date_str: str, field_name: str, result: ValidationResult) -> None:
     """Validate a date string in YYYYMMDD format."""
+    from datetime import date as date_type
+
     try:
         year = int(date_str[:4])
         month = int(date_str[4:6])
         day = int(date_str[6:8])
-        if not (1900 <= year <= 2099 and 1 <= month <= 12 and 1 <= day <= 31):
-            result.valid = False
-            result.errors.append(f"{field_name} has invalid date components: {date_str}")
     except (ValueError, IndexError):
         result.valid = False
         result.errors.append(f"{field_name} is not a valid date: {date_str}")
+        return
+
+    # Use stdlib to catch impossible calendar dates (Feb 30, etc.)
+    try:
+        date_type(year, month, day)
+    except ValueError:
+        result.valid = False
+        result.errors.append(f"{field_name} has invalid date components: {date_str}")
+        return
+
+    if not (1900 <= year <= 2099):
+        result.valid = False
+        result.errors.append(f"{field_name} has invalid date components: {date_str}")
 
 
 # ---------------------------------------------------------------------------
