@@ -147,7 +147,7 @@ class AuthMiddleware:
                     error_info="User validation failed",
                 )
 
-            if not verify_password(password, user.hashed_password):
+            if not user.hashed_password or not verify_password(password, user.hashed_password):
                 self._audit_event(
                     user_id=user.user_id,
                     terminal_id=terminal_id,
