@@ -49,11 +49,15 @@ class RetryConfig:
     )
 
 
-def _before_retry_log(retry_state: RetryCallState) -> None:
-    """Log retry attempts, mirroring DB2RECV's retry tracking.
+def _before_sleep_log(retry_state: RetryCallState) -> None:
+    """Log retry attempts before sleeping, mirroring DB2RECV's retry tracking.
 
     Equivalent to DB2RECV incrementing WS-RETRY-COUNT and
     storing WS-LAST-ERROR before each retry.
+
+    Uses tenacity's ``before_sleep`` callback so that
+    ``retry_state.outcome`` is populated with the previous
+    attempt's failure.
     """
     attempt = retry_state.attempt_number
     fn_name = getattr(retry_state.fn, "__name__", "unknown")
@@ -73,20 +77,36 @@ def _before_retry_log(retry_state: RetryCallState) -> None:
         )
 
 
-def _after_retry_log(retry_state: RetryCallState) -> None:
-    """Log final retry outcome."""
-    fn_name = getattr(retry_state.fn, "__name__", "unknown")
+def _create_after_retry_log(max_retries: int) -> Callable[[RetryCallState], None]:
+    """Create an after-attempt callback that only logs exhaustion on the final attempt.
 
-    if retry_state.outcome is not None and retry_state.outcome.failed:
-        logger.error(
-            "All retries exhausted for %s after %d attempts",
-            fn_name,
-            retry_state.attempt_number,
-            extra={
-                "function": fn_name,
-                "total_attempts": retry_state.attempt_number,
-            },
-        )
+    Args:
+        max_retries: The configured maximum number of attempts.
+
+    Returns:
+        A callback suitable for tenacity's ``after`` parameter.
+    """
+
+    def _after_retry_log(retry_state: RetryCallState) -> None:
+        """Log only when all retries are truly exhausted."""
+        fn_name = getattr(retry_state.fn, "__name__", "unknown")
+
+        if (
+            retry_state.outcome is not None
+            and retry_state.outcome.failed
+            and retry_state.attempt_number >= max_retries
+        ):
+            logger.error(
+                "All retries exhausted for %s after %d attempts",
+                fn_name,
+                retry_state.attempt_number,
+                extra={
+                    "function": fn_name,
+                    "total_attempts": retry_state.attempt_number,
+                },
+            )
+
+    return _after_retry_log
 
 
 def create_retry_decorator(config: Optional[RetryConfig] = None) -> Callable:
@@ -121,8 +141,8 @@ def create_retry_decorator(config: Optional[RetryConfig] = None) -> Callable:
         stop=stop_after_attempt(config.max_retries),
         wait=wait_strategy,
         retry=retry_if_exception_type(exception_types),
-        before=_before_retry_log,
-        after=_after_retry_log,
+        before_sleep=_before_sleep_log,
+        after=_create_after_retry_log(config.max_retries),
         reraise=True,
     )
 
