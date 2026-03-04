@@ -81,11 +81,15 @@ public class PositionRecord {
     public void setLastMaintUser(String lastMaintUser) { this.lastMaintUser = lastMaintUser; }
 
     /**
-     * Builds the composite key (portfolioId + date + investmentId)
+     * Builds the composite key (portfolioId + investmentId)
      * corresponding to POS-KEY in the COBOL copybook.
+     *
+     * Note: positionDate is excluded from the key because a portfolio holds
+     * at most one position per investment. Using the date would cause
+     * lookups from transactions on different dates to miss existing positions.
      */
     public String getCompositeKey() {
-        return portfolioId + positionDate + investmentId;
+        return portfolioId + investmentId;
     }
 
     @Override

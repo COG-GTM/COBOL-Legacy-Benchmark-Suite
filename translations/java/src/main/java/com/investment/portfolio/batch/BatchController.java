@@ -207,10 +207,11 @@ public class BatchController {
         LOGGER.info("Updating status for job: " + record.getJobName()
                 + " to " + record.getStatus());
 
+        // Set return code BEFORE persisting, so the file reflects the final state
+        // (matches COBOL REWRITE which writes the record after all fields are set)
+        record.setReturnCode(ReturnCode.SUCCESS);
         controlRecords.put(record.getCompositeKey(), record);
         saveControlRecords();
-
-        record.setReturnCode(ReturnCode.SUCCESS);
     }
 
     /**

@@ -65,6 +65,12 @@ public class HistoryLoader {
     private long recordsInError;
     private long duplicateCount;
 
+    /**
+     * Tracks inserts since last commit so we can adjust recordsWritten
+     * if a rollback occurs (rollback undoes all uncommitted inserts).
+     */
+    private long recordsSinceLastCommit;
+
     /** Commit frequency - maps to COBOL WS-COMMIT-FREQUENCY VALUE 1000 */
     private static final int COMMIT_FREQUENCY = 1000;
 
@@ -119,6 +125,7 @@ public class HistoryLoader {
         recordsWritten = 0;
         recordsInError = 0;
         duplicateCount = 0;
+        recordsSinceLastCommit = 0;
 
         // Connect to database - maps to PERFORM CONNECT-TO-DB2
         dbManager.connect();
@@ -169,6 +176,7 @@ public class HistoryLoader {
                 boolean inserted = loadToDb2(insertStmt, histRecord);
                 if (inserted) {
                     recordsWritten++;
+                    recordsSinceLastCommit++;
                 }
 
                 // 2300-CHECK-COMMIT: Commit every COMMIT_FREQUENCY records
@@ -250,6 +258,15 @@ public class HistoryLoader {
                 return loadToDb2(stmt, rec); // Retry
             }
 
+            // handleSqlException may have triggered a rollback, which undoes
+            // all uncommitted inserts. Adjust recordsWritten accordingly.
+            if (recordsSinceLastCommit > 0) {
+                LOGGER.warning("Rollback detected: adjusting recordsWritten by -"
+                        + recordsSinceLastCommit);
+                recordsWritten -= recordsSinceLastCommit;
+                recordsSinceLastCommit = 0;
+            }
+
             recordsInError++;
             return false;
         }
@@ -268,6 +285,9 @@ public class HistoryLoader {
      */
     private void checkCommit() {
         dbManager.commit();
+
+        // Reset since-last-commit counter — these records are now durable
+        recordsSinceLastCommit = 0;
 
         // Update checkpoint/batch control
         checkpoint.setRecordsRead(recordsRead);

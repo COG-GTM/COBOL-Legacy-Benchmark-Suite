@@ -198,7 +198,9 @@ public class PositionUpdater {
      * Implements the core position update business logic.
      */
     private boolean updatePosition(TransactionRecord trn, FileHandler histFile) {
-        String posKey = trn.getPortfolioId() + trn.getTransactionDate() + trn.getInvestmentId();
+        // Key matches PositionRecord.getCompositeKey(): portfolioId + investmentId
+        // (date excluded so transactions on any date find the same position)
+        String posKey = trn.getPortfolioId() + trn.getInvestmentId();
 
         PositionRecord position = positionCache.get(posKey);
 
