@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -35,7 +36,8 @@ public class ProcessSequenceJob {
     private final ReturnCodeManager returnCodeManager = new ReturnCodeManager();
 
     // Process table - max 100 entries from PRCSEQ00.cbl
-    private final List<ProcessSequenceRecord> processTable = new ArrayList<>();
+    // Synchronized list for thread-safety in singleton bean
+    private final List<ProcessSequenceRecord> processTable = Collections.synchronizedList(new ArrayList<>());
 
     public ProcessSequenceJob(ProcessSequenceRepository processSequenceRepository,
                               BatchControlRepository batchControlRepository) {
@@ -48,7 +50,7 @@ public class ProcessSequenceJob {
      * From PRCSEQ00.cbl: P200-INIT-SEQUENCE paragraph.
      * Replaces VSAM START/READ NEXT with database query.
      */
-    public void initialize(String startKey) {
+    public synchronized void initialize(String startKey) {
         logger.info("Initializing process sequence from key: {}", startKey);
         returnCodeManager.reset();
         processTable.clear();
@@ -74,7 +76,7 @@ public class ProcessSequenceJob {
      * From PRCSEQ00.cbl: P300-NEXT-PROCESS paragraph.
      * Checks scheduling and dependencies.
      */
-    public ProcessSequenceRecord getNextProcess(String processDate) {
+    public synchronized ProcessSequenceRecord getNextProcess(String processDate) {
         DayOfWeek today = LocalDate.now().getDayOfWeek();
 
         for (ProcessSequenceRecord process : processTable) {
@@ -144,14 +146,14 @@ public class ProcessSequenceJob {
      * TERM function - terminate process sequence.
      * From PRCSEQ00.cbl: P500-TERMINATE paragraph.
      */
-    public int terminate() {
+    public synchronized int terminate() {
         logger.info("Terminating process sequence. Highest RC: {}", returnCodeManager.getHighestReturnCode());
         int rc = returnCodeManager.getHighestReturnCode();
         processTable.clear();
         return rc;
     }
 
-    public List<ProcessSequenceRecord> getProcessTable() {
+    public synchronized List<ProcessSequenceRecord> getProcessTable() {
         return new ArrayList<>(processTable);
     }
 }

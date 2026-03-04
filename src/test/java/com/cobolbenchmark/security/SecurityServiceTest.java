@@ -107,8 +107,8 @@ class SecurityServiceTest {
         assertDoesNotThrow(() ->
                 securityService.performSecurityCheck("USER01", "PASS01", "PORT0001", "PORTFOLIO"));
 
-        // Verify audit log was called
-        verify(jdbcTemplate, atLeastOnce()).update(contains("AUDITLOG"), any(), any(), any(), any());
+        // Verify audit log was called (6 params: timestamp, userId, program, accessType, action, detail)
+        verify(jdbcTemplate, atLeastOnce()).update(contains("AUDITLOG"), any(), any(), any(), any(), any(), any());
     }
 
     @Test

@@ -80,8 +80,8 @@ public class SecurityService {
         logger.info("Security audit - User: {} Action: {} Detail: {}", userId, action, detail);
         try {
             jdbcTemplate.update(
-                "INSERT INTO AUDITLOG (USER_ID, ACTION, DETAIL, AUDIT_TIMESTAMP) VALUES (?, ?, ?, ?)",
-                userId, action, detail, Timestamp.from(Instant.now())
+                "INSERT INTO AUDITLOG (AUDIT_TIMESTAMP, USER_ID, PROGRAM, ACCESS_TYPE, ACTION, DETAIL) VALUES (?, ?, ?, ?, ?, ?)",
+                Timestamp.from(Instant.now()), userId, "SECMGR", action, action, detail
             );
         } catch (Exception e) {
             // Audit logging failure should not stop processing

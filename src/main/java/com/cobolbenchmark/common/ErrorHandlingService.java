@@ -6,8 +6,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
+import java.sql.Time;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 /**
  * Error Handling Service - migrated from ERRHNDL.cbl.
@@ -32,10 +36,11 @@ public class ErrorHandlingService {
     public void logError(String programId, String errorCode, ErrorSeverity severity, String errorMessage) {
         try {
             jdbcTemplate.update(
-                "INSERT INTO ERRLOG (PROGRAM_ID, ERROR_CODE, SEVERITY, ERROR_MESSAGE, ERROR_TIMESTAMP) " +
-                "VALUES (?, ?, ?, ?, ?)",
-                programId, errorCode, severity.getCode(), errorMessage,
-                Timestamp.from(Instant.now())
+                "INSERT INTO ERRLOG (ERROR_TIMESTAMP, PROGRAM_ID, ERROR_TYPE, ERROR_SEVERITY, ERROR_CODE, " +
+                "ERROR_MESSAGE, PROCESS_DATE, PROCESS_TIME, USER_ID) " +
+                "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                Timestamp.from(Instant.now()), programId, "E", severity.getCode(), errorCode,
+                errorMessage, Date.valueOf(LocalDate.now()), Time.valueOf(LocalTime.now()), "SYSTEM"
             );
         } catch (Exception e) {
             // If we can't log to DB, at least log to application log

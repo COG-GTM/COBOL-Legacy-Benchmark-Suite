@@ -3,9 +3,11 @@ package com.cobolbenchmark.db;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Service;
 
+import java.sql.PreparedStatement;
 import java.util.List;
 
 /**
@@ -31,18 +33,25 @@ public class CursorManagerService {
      * Spring JDBC handles cursor lifecycle automatically.
      */
     public <T> List<T> executeQuery(String sql, RowMapper<T> rowMapper, Object... params) {
-        logger.debug("Executing cursor query: {}", sql);
-        jdbcTemplate.setFetchSize(DEFAULT_FETCH_SIZE);
-        return jdbcTemplate.query(sql, rowMapper, params);
+        return executeQuery(sql, DEFAULT_FETCH_SIZE, rowMapper, params);
     }
 
     /**
      * Execute a query with custom fetch size.
+     * Sets fetch size on the individual PreparedStatement rather than the shared JdbcTemplate
+     * to avoid thread-safety issues with the singleton bean.
      */
     public <T> List<T> executeQuery(String sql, int fetchSize, RowMapper<T> rowMapper, Object... params) {
         logger.debug("Executing cursor query with fetch size {}: {}", fetchSize, sql);
-        jdbcTemplate.setFetchSize(fetchSize);
-        return jdbcTemplate.query(sql, rowMapper, params);
+        PreparedStatementCreator psc = connection -> {
+            PreparedStatement ps = connection.prepareStatement(sql);
+            ps.setFetchSize(fetchSize);
+            for (int i = 0; i < params.length; i++) {
+                ps.setObject(i + 1, params[i]);
+            }
+            return ps;
+        };
+        return jdbcTemplate.query(psc, rowMapper);
     }
 
     /**

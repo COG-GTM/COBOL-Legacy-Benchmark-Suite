@@ -29,6 +29,8 @@ CREATE TABLE IF NOT EXISTS INVESTMENT_POSITIONS (
     PORTFOLIO_ID      CHAR(8)         NOT NULL,
     INVESTMENT_ID     CHAR(10)        NOT NULL,
     POSITION_DATE     DATE            NOT NULL,
+    INVESTMENT_TYPE   CHAR(2),
+    STATUS            CHAR(1),
     QUANTITY          DECIMAL(18,4)   NOT NULL,
     COST_BASIS        DECIMAL(18,2)   NOT NULL,
     MARKET_VALUE      DECIMAL(18,2)   NOT NULL,
@@ -120,6 +122,8 @@ CREATE TABLE IF NOT EXISTS RTNCODES (
 -- ============================================================================
 CREATE TABLE IF NOT EXISTS AUTHFILE (
     USER_ID           CHAR(8)         NOT NULL,
+    PASSWORD_HASH     VARCHAR(128)    NOT NULL,
+    STATUS            CHAR(1)         NOT NULL DEFAULT 'A',
     RESOURCE          CHAR(8)         NOT NULL,
     ACCESS_TYPE       CHAR(8)         NOT NULL,
     PRIMARY KEY (USER_ID, RESOURCE, ACCESS_TYPE)
@@ -133,8 +137,10 @@ CREATE TABLE IF NOT EXISTS AUDITLOG (
     USER_ID           CHAR(8)         NOT NULL,
     TERMINAL_ID       CHAR(4),
     TRANS_ID          CHAR(4),
-    PROGRAM           CHAR(8)         NOT NULL,
+    PROGRAM           CHAR(8)         NOT NULL DEFAULT 'SECMGR',
     ACCESS_TYPE       CHAR(8)         NOT NULL,
+    ACTION            VARCHAR(50),
+    DETAIL            VARCHAR(200),
     PRIMARY KEY (AUDIT_TIMESTAMP, USER_ID)
 );
 
