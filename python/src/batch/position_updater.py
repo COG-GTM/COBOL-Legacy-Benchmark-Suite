@@ -64,7 +64,7 @@ class PositionUpdater:
                 "Position update complete: %d processed, %d errors",
                 self.records_processed, self.error_count,
             )
-            return ReturnCode.WARNING if self.error_count < self.records_processed else ReturnCode.ERROR
+            return ReturnCode.WARNING if self.records_processed > 0 else ReturnCode.ERROR
 
         logger.info("Position update complete: %d processed successfully", self.records_processed)
         return ReturnCode.SUCCESS
