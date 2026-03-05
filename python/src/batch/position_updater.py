@@ -50,14 +50,16 @@ class PositionUpdater:
         logger.info("Processing %d pending transactions", len(pending))
 
         for trn in pending:
+            savepoint = self.session.begin_nested()
             try:
                 self._process_single(trn)
+                savepoint.commit()
                 self.records_processed += 1
             except Exception as e:
+                savepoint.rollback()
                 self.error_count += 1
                 logger.error("Error processing transaction %s: %s", trn.transaction_id, e)
                 try:
-                    self.session.rollback()
                     trn.status = TransactionStatus.FAILED.value
                     self.session.flush()
                 except Exception as recovery_err:

@@ -116,18 +116,25 @@ class HistoryLoader:
     def _checkpoint(self) -> None:
         """
         Translates HISTLD00.cbl 2300-CHECK-COMMIT.
-        EXEC SQL COMMIT WORK END-EXEC at threshold intervals.
+
+        The original COBOL used EXEC SQL COMMIT WORK at threshold intervals.
+        In the Python version the session is managed by the caller's context
+        manager (get_db_session), which is the sole commit/rollback authority.
+        Calling commit() here would prematurely commit ALL pending changes
+        from prior batch steps and leave the DB inconsistent if a later error
+        triggers the context manager's rollback.  We therefore flush() to push
+        changes to the DB without ending the transaction.
         """
         try:
-            self.session.commit()
+            self.session.flush()
             logger.debug(
-                "Checkpoint: read=%d, written=%d",
+                "Checkpoint (flush): read=%d, written=%d",
                 self.records_read, self.records_written,
             )
         except Exception as e:
-            logger.error("Checkpoint commit failed: %s", e)
+            logger.error("Checkpoint flush failed: %s", e)
             raise DatabaseError(
-                f"Checkpoint commit failed: {e}",
+                f"Checkpoint flush failed: {e}",
                 program="HISTLD00",
                 error_code="HL01",
             )
