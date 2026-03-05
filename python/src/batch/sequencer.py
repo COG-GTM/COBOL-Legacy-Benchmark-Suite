@@ -124,9 +124,9 @@ class BatchSequencer:
             if dep_step.status != BatchStatus.DONE.value:
                 if is_hard:
                     return False
-                # Soft dependency — check if it errored
-                if dep_step.status == BatchStatus.ERROR.value:
-                    return False
+                # Soft dependency — block if not yet completed
+                # (still READY, ACTIVE, or ERROR)
+                return False
 
             # Check return code threshold
             if dep_step.return_code > max_rc:

@@ -45,6 +45,7 @@ class PositionUpdater:
         Process all pending transactions.
         Translates POSUPD00.cbl 2000-PROCESS main loop.
         """
+        self._process_date = process_date
         pending = self.trn_repo.list_pending()
         logger.info("Processing %d pending transactions", len(pending))
 
@@ -90,7 +91,7 @@ class PositionUpdater:
                 )
 
         trn.status = TransactionStatus.DONE.value
-        trn.process_date = date.today()
+        trn.process_date = self._process_date or date.today()
         self.session.flush()
         self.records_updated += 1
 
