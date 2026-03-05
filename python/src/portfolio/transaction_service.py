@@ -267,14 +267,23 @@ class TransactionService:
     def _generate_sequence(
         self, portfolio_id: str, trn_date: date, trn_time: str
     ) -> str:
-        """Generate unique sequence number for VSAM key."""
+        """Generate unique sequence number for VSAM key.
+
+        Uses MAX(sequence_no)+1 so the result is always one past the
+        highest existing sequence, avoiding duplicates from deleted rows
+        that a simple COUNT approach would produce.
+        """
         from sqlalchemy import func, select
 
         from src.db.tables import TransactionHistory
 
-        stmt = select(func.count()).select_from(TransactionHistory).where(
-            TransactionHistory.portfolio_id == portfolio_id,
-            TransactionHistory.trn_date == trn_date,
+        stmt = (
+            select(func.max(TransactionHistory.sequence_no))
+            .where(
+                TransactionHistory.portfolio_id == portfolio_id,
+                TransactionHistory.trn_date == trn_date,
+            )
         )
-        count = self.session.scalar(stmt) or 0
-        return str(count + 1).zfill(6)
+        current_max = self.session.scalar(stmt)
+        next_seq = int(current_max) + 1 if current_max else 1
+        return str(next_seq).zfill(6)

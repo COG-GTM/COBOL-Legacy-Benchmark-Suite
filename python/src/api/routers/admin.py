@@ -21,7 +21,6 @@ router = APIRouter()
 @router.post("/batch/run", response_model=dict)
 def run_batch(
     req: BatchRunRequest,
-    session: Session = Depends(get_session_dependency),
     user: str = Depends(validate_api_key),
 ):
     """POST /batch/run — trigger batch processing."""
