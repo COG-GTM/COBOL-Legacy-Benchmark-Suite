@@ -153,11 +153,13 @@ class BatchController:
         if record.error_count > 0:
             record.status = BatchStatus.ERROR.value
             record.return_code = ReturnCode.ERROR.value
+            self.repo.update(record)
             logger.warning("Batch job completed with errors: %s (%d errors)", job_name, record.error_count)
             return ReturnCode.ERROR
         else:
             record.status = BatchStatus.DONE.value
             record.return_code = ReturnCode.SUCCESS.value
+            self.repo.update(record)
             logger.info("Batch job completed successfully: %s", job_name)
             return ReturnCode.SUCCESS
 

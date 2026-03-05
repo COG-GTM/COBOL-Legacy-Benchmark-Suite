@@ -159,7 +159,7 @@ def run_reports(session, process_date: str) -> ReturnCode:
     return ReturnCode.SUCCESS
 
 
-def run_recovery(process_date: str, mode: str = "ALL", job_name: str | None = None) -> ReturnCode:
+def run_recovery(process_date: str, mode: str = "A", job_name: str | None = None) -> ReturnCode:
     """Run recovery process."""
     with get_db_session() as session:
         recovery = ProcessRecovery(session)
@@ -194,8 +194,8 @@ def main() -> int:
     )
     parser.add_argument(
         "--recovery-mode",
-        choices=["PROCESS", "SEQUENCE", "ALL"],
-        default="ALL",
+        choices=["P", "S", "A"],
+        default="A",
     )
     parser.add_argument("--job-name", help="Job name for recovery")
     parser.add_argument("--log-level", default="INFO")

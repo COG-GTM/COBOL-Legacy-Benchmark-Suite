@@ -106,10 +106,12 @@ class HistoryLoader:
         Load a single transaction into history.
         Translates HISTLD00.cbl 2200-LOAD-TO-DB2.
         """
-        # The transaction is already in the table, just mark it as archived
-        # In the original COBOL, this was an INSERT into a separate DB2 table
-        # In our Python version, the transaction_history table serves both purposes
-        pass
+        # The transaction is already in the table, just mark it as archived.
+        # In the original COBOL, this was an INSERT into a separate DB2 table.
+        # In our Python version, the transaction_history table serves both purposes,
+        # so we mark the record as archived by updating its status.
+        trn.status = "A"  # Archived
+        self.session.flush()
 
     def _checkpoint(self) -> None:
         """
