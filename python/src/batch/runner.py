@@ -84,7 +84,7 @@ def run_full_cycle(process_date: str) -> ReturnCode:
                 break
 
             try:
-                step_rc = _run_step(session, step.step_id, process_date)
+                step_rc = _run_step(session, step.step_id, process_date, controller)
                 sequencer.mark_step_complete(step.step_id, step_rc)
                 if step_rc.value > max_rc.value:
                     max_rc = step_rc
@@ -100,24 +100,49 @@ def run_full_cycle(process_date: str) -> ReturnCode:
     return max_rc
 
 
-def _run_step(session, step_id: str, process_date: str) -> ReturnCode:
-    """Run a single batch step."""
+def _run_step(
+    session, step_id: str, process_date: str, controller: BatchController | None = None,
+) -> ReturnCode:
+    """Run a single batch step and propagate counts to the controller."""
     logger.info("Running step: %s", step_id)
 
     match step_id:
         case "VALIDATE":
-            return run_validate(session)
+            rc, summary = run_validate(session)
+            if controller is not None:
+                controller.update_counts(
+                    "FULLCYCL", process_date,
+                    records_read=summary.get("records_validated", 0),
+                    error_count=summary.get("records_rejected", 0),
+                )
+            return rc
         case "POSUPDATE":
-            return run_position_update(session, process_date)
+            rc, summary = run_position_update(session, process_date)
+            if controller is not None:
+                controller.update_counts(
+                    "FULLCYCL", process_date,
+                    records_read=summary.get("records_processed", 0),
+                    records_written=summary.get("records_updated", 0),
+                    error_count=summary.get("error_count", 0),
+                )
+            return rc
         case "HISTLOAD":
-            return run_history_load(session, process_date)
+            rc, summary = run_history_load(session, process_date)
+            if controller is not None:
+                controller.update_counts(
+                    "FULLCYCL", process_date,
+                    records_read=summary.get("records_read", 0),
+                    records_written=summary.get("records_written", 0),
+                    error_count=summary.get("error_count", 0),
+                )
+            return rc
         case "REPORTS":
             return run_reports(session, process_date)
         case _:
             raise BatchError(f"Unknown step: {step_id}", error_code="RN01")
 
 
-def run_validate(session) -> ReturnCode:
+def run_validate(session) -> tuple[ReturnCode, dict]:
     """Run transaction validation step."""
     from src.db.repository import TransactionRepository
 
@@ -127,10 +152,10 @@ def run_validate(session) -> ReturnCode:
     rc = validator.validate_batch(pending)
     summary = validator.get_summary()
     logger.info("Validation: %s", summary)
-    return rc
+    return rc, summary
 
 
-def run_position_update(session, process_date: str) -> ReturnCode:
+def run_position_update(session, process_date: str) -> tuple[ReturnCode, dict]:
     """Run position update step."""
     from datetime import date as date_type
 
@@ -139,16 +164,16 @@ def run_position_update(session, process_date: str) -> ReturnCode:
     rc = updater.process_pending_transactions(pd)
     summary = updater.get_summary()
     logger.info("Position update: %s", summary)
-    return rc
+    return rc, summary
 
 
-def run_history_load(session, process_date: str) -> ReturnCode:
+def run_history_load(session, process_date: str) -> tuple[ReturnCode, dict]:
     """Run history load step."""
     loader = HistoryLoader(session)
     rc = loader.load_transactions(process_date)
     summary = loader.get_summary()
     logger.info("History load: %s", summary)
-    return rc
+    return rc, summary
 
 
 def run_reports(session, process_date: str) -> ReturnCode:
@@ -217,11 +242,11 @@ def main() -> int:
         with get_db_session() as session:
             match args.step:
                 case "validate":
-                    rc = run_validate(session)
+                    rc, _ = run_validate(session)
                 case "position-update":
-                    rc = run_position_update(session, args.process_date)
+                    rc, _ = run_position_update(session, args.process_date)
                 case "history-load":
-                    rc = run_history_load(session, args.process_date)
+                    rc, _ = run_history_load(session, args.process_date)
                 case "reports":
                     rc = run_reports(session, args.process_date)
                 case _:

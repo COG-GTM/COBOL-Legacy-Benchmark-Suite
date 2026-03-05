@@ -16,6 +16,7 @@ from src.common.constants import (
     VALID_CURRENCIES,
     PositionStatus,
     ReturnCode,
+    TransactionStatus,
     TransactionType,
 )
 from src.db.repository import (
@@ -67,18 +68,31 @@ class TransactionValidator:
         if errors:
             self.records_rejected += 1
             self.errors.extend(errors)
+            transaction.status = TransactionStatus.FAILED.value
+            if transaction in self.session.identity_map.values():
+                self.session.flush()
             logger.warning("Transaction validation failed: %s", "; ".join(errors))
             return ReturnCode.ERROR
 
         return ReturnCode.SUCCESS
 
     def validate_batch(self, transactions: list[TransactionHistory]) -> ReturnCode:
-        """Validate a batch of transactions."""
+        """Validate a batch of transactions.
+
+        Returns WARNING when some (but not all) transactions fail so the
+        pipeline can continue processing valid ones.  Returns ERROR only
+        when every transaction in the batch is rejected.
+        """
+        if not transactions:
+            return ReturnCode.SUCCESS
         max_rc = ReturnCode.SUCCESS
         for trn in transactions:
             rc = self.validate_transaction(trn)
             if rc.value > max_rc.value:
                 max_rc = rc
+        # Partial failure → WARNING so downstream steps can process valid txns
+        if max_rc == ReturnCode.ERROR and self.records_rejected < self.records_validated:
+            return ReturnCode.WARNING
         return max_rc
 
     def _check_required_fields(self, trn: TransactionHistory) -> list[str]:
