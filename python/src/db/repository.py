@@ -231,7 +231,12 @@ class TransactionRepository:
         return list(self.session.scalars(stmt).all())
 
     def check_duplicate(
-        self, trn_date: date, trn_time: str, portfolio_id: str, sequence_no: str
+        self,
+        trn_date: date,
+        trn_time: str,
+        portfolio_id: str,
+        sequence_no: str,
+        exclude_id: int | None = None,
     ) -> bool:
         """Check for duplicate transaction (from TRNVAL00.cbl)."""
         stmt = select(func.count()).select_from(TransactionHistory).where(
@@ -242,6 +247,8 @@ class TransactionRepository:
                 TransactionHistory.sequence_no == sequence_no,
             )
         )
+        if exclude_id is not None:
+            stmt = stmt.where(TransactionHistory.transaction_id != exclude_id)
         return (self.session.scalar(stmt) or 0) > 0
 
     def bulk_create(self, transactions: list[TransactionHistory]) -> int:

@@ -110,7 +110,8 @@ class TransactionValidator:
     def _check_duplicate(self, trn: TransactionHistory) -> bool:
         """Translates TRNVAL00.cbl 2200-CHECK-DUPLICATE."""
         return self.trn_repo.check_duplicate(
-            trn.trn_date, trn.trn_time, trn.portfolio_id, trn.sequence_no
+            trn.trn_date, trn.trn_time, trn.portfolio_id, trn.sequence_no,
+            exclude_id=trn.transaction_id,
         )
 
     def _validate_portfolio(self, trn: TransactionHistory) -> list[str]:
