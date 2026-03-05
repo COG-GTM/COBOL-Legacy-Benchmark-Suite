@@ -90,7 +90,7 @@ The system comprises several key components:
 - **Online Layer**: Provides inquiry capabilities through `INQONLN`, allowing users to view portfolio positions and transaction histories.
 - **Utility Programs**: Include file maintenance (`UTLMNT00`), system monitoring (`UTLMON00`), and data validation (`UTLVAL00`).
 - **Reporting System**: Generates reports on positions (`RPTPOS00`), audits (`RPTAUD00`), and system statistics (`RPTSTA00`).
-- **Test Components**: Consist of test data generation (`TSTGEN00`) and test validation (`TSTVAL00`) to support testing and benchmarking.
+- **Test Components**: Consist of test data generation (`TSTGEN00`), test validation (`TSTVAL00`), and portfolio transaction unit tests (`TSTTRN00`) to support testing and benchmarking.
 
 ## Use in LLM Translation Tools Benchmarking
 
