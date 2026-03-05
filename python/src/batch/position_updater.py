@@ -56,8 +56,12 @@ class PositionUpdater:
             except Exception as e:
                 self.error_count += 1
                 logger.error("Error processing transaction %s: %s", trn.transaction_id, e)
-                trn.status = TransactionStatus.FAILED.value
-                self.session.flush()
+                try:
+                    self.session.rollback()
+                    trn.status = TransactionStatus.FAILED.value
+                    self.session.flush()
+                except Exception as recovery_err:
+                    logger.error("Failed to mark transaction %s as FAILED: %s", trn.transaction_id, recovery_err)
 
         if self.error_count > 0:
             logger.warning(
