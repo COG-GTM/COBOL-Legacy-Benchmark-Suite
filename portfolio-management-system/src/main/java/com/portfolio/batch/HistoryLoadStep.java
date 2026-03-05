@@ -21,6 +21,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * History Load Step.
@@ -54,9 +55,18 @@ public class HistoryLoadStep implements Tasklet {
         this.statisticsService = statisticsService;
     }
 
+    // Unique sequence counter for transaction ID generation within a single execution
+    private final AtomicInteger txnIdSequence = new AtomicInteger(0);
+
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
         log.info("Starting History Load Step (HISTLD00)");
+
+        // Reset counters for each execution (singleton component reused across runs)
+        recordsProcessed = 0;
+        recordsError = 0;
+        recordsWarning = 0;
+        txnIdSequence.set(0);
 
         List<HistoryRecord> historyRecords = historyRepository.findAll();
         log.info("Found {} history records to load to DB2", historyRecords.size());
@@ -94,11 +104,11 @@ public class HistoryLoadStep implements Tasklet {
     private TransactionRecord transformToDb2Format(HistoryRecord history) {
         TransactionRecord txn = new TransactionRecord();
 
-        // Generate transaction ID: YYYYMMDDHHMMSS + 6-digit sequence
+        // Generate unique transaction ID: YYYYMMDD + portfolio hash + 6-digit sequence
+        // Uses an independent AtomicInteger counter to guarantee uniqueness across all records
         String dateStr = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
-        String timeStr = LocalTime.now().format(DateTimeFormatter.ofPattern("HHmmss"));
-        String seqStr = String.format("%06d", history.getSeq());
-        txn.setTransactionId(dateStr + timeStr + seqStr);
+        String seqStr = String.format("%06d", txnIdSequence.incrementAndGet());
+        txn.setTransactionId(dateStr + history.getPortfolioId().hashCode() + seqStr);
 
         txn.setPortfolioId(history.getPortfolioId());
         txn.setTransactionDate(history.getTxnDate());

@@ -59,6 +59,11 @@ public class PositionUpdateStep implements Tasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
         log.info("Starting Position Update Step (POSUPD00)");
 
+        // Reset counters for each execution (singleton component reused across runs)
+        recordsProcessed = 0;
+        recordsError = 0;
+        recordsWarning = 0;
+
         List<PositionRecord> positions = positionRepository.findAll();
         log.info("Found {} positions to update", positions.size());
 
@@ -101,12 +106,16 @@ public class PositionUpdateStep implements Tasklet {
                     "Negative quantity for position " + position.getPortfolioId() + "/" + position.getSymbolId());
         }
 
-        // Calculate average cost basis per unit
+        // Recalculate market value using current market price if available,
+        // otherwise preserve existing market value. Cost basis is validated separately.
         if (position.getQuantity().compareTo(BigDecimal.ZERO) > 0) {
-            BigDecimal avgCost = position.getCostBasis()
-                    .divide(position.getQuantity(), 4, RoundingMode.HALF_UP);
-            position.setMarketValue(position.getQuantity().multiply(avgCost)
-                    .setScale(2, RoundingMode.HALF_UP));
+            // If market value was already set by the validation step (from transaction price),
+            // keep it. Otherwise, use cost basis as a conservative estimate.
+            if (position.getMarketValue() == null || position.getMarketValue().compareTo(BigDecimal.ZERO) == 0) {
+                position.setMarketValue(position.getCostBasis());
+            }
+            // Ensure market value is properly scaled
+            position.setMarketValue(position.getMarketValue().setScale(2, RoundingMode.HALF_UP));
         }
 
         position.setLastMaintDate(LocalDateTime.now());

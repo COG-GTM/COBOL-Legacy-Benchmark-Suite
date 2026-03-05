@@ -57,12 +57,20 @@ public class TransactionValidationStep implements Tasklet {
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) {
         log.info("Starting Transaction Validation Step (TRNVAL00)");
 
-        List<TransactionRecord> pendingTransactions =
+        // Reset counters for each execution (singleton component reused across runs)
+        recordsProcessed = 0;
+        recordsError = 0;
+        recordsWarning = 0;
+
+        // Query for pending transactions in the daily window
+        List<TransactionRecord> transactions =
                 transactionRepository.findByPortfolioIdAndTransactionDateBetween(
                         null, LocalDate.now().minusDays(1), LocalDate.now());
 
-        // If no pending transactions, use all transactions
-        List<TransactionRecord> transactions = transactionRepository.findAll();
+        // If no pending transactions in daily window, fall back to all transactions
+        if (transactions.isEmpty()) {
+            transactions = transactionRepository.findAll();
+        }
         log.info("Found {} transactions to validate", transactions.size());
 
         for (TransactionRecord txn : transactions) {
