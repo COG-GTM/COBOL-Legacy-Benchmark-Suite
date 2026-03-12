@@ -63,8 +63,8 @@ def run_full_cycle(process_date: date, restart: bool = False) -> ReturnCode:
         # Initialize
         controller.initialize(params)
 
-        # Check for restart
-        needs_restart, restart_key = recovery.initialize_recovery(batch_id)
+        # Check for restart (returns step/program name, not record key)
+        needs_restart, restart_step_name = recovery.initialize_recovery(batch_id)
 
         # Build sequence
         sequencer = BatchSequencer()
@@ -159,7 +159,7 @@ def run_full_cycle(process_date: date, restart: bool = False) -> ReturnCode:
         sequencer.register_step("RPTGEN", report_step)
 
         # Execute sequence
-        restart_from = restart_key if needs_restart else ""
+        restart_from = restart_step_name if needs_restart else ""
         rc = sequencer.execute(process_date, restart_step=restart_from)
 
         # Save final checkpoint
