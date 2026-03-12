@@ -15,6 +15,7 @@ from sqlalchemy import (
     Boolean,
     Date,
     DateTime,
+    ForeignKey,
     Index,
     Integer,
     Numeric,
@@ -92,7 +93,7 @@ class InvestmentPosition(Base):
     __tablename__ = "investment_positions"
 
     portfolio_id: Mapped[str] = mapped_column(
-        String(8), primary_key=True
+        String(8), ForeignKey("portfolio_master.portfolio_id"), primary_key=True
     )
     investment_id: Mapped[str] = mapped_column(String(10), primary_key=True)
     position_date: Mapped[date] = mapped_column(Date, primary_key=True)
@@ -133,7 +134,7 @@ class TransactionHistory(Base):
     transaction_id: Mapped[str] = mapped_column(String(20), primary_key=True)
     trn_date: Mapped[date] = mapped_column(Date, nullable=False)
     trn_time: Mapped[str] = mapped_column(String(6), nullable=False, default="000000")
-    portfolio_id: Mapped[str] = mapped_column(String(8), nullable=False)
+    portfolio_id: Mapped[str] = mapped_column(String(8), ForeignKey("portfolio_master.portfolio_id"), nullable=False)
     sequence_no: Mapped[str] = mapped_column(String(6), nullable=False, default="000001")
 
     # Transaction data

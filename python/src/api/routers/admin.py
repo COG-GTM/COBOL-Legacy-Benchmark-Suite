@@ -103,11 +103,15 @@ def get_batch_status(
     if batch_id:
         control = repo.get_by_id(batch_id)
     else:
-        # Get most recent batch
-        active = repo.list_by_status("A")
-        done = repo.list_by_status("D")
-        all_batches = active + done
-        control = all_batches[-1] if all_batches else None
+        # Get most recent batch across all statuses
+        all_batches = sorted(
+            repo.list_by_status("A") + repo.list_by_status("D")
+            + repo.list_by_status("E") + repo.list_by_status("R")
+            + repo.list_by_status("W"),
+            key=lambda b: b.schedule_date,
+            reverse=True,
+        )
+        control = all_batches[0] if all_batches else None
 
     if control is None:
         raise HTTPException(
