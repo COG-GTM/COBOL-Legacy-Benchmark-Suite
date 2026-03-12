@@ -290,6 +290,8 @@ def _setup_per_logger_files(
 
     for logger_name in _ALL_LOGGERS:
         logger = logging.getLogger(logger_name)
+        # Clear existing handlers to avoid duplicates on re-configuration
+        logger.handlers.clear()
         # Derive filename from the last segment (e.g. "batch", "api")
         short_name = logger_name.rsplit(".", maxsplit=1)[-1]
         file_handler = logging.handlers.RotatingFileHandler(

@@ -525,6 +525,10 @@ class ErrorHandler:
             result.return_code = Severity.SEVERE.value
             result.error_message = "Unhandled DB2 error"
 
+        elif sqlcode is None:
+            # No SQLCODE provided — fall back to general severity-based action
+            return self._determine_general_action(error, context, result)
+
         else:
             # Positive / zero SQLCODE — warning
             result.action = RecoveryAction.CONTINUE
