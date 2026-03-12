@@ -277,7 +277,7 @@ class BatchControl(Base):
 class Checkpoint(Base):
     __tablename__ = "checkpoint"
 
-    checkpoint_id: Mapped[str] = mapped_column(String(8), primary_key=True)
+    checkpoint_id: Mapped[str] = mapped_column(String(20), primary_key=True)
     batch_id: Mapped[str] = mapped_column(String(8), nullable=False)
     status: Mapped[str] = mapped_column(String(1), nullable=False, default="I")
     phase: Mapped[str] = mapped_column(String(2), nullable=False, default="00")

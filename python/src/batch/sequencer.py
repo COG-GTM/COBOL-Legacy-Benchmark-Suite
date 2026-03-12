@@ -141,7 +141,9 @@ class BatchSequencer:
 
             # 3100-CHECK-DEPENDENCY
             if not self._check_dependency(step):
-                if step.dependency_type == DependencyType.REQUIRED:
+                if step.dependency_type in (
+                    DependencyType.REQUIRED, DependencyType.HARD, DependencyType.EXCLUSIVE,
+                ):
                     logger.error(
                         "Required dependency failed for step %d: %s",
                         step.step_number,
