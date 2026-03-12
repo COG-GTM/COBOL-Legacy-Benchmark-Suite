@@ -16,7 +16,7 @@ All monetary arithmetic uses Decimal, never float.
 
 import logging
 from datetime import date, datetime, time
-from decimal import Decimal
+from decimal import ROUND_HALF_UP, Decimal
 
 from sqlalchemy.orm import Session
 
@@ -189,7 +189,7 @@ class TransactionService:
             position.status = PositionStatus.CLOSED.value
         else:
             ratio = record.quantity / (position.quantity + record.quantity)
-            cost_reduction = (position.cost_basis * ratio).quantize(Decimal("0.01"))
+            cost_reduction = (position.cost_basis * ratio).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
             position.cost_basis -= cost_reduction
             position.market_value -= record.amount
 
