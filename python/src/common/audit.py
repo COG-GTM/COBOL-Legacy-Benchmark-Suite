@@ -18,6 +18,7 @@ Key COBOL patterns preserved:
 from __future__ import annotations
 
 import functools
+import inspect
 import logging
 from contextlib import contextmanager
 from dataclasses import dataclass, field
@@ -286,7 +287,9 @@ class AuditLogger:
         elif step_upper in ("END", "SHUTDOWN", "COMPLETE"):
             action = AuditAction.BATCH_END
         else:
-            action = AuditAction.BATCH_START
+            # Mid-process steps (PROCESS, CHECKPOINT, etc.) use CREATE
+            # as a neutral action to avoid misrepresenting as STARTUP
+            action = AuditAction.CREATE
 
         record = AuditRecord(
             system_id=self._system_id,
@@ -400,10 +403,17 @@ class AuditLogger:
             A decorator that wraps the function with audit logging.
         """
         def decorator(func: F) -> F:
+            sig = inspect.signature(func)
+
             @functools.wraps(func)
             def wrapper(*args: Any, **kwargs: Any) -> Any:
-                user = kwargs.get(user_param, "UNKNOWN")
-                entity_id = kwargs.get(entity_id_param, "")
+                # Bind positional + keyword args so we can look up by name
+                bound = sig.bind(*args, **kwargs)
+                bound.apply_defaults()
+                all_args = bound.arguments
+
+                user = all_args.get(user_param, "UNKNOWN")
+                entity_id = all_args.get(entity_id_param, "")
 
                 record = AuditRecord(
                     system_id=self._system_id,
@@ -447,6 +457,12 @@ class AuditLogger:
         this to the audit table (similar to ERRHNDL.cbl's DB2 INSERT).
         """
         data = record.to_dict()
+        # Prefix reserved LogRecord attribute names to avoid KeyError
+        # from logging.Logger.makeRecord (e.g. "message" is reserved).
+        safe_extra = {
+            (f"audit_{k}" if k in ("message", "name", "args", "levelname") else k): v
+            for k, v in data.items()
+        }
         logger.info(
             "AUDIT: [%s] %s %s %s by %s",
             record.action.value,
@@ -454,5 +470,5 @@ class AuditLogger:
             record.entity_id,
             record.status.value,
             record.user_id,
-            extra=data,
+            extra=safe_extra,
         )
