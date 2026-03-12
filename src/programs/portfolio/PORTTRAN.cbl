@@ -52,6 +52,9 @@
            05  WS-PROCESS-COUNT    PIC 9(8) COMP.
            05  WS-ERROR-COUNT      PIC 9(8) COMP.
            
+       01  WS-BEFORE-IMAGE         PIC X(100).
+       01  WS-CURRENT-ERR-CAT     PIC X(2) VALUE 'PR'.
+           
        01  WS-EOF-FLAG            PIC X(1).
            88  END-OF-FILE          VALUE 'Y'.
            88  MORE-RECORDS         VALUE 'N'.
@@ -79,12 +82,14 @@
            OPEN INPUT TRANSACTION-FILE
            IF WS-TRAN-STATUS NOT = '00'
                MOVE 'Error opening transaction file' TO ERR-TEXT
+               MOVE ERR-CAT-VSAM TO WS-CURRENT-ERR-CAT
                PERFORM 9000-ERROR-ROUTINE
            END-IF
            
            OPEN I-O PORTFOLIO-FILE
            IF WS-PORT-STATUS NOT = '00'
                MOVE 'Error opening portfolio file' TO ERR-TEXT
+               MOVE ERR-CAT-VSAM TO WS-CURRENT-ERR-CAT
                PERFORM 9000-ERROR-ROUTINE
            END-IF
            .
@@ -112,7 +117,9 @@
            
            IF ERR-TEXT = SPACES
                ADD 1 TO WS-PROCESS-COUNT
+               PERFORM 2200-UPDATE-POSITIONS
            ELSE
+               MOVE ERR-CAT-VALID TO WS-CURRENT-ERR-CAT
                PERFORM 9000-ERROR-ROUTINE
            END-IF
            .
@@ -184,9 +191,12 @@
            READ PORTFOLIO-FILE
                INVALID KEY
                    MOVE 'Portfolio not found for update' TO ERR-TEXT
+                   MOVE ERR-CAT-VSAM TO WS-CURRENT-ERR-CAT
                    PERFORM 9000-ERROR-ROUTINE
                    EXIT PARAGRAPH
            END-READ
+           
+           MOVE PORTFOLIO-RECORD TO WS-BEFORE-IMAGE
            
            ADD TRN-QUANTITY TO PORT-TOTAL-UNITS
            ADD TRN-AMOUNT   TO PORT-TOTAL-COST
@@ -194,6 +204,7 @@
            REWRITE PORTFOLIO-RECORD
                INVALID KEY
                    MOVE 'Error updating portfolio' TO ERR-TEXT
+                   MOVE ERR-CAT-VSAM TO WS-CURRENT-ERR-CAT
                    PERFORM 9000-ERROR-ROUTINE
            END-REWRITE
            .
@@ -203,12 +214,16 @@
            READ PORTFOLIO-FILE
                INVALID KEY
                    MOVE 'Portfolio not found for update' TO ERR-TEXT
+                   MOVE ERR-CAT-VSAM TO WS-CURRENT-ERR-CAT
                    PERFORM 9000-ERROR-ROUTINE
                    EXIT PARAGRAPH
            END-READ
            
+           MOVE PORTFOLIO-RECORD TO WS-BEFORE-IMAGE
+           
            IF PORT-TOTAL-UNITS < TRN-QUANTITY
                MOVE 'Insufficient units for sale' TO ERR-TEXT
+               MOVE ERR-CAT-VALID TO WS-CURRENT-ERR-CAT
                PERFORM 9000-ERROR-ROUTINE
                EXIT PARAGRAPH
            END-IF
@@ -219,6 +234,7 @@
            REWRITE PORTFOLIO-RECORD
                INVALID KEY
                    MOVE 'Error updating portfolio' TO ERR-TEXT
+                   MOVE ERR-CAT-VSAM TO WS-CURRENT-ERR-CAT
                    PERFORM 9000-ERROR-ROUTINE
            END-REWRITE
            .
@@ -233,15 +249,26 @@
            READ PORTFOLIO-FILE
                INVALID KEY
                    MOVE 'Portfolio not found for fee' TO ERR-TEXT
+                   MOVE ERR-CAT-VSAM TO WS-CURRENT-ERR-CAT
                    PERFORM 9000-ERROR-ROUTINE
                    EXIT PARAGRAPH
            END-READ
+           
+           MOVE PORTFOLIO-RECORD TO WS-BEFORE-IMAGE
+           
+           IF PORT-TOTAL-COST < TRN-AMOUNT
+               MOVE 'Insufficient balance for fee' TO ERR-TEXT
+               MOVE ERR-CAT-VALID TO WS-CURRENT-ERR-CAT
+               PERFORM 9000-ERROR-ROUTINE
+               EXIT PARAGRAPH
+           END-IF
            
            SUBTRACT TRN-AMOUNT FROM PORT-TOTAL-COST
            
            REWRITE PORTFOLIO-RECORD
                INVALID KEY
                    MOVE 'Error updating portfolio' TO ERR-TEXT
+                   MOVE ERR-CAT-VSAM TO WS-CURRENT-ERR-CAT
                    PERFORM 9000-ERROR-ROUTINE
            END-REWRITE
            .
@@ -274,8 +301,9 @@
            MOVE TRN-PORTFOLIO-ID TO AUD-PORTFOLIO-ID
            MOVE PORT-ACCOUNT-NO  TO AUD-ACCOUNT-NO
            
-      *    Store original portfolio state
-           MOVE PORT-RECORD      TO AUD-BEFORE-IMAGE
+      *    Store original and updated portfolio state
+           MOVE WS-BEFORE-IMAGE  TO AUD-BEFORE-IMAGE
+           MOVE PORTFOLIO-RECORD TO AUD-AFTER-IMAGE
            
       *    Build audit message
            STRING 'Transaction: ' DELIMITED BY SIZE
@@ -310,8 +338,9 @@
            
        9000-ERROR-ROUTINE.
            ADD 1 TO WS-ERROR-COUNT
-           MOVE ERR-CAT-PROC TO ERR-CATEGORY
+           MOVE WS-CURRENT-ERR-CAT TO ERR-CATEGORY
            MOVE 'PORTTRAN' TO ERR-PROGRAM
            
            CALL 'ERRPROC' USING ERR-MESSAGE
-           . 
+           MOVE ERR-CAT-PROC TO WS-CURRENT-ERR-CAT
+           .   
