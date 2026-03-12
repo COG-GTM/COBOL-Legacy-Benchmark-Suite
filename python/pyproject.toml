@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "investment-portfolio-manager"
+version = "1.0.0"
+description = "Python migration of the COBOL Investment Portfolio Management System"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "sqlalchemy>=2.0,<3.0",
+    "pydantic>=2.0,<3.0",
+    "alembic>=1.13,<2.0",
+    "fastapi>=0.110,<1.0",
+    "uvicorn>=0.27,<1.0",
+    "psycopg2-binary>=2.9,<3.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0,<9.0",
+    "pytest-cov>=4.0,<6.0",
+    "ruff>=0.3,<1.0",
+]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+extend-exclude = ["db/migrations/versions"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "W", "UP"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
