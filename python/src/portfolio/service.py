@@ -155,6 +155,15 @@ class PortfolioService:
             offset=offset, limit=limit, status=status, branch_id=branch_id, client_id=client_id,
         )
 
+    def count(
+        self,
+        status: str | None = None,
+        branch_id: str | None = None,
+        client_id: str | None = None,
+    ) -> int:
+        """Count portfolios matching the given filters."""
+        return self._repo.count(status=status, branch_id=branch_id, client_id=client_id)
+
     # ------------------------------------------------------------------
     # UPDATE - translates PORTUPDT.cbl
     # ------------------------------------------------------------------
@@ -231,7 +240,7 @@ class PortfolioService:
         # 2000-VERIFY-POSITIONS
         open_positions = self._position_repo.list_by_portfolio(portfolio_id)
         has_open = any(p.status == "A" for p in open_positions)
-        pending_count = self._transaction_repo.count_by_status("P")
+        pending_count = self._transaction_repo.count_by_portfolio_and_status(portfolio_id, "P")
         validate_portfolio_for_closure(has_open, pending_count > 0)
 
         # 3000-UPDATE-STATUS

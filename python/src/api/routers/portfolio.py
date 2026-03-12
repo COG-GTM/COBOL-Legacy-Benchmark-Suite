@@ -149,10 +149,13 @@ def list_portfolios(
         offset=offset, limit=limit, status=status_filter,
         branch_id=branch_id, client_id=client_id,
     )
+    total = service.count(
+        status=status_filter, branch_id=branch_id, client_id=client_id,
+    )
     items = [PortfolioResponse.model_validate(p) for p in portfolios]
     return PortfolioListResponse(
         items=items,
-        total=len(items),
+        total=total,
         offset=offset,
         limit=limit,
     )

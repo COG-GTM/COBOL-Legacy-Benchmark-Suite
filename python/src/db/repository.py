@@ -139,11 +139,20 @@ class PortfolioRepository:
         stmt = stmt.order_by(PortfolioMaster.portfolio_id).offset(offset).limit(limit)
         return list(self._session.execute(stmt).scalars().all())
 
-    def count(self, status: str | None = None) -> int:
-        """Count portfolios with optional status filter."""
+    def count(
+        self,
+        status: str | None = None,
+        branch_id: str | None = None,
+        client_id: str | None = None,
+    ) -> int:
+        """Count portfolios with optional filters."""
         stmt = select(func.count()).select_from(PortfolioMaster)
         if status is not None:
             stmt = stmt.where(PortfolioMaster.status == status)
+        if branch_id is not None:
+            stmt = stmt.where(PortfolioMaster.branch_id == branch_id)
+        if client_id is not None:
+            stmt = stmt.where(PortfolioMaster.client_id == client_id)
         result = self._session.execute(stmt).scalar()
         return result if result is not None else 0
 
@@ -316,6 +325,17 @@ class TransactionRepository:
         """Count transactions by status."""
         stmt = select(func.count()).select_from(TransactionHistory).where(
             TransactionHistory.status == status
+        )
+        result = self._session.execute(stmt).scalar()
+        return result if result is not None else 0
+
+    def count_by_portfolio_and_status(self, portfolio_id: str, status: str) -> int:
+        """Count transactions for a specific portfolio by status."""
+        stmt = select(func.count()).select_from(TransactionHistory).where(
+            and_(
+                TransactionHistory.portfolio_id == portfolio_id,
+                TransactionHistory.status == status,
+            )
         )
         result = self._session.execute(stmt).scalar()
         return result if result is not None else 0

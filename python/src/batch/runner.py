@@ -27,6 +27,7 @@ from src.common.constants import (
     DependencyType,
     ProcessFrequency,
     ReturnCode,
+    TransactionStatus,
 )
 from src.common.logging_config import configure_logging
 from src.db.engine import create_db_engine
@@ -126,6 +127,8 @@ def run_full_cycle(process_date: date, restart: bool = False) -> ReturnCode:
                 if result.is_valid:
                     controller.increment_processed()
                 else:
+                    txn.status = TransactionStatus.FAILED.value
+                    txn_repo.update(txn)
                     controller.increment_error("; ".join(result.errors))
             logger.info(
                 "Validation: %d passed, %d failed",
@@ -191,7 +194,10 @@ def run_single_step(step_name: str, process_date: date) -> ReturnCode:
                         amount=txn.amount,
                         investment_id=txn.investment_id,
                     )
-                    validator.validate(record)
+                    result = validator.validate(record)
+                    if not result.is_valid:
+                        txn.status = TransactionStatus.FAILED.value
+                        txn_repo.update(txn)
                 return ReturnCode.SUCCESS if validator.total_failed == 0 else ReturnCode.WARNING
 
             case "position-update":
