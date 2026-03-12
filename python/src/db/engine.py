@@ -95,7 +95,7 @@ def get_engine(url: str | None = None, **kwargs: Any) -> Engine:
     resolved_url = url or _get_database_url()
 
     if _engine is not None:
-        existing_url = str(_engine.url)
+        existing_url = _engine.url.render_as_string(hide_password=False)
         if existing_url != resolved_url:
             raise ValueError(
                 f"Engine already exists with URL {existing_url!r}; "
@@ -129,13 +129,19 @@ def dispose_engine() -> None:
     """Dispose the engine and release all pooled connections.
 
     Mirrors COBOL ``DB2CONN`` 2000-DISCONNECT: commits outstanding work
-    and resets the connection.
+    and resets the connection.  Also resets the session factory so it
+    does not hold a reference to the disposed engine.
     """
     global _engine
     if _engine is not None:
         _engine.dispose()
         logger.info("Database engine disposed")
         _engine = None
+
+        # Reset the session factory to avoid stale references
+        from python.src.db.session import reset_session_factory
+
+        reset_session_factory()
 
 
 def check_connection(engine: Engine | None = None) -> bool:
