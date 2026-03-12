@@ -190,7 +190,7 @@ class BatchController:
 
         control = self._repo.get_by_id(params.batch_id)
         if control is not None:
-            if self._status.error_count > MAX_BATCH_ERRORS:
+            if self._status.error_count >= MAX_BATCH_ERRORS:
                 control.batch_status = BatchStatus.ERROR.value
                 self._status.return_code = ReturnCode.SEVERE
             elif self._status.error_count > 0:
