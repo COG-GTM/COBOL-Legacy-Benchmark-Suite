@@ -152,23 +152,29 @@ class TransactionService:
           IF WS-TRN-QUANTITY > PORT-TOTAL-UNITS -> error
           SUBTRACT WS-TRN-QUANTITY FROM PORT-TOTAL-UNITS
         """
-        position = self._position_repo.get_latest_position(
+        # First check latest position exists and has sufficient units
+        latest = self._position_repo.get_latest_position(
             portfolio.portfolio_id, record.investment_id
         )
-        if position is None:
+        if latest is None:
             self.error_count += 1
             raise ValidationError(
                 f"No position found for investment {record.investment_id}",
                 field="investment_id",
             )
 
-        # Validate sufficient units
-        if record.quantity > position.quantity:
+        # Validate sufficient units against latest known position
+        if record.quantity > latest.quantity:
             self.error_count += 1
             raise ValidationError(
-                f"Insufficient units: have {position.quantity}, selling {record.quantity}",
+                f"Insufficient units: have {latest.quantity}, selling {record.quantity}",
                 field="quantity",
             )
+
+        # Create position for the transaction date (preserves historical snapshots)
+        position = self._get_or_create_position(
+            portfolio.portfolio_id, record.investment_id, record.trn_date
+        )
 
         # SUBTRACT quantity from position
         position.quantity -= record.quantity

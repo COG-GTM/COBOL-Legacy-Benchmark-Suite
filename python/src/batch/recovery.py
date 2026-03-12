@@ -142,8 +142,10 @@ class RecoveryManager:
         # Upsert: update existing or create new
         existing = self._repo.get_by_id(checkpoint_id)
         if existing is not None:
+            existing.batch_id = checkpoint.batch_id
             existing.status = checkpoint.status
             existing.phase = checkpoint.phase
+            existing.save_date = checkpoint.save_date
             existing.save_time = now
             existing.last_key = checkpoint.last_key
             existing.records_at_checkpoint = checkpoint.records_at_checkpoint
