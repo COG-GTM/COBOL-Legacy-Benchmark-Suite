@@ -113,15 +113,22 @@ def run_full_cycle(process_date: date, restart: bool = False) -> ReturnCode:
             pending = txn_repo.list_pending()
             for txn in pending:
                 from src.models.transaction import TransactionRecord
-                record = TransactionRecord(
-                    transaction_id=txn.transaction_id,
-                    portfolio_id=txn.portfolio_id,
-                    trn_type=txn.trn_type,
-                    quantity=txn.quantity,
-                    price=txn.price,
-                    amount=txn.amount,
-                    investment_id=txn.investment_id,
-                )
+                try:
+                    record = TransactionRecord(
+                        transaction_id=txn.transaction_id,
+                        portfolio_id=txn.portfolio_id,
+                        trn_type=txn.trn_type,
+                        quantity=txn.quantity,
+                        price=txn.price,
+                        amount=txn.amount,
+                        investment_id=txn.investment_id,
+                    )
+                except Exception as exc:
+                    txn.status = TransactionStatus.FAILED.value
+                    txn_repo.update(txn)
+                    controller.increment_read()
+                    controller.increment_error(str(exc))
+                    continue
                 result = validator.validate(record)
                 controller.increment_read()
                 if result.is_valid:
@@ -185,15 +192,21 @@ def run_single_step(step_name: str, process_date: date) -> ReturnCode:
                 pending = txn_repo.list_pending()
                 for txn in pending:
                     from src.models.transaction import TransactionRecord
-                    record = TransactionRecord(
-                        transaction_id=txn.transaction_id,
-                        portfolio_id=txn.portfolio_id,
-                        trn_type=txn.trn_type,
-                        quantity=txn.quantity,
-                        price=txn.price,
-                        amount=txn.amount,
-                        investment_id=txn.investment_id,
-                    )
+                    try:
+                        record = TransactionRecord(
+                            transaction_id=txn.transaction_id,
+                            portfolio_id=txn.portfolio_id,
+                            trn_type=txn.trn_type,
+                            quantity=txn.quantity,
+                            price=txn.price,
+                            amount=txn.amount,
+                            investment_id=txn.investment_id,
+                        )
+                    except Exception:
+                        txn.status = TransactionStatus.FAILED.value
+                        txn_repo.update(txn)
+                        validator.total_failed += 1
+                        continue
                     result = validator.validate(record)
                     if not result.is_valid:
                         txn.status = TransactionStatus.FAILED.value

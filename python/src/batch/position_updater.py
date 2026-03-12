@@ -218,6 +218,8 @@ class PositionUpdater:
                 )
             case TransactionType.TRANSFER | "TR":
                 pass  # Transfers don't affect individual positions
+            case _:
+                raise ValueError(f"Unknown transaction type: {trn_type}")
 
         position.last_maint_date = datetime.now()
         position.last_maint_user = "BATCH"
