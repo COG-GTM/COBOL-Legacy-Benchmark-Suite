@@ -55,6 +55,8 @@ class StatsReportData:
         self.pending_transactions: int = 0
         self.completed_transactions: int = 0
         self.failed_transactions: int = 0
+        self.reversed_transactions: int = 0
+        self.archived_transactions: int = 0
 
 
 class BatchReporting:
@@ -191,12 +193,14 @@ class BatchReporting:
         report.pending_transactions = self._transaction_repo.count_by_status("P")
         report.completed_transactions = self._transaction_repo.count_by_status("D")
         report.failed_transactions = self._transaction_repo.count_by_status("F")
-        reversed_transactions = self._transaction_repo.count_by_status("R")
+        report.reversed_transactions = self._transaction_repo.count_by_status("R")
+        report.archived_transactions = self._transaction_repo.count_by_status("X")
         report.total_transactions = (
             report.pending_transactions
             + report.completed_transactions
             + report.failed_transactions
-            + reversed_transactions
+            + report.reversed_transactions
+            + report.archived_transactions
         )
 
         logger.info(

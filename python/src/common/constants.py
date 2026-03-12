@@ -57,6 +57,7 @@ class TransactionStatus(StrEnum):
     DONE = "D"
     FAILED = "F"
     REVERSED = "R"
+    ARCHIVED = "X"
 
 
 # ---------------------------------------------------------------------------

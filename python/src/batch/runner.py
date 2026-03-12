@@ -148,11 +148,21 @@ def run_full_cycle(process_date: date, restart: bool = False) -> ReturnCode:
 
         def position_update_step() -> ReturnCode:
             updater = PositionUpdater(session)
-            return updater.process(process_date)
+            rc = updater.process(process_date)
+            # Propagate counters to controller so terminate() sees all errors
+            controller._status.records_read += updater.records_read
+            controller._status.records_processed += updater.records_updated
+            controller._status.error_count += updater.records_error
+            return rc
 
         def history_load_step() -> ReturnCode:
             loader = HistoryLoader(session)
-            return loader.process(process_date)
+            rc = loader.process(process_date)
+            # Propagate counters to controller so terminate() sees all errors
+            controller._status.records_read += loader.records_read
+            controller._status.records_processed += loader.records_inserted
+            controller._status.error_count += loader.records_error
+            return rc
 
         def report_step() -> ReturnCode:
             reporting = BatchReporting(session)

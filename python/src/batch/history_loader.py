@@ -97,7 +97,7 @@ class HistoryLoader:
             try:
                 # 2200-INSERT-DB2-RECORD: In Python, the transaction is already
                 # in the database. Mark as archived so it won't be reprocessed.
-                txn.status = TransactionStatus.REVERSED.value  # 'R' = archived/reversed
+                txn.status = TransactionStatus.ARCHIVED.value  # 'X' = archived
                 self._transaction_repo.update(txn)
                 nested.commit()
                 self.records_inserted += 1
