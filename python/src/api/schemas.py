@@ -163,7 +163,7 @@ class BatchRunRequest(BaseModel):
     """Request to trigger batch processing."""
 
     process_date: date = Field(default_factory=date.today)
-    full_cycle: bool = Field(default=True)
+    full_cycle: bool = Field(default=False)
     step: str | None = Field(default=None)
     restart: bool = Field(default=False)
 

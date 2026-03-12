@@ -55,7 +55,7 @@ class TransactionRecord(BaseModel):
     # Transaction data
     investment_id: str = Field(default="", max_length=10, description="Investment identifier")
     trn_type: TransactionType = Field(description="Transaction type: BU/SL/TR/FE")
-    quantity: Decimal = Field(default=Decimal("0.0000"), max_digits=15, decimal_places=4)
+    quantity: Decimal = Field(gt=0, max_digits=15, decimal_places=4)
     price: Decimal = Field(default=Decimal("0.0000"), max_digits=15, decimal_places=4)
     amount: Decimal = Field(default=Decimal("0.00"), max_digits=15, decimal_places=2)
     currency: CurrencyCode = Field(default=CurrencyCode.USD, description="Currency code")
@@ -71,10 +71,3 @@ class TransactionRecord(BaseModel):
         if not v or not v.strip():
             raise ValueError("Portfolio ID is required")
         return v.strip()
-
-    @field_validator("quantity")
-    @classmethod
-    def validate_quantity(cls, v: Decimal) -> Decimal:
-        if v <= Decimal("0"):
-            raise ValueError("Quantity must be greater than zero")
-        return v
