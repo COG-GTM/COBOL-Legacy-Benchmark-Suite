@@ -191,10 +191,12 @@ class BatchReporting:
         report.pending_transactions = self._transaction_repo.count_by_status("P")
         report.completed_transactions = self._transaction_repo.count_by_status("D")
         report.failed_transactions = self._transaction_repo.count_by_status("F")
+        reversed_transactions = self._transaction_repo.count_by_status("R")
         report.total_transactions = (
             report.pending_transactions
             + report.completed_transactions
             + report.failed_transactions
+            + reversed_transactions
         )
 
         logger.info(

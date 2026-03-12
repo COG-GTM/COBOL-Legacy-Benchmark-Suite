@@ -61,6 +61,7 @@ def trigger_batch(
     from src.batch.runner import run_full_cycle, run_single_step
 
     process_date = request.process_date
+    start_time = datetime.now()
 
     if request.full_cycle:
         rc = run_full_cycle(process_date, restart=request.restart)
@@ -72,11 +73,13 @@ def trigger_batch(
             detail="Either full_cycle or step must be specified",
         )
 
+    end_time = datetime.now()
+
     return BatchStatusResponse(
         batch_id=f"BCH{process_date.strftime('%m%d')}",
         status="completed" if rc <= ReturnCode.WARNING else "failed",
-        start_time=datetime.now(),
-        end_time=datetime.now(),
+        start_time=start_time,
+        end_time=end_time,
         records_read=0,
         records_processed=0,
         records_rejected=0,

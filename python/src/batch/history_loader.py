@@ -110,6 +110,8 @@ class HistoryLoader:
 
             except Exception as exc:
                 self.records_error += 1
+                # Rollback the failed flush so the session is usable again
+                self._session.rollback()
                 logger.error(
                     "Error archiving transaction %s: %s",
                     txn.transaction_id,
