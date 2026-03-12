@@ -91,11 +91,15 @@ class HistoryLoader:
 
         for txn in done_transactions:
             self.records_read += 1
+            # Use SAVEPOINT so a failure only rolls back this single
+            # record, not all uncommitted successful work.
+            nested = self._session.begin_nested()
             try:
                 # 2200-INSERT-DB2-RECORD: In Python, the transaction is already
                 # in the database. Mark as archived so it won't be reprocessed.
                 txn.status = TransactionStatus.REVERSED.value  # 'R' = archived/reversed
                 self._transaction_repo.update(txn)
+                nested.commit()
                 self.records_inserted += 1
 
                 # Commit at threshold (from HISTLD00.cbl)
@@ -110,8 +114,8 @@ class HistoryLoader:
 
             except Exception as exc:
                 self.records_error += 1
-                # Rollback the failed flush so the session is usable again
-                self._session.rollback()
+                # Rollback only this SAVEPOINT; prior successful work is preserved
+                nested.rollback()
                 logger.error(
                     "Error archiving transaction %s: %s",
                     txn.transaction_id,

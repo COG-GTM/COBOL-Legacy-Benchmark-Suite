@@ -99,12 +99,16 @@ class PositionUpdater:
 
         for txn in pending:
             self.records_read += 1
+            # Use SAVEPOINT so a failure only rolls back this single
+            # transaction, not all uncommitted successful work.
+            nested = self._session.begin_nested()
             try:
                 self._update_position(txn, process_date)
                 # Mark transaction as done
                 txn.status = TransactionStatus.DONE.value
                 txn.process_date = datetime.now()
                 self._transaction_repo.update(txn)
+                nested.commit()
                 self.records_updated += 1
 
                 # Periodic commit (from POSUPD00.cbl commit threshold)
@@ -119,8 +123,8 @@ class PositionUpdater:
 
             except Exception as exc:
                 self.records_error += 1
-                # Rollback the failed flush so the session is usable again
-                self._session.rollback()
+                # Rollback only this SAVEPOINT; prior successful work is preserved
+                nested.rollback()
                 txn.status = TransactionStatus.FAILED.value
                 self._transaction_repo.update(txn)
                 self._session.commit()
