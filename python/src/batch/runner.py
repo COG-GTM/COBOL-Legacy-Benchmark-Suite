@@ -115,7 +115,7 @@ def run_full_cycle(process_date: date, restart: bool = False) -> ReturnCode:
                 from src.models.transaction import TransactionRecord
                 try:
                     record = TransactionRecord(
-                        transaction_id=txn.transaction_id,
+                        transaction_id="",
                         portfolio_id=txn.portfolio_id,
                         trn_type=txn.trn_type,
                         quantity=txn.quantity,
@@ -194,7 +194,7 @@ def run_single_step(step_name: str, process_date: date) -> ReturnCode:
                     from src.models.transaction import TransactionRecord
                     try:
                         record = TransactionRecord(
-                            transaction_id=txn.transaction_id,
+                            transaction_id="",
                             portfolio_id=txn.portfolio_id,
                             trn_type=txn.trn_type,
                             quantity=txn.quantity,

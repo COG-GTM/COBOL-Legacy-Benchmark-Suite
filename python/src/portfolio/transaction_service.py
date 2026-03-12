@@ -130,7 +130,8 @@ class TransactionService:
           ADD WS-TRN-AMOUNT TO PORT-TOTAL-COST
         """
         position = self._get_or_create_position(
-            portfolio.portfolio_id, record.investment_id, record.trn_date
+            portfolio.portfolio_id, record.investment_id, record.trn_date,
+            record.currency.value,
         )
         # ADD quantity to position
         position.quantity += record.quantity
@@ -173,7 +174,8 @@ class TransactionService:
 
         # Create position for the transaction date (preserves historical snapshots)
         position = self._get_or_create_position(
-            portfolio.portfolio_id, record.investment_id, record.trn_date
+            portfolio.portfolio_id, record.investment_id, record.trn_date,
+            record.currency.value,
         )
 
         # SUBTRACT quantity from position
@@ -261,7 +263,8 @@ class TransactionService:
         return transaction
 
     def _get_or_create_position(
-        self, portfolio_id: str, investment_id: str, position_date: date
+        self, portfolio_id: str, investment_id: str, position_date: date,
+        currency: str = "USD",
     ) -> InvestmentPosition:
         """Get existing position or create a new one."""
         position = self._position_repo.get(portfolio_id, investment_id, position_date)
@@ -275,7 +278,7 @@ class TransactionService:
                 quantity=latest.quantity if latest else Decimal("0.0000"),
                 cost_basis=latest.cost_basis if latest else Decimal("0.00"),
                 market_value=latest.market_value if latest else Decimal("0.00"),
-                currency="USD",
+                currency=currency,
                 status=PositionStatus.ACTIVE.value,
                 last_maint_date=datetime.now(),
                 last_maint_user="SYSTEM",
