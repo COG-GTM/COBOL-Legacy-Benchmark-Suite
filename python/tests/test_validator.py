@@ -49,19 +49,19 @@ class TestTransactionValidator:
         assert any("Investment ID" in e for e in result.errors)
 
     def test_negative_quantity(self, session: Session, sample_portfolio):
-        validator = TransactionValidator(session)
-        record = TransactionRecord(
-            portfolio_id="PORT0001",
-            investment_id="AAPL000001",
-            trn_type=TransactionType.BUY,
-            quantity=Decimal("-10.0000"),
-            price=Decimal("150.0000"),
-            amount=Decimal("15000.00"),
-        )
-        # Pydantic should catch this at model level
-        # but if it doesn't, the validator should
-        result = validator.validate(record)
-        assert not result.is_valid
+        """Pydantic model rejects negative quantity at construction time."""
+        import pytest
+        from pydantic import ValidationError as PydanticValidationError
+
+        with pytest.raises(PydanticValidationError):
+            TransactionRecord(
+                portfolio_id="PORT0001",
+                investment_id="AAPL000001",
+                trn_type=TransactionType.BUY,
+                quantity=Decimal("-10.0000"),
+                price=Decimal("150.0000"),
+                amount=Decimal("15000.00"),
+            )
 
     def test_portfolio_not_found(self, session: Session):
         validator = TransactionValidator(session)
