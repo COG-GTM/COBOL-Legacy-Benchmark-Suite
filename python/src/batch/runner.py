@@ -177,7 +177,7 @@ def run_full_cycle(process_date: date, restart: bool = False) -> ReturnCode:
         sequencer.register_step("RPTGEN", report_step)
 
         # Execute sequence
-        restart_from = restart_step_name if needs_restart else ""
+        restart_from = restart_step_name if (needs_restart and restart) else ""
         rc = sequencer.execute(process_date, restart_step=restart_from)
 
         # Save final checkpoint
