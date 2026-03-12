@@ -15,6 +15,7 @@ adds a lightweight ``PriceSnapshot`` derived from position fields.
 from __future__ import annotations
 
 import datetime
+from decimal import Decimal
 from enum import Enum
 from typing import Annotated, Optional
 
@@ -116,9 +117,7 @@ class PriceSnapshot(BaseModel):
     and POS-COST-BASIS fields in POSREC.cpy for market-data tracking.
     """
 
-    from decimal import Decimal as _Decimal
-
     investment_id: Annotated[str, Field(max_length=10)]
     date: datetime.date
-    market_value: Annotated[_Decimal, Field(decimal_places=2, max_digits=15)]
+    market_value: Annotated[Decimal, Field(decimal_places=2, max_digits=15)]
     currency: Annotated[str, Field(max_length=3, min_length=3)]
