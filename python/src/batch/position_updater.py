@@ -119,8 +119,11 @@ class PositionUpdater:
 
             except Exception as exc:
                 self.records_error += 1
+                # Rollback the failed flush so the session is usable again
+                self._session.rollback()
                 txn.status = TransactionStatus.FAILED.value
                 self._transaction_repo.update(txn)
+                self._session.commit()
                 logger.error(
                     "Error processing transaction %s: %s",
                     txn.transaction_id,

@@ -189,9 +189,9 @@ class RecoveryManager:
         checkpoint = self._repo.get_latest_for_batch(batch_id)
         if checkpoint is not None:
             checkpoint.status = CheckpointStatus.FAILED.value
-            # Do NOT overwrite restart_data — it holds the step/program name
-            # needed by initialize_recovery(). Store error in last_key instead.
-            checkpoint.last_key = error_msg[:50]
+            # Preserve both restart_data (step name) and last_key (record key)
+            # so initialize_recovery can determine the correct restart point.
+            # Error details are logged only — not stored in checkpoint fields.
             self._repo.update(checkpoint)
             self._session.commit()
             logger.error("Checkpoint failed for batch: %s - %s", batch_id, error_msg)
