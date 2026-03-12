@@ -195,8 +195,11 @@ def upgrade() -> None:
         sa.Column("additional_info", sa.String(500), nullable=True, comment="Additional diagnostic information"),
         sa.PrimaryKeyConstraint("error_timestamp", "program_id"),
     )
-    # ERRLOG_IX1: (PROCESS_DATE, ERROR_SEVERITY)
-    op.create_index("ix_errlog_process_date", "errlog", ["process_date", "error_severity"])
+    # ERRLOG_IX1: (PROCESS_DATE, ERROR_SEVERITY DESC)
+    op.create_index(
+        "ix_errlog_process_date", "errlog",
+        [sa.text("process_date"), sa.text("error_severity DESC")],
+    )
 
     # ------------------------------------------------------------------
     # RTNCODES (Return Codes)

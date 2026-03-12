@@ -95,6 +95,13 @@ def get_engine(url: str | None = None, **kwargs: Any) -> Engine:
     resolved_url = url or _get_database_url()
 
     if _engine is not None:
+        existing_url = str(_engine.url)
+        if existing_url != resolved_url:
+            raise ValueError(
+                f"Engine already exists with URL {existing_url!r}; "
+                f"requested URL {resolved_url!r} differs. "
+                f"Call dispose_engine() first to create a new engine."
+            )
         return _engine
 
     engine_kwargs = _build_engine_kwargs(resolved_url, **kwargs)

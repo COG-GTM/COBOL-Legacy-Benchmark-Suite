@@ -451,7 +451,7 @@ class ErrorLog(Base):
     # Indexes matching ERRLOG.sql secondary indexes
     __table_args__ = (
         # ERRLOG_IX1: (PROCESS_DATE, ERROR_SEVERITY DESC)
-        Index("ix_errlog_process_date", "process_date", "error_severity"),
+        Index("ix_errlog_process_date", "process_date", error_severity.desc()),
     )
 
     def __repr__(self) -> str:
