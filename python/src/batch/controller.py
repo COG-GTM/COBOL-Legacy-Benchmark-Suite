@@ -123,6 +123,8 @@ class BatchController:
             control.batch_status = BatchStatus.ACTIVE.value
             if params.restart_flag:
                 control.restart_count += 1
+            else:
+                control.restart_count = 0
             self._repo.update(control)
 
         logger.info("Batch job initialized: %s", params.batch_id)
