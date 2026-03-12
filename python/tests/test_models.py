@@ -204,9 +204,10 @@ class TestPortfolioValidation:
         assert p.id == "PORT1234"
         assert isinstance(p.total_value, Decimal)
 
-    def test_valid_5_digit_id(self):
-        p = Portfolio(**_valid_portfolio(id="PORT12345"))
-        assert p.id == "PORT12345"
+    def test_invalid_id_5_digits(self):
+        """5-digit suffix exceeds PIC X(8) / CHAR(8) limit."""
+        with pytest.raises(Exception):
+            Portfolio(**_valid_portfolio(id="PORT12345"))
 
     def test_invalid_id_no_prefix(self):
         with pytest.raises(Exception):

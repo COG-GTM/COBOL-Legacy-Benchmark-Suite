@@ -33,14 +33,14 @@ class Portfolio(BaseModel):
     @field_validator("id")
     @classmethod
     def validate_portfolio_id(cls, v: str) -> str:
-        """Portfolio ID must start with 'PORT' followed by 4-5 numeric digits.
+        """Portfolio ID must start with 'PORT' followed by exactly 4 numeric digits.
 
-        Mirrors PORTMSTR.cbl lines 142-147 and PORTVALD.cbl lines 52-71.
-        PORTVAL.cpy defines VAL-ID-PREFIX as 'PORT'.
+        Mirrors PORTVALD.cbl lines 52-71: checks LS-INPUT-VALUE(5:4) for numeric.
+        PORT-ID is PIC X(8) so total length must be exactly 8 characters.
         """
-        if not re.match(r"^PORT\d{4,5}$", v):
+        if not re.match(r"^PORT\d{4}$", v):
             raise ValueError(
-                "Portfolio ID must start with 'PORT' followed by 4-5 numeric digits"
+                "Portfolio ID must start with 'PORT' followed by exactly 4 numeric digits"
             )
         return v
 

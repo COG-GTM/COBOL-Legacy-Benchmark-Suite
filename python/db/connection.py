@@ -25,6 +25,8 @@ from sqlalchemy.orm import Session, sessionmaker
 
 from db.schema import Base
 
+_engine: Engine | None = None
+
 
 def _build_url() -> str:
     """Build a SQLAlchemy database URL from environment variables."""
@@ -54,19 +56,24 @@ def _build_url() -> str:
 
 
 def get_engine() -> Engine:
-    """Create and return a SQLAlchemy engine with connection pooling.
+    """Return a cached SQLAlchemy engine (singleton).
 
+    The engine and its connection pool are created once and reused across calls.
     For SQLite the pool is disabled (StaticPool equivalent via NullPool).
     For PostgreSQL, pool_size and max_overflow are configurable.
     """
+    global _engine  # noqa: PLW0603
+    if _engine is not None:
+        return _engine
+
     url = _build_url()
 
     if url.startswith("sqlite"):
-        engine = create_engine(url, echo=False, connect_args={"check_same_thread": False})
+        _engine = create_engine(url, echo=False, connect_args={"check_same_thread": False})
     else:
         pool_size = int(os.environ.get("DB_POOL_SIZE", "5"))
         max_overflow = int(os.environ.get("DB_MAX_OVERFLOW", "10"))
-        engine = create_engine(
+        _engine = create_engine(
             url,
             echo=False,
             pool_size=pool_size,
@@ -74,7 +81,15 @@ def get_engine() -> Engine:
             pool_pre_ping=True,
         )
 
-    return engine
+    return _engine
+
+
+def reset_engine() -> None:
+    """Dispose of the cached engine and reset. Useful for testing."""
+    global _engine  # noqa: PLW0603
+    if _engine is not None:
+        _engine.dispose()
+        _engine = None
 
 
 def get_session_factory(engine: Engine | None = None) -> sessionmaker[Session]:
