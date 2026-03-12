@@ -197,6 +197,7 @@ class PositionUpdater:
                 )
                 # Proportional cost basis reduction
                 if position.quantity <= Decimal("0"):
+                    position.quantity = Decimal("0.0000")
                     position.cost_basis = Decimal("0.00")
                     position.market_value = Decimal("0.00")
                     position.status = PositionStatus.CLOSED.value

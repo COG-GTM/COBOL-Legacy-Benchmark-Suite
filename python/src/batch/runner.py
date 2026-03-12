@@ -128,6 +128,7 @@ def run_full_cycle(process_date: date, restart: bool = False) -> ReturnCode:
                     txn_repo.update(txn)
                     controller.increment_read()
                     controller.increment_error(str(exc))
+                    validator.total_failed += 1
                     continue
                 result = validator.validate(record)
                 controller.increment_read()
