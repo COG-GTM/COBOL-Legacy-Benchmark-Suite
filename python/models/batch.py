@@ -15,7 +15,7 @@ from models.enums import (
     BatchStatus,
     CheckpointPhase,
     CheckpointStatus,
-    DependencyType,
+    PrcseqDependencyType,
     ProcessSequenceType,
     RestartMode,
     ScheduleFrequency,
@@ -55,7 +55,7 @@ class DependencyEntry(BaseModel):
     """Single dependency entry from PSR-DEP-ENTRY OCCURS 10 TIMES."""
 
     dep_id: str
-    dep_type: DependencyType
+    dep_type: PrcseqDependencyType
     dep_return_code: int
 
     @field_validator("dep_id")

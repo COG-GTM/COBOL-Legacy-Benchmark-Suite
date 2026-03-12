@@ -100,8 +100,11 @@ class ProcessingError(AppError):
         super().__init__(message, severity=ErrorSeverity.ERROR, code=code, program=program)
 
 
-class SystemError(AppError):
-    """System-level errors (ERRHAND.cpy ERR-CAT-SYSTEM)."""
+class SystemLevelError(AppError):
+    """System-level errors (ERRHAND.cpy ERR-CAT-SYSTEM).
+
+    Named SystemLevelError to avoid shadowing Python's builtin SystemError.
+    """
 
     def __init__(self, message: str, code: str = "E005", program: str = "") -> None:
         super().__init__(message, severity=ErrorSeverity.SEVERE, code=code, program=program)

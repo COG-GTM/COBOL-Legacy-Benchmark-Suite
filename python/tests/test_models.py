@@ -49,7 +49,7 @@ from models.errors import (
     ErrorSeverity,
     NotFoundError,
     ProcessingError,
-    SystemError,
+    SystemLevelError,
     ValidationError,
     VsamError,
 )
@@ -416,7 +416,7 @@ class TestExceptionHierarchy:
         assert e.code == "E007"
 
     def test_system_error(self):
-        e = SystemError("crash")
+        e = SystemLevelError("crash")
         assert isinstance(e, AppError)
         assert e.severity == ErrorSeverity.SEVERE
 

@@ -168,6 +168,13 @@ class DependencyType(str, Enum):
     EXCLUSIVE = "X"
 
 
+class PrcseqDependencyType(str, Enum):
+    """Dependency types from PRCSEQ.cpy PSR-DEP-TYPE."""
+
+    HARD = "H"
+    SOFT = "S"
+
+
 class ProcessSequenceType(str, Enum):
     """Process sequence types from PRCSEQ.cpy PSR-TYPE."""
 

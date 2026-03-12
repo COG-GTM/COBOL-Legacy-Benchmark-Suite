@@ -20,7 +20,7 @@ from collections.abc import Generator
 from contextlib import contextmanager
 
 from sqlalchemy import create_engine
-from sqlalchemy.engine import Engine
+from sqlalchemy.engine import URL, Engine
 from sqlalchemy.orm import Session, sessionmaker
 
 from db.schema import Base
@@ -43,7 +43,14 @@ def _build_url() -> str:
     name = os.environ.get("DB_NAME", "portfolio")
     user = os.environ.get("DB_USER", "")
     password = os.environ.get("DB_PASSWORD", "")
-    return f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{name}"
+    return str(URL.create(
+        "postgresql+psycopg2",
+        username=user,
+        password=password,
+        host=host,
+        port=int(port),
+        database=name,
+    ))
 
 
 def get_engine() -> Engine:
