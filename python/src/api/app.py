@@ -15,7 +15,7 @@ from fastapi import FastAPI
 
 from src.api.routers import admin, history, inquiry, portfolio
 from src.common.logging_config import configure_logging
-from src.db.engine import create_db_engine, dispose_engine
+from src.db.engine import dispose_engine, get_engine
 from src.db.tables import Base
 
 logger = logging.getLogger(__name__)
@@ -27,8 +27,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     configure_logging()
     logger.info("Starting Investment Portfolio Management System")
 
-    # Initialize database
-    engine = create_db_engine()
+    # Initialize database (use singleton engine so dispose_engine() cleans it up)
+    engine = get_engine()
     Base.metadata.create_all(engine)
     logger.info("Database initialized")
 

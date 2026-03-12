@@ -49,9 +49,9 @@ class RecoveryManager:
         Translates RCVPRC00.cbl 1000-INITIALIZE-RECOVERY.
 
         Returns:
-            Tuple of (needs_restart, restart_key).
-            If needs_restart is True, restart_key contains the last
-            successfully processed key.
+            Tuple of (needs_restart, restart_step_name).
+            If needs_restart is True, restart_step_name contains the
+            program/step name to restart from (stored in restart_data).
         """
         logger.info("Initializing recovery for batch: %s", batch_id)
 
@@ -68,14 +68,17 @@ class RecoveryManager:
             CheckpointStatus.ACTIVE.value,
             CheckpointStatus.FAILED.value,
         ):
+            # restart_data stores the step/program name for sequencer restart
+            restart_step = checkpoint.restart_data if checkpoint.restart_data else ""
             logger.info(
-                "Found restart point: key=%s, records=%d, phase=%s",
+                "Found restart point: step=%s, key=%s, records=%d, phase=%s",
+                restart_step,
                 checkpoint.last_key,
                 checkpoint.records_at_checkpoint,
                 checkpoint.phase,
             )
             self._current_checkpoint = checkpoint
-            return True, checkpoint.last_key
+            return True, restart_step
 
         return False, ""
 
@@ -110,7 +113,7 @@ class RecoveryManager:
         records_processed: int,
         phase: CheckpointPhase = CheckpointPhase.PROCESS,
         total_amount: Decimal = Decimal("0.00"),
-        restart_data: str = "",
+        current_step: str = "",
     ) -> Checkpoint:
         """
         Save a checkpoint during batch processing.
@@ -132,7 +135,7 @@ class RecoveryManager:
             last_key=last_key[:50],
             records_at_checkpoint=records_processed,
             commit_count=records_processed // COMMIT_THRESHOLD,
-            restart_data=restart_data[:200],
+            restart_data=current_step[:200],
             total_amount=total_amount,
         )
 
