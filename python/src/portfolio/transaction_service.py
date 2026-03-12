@@ -181,8 +181,9 @@ class TransactionService:
         # SUBTRACT quantity from position
         position.quantity -= record.quantity
         # Proportional cost basis reduction
-        if position.quantity == Decimal("0"):
+        if position.quantity <= Decimal("0"):
             cost_reduction = position.cost_basis
+            position.quantity = Decimal("0.0000")
             position.cost_basis = Decimal("0.00")
             position.market_value = Decimal("0.00")
             position.status = PositionStatus.CLOSED.value

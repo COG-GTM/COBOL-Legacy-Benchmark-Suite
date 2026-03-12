@@ -123,7 +123,7 @@ class RecoveryManager:
         enable restart from the last checkpoint.
         """
         now = datetime.now()
-        checkpoint_id = f"{batch_id}_{now.strftime('%H%M%S')}"
+        checkpoint_id = f"{batch_id}_{now.strftime('%H%M%S%f')}"[:20]
 
         checkpoint = Checkpoint(
             checkpoint_id=checkpoint_id,
