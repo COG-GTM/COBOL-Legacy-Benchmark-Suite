@@ -121,7 +121,6 @@ class PortfolioPositionsResponse(BaseModel):
 class TransactionCreateRequest(BaseModel):
     """Request to create a transaction."""
 
-    portfolio_id: str = Field(max_length=8)
     investment_id: str = Field(default="", max_length=10)
     trn_type: TransactionType
     quantity: Decimal = Field(gt=0)

@@ -183,11 +183,15 @@ class RecoveryManager:
         Mark the latest checkpoint as failed.
 
         Called when batch processing encounters a fatal error.
+        Preserves restart_data (step name) so that initialize_recovery
+        can still determine which step to restart from.
         """
         checkpoint = self._repo.get_latest_for_batch(batch_id)
         if checkpoint is not None:
             checkpoint.status = CheckpointStatus.FAILED.value
-            checkpoint.restart_data = error_msg[:200]
+            # Do NOT overwrite restart_data — it holds the step/program name
+            # needed by initialize_recovery(). Store error in last_key instead.
+            checkpoint.last_key = error_msg[:50]
             self._repo.update(checkpoint)
             self._session.commit()
             logger.error("Checkpoint failed for batch: %s - %s", batch_id, error_msg)
