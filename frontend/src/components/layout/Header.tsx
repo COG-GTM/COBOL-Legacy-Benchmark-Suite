@@ -15,7 +15,7 @@ export default function Header() {
   const currentPage = routeNames[location.pathname] || "Page Not Found";
 
   return (
-    <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6">
+    <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6 pl-16 lg:pl-6">
       {/* Breadcrumb */}
       <nav className="flex items-center gap-2 text-sm">
         <span className="text-gray-400">Home</span>
