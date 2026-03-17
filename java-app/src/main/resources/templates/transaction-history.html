@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Transaction History Inquiry</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            margin: 0;
+            padding: 20px;
+        }
+        .screen {
+            width: 80ch;
+            margin: 0 auto;
+            border: 1px solid #00ff00;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            background-color: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            padding: 2px 5px;
+        }
+        input[type="submit"] {
+            background-color: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            padding: 2px 10px;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th {
+            color: #ffffff;
+            border-bottom: 1px solid #00ff00;
+            text-align: left;
+            padding: 3px 8px;
+        }
+        td {
+            padding: 3px 8px;
+            border-bottom: 1px solid #003300;
+        }
+        td.status-P { color: #00ff00; }
+        td.status-F { color: #ff0000; }
+        td.status-R { color: #ffff00; }
+        .pagination {
+            margin-top: 15px;
+        }
+        .pagination a {
+            color: #00ff00;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+        .footer {
+            border-top: 1px solid #00ff00;
+            margin-top: 20px;
+            padding-top: 10px;
+            font-size: 12px;
+        }
+        a { color: #00ff00; }
+    </style>
+</head>
+<body>
+<div class="screen">
+    <!-- Replaces HISMAP header -->
+    <div class="header">
+        <h2>TRANSACTION HISTORY INQUIRY</h2>
+    </div>
+
+    <!-- Input form - replaces HISMAP Account ID input field -->
+    <form th:action="@{/history}" method="get">
+        <label>Portfolio ID: </label>
+        <input type="text" name="portfolioId" maxlength="8"
+               th:value="${portfolioId}"
+               placeholder="XXXXXXXX"/>
+        <input type="submit" value="INQUIRE"/>
+        &nbsp;&nbsp;
+        <a href="/">PF3=Menu</a>
+    </form>
+
+    <!-- Transaction table - replaces HISMAP display fields -->
+    <!-- COBOL HISMAP shows: TRANS_DATE, TRANS_TYPE, TRANS_UNITS, TRANS_PRICE, TRANS_AMOUNT, STATUS -->
+    <table th:if="${transactions != null and !transactions.isEmpty()}">
+        <thead>
+            <tr>
+                <th>Trans ID</th>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Investment</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Amount</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="txn : ${transactions}">
+                <td th:text="${txn.transactionId}">TXN001</td>
+                <td th:text="${txn.transactionDate}">2024-01-01</td>
+                <td th:text="${txn.transactionType}">BU</td>
+                <td th:text="${txn.investmentId}">INV001</td>
+                <td th:text="${txn.quantity}">0.0000</td>
+                <td th:text="${txn.price}">0.00</td>
+                <td th:text="${txn.amount}">0.00</td>
+                <td th:text="${txn.status}"
+                    th:classappend="'status-' + ${txn.status}">P</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p th:if="${transactions != null and transactions.isEmpty()}"
+       style="color: #ffff00;">No transactions found for this portfolio.</p>
+
+    <!-- Pagination - replaces PF7/PF8 scrolling in HISMAP -->
+    <div class="pagination" th:if="${totalPages != null and totalPages > 1}">
+        <a th:if="${currentPage > 0}"
+           th:href="@{/history/{id}(id=${portfolioId}, page=${currentPage - 1})}">
+            PF7=Previous
+        </a>
+        <span th:text="'Page ' + (${currentPage} + 1) + ' of ' + ${totalPages}">Page 1 of 1</span>
+        <a th:if="${currentPage + 1 < totalPages}"
+           th:href="@{/history/{id}(id=${portfolioId}, page=${currentPage + 1})}">
+            PF8=Next
+        </a>
+    </div>
+
+    <div class="footer">
+        <p>PF3=Menu &nbsp; PF7=Previous &nbsp; PF8=Next &nbsp; PF12=Cancel</p>
+        <p>Status: P=Processed &nbsp; F=Failed &nbsp; R=Reversed</p>
+        <p>Type: BU=Buy &nbsp; SL=Sell &nbsp; TR=Transfer &nbsp; FE=Fee</p>
+    </div>
+</div>
+</body>
+</html>

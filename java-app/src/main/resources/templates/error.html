@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Error - Portfolio Management System</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            margin: 0;
+            padding: 20px;
+        }
+        .screen {
+            width: 80ch;
+            margin: 0 auto;
+            border: 1px solid #00ff00;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        /* Replaces ERRMAP COLOR=RED attribute from BMS */
+        .error-box {
+            border: 2px solid #ff0000;
+            padding: 15px;
+            margin: 20px 0;
+            color: #ff0000;
+        }
+        .error-code {
+            font-size: 12px;
+            color: #ff6666;
+        }
+        .footer {
+            border-top: 1px solid #00ff00;
+            margin-top: 20px;
+            padding-top: 10px;
+            font-size: 12px;
+        }
+        a { color: #00ff00; }
+    </style>
+</head>
+<body>
+<div class="screen">
+    <!-- Replaces ERRMAP header -->
+    <div class="header">
+        <h2>SYSTEM ERROR</h2>
+    </div>
+
+    <!-- Error message display - replaces ERRMAP red error message field -->
+    <div class="error-box">
+        <p><strong>ERROR:</strong> <span th:text="${errorMessage}">An error occurred.</span></p>
+        <p class="error-code" th:if="${errorCode}">
+            Error Code: <span th:text="${errorCode}">SY-9999</span>
+        </p>
+    </div>
+
+    <p>Please contact your system administrator if this problem persists.</p>
+
+    <div class="footer">
+        <p><a href="/">PF3=Return to Menu</a> &nbsp; <a href="javascript:history.back()">PF12=Back</a></p>
+    </div>
+</div>
+</body>
+</html>
