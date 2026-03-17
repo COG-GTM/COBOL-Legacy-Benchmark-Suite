@@ -3,6 +3,7 @@ package com.portfolio.batch;
 import com.portfolio.model.BatchControlKey;
 import com.portfolio.model.BatchControlRecord;
 import com.portfolio.model.enums.BatchStatus;
+import com.portfolio.batch.listeners.BatchControlListener;
 import com.portfolio.repository.BatchControlRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,9 +40,12 @@ public class ProcessSequencerJobConfig {
     private static final String PROCESS_DATE_KEY = "processDate";
 
     private final BatchControlRepository batchControlRepository;
+    private final BatchControlListener batchControlListener;
 
-    public ProcessSequencerJobConfig(BatchControlRepository batchControlRepository) {
+    public ProcessSequencerJobConfig(BatchControlRepository batchControlRepository,
+                                      BatchControlListener batchControlListener) {
         this.batchControlRepository = batchControlRepository;
+        this.batchControlListener = batchControlListener;
     }
 
     @Bean
@@ -50,6 +54,7 @@ public class ProcessSequencerJobConfig {
                                     Step sequenceCheckStep,
                                     Step sequenceTerminateStep) {
         return new JobBuilder("processSequencerJob", jobRepository)
+                .listener(batchControlListener)
                 .start(sequenceInitStep)
                 .next(sequenceCheckStep)
                 .next(sequenceTerminateStep)

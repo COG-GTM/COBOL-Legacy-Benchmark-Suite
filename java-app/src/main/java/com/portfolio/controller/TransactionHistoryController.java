@@ -67,14 +67,15 @@ public class TransactionHistoryController {
                                           Model model) {
         securityManager.logAccess("HISTORY", "READ");
 
+        int safePage = Math.max(page, 0);
         Page<TransactionHistory> transactions = transactionRepository
                 .findByPortfolioIdOrderByTransactionDateDesc(
                         portfolioId.trim(),
-                        PageRequest.of(page, PAGE_SIZE));
+                        PageRequest.of(safePage, PAGE_SIZE));
 
         model.addAttribute("portfolioId", portfolioId);
         model.addAttribute("transactions", transactions);
-        model.addAttribute("currentPage", page);
+        model.addAttribute("currentPage", safePage);
         model.addAttribute("totalPages", transactions.getTotalPages());
 
         log.debug("History inquiry: portfolioId={}, total={}", portfolioId,

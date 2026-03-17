@@ -3,6 +3,7 @@ package com.portfolio.batch;
 import com.portfolio.model.BatchControlKey;
 import com.portfolio.model.BatchControlRecord;
 import com.portfolio.model.enums.BatchStatus;
+import com.portfolio.batch.listeners.BatchControlListener;
 import com.portfolio.repository.BatchControlRepository;
 import com.portfolio.service.AuditService;
 import org.slf4j.Logger;
@@ -48,11 +49,14 @@ public class BatchControlJobConfig {
 
     private final BatchControlRepository batchControlRepository;
     private final AuditService auditService;
+    private final BatchControlListener batchControlListener;
 
     public BatchControlJobConfig(BatchControlRepository batchControlRepository,
-                                  AuditService auditService) {
+                                  AuditService auditService,
+                                  BatchControlListener batchControlListener) {
         this.batchControlRepository = batchControlRepository;
         this.auditService = auditService;
+        this.batchControlListener = batchControlListener;
     }
 
     @Bean
@@ -60,6 +64,7 @@ public class BatchControlJobConfig {
                                Step initStep, Step checkPrereqStep,
                                Step updateStatusStep, Step terminateStep) {
         return new JobBuilder("batchControlJob", jobRepository)
+                .listener(batchControlListener)
                 .start(initStep)
                 .next(checkPrereqStep)
                 .next(updateStatusStep)
@@ -149,9 +154,9 @@ public class BatchControlJobConfig {
 
             if (!allPrereqsMet) {
                 log.warn("Prerequisites not met for job: {}", jobName);
-            } else {
-                log.info("All prerequisites met for job: {}", jobName);
+                throw new IllegalStateException("Prerequisites not met for job: " + jobName);
             }
+            log.info("All prerequisites met for job: {}", jobName);
 
             return RepeatStatus.FINISHED;
         };

@@ -84,15 +84,16 @@ public class PortfolioInquiryController {
         List<InvestmentPosition> allPositions = positionRepository.findByKeyPortfolioId(id.trim());
 
         // Pagination (replaces PF7/PF8 scrolling)
-        int start = Math.min(page * PAGE_SIZE, allPositions.size());
+        int safePage = Math.max(page, 0);
+        int start = Math.min(safePage * PAGE_SIZE, allPositions.size());
         int end = Math.min(start + PAGE_SIZE, allPositions.size());
         List<InvestmentPosition> pageContent = allPositions.subList(start, end);
         Page<InvestmentPosition> positions = new PageImpl<>(
-                pageContent, PageRequest.of(page, PAGE_SIZE), allPositions.size());
+                pageContent, PageRequest.of(safePage, PAGE_SIZE), allPositions.size());
 
         model.addAttribute("portfolio", portfolio);
         model.addAttribute("positions", positions);
-        model.addAttribute("currentPage", page);
+        model.addAttribute("currentPage", safePage);
         model.addAttribute("totalPages", positions.getTotalPages());
 
         log.debug("Portfolio inquiry: id={}, positions={}", id, allPositions.size());
