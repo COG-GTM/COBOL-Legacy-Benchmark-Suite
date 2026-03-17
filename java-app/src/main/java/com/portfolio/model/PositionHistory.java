@@ -36,7 +36,7 @@ public class PositionHistory {
     private LocalTime historyTime;
 
     @Id
-    @Column(name = "sequence_no", length = 4, nullable = false)
+    @Column(name = "sequence_no", length = 20, nullable = false)
     private String sequenceNo;
 
     @Column(name = "record_type", length = 2, nullable = false)

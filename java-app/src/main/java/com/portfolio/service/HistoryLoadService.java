@@ -48,12 +48,8 @@ public class HistoryLoadService {
         history.setHistoryDate(transaction.getTransactionDate());
         history.setHistoryTime(transaction.getTransactionTime() != null
                 ? transaction.getTransactionTime() : LocalTime.now());
-        // Use last 4 chars of transaction ID as sequence to guarantee uniqueness
-        String txnId = transaction.getTransactionId();
-        String seq = txnId.length() >= 4
-                ? txnId.substring(txnId.length() - 4)
-                : String.format("%4s", txnId).replace(' ', '0');
-        history.setSequenceNo(seq);
+        // Use the full transaction ID as sequence_no to guarantee uniqueness
+        history.setSequenceNo(transaction.getTransactionId());
         history.setRecordType("TR");
         history.setActionCode("A");
         history.setInvestmentId(transaction.getInvestmentId());

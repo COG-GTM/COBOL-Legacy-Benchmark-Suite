@@ -45,11 +45,11 @@ public class TestDataGenerator {
             Portfolio p = new Portfolio();
             p.setPortfolioId(String.format("PORT%04d", i));
             p.setAccountType("IN");
-            p.setBranchId(branches[i - 1].substring(0, 2));
+            p.setBranchId(branches[i - 1].substring(2, 4));
             p.setClientId(String.format("CLIENT%04d", i));
             p.setPortfolioName("Test Portfolio " + i);
             p.setCurrencyCode("USD");
-            p.setRiskLevel(i <= 3 ? "L" : (i <= 7 ? "M" : "H"));
+            p.setRiskLevel(i <= 3 ? "1" : (i <= 7 ? "3" : "5"));
             p.setStatus(statuses[i - 1]);
             p.setOpenDate(LocalDate.of(2020, 1, i));
             if ("C".equals(statuses[i - 1])) {

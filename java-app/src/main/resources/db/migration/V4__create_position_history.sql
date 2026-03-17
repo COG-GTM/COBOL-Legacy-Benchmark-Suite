@@ -11,7 +11,7 @@ CREATE TABLE position_history (
     portfolio_id      CHAR(8)         NOT NULL,
     history_date      DATE            NOT NULL,
     history_time      TIME            NOT NULL,
-    sequence_no       CHAR(4)         NOT NULL,
+    sequence_no       VARCHAR(20)     NOT NULL,
     record_type       CHAR(2)         NOT NULL,
     action_code       CHAR(1)         NOT NULL,
     investment_id     CHAR(10),
