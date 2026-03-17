@@ -64,13 +64,15 @@ public class CheckpointRestartService {
      * Saves checkpoint data from a Spring Batch chunk context.
      */
     public void saveCheckpointFromContext(ChunkContext chunkContext, String lastProcessedKey) {
-        String jobName = chunkContext.getStepContext().getJobName();
         String stepName = chunkContext.getStepContext().getStepName();
 
-        // Retrieve processDate from JobExecutionContext (set during INIT step)
-        // to avoid midnight-crossing mismatches with the batch control record key
+        // Retrieve jobName and processDate from JobExecutionContext (set during INIT step)
+        // to match the BatchControlKey used when the record was created.
+        // Fall back to Spring Batch instance name / current date if not found.
         org.springframework.batch.item.ExecutionContext jobCtx = chunkContext.getStepContext()
                 .getStepExecution().getJobExecution().getExecutionContext();
+        String jobName = jobCtx.getString("resolvedJobName",
+                chunkContext.getStepContext().getJobName());
         String processDate = jobCtx.getString("processDate", null);
         if (processDate == null) {
             // Fallback if not running within a batch job that stores processDate

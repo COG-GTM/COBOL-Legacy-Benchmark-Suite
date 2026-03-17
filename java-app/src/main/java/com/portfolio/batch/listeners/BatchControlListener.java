@@ -46,13 +46,15 @@ public class BatchControlListener implements JobExecutionListener {
 
     @Override
     public void afterJob(JobExecution jobExecution) {
-        String jobName = jobExecution.getJobInstance().getJobName();
-        // Use the job's start time for processDate to match the INIT step,
-        // avoiding mismatches if the job spans midnight
+        // Retrieve jobName and processDate from the JobExecutionContext where the
+        // INIT step stored them, so the BatchControlKey matches the record created
+        // during initialization. Fall back to Spring Batch instance name / start time.
+        String jobName = jobExecution.getExecutionContext()
+                .getString("resolvedJobName", jobExecution.getJobInstance().getJobName());
         LocalDateTime startTime = jobExecution.getStartTime() != null
                 ? jobExecution.getStartTime() : LocalDateTime.now();
-        String processDate = startTime
-                .format(DateTimeFormatter.BASIC_ISO_DATE);
+        String processDate = jobExecution.getExecutionContext()
+                .getString("processDate", startTime.format(DateTimeFormatter.BASIC_ISO_DATE));
 
         Optional<BatchControlRecord> recordOpt = batchControlRepository
                 .findById(new BatchControlKey(jobName, processDate, 1));
