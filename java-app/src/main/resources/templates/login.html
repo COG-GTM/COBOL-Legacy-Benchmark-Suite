@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Sign On - Portfolio Management System</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            margin: 0;
+            padding: 20px;
+        }
+        .screen {
+            width: 80ch;
+            margin: 0 auto;
+            border: 1px solid #00ff00;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: inline-block;
+            width: 15ch;
+        }
+        input[type="text"], input[type="password"] {
+            background-color: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            padding: 2px 5px;
+            width: 20ch;
+        }
+        input[type="submit"] {
+            background-color: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            padding: 4px 15px;
+            cursor: pointer;
+            margin-top: 15px;
+        }
+        /* Replaces CICS sign-on error message display */
+        .error-msg {
+            color: #ff0000;
+            margin: 10px 0;
+        }
+        .success-msg {
+            color: #ffff00;
+            margin: 10px 0;
+        }
+        .footer {
+            border-top: 1px solid #00ff00;
+            margin-top: 30px;
+            padding-top: 10px;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+<div class="screen">
+    <!-- Replaces CICS sign-on screen -->
+    <div class="header">
+        <h2>PORTFOLIO MANAGEMENT SYSTEM</h2>
+        <p>CICS SIGN ON</p>
+    </div>
+
+    <!-- Error/success messages - replaces CICS sign-on error display -->
+    <div class="error-msg" th:if="${param.error}">
+        Invalid user ID or password. Please try again.
+    </div>
+    <div class="success-msg" th:if="${param.logout}">
+        You have been signed off successfully.
+    </div>
+
+    <form th:action="@{/login}" method="post">
+        <div class="form-group">
+            <label>User ID:</label>
+            <input type="text" name="username" maxlength="8"
+                   placeholder="USERID" autofocus/>
+        </div>
+        <div class="form-group">
+            <label>Password:</label>
+            <input type="password" name="password" maxlength="8"
+                   placeholder="PASSWORD"/>
+        </div>
+        <div>
+            <input type="submit" value="SIGN ON"/>
+        </div>
+    </form>
+
+    <div class="footer">
+        <p>Press ENTER to sign on</p>
+    </div>
+</div>
+</body>
+</html>

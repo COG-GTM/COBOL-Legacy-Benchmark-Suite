@@ -1,0 +1,86 @@
+spring:
+  application:
+    name: portfolio-management
+
+  # PostgreSQL DataSource (replaces DB2 connection parameters from DB2CONN/DB2ONLN)
+  datasource:
+    url: jdbc:postgresql://localhost:5432/portfolio_db
+    username: portfolio_user
+    password: ${DB_PASSWORD:portfolio_pass}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 5
+      idle-timeout: 300000
+      connection-timeout: 20000
+      max-lifetime: 1200000
+
+  # JPA Configuration
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+
+  # Flyway Migration (replaces DB2 DDL and VSAM file definitions)
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  # Spring Batch Configuration (replaces JCL batch orchestration)
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+
+  # Thymeleaf Configuration (replaces BMS screen maps)
+  thymeleaf:
+    cache: false
+    prefix: classpath:/templates/
+    suffix: .html
+
+  # Security (replaces SECMGR.cbl CICS sign-on)
+  security:
+    user:
+      name: admin
+      password: ${ADMIN_PASSWORD:admin}
+
+# Server Configuration
+server:
+  port: 8080
+  servlet:
+    session:
+      timeout: 30m
+
+# Actuator (replaces UTLMON00.cbl monitoring)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,batch
+  endpoint:
+    health:
+      show-details: when_authorized
+
+# Logging (replaces COBOL DISPLAY statements and AUDPROC logging)
+logging:
+  level:
+    com.portfolio: INFO
+    org.springframework.batch: INFO
+    org.springframework.security: WARN
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+# Application-specific properties
+portfolio:
+  batch:
+    chunk-size: 1000
+    max-errors: 100
+    commit-interval: 1000
+  reports:
+    output-dir: ./reports

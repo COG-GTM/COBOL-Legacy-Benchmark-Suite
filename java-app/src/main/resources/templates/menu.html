@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8">
+    <title>Portfolio Management System</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            margin: 0;
+            padding: 20px;
+        }
+        .screen {
+            width: 80ch;
+            margin: 0 auto;
+            border: 1px solid #00ff00;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .menu-option {
+            margin: 10px 0;
+            padding: 5px;
+        }
+        .menu-option a {
+            color: #00ff00;
+            text-decoration: none;
+        }
+        .menu-option a:hover {
+            color: #ffffff;
+            text-decoration: underline;
+        }
+        .footer {
+            border-top: 1px solid #00ff00;
+            margin-top: 20px;
+            padding-top: 10px;
+            font-size: 12px;
+        }
+        .user-info {
+            text-align: right;
+            font-size: 12px;
+        }
+        form { display: inline; }
+        button {
+            background: none;
+            border: none;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 0;
+        }
+        button:hover { color: #ffffff; text-decoration: underline; }
+    </style>
+</head>
+<body>
+<div class="screen">
+    <!-- Replaces MENMAP BMS map header -->
+    <div class="header">
+        <h2>PORTFOLIO MANAGEMENT SYSTEM</h2>
+        <p>MAIN MENU</p>
+    </div>
+
+    <div class="user-info">
+        User: <span sec:authentication="name">USER</span>
+        &nbsp;&nbsp;
+        Date: <span th:text="${#dates.format(#dates.createNow(), 'yyyy-MM-dd')}">DATE</span>
+    </div>
+
+    <!-- Replaces MENMAP options 1-3 -->
+    <div class="menu-option">
+        <span>1.</span>
+        <a href="/portfolio">Portfolio Position Inquiry</a>
+    </div>
+    <div class="menu-option">
+        <span>2.</span>
+        <a href="/history">Transaction History Inquiry</a>
+    </div>
+    <div class="menu-option">
+        <span>3.</span>
+        <form th:action="@{/logout}" method="post">
+            <button type="submit">Exit / Sign Off</button>
+        </form>
+    </div>
+
+    <!-- Replaces MENMAP message field -->
+    <div class="footer">
+        <p>Select an option and press ENTER</p>
+        <p>PF3=Exit &nbsp; PF12=Cancel</p>
+    </div>
+</div>
+</body>
+</html>

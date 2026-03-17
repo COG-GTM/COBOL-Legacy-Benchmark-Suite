@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Portfolio Position Inquiry</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            margin: 0;
+            padding: 20px;
+        }
+        .screen {
+            width: 80ch;
+            margin: 0 auto;
+            border: 1px solid #00ff00;
+            padding: 20px;
+        }
+        .header {
+            text-align: center;
+            border-bottom: 1px solid #00ff00;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        input[type="text"] {
+            background-color: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            padding: 2px 5px;
+        }
+        input[type="submit"] {
+            background-color: #000;
+            color: #00ff00;
+            border: 1px solid #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            padding: 2px 10px;
+            cursor: pointer;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+        th {
+            color: #ffffff;
+            border-bottom: 1px solid #00ff00;
+            text-align: left;
+            padding: 3px 8px;
+        }
+        td {
+            padding: 3px 8px;
+            border-bottom: 1px solid #003300;
+        }
+        .portfolio-info {
+            margin: 10px 0;
+            padding: 10px;
+            border: 1px solid #003300;
+        }
+        .pagination {
+            margin-top: 15px;
+        }
+        .pagination a {
+            color: #00ff00;
+            text-decoration: none;
+            margin-right: 10px;
+        }
+        /* Replaces POSMSG field at position 23,1 - error message area */
+        .error-msg {
+            color: #ff0000;
+            margin-top: 10px;
+            min-height: 20px;
+        }
+        .footer {
+            border-top: 1px solid #00ff00;
+            margin-top: 20px;
+            padding-top: 10px;
+            font-size: 12px;
+        }
+        a { color: #00ff00; }
+    </style>
+</head>
+<body>
+<div class="screen">
+    <!-- Replaces POSMAP header -->
+    <div class="header">
+        <h2>PORTFOLIO POSITION INQUIRY</h2>
+    </div>
+
+    <!-- Input form - replaces POSMAP Account ID input field -->
+    <form th:action="@{/portfolio}" method="get">
+        <label>Account ID: </label>
+        <input type="text" name="id" maxlength="8"
+               th:value="${portfolio != null ? portfolio.portfolioId : ''}"
+               placeholder="XXXXXXXX"/>
+        <input type="submit" value="INQUIRE"/>
+        &nbsp;&nbsp;
+        <a href="/">PF3=Menu</a>
+    </form>
+
+    <!-- Portfolio header info (shown when portfolio is found) -->
+    <div class="portfolio-info" th:if="${portfolio != null}">
+        <span>Portfolio: <strong th:text="${portfolio.portfolioId}">ID</strong></span>
+        &nbsp;&nbsp;
+        <span>Name: <strong th:text="${portfolio.portfolioName}">NAME</strong></span>
+        &nbsp;&nbsp;
+        <span>Status: <strong th:text="${portfolio.status}">S</strong></span>
+        &nbsp;&nbsp;
+        <span>Currency: <strong th:text="${portfolio.currencyCode}">USD</strong></span>
+    </div>
+
+    <!-- Position table - replaces POSMAP Fund ID/Name/Units/Cost/Market fields -->
+    <table th:if="${positions != null and !positions.isEmpty()}">
+        <thead>
+            <tr>
+                <th>Fund ID</th>
+                <th>Fund Name</th>
+                <th>Units</th>
+                <th>Cost Basis</th>
+                <th>Market Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="pos : ${positions}">
+                <td th:text="${pos.key.investmentId}">FUND001</td>
+                <td th:text="${pos.investmentName}">Fund Name</td>
+                <td th:text="${pos.quantity}">0.0000</td>
+                <td th:text="${pos.costBasis}">0.00</td>
+                <td th:text="${pos.marketValue}">0.00</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p th:if="${positions != null and positions.isEmpty()}"
+       style="color: #ffff00;">No positions found for this portfolio.</p>
+
+    <!-- Pagination - replaces PF7=Previous, PF8=Next from BMS map line 47 -->
+    <div class="pagination" th:if="${totalPages != null and totalPages > 1}">
+        <a th:if="${currentPage > 0}"
+           th:href="@{/portfolio/{id}(id=${portfolio.portfolioId}, page=${currentPage - 1})}">
+            PF7=Previous
+        </a>
+        <span th:text="'Page ' + (${currentPage} + 1) + ' of ' + ${totalPages}">Page 1 of 1</span>
+        <a th:if="${currentPage + 1 < totalPages}"
+           th:href="@{/portfolio/{id}(id=${portfolio.portfolioId}, page=${currentPage + 1})}">
+            PF8=Next
+        </a>
+    </div>
+
+    <!-- Error message area - replaces POSMSG field at position 23,1 -->
+    <div class="error-msg" th:if="${errorMessage}" th:text="${errorMessage}"></div>
+
+    <div class="footer">
+        <p>PF3=Menu &nbsp; PF7=Previous &nbsp; PF8=Next &nbsp; PF12=Cancel</p>
+    </div>
+</div>
+</body>
+</html>
