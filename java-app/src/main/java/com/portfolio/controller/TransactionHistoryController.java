@@ -40,11 +40,15 @@ public class TransactionHistoryController {
     }
 
     /**
-     * Shows the transaction history inquiry form.
+     * Shows the transaction history inquiry form or handles form submission.
      * Replaces: HISMAP initial display with Account input field.
+     * When portfolioId is provided as query param (from form), redirects to path variable URL.
      */
     @GetMapping("/history")
-    public String showHistoryForm() {
+    public String showHistoryForm(@RequestParam(name = "portfolioId", required = false) String portfolioId) {
+        if (portfolioId != null && !portfolioId.trim().isEmpty()) {
+            return "redirect:/history/" + portfolioId.trim();
+        }
         return "transaction-history";
     }
 

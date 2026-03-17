@@ -49,11 +49,15 @@ public class PortfolioInquiryController {
     }
 
     /**
-     * Shows the portfolio inquiry form.
+     * Shows the portfolio inquiry form or handles form submission.
      * Replaces: POSMAP initial display with Account input field.
+     * When id is provided as query param (from form), redirects to path variable URL.
      */
     @GetMapping("/portfolio")
-    public String showInquiryForm() {
+    public String showInquiryForm(@RequestParam(name = "id", required = false) String id) {
+        if (id != null && !id.trim().isEmpty()) {
+            return "redirect:/portfolio/" + id.trim();
+        }
         return "position-inquiry";
     }
 

@@ -15,6 +15,8 @@ CREATE TABLE investment_positions (
     market_value      NUMERIC(18,2)   NOT NULL DEFAULT 0,
     currency_code     CHAR(3)         NOT NULL,
     status            CHAR(1)         NOT NULL DEFAULT 'A',
+    investment_name   VARCHAR(50),
+    last_activity_date CHAR(8),
     last_maint_date   TIMESTAMP       NOT NULL DEFAULT CURRENT_TIMESTAMP,
     last_maint_user   VARCHAR(8)      NOT NULL,
     CONSTRAINT pk_investment_positions PRIMARY KEY (portfolio_id, investment_id, position_date),
