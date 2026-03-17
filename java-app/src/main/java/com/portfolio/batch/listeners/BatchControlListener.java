@@ -47,7 +47,11 @@ public class BatchControlListener implements JobExecutionListener {
     @Override
     public void afterJob(JobExecution jobExecution) {
         String jobName = jobExecution.getJobInstance().getJobName();
-        String processDate = LocalDateTime.now()
+        // Use the job's start time for processDate to match the INIT step,
+        // avoiding mismatches if the job spans midnight
+        LocalDateTime startTime = jobExecution.getStartTime() != null
+                ? jobExecution.getStartTime() : LocalDateTime.now();
+        String processDate = startTime
                 .format(DateTimeFormatter.BASIC_ISO_DATE);
 
         Optional<BatchControlRecord> recordOpt = batchControlRepository

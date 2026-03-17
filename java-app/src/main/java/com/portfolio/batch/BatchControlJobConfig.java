@@ -13,6 +13,7 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,11 +35,16 @@ import java.util.Optional;
  * 4. TERM: Finalize (set status to Done, record end time, set return code)
  *
  * Maps the linkage section functions (INIT/CHEK/UPDT/TERM from BCHCTL00.cbl lines 49-53).
+ *
+ * processDate is computed once during INIT and stored in the JobExecutionContext
+ * so that all steps use the same date even if the job spans midnight.
  */
 @Configuration
 public class BatchControlJobConfig {
 
     private static final Logger log = LoggerFactory.getLogger(BatchControlJobConfig.class);
+    private static final String PROCESS_DATE_KEY = "processDate";
+    private static final String JOB_NAME_KEY = "resolvedJobName";
 
     private final BatchControlRepository batchControlRepository;
     private final AuditService auditService;
@@ -61,9 +67,27 @@ public class BatchControlJobConfig {
                 .build();
     }
 
+    private String getJobName(org.springframework.batch.core.scope.context.ChunkContext chunkContext) {
+        ExecutionContext jobCtx = chunkContext.getStepContext()
+                .getStepExecution().getJobExecution().getExecutionContext();
+        String cached = jobCtx.getString(JOB_NAME_KEY, null);
+        if (cached != null) {
+            return cached;
+        }
+        Object param = chunkContext.getStepContext().getJobParameters().get("jobName");
+        return param != null ? param.toString() : "DEFAULT";
+    }
+
+    private String getProcessDate(org.springframework.batch.core.scope.context.ChunkContext chunkContext) {
+        ExecutionContext jobCtx = chunkContext.getStepContext()
+                .getStepExecution().getJobExecution().getExecutionContext();
+        return jobCtx.getString(PROCESS_DATE_KEY, null);
+    }
+
     /**
      * INIT step: Initialize batch control record.
      * Replaces: BCHCTL00.cbl 1000-PROCESS-INITIALIZE.
+     * Computes processDate once and stores it in JobExecutionContext for all subsequent steps.
      */
     @Bean
     public Step initStep(JobRepository jobRepository,
@@ -73,6 +97,12 @@ public class BatchControlJobConfig {
             String jobName = jobNameParam != null ? jobNameParam.toString() : "DEFAULT";
             String processDate = LocalDateTime.now()
                     .format(DateTimeFormatter.BASIC_ISO_DATE);
+
+            // Store processDate and jobName in JobExecutionContext for subsequent steps
+            ExecutionContext jobCtx = chunkContext.getStepContext()
+                    .getStepExecution().getJobExecution().getExecutionContext();
+            jobCtx.putString(PROCESS_DATE_KEY, processDate);
+            jobCtx.putString(JOB_NAME_KEY, jobName);
 
             BatchControlRecord record = new BatchControlRecord();
             record.setKey(new BatchControlKey(jobName, processDate, 1));
@@ -106,10 +136,8 @@ public class BatchControlJobConfig {
     public Step checkPrereqStep(JobRepository jobRepository,
                                 PlatformTransactionManager transactionManager) {
         Tasklet tasklet = (contribution, chunkContext) -> {
-            Object jobNameParam2 = chunkContext.getStepContext().getJobParameters().get("jobName");
-            String jobName = jobNameParam2 != null ? jobNameParam2.toString() : "DEFAULT";
-            String processDate = LocalDateTime.now()
-                    .format(DateTimeFormatter.BASIC_ISO_DATE);
+            String jobName = getJobName(chunkContext);
+            String processDate = getProcessDate(chunkContext);
 
             // Check if all prerequisite jobs are done
             List<BatchControlRecord> prereqs = batchControlRepository
@@ -141,10 +169,8 @@ public class BatchControlJobConfig {
     public Step updateStatusStep(JobRepository jobRepository,
                                  PlatformTransactionManager transactionManager) {
         Tasklet tasklet = (contribution, chunkContext) -> {
-            Object jobNameParam3 = chunkContext.getStepContext().getJobParameters().get("jobName");
-            String jobName = jobNameParam3 != null ? jobNameParam3.toString() : "DEFAULT";
-            String processDate = LocalDateTime.now()
-                    .format(DateTimeFormatter.BASIC_ISO_DATE);
+            String jobName = getJobName(chunkContext);
+            String processDate = getProcessDate(chunkContext);
 
             Optional<BatchControlRecord> recordOpt = batchControlRepository
                     .findById(new BatchControlKey(jobName, processDate, 1));
@@ -172,10 +198,8 @@ public class BatchControlJobConfig {
     public Step terminateStep(JobRepository jobRepository,
                               PlatformTransactionManager transactionManager) {
         Tasklet tasklet = (contribution, chunkContext) -> {
-            Object jobNameParam4 = chunkContext.getStepContext().getJobParameters().get("jobName");
-            String jobName = jobNameParam4 != null ? jobNameParam4.toString() : "DEFAULT";
-            String processDate = LocalDateTime.now()
-                    .format(DateTimeFormatter.BASIC_ISO_DATE);
+            String jobName = getJobName(chunkContext);
+            String processDate = getProcessDate(chunkContext);
 
             Optional<BatchControlRecord> recordOpt = batchControlRepository
                     .findById(new BatchControlKey(jobName, processDate, 1));

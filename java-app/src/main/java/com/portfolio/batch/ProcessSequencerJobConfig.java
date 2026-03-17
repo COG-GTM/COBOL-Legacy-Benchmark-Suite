@@ -12,6 +12,7 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.item.ExecutionContext;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -27,11 +28,15 @@ import java.util.List;
  *
  * Orchestrates execution order: TRNVAL00 -> POSUPD00 -> HISTLD00 -> Reports.
  * Uses Spring Batch's FlowBuilder with conditional transitions.
+ *
+ * processDate is computed once during sequenceInitStep and stored in the JobExecutionContext
+ * so that all steps use the same date even if the job spans midnight.
  */
 @Configuration
 public class ProcessSequencerJobConfig {
 
     private static final Logger log = LoggerFactory.getLogger(ProcessSequencerJobConfig.class);
+    private static final String PROCESS_DATE_KEY = "processDate";
 
     private final BatchControlRepository batchControlRepository;
 
@@ -61,6 +66,11 @@ public class ProcessSequencerJobConfig {
         Tasklet tasklet = (contribution, chunkContext) -> {
             String processDate = LocalDateTime.now()
                     .format(DateTimeFormatter.BASIC_ISO_DATE);
+
+            // Store processDate in JobExecutionContext for subsequent steps
+            ExecutionContext jobCtx = chunkContext.getStepContext()
+                    .getStepExecution().getJobExecution().getExecutionContext();
+            jobCtx.putString(PROCESS_DATE_KEY, processDate);
 
             // Create sequence: TRNVAL -> POSUPD -> HISTLD -> RPTPOS -> RPTAUD -> RPTSTA
             String[] sequence = {"TRNVAL00", "POSUPD00", "HISTLD00",
@@ -94,8 +104,9 @@ public class ProcessSequencerJobConfig {
     public Step sequenceCheckStep(JobRepository jobRepository,
                                    PlatformTransactionManager transactionManager) {
         Tasklet tasklet = (contribution, chunkContext) -> {
-            String processDate = LocalDateTime.now()
-                    .format(DateTimeFormatter.BASIC_ISO_DATE);
+            ExecutionContext jobCtx = chunkContext.getStepContext()
+                    .getStepExecution().getJobExecution().getExecutionContext();
+            String processDate = jobCtx.getString(PROCESS_DATE_KEY, null);
 
             List<BatchControlRecord> records =
                     batchControlRepository.findByKeyProcessDate(processDate);
@@ -129,8 +140,9 @@ public class ProcessSequencerJobConfig {
     public Step sequenceTerminateStep(JobRepository jobRepository,
                                        PlatformTransactionManager transactionManager) {
         Tasklet tasklet = (contribution, chunkContext) -> {
-            String processDate = LocalDateTime.now()
-                    .format(DateTimeFormatter.BASIC_ISO_DATE);
+            ExecutionContext jobCtx = chunkContext.getStepContext()
+                    .getStepExecution().getJobExecution().getExecutionContext();
+            String processDate = jobCtx.getString(PROCESS_DATE_KEY, null);
 
             List<BatchControlRecord> records =
                     batchControlRepository.findByKeyProcessDate(processDate);
