@@ -30,9 +30,8 @@ const navCards: NavCard[] = [
     title: 'Reports',
     description: 'Generate portfolio performance and audit reports',
     icon: FileBarChart,
-    path: '#',
+    path: '/reports',
     color: '#818CF8',
-    disabled: true,
   },
   {
     title: 'System Settings',

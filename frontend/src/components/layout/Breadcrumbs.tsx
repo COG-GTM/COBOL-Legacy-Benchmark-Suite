@@ -5,6 +5,10 @@ const routeLabels: Record<string, string> = {
   '/': 'Dashboard',
   '/portfolio': 'Portfolio Inquiry',
   '/transactions': 'Transaction History',
+  '/reports': 'Reports',
+  '/reports/positions': 'Position Reports',
+  '/reports/audit': 'Audit Reports',
+  '/reports/statistics': 'Statistics Reports',
   '/login': 'Login',
 };
 
