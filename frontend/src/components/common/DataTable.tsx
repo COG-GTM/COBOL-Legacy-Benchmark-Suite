@@ -63,9 +63,10 @@ export function DataTable<T extends object>({
   }, [data, sortKey, sortDir]);
 
   const totalPages = Math.max(1, Math.ceil(sortedData.length / pageSize));
+  const safeCurrentPage = Math.min(currentPage, totalPages);
   const paginatedData = sortedData.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize
+    (safeCurrentPage - 1) * pageSize,
+    safeCurrentPage * pageSize
   );
 
   function handleSort(key: string) {
@@ -269,7 +270,7 @@ export function DataTable<T extends object>({
         </div>
       </div>
       <Pagination
-        currentPage={currentPage}
+        currentPage={safeCurrentPage}
         totalPages={totalPages}
         onPageChange={setCurrentPage}
         totalItems={sortedData.length}
