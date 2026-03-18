@@ -109,7 +109,7 @@ export function AuditReportTab() {
       key: 'message',
       header: 'Message',
       render: (row) => (
-        <span className="max-w-[200px] truncate" title={row.message}>
+        <span className="inline-block max-w-[200px] truncate align-bottom" title={row.message}>
           {row.message}
         </span>
       ),
