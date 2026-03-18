@@ -97,14 +97,34 @@ export function DataTable<T extends object>({
     return sortDir === 'asc' ? 'ascending' : 'descending';
   }
 
-  // Group-based rendering
+  // Group-based rendering: group full dataset first, then paginate by groups
   if (groupBy && groupSummary) {
-    const groups = new Map<string, T[]>();
-    for (const row of paginatedData) {
+    const allGroups = new Map<string, T[]>();
+    for (const row of sortedData) {
       const key = String((row as Record<string, unknown>)[groupBy]);
-      if (!groups.has(key)) groups.set(key, []);
-      groups.get(key)!.push(row);
+      if (!allGroups.has(key)) allGroups.set(key, []);
+      allGroups.get(key)!.push(row);
     }
+
+    // Paginate by groups: keep groups intact, fill pages up to ~pageSize rows
+    const groupEntries = Array.from(allGroups.entries());
+    const groupPages: [string, T[]][][] = [[]];
+    let currentPageRows = 0;
+    for (const entry of groupEntries) {
+      const groupRows = entry[1].length;
+      // If adding this group would exceed pageSize and we already have groups on this page, start a new page
+      if (currentPageRows > 0 && currentPageRows + groupRows > pageSize) {
+        groupPages.push([]);
+        currentPageRows = 0;
+      }
+      groupPages[groupPages.length - 1].push(entry);
+      currentPageRows += groupRows;
+    }
+
+    const groupTotalPages = Math.max(1, groupPages.length);
+    const safeCurrentPage = Math.min(currentPage, groupTotalPages);
+    const currentGroups = groupPages[safeCurrentPage - 1] ?? [];
+    const totalRows = sortedData.length;
 
     return (
       <div className="space-y-4">
@@ -134,7 +154,7 @@ export function DataTable<T extends object>({
                 </tr>
               </thead>
               <tbody>
-                {Array.from(groups.entries()).map(([groupKey, rows]) => {
+                {currentGroups.map(([groupKey, rows]) => {
                   const summary = groupSummary(groupKey, rows);
                   return (
                     <GroupRows
@@ -144,7 +164,7 @@ export function DataTable<T extends object>({
                       summary={summary}
                       rowClassName={rowClassName}
                       getRowKey={getRowKey}
-                      globalOffset={(currentPage - 1) * pageSize}
+                      globalOffset={0}
                     />
                   );
                 })}
@@ -162,10 +182,10 @@ export function DataTable<T extends object>({
           </div>
         </div>
         <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
+          currentPage={safeCurrentPage}
+          totalPages={groupTotalPages}
           onPageChange={setCurrentPage}
-          totalItems={sortedData.length}
+          totalItems={totalRows}
           pageSize={pageSize}
         />
       </div>

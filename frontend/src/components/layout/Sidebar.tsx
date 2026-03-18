@@ -2,7 +2,7 @@ import { NavLink, useLocation } from 'react-router-dom';
 import { LayoutDashboard, Briefcase, History, FileBarChart, X, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -35,6 +35,12 @@ const navItems: NavItem[] = [
 export function Sidebar({ isOpen, onClose }: SidebarProps) {
   const location = useLocation();
   const [reportsOpen, setReportsOpen] = useState(location.pathname.startsWith('/reports'));
+
+  useEffect(() => {
+    if (location.pathname.startsWith('/reports')) {
+      setReportsOpen(true);
+    }
+  }, [location.pathname]);
 
   return (
     <>
