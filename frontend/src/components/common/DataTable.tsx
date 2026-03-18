@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { ChevronUp, ChevronDown, ChevronsUpDown } from 'lucide-react';
 import { Pagination } from '@/components/shared/Pagination';
 import { cn } from '@/lib/utils';
@@ -40,6 +40,11 @@ export function DataTable<T extends object>({
   const [currentPage, setCurrentPage] = useState(1);
   const [expandedRows, setExpandedRows] = useState<Set<number>>(new Set());
 
+  useEffect(() => {
+    setCurrentPage(1);
+    setExpandedRows(new Set());
+  }, [data]);
+
   const sortedData = useMemo(() => {
     if (!sortKey || !sortDir) return data;
     return [...data].sort((a, b) => {
@@ -75,6 +80,7 @@ export function DataTable<T extends object>({
       setSortDir('asc');
     }
     setCurrentPage(1);
+    setExpandedRows(new Set());
   }
 
   function toggleRow(index: number) {
