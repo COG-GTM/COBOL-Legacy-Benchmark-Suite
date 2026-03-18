@@ -42,9 +42,9 @@ function randomizePool(pool: ConnectionPoolStats): ConnectionPoolStats {
   const active = clamp(
     pool.active + Math.round((Math.random() * 2 - 1) * 2),
     1,
-    pool.maxTotal
+    pool.total
   );
-  const idle = clamp(pool.total - active, 0, pool.maxTotal);
+  const idle = pool.total - active;
   return {
     ...pool,
     active,
