@@ -232,7 +232,7 @@ export function DataTable<T extends object>({
             </thead>
             <tbody>
               {paginatedData.map((row, i) => {
-                const globalIndex = (currentPage - 1) * pageSize + i;
+                const globalIndex = (safeCurrentPage - 1) * pageSize + i;
                 const rowKey = getRowKey ? getRowKey(row, globalIndex) : globalIndex;
                 const isExpanded = expandedRows.has(globalIndex);
                 return (
