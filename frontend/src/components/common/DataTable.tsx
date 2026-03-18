@@ -159,8 +159,11 @@ export function DataTable<T extends object>({
                 </tr>
               </thead>
               <tbody>
-                {currentGroups.map(([groupKey, rows]) => {
+                {currentGroups.map(([groupKey, rows], groupIdx) => {
                   const summary = groupSummary(groupKey, rows);
+                  const offset = currentGroups
+                    .slice(0, groupIdx)
+                    .reduce((sum, [, r]) => sum + r.length, 0);
                   return (
                     <GroupRows
                       key={groupKey}
@@ -169,7 +172,7 @@ export function DataTable<T extends object>({
                       summary={summary}
                       rowClassName={rowClassName}
                       getRowKey={getRowKey}
-                      globalOffset={0}
+                      globalOffset={offset}
                     />
                   );
                 })}
