@@ -124,6 +124,11 @@ export function DataTable<T extends object>({
     const groupTotalPages = Math.max(1, groupPages.length);
     const safeCurrentPage = Math.min(currentPage, groupTotalPages);
     const currentGroups = groupPages[safeCurrentPage - 1] ?? [];
+    const currentPageItemCount = currentGroups.reduce((sum, [, rows]) => sum + rows.length, 0);
+    const itemsBefore = groupPages.slice(0, safeCurrentPage - 1).reduce(
+      (sum, page) => sum + page.reduce((s, [, rows]) => s + rows.length, 0),
+      0
+    );
     const totalRows = sortedData.length;
 
     return (
@@ -186,7 +191,8 @@ export function DataTable<T extends object>({
           totalPages={groupTotalPages}
           onPageChange={setCurrentPage}
           totalItems={totalRows}
-          pageSize={pageSize}
+          startItem={totalRows > 0 ? itemsBefore + 1 : 0}
+          endItem={itemsBefore + currentPageItemCount}
         />
       </div>
     );

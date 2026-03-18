@@ -21,7 +21,8 @@ export function ReportsPage() {
   const { tab } = useParams<{ tab?: string }>();
   const [reportDate, setReportDate] = useState('2024-01-15');
 
-  const activeTab: TabId = (tab as TabId) || 'positions';
+  const validTabs: Set<string> = new Set(tabs.map((t) => t.id));
+  const activeTab: TabId = validTabs.has(tab ?? '') ? (tab as TabId) : 'positions';
 
   const handleTabChange = (tabId: TabId) => {
     navigate(`/reports/${tabId}`);
