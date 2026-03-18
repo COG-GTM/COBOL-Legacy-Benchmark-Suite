@@ -52,7 +52,6 @@ const navItems: NavItemConfig[] = [
     label: "System Monitor",
     path: "/system-monitor",
     icon: <Activity size={20} />,
-    badge: "Coming Soon",
   },
 ];
 
