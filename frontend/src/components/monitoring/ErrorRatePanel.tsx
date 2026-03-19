@@ -60,8 +60,8 @@ export default function ErrorRatePanel({ data }: ErrorRatePanelProps) {
           </div>
           <div className="flex items-center gap-2">
             <p className="text-xs text-gray-400">vs Yesterday ({data.totalYesterday})</p>
-            <span className={cn('inline-flex items-center text-sm font-medium', isDown ? 'text-green-600' : 'text-red-600')}>
-              {isDown ? <ArrowDown className="h-3.5 w-3.5" /> : <ArrowUp className="h-3.5 w-3.5" />}
+            <span className={cn('inline-flex items-center text-sm font-medium', isDown ? 'text-green-600' : data.totalToday === data.totalYesterday ? 'text-gray-500' : 'text-red-600')}>
+              {isDown ? <ArrowDown className="h-3.5 w-3.5" /> : data.totalToday === data.totalYesterday ? null : <ArrowUp className="h-3.5 w-3.5" />}
               {Math.abs(Number(changePercent))}%
             </span>
           </div>

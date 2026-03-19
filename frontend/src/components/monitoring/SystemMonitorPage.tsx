@@ -36,7 +36,7 @@ export default function SystemMonitorPage() {
       }))
     );
     setPool((prev) => {
-      const newActive = randomize(prev.active, 1, 0, prev.maxTotal);
+      const newActive = randomize(prev.active, 1, 0, prev.total);
       const newIdle = Math.max(0, prev.total - newActive);
       return {
         ...prev,
