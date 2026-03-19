@@ -70,10 +70,12 @@ export default function BatchPipelineStatus({ data }: BatchPipelineStatusProps) 
                 {!isLast && (
                   <div className="flex items-center pt-4 px-1">
                     <div className={cn('h-0.5 w-8', config.line)} />
-                    <div className={cn(
-                      'h-0 w-0 border-t-4 border-b-4 border-l-6 border-t-transparent border-b-transparent',
-                      step.status === 'complete' ? 'border-l-green-500' : 'border-l-gray-300'
-                    )} />
+                    <svg width="8" height="12" viewBox="0 0 8 12" className="shrink-0" aria-hidden="true">
+                      <polygon
+                        points="0,0 8,6 0,12"
+                        fill={step.status === 'complete' ? '#22c55e' : '#d1d5db'}
+                      />
+                    </svg>
                   </div>
                 )}
               </div>
