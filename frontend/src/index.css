@@ -38,3 +38,9 @@ body {
   scrollbar-width: thin;
   scrollbar-color: var(--color-border) transparent;
 }
+
+/* Dashboard nav card hover using CSS custom property --card-color */
+.group[style*='--card-color']:hover {
+  border-color: color-mix(in srgb, var(--card-color) 50%, transparent);
+  box-shadow: 0 10px 15px -3px color-mix(in srgb, var(--card-color) 5%, transparent);
+}

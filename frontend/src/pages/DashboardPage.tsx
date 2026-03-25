@@ -63,8 +63,13 @@ export function DashboardPage() {
             className={`group cursor-pointer transition-all ${
               card.disabled
                 ? 'cursor-not-allowed opacity-50'
-                : 'hover:border-[' + card.color + ']/50 hover:shadow-lg hover:shadow-[' + card.color + ']/5'
+                : 'hover:shadow-lg'
             }`}
+            style={
+              !card.disabled
+                ? ({ '--card-color': card.color } as React.CSSProperties)
+                : undefined
+            }
             onClick={() => {
               if (!card.disabled) navigate(card.path);
             }}
