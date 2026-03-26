@@ -81,6 +81,16 @@
            05  WS-ALERT-STATUS      PIC XX.
            05  WS-DB2-STATUS        PIC XX.
 
+       01  WS-FILE-FLAGS.
+           05  WS-CFG-OPENED        PIC X VALUE 'N'.
+               88  CFG-IS-OPEN             VALUE 'Y'.
+           05  WS-LOG-OPENED        PIC X VALUE 'N'.
+               88  LOG-IS-OPEN             VALUE 'Y'.
+           05  WS-ALERT-OPENED      PIC X VALUE 'N'.
+               88  ALERT-IS-OPEN           VALUE 'Y'.
+           05  WS-DB2-OPENED        PIC X VALUE 'N'.
+               88  DB2-IS-OPEN             VALUE 'Y'.
+
        01  WS-RESOURCE-TYPES.
            05  WS-CPU               PIC X(10) VALUE 'CPU'.
            05  WS-MEMORY            PIC X(10) VALUE 'MEMORY'.
@@ -143,6 +153,7 @@
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
            END-IF
+           SET CFG-IS-OPEN TO TRUE
 
            OPEN OUTPUT MONITOR-LOG
            IF WS-LOG-STATUS NOT = '00'
@@ -150,6 +161,7 @@
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
            END-IF
+           SET LOG-IS-OPEN TO TRUE
 
            OPEN OUTPUT ALERT-FILE
            IF WS-ALERT-STATUS NOT = '00'
@@ -157,13 +169,15 @@
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
            END-IF
+           SET ALERT-IS-OPEN TO TRUE
 
            OPEN INPUT DB2-STATS
            IF WS-DB2-STATUS NOT = '00'
                MOVE 'ERROR OPENING DB2 STATS'
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
-           END-IF.
+           END-IF
+           SET DB2-IS-OPEN TO TRUE.
 
        1200-INIT-PROCESSING.
            ACCEPT WS-TIMESTAMP FROM TIME.
@@ -215,7 +229,22 @@
                 ALERT-FILE
                 DB2-STATS.
 
+       9900-CLEANUP.
+           IF CFG-IS-OPEN
+               CLOSE MONITOR-CONFIG
+           END-IF
+           IF LOG-IS-OPEN
+               CLOSE MONITOR-LOG
+           END-IF
+           IF ALERT-IS-OPEN
+               CLOSE ALERT-FILE
+           END-IF
+           IF DB2-IS-OPEN
+               CLOSE DB2-STATS
+           END-IF.
+
        9999-ERROR-HANDLER.
            DISPLAY WS-ERROR-MESSAGE UPON CONS
            MOVE 12 TO RETURN-CODE
-           GOBACK. 
+           PERFORM 9900-CLEANUP
+           GOBACK.   

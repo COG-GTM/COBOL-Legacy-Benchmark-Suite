@@ -62,6 +62,14 @@
            05  WS-END-OF-FILE-SW     PIC X(1) VALUE 'N'.
                88  END-OF-FILE         VALUE 'Y'.
                88  MORE-RECORDS        VALUE 'N'.
+
+       01  WS-FILE-FLAGS.
+           05  WS-TH-OPENED           PIC X VALUE 'N'.
+               88  TH-IS-OPEN                VALUE 'Y'.
+           05  WS-BCT-OPENED          PIC X VALUE 'N'.
+               88  BCT-IS-OPEN               VALUE 'Y'.
+           05  WS-DB2-CONNECTED       PIC X VALUE 'N'.
+               88  DB2-IS-CONNECTED          VALUE 'Y'.
                
        PROCEDURE DIVISION.
        0000-MAIN.
@@ -105,16 +113,19 @@
                MOVE 'Error opening history file' TO ERR-TEXT
                PERFORM 9000-ERROR-ROUTINE
            END-IF
+           SET TH-IS-OPEN TO TRUE
            
            OPEN I-O BATCH-CONTROL-FILE
            IF WS-BCT-STATUS NOT = '00'
                MOVE 'Error opening control file' TO ERR-TEXT
                PERFORM 9000-ERROR-ROUTINE
            END-IF
+           SET BCT-IS-OPEN TO TRUE
            .
            
        1200-CONNECT-DB2.
            PERFORM CONNECT-TO-DB2
+           SET DB2-IS-CONNECTED TO TRUE
            .
            
        1300-INIT-CHECKPOINTS.
@@ -230,4 +241,14 @@
            EXEC SQL
                ROLLBACK WORK
            END-EXEC
+           
+           IF TH-IS-OPEN
+               CLOSE TRANSACTION-HISTORY
+           END-IF
+           IF BCT-IS-OPEN
+               CLOSE BATCH-CONTROL-FILE
+           END-IF
+           IF DB2-IS-CONNECTED
+               PERFORM 3300-DISCONNECT-DB2
+           END-IF
            .

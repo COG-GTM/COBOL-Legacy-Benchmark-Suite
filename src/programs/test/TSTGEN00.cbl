@@ -72,6 +72,16 @@
            05  WS-TRAN-STATUS       PIC XX.
            05  WS-RAND-STATUS       PIC XX.
 
+       01  WS-FILE-FLAGS.
+           05  WS-CFG-OPENED        PIC X VALUE 'N'.
+               88  CFG-IS-OPEN             VALUE 'Y'.
+           05  WS-PORT-OPENED       PIC X VALUE 'N'.
+               88  PORT-IS-OPEN            VALUE 'Y'.
+           05  WS-TRAN-OPENED       PIC X VALUE 'N'.
+               88  TRAN-IS-OPEN            VALUE 'Y'.
+           05  WS-RAND-OPENED       PIC X VALUE 'N'.
+               88  RAND-IS-OPEN            VALUE 'Y'.
+
        01  WS-TEST-TYPES.
            05  WS-PORTFOLIO         PIC X(10) VALUE 'PORTFOLIO'.
            05  WS-TRANSACTION       PIC X(10) VALUE 'TRANSACTN'.
@@ -124,6 +134,7 @@
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
            END-IF
+           SET CFG-IS-OPEN TO TRUE
 
            OPEN OUTPUT PORTFOLIO-OUT
            IF WS-PORT-STATUS NOT = '00'
@@ -131,6 +142,7 @@
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
            END-IF
+           SET PORT-IS-OPEN TO TRUE
 
            OPEN OUTPUT TRANSACTION-OUT
            IF WS-TRAN-STATUS NOT = '00'
@@ -138,13 +150,15 @@
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
            END-IF
+           SET TRAN-IS-OPEN TO TRUE
 
            OPEN INPUT RANDOM-SEED
            IF WS-RAND-STATUS NOT = '00'
                MOVE 'ERROR OPENING RANDOM SEED'
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
-           END-IF.
+           END-IF
+           SET RAND-IS-OPEN TO TRUE.
 
        1200-INIT-RANDOM.
            READ RANDOM-SEED
@@ -207,10 +221,25 @@
                 TRANSACTION-OUT
                 RANDOM-SEED.
 
+       9900-CLEANUP.
+           IF CFG-IS-OPEN
+               CLOSE TEST-CONFIG
+           END-IF
+           IF PORT-IS-OPEN
+               CLOSE PORTFOLIO-OUT
+           END-IF
+           IF TRAN-IS-OPEN
+               CLOSE TRANSACTION-OUT
+           END-IF
+           IF RAND-IS-OPEN
+               CLOSE RANDOM-SEED
+           END-IF.
+
        9999-ERROR-HANDLER.
            ADD 1 TO WS-ERROR-COUNT
            DISPLAY WS-ERROR-MESSAGE UPON CONS
            IF WS-ERROR-COUNT > 100
                MOVE 12 TO RETURN-CODE
+               PERFORM 9900-CLEANUP
                GOBACK
-           END-IF. 
+           END-IF.   

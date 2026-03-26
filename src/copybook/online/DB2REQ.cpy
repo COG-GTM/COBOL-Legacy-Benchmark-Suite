@@ -10,4 +10,5 @@
            05 DB2-CONNECTION-TOKEN    PIC X(16).
            05 DB2-ERROR-INFO.
               10 DB2-SQLCODE          PIC S9(9) COMP.
-              10 DB2-ERROR-MSG        PIC X(80). 
+              10 DB2-ERROR-MSG        PIC X(80).
+           05 DB2-ACTIVE-CONNECTIONS  PIC S9(8) COMP.   

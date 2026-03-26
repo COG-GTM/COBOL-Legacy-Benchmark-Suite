@@ -48,6 +48,14 @@
            05  WS-ERROR-STATUS       PIC XX.
            05  WS-REPORT-STATUS      PIC XX.
 
+       01  WS-FILE-FLAGS.
+           05  WS-AUDIT-OPENED       PIC X VALUE 'N'.
+               88  AUDIT-IS-OPEN            VALUE 'Y'.
+           05  WS-ERROR-OPENED       PIC X VALUE 'N'.
+               88  ERROR-IS-OPEN            VALUE 'Y'.
+           05  WS-REPORT-OPENED      PIC X VALUE 'N'.
+               88  REPORT-IS-OPEN           VALUE 'Y'.
+
        01  WS-REPORT-HEADERS.
            05  WS-HEADER1.
                10  FILLER            PIC X(132) VALUE ALL '*'.
@@ -97,6 +105,7 @@
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
            END-IF
+           SET AUDIT-IS-OPEN TO TRUE
 
            OPEN INPUT ERROR-FILE
            IF WS-ERROR-STATUS NOT = '00'
@@ -104,13 +113,15 @@
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
            END-IF
+           SET ERROR-IS-OPEN TO TRUE
 
            OPEN OUTPUT REPORT-FILE
            IF WS-REPORT-STATUS NOT = '00'
                MOVE 'ERROR OPENING REPORT FILE'
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
-           END-IF.
+           END-IF
+           SET REPORT-IS-OPEN TO TRUE.
 
        1200-WRITE-HEADERS.
            ACCEPT WS-REPORT-DATE FROM DATE
@@ -141,7 +152,19 @@
                 ERROR-FILE
                 REPORT-FILE.
 
+       9900-CLEANUP.
+           IF AUDIT-IS-OPEN
+               CLOSE AUDIT-FILE
+           END-IF
+           IF ERROR-IS-OPEN
+               CLOSE ERROR-FILE
+           END-IF
+           IF REPORT-IS-OPEN
+               CLOSE REPORT-FILE
+           END-IF.
+
        9999-ERROR-HANDLER.
            DISPLAY WS-ERROR-MESSAGE
            MOVE 12 TO RETURN-CODE
+           PERFORM 9900-CLEANUP
            GOBACK.

@@ -49,6 +49,14 @@
            05  WS-TRAN-STATUS        PIC XX.
            05  WS-REPORT-STATUS      PIC XX.
 
+       01  WS-FILE-FLAGS.
+           05  WS-POSITION-OPENED    PIC X VALUE 'N'.
+               88  POSITION-IS-OPEN         VALUE 'Y'.
+           05  WS-TRAN-OPENED        PIC X VALUE 'N'.
+               88  TRAN-IS-OPEN             VALUE 'Y'.
+           05  WS-REPORT-OPENED      PIC X VALUE 'N'.
+               88  REPORT-IS-OPEN           VALUE 'Y'.
+
        01  WS-REPORT-HEADERS.
            05  WS-HEADER1.
                10  FILLER            PIC X(132) VALUE ALL '*'.
@@ -92,6 +100,7 @@
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
            END-IF
+           SET POSITION-IS-OPEN TO TRUE
 
            OPEN INPUT TRANSACTION-HISTORY
            IF WS-TRAN-STATUS NOT = '00'
@@ -99,13 +108,15 @@
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
            END-IF
+           SET TRAN-IS-OPEN TO TRUE
 
            OPEN OUTPUT REPORT-FILE
            IF WS-REPORT-STATUS NOT = '00'
                MOVE 'ERROR OPENING REPORT FILE'
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
-           END-IF.
+           END-IF
+           SET REPORT-IS-OPEN TO TRUE.
 
        1200-WRITE-HEADERS.
            ACCEPT WS-REPORT-DATE FROM DATE
@@ -154,7 +165,19 @@
                 TRANSACTION-HISTORY
                 REPORT-FILE.
 
+       9900-CLEANUP.
+           IF POSITION-IS-OPEN
+               CLOSE POSITION-MASTER
+           END-IF
+           IF TRAN-IS-OPEN
+               CLOSE TRANSACTION-HISTORY
+           END-IF
+           IF REPORT-IS-OPEN
+               CLOSE REPORT-FILE
+           END-IF.
+
        9999-ERROR-HANDLER.
            DISPLAY WS-ERROR-MESSAGE
            MOVE 12 TO RETURN-CODE
-           GOBACK. 
+           PERFORM 9900-CLEANUP
+           GOBACK.     

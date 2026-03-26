@@ -76,6 +76,9 @@
            PERFORM P300-FORMAT-DISPLAY
               THRU P300-EXIT.
               
+           PERFORM P250-DB2-DISCONNECT
+              THRU P250-EXIT.
+              
            EXEC CICS RETURN END-EXEC.
            
        P100-INIT-PROGRAM.
@@ -174,6 +177,16 @@
        P250-EXIT.
            EXIT.
            
+       P250-DB2-DISCONNECT.
+           MOVE 'D' TO DB2-REQUEST-TYPE.
+           
+           EXEC CICS LINK PROGRAM('DB2ONLN')
+                     COMMAREA(WS-DB2-REQUEST)
+                     LENGTH(LENGTH OF WS-DB2-REQUEST)
+           END-EXEC.
+       P250-EXIT.
+           EXIT.
+           
        P300-FORMAT-DISPLAY.
            EXEC CICS SEND MAP('HISMAP')
                      MAPSET('INQSET')
@@ -189,5 +202,10 @@
            MOVE SQLCODE 
              TO INQCOM-RESPONSE-CODE OF WS-COMMAREA.
            MOVE WS-COMMAREA TO DFHCOMMAREA.
+           
+           PERFORM P250-DB2-DISCONNECT
+              THRU P250-EXIT.
+              
+           EXEC CICS RETURN END-EXEC.
        P999-EXIT.
            EXIT.
