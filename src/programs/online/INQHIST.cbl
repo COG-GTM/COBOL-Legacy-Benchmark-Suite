@@ -39,6 +39,7 @@
            05 DB2-ERROR-INFO.
               10 DB2-SQLCODE          PIC S9(9) COMP.
               10 DB2-ERROR-MSG        PIC X(80).
+           05 DB2-ACTIVE-CONNECTIONS  PIC S9(8) COMP.
            
        01  WS-CURSOR-REQUEST.
            05 CURS-REQUEST-TYPE     PIC X.
@@ -76,8 +77,8 @@
            PERFORM P300-FORMAT-DISPLAY
               THRU P300-EXIT.
               
-           PERFORM P250-DB2-DISCONNECT
-              THRU P250-EXIT.
+           PERFORM P260-DB2-DISCONNECT
+              THRU P260-EXIT.
               
            EXEC CICS RETURN END-EXEC.
            
@@ -177,14 +178,14 @@
        P250-EXIT.
            EXIT.
            
-       P250-DB2-DISCONNECT.
+       P260-DB2-DISCONNECT.
            MOVE 'D' TO DB2-REQUEST-TYPE.
            
            EXEC CICS LINK PROGRAM('DB2ONLN')
                      COMMAREA(WS-DB2-REQUEST)
                      LENGTH(LENGTH OF WS-DB2-REQUEST)
            END-EXEC.
-       P250-EXIT.
+       P260-EXIT.
            EXIT.
            
        P300-FORMAT-DISPLAY.
@@ -203,8 +204,8 @@
              TO INQCOM-RESPONSE-CODE OF WS-COMMAREA.
            MOVE WS-COMMAREA TO DFHCOMMAREA.
            
-           PERFORM P250-DB2-DISCONNECT
-              THRU P250-EXIT.
+           PERFORM P260-DB2-DISCONNECT
+              THRU P260-EXIT.
               
            EXEC CICS RETURN END-EXEC.
        P999-EXIT.
