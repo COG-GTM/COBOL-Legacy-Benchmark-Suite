@@ -7,6 +7,10 @@ interface PaginationProps {
   onPageChange: (page: number) => void;
   totalItems?: number;
   pageSize?: number;
+  /** Override the displayed start item (1-indexed). Used for variable-size pages (e.g. grouped pagination). */
+  startItem?: number;
+  /** Override the displayed end item. Used for variable-size pages (e.g. grouped pagination). */
+  endItem?: number;
 }
 
 export function Pagination({
@@ -15,6 +19,8 @@ export function Pagination({
   onPageChange,
   totalItems,
   pageSize,
+  startItem,
+  endItem,
 }: PaginationProps) {
   const canGoPrevious = currentPage > 1;
   const canGoNext = currentPage < totalPages;
@@ -22,12 +28,16 @@ export function Pagination({
   return (
     <div className="flex items-center justify-between gap-4">
       <div className="text-sm text-[#94A3B8]">
-        {totalItems !== undefined && pageSize !== undefined && (
+        {totalItems !== undefined && startItem !== undefined && endItem !== undefined ? (
+          <span>
+            Showing {startItem}-{endItem} of {totalItems} items
+          </span>
+        ) : totalItems !== undefined && pageSize !== undefined ? (
           <span>
             Showing {Math.min((currentPage - 1) * pageSize + 1, totalItems)}-
             {Math.min(currentPage * pageSize, totalItems)} of {totalItems} items
           </span>
-        )}
+        ) : null}
       </div>
       <div className="flex items-center gap-1">
         <Button
