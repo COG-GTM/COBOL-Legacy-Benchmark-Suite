@@ -85,15 +85,15 @@ Reference: `documentation/technical/data-dictionary.md` (lines 296-305):
 ### Step 1: Transaction Form Component
 Create a transaction entry form with conditional fields by type:
 - Common fields: Transaction Type dropdown, Account Number (9-digit numeric), Portfolio ID (8-char), Transaction Date (date picker, default today), Currency dropdown (default USD)
-- BUY/SELL: Fund ID (6-char), Quantity (positive, 4 decimals), Price (positive, 4 decimals), Amount (auto-calculated, read-only)
-- TRANSFER: Source Account, Destination Account, Fund ID, Quantity
+- BUY/SELL: Security/Fund ID (10-char), Quantity (positive, 4 decimals), Price (positive, 4 decimals), Amount (auto-calculated, read-only)
+- TRANSFER: Source Account, Destination Account, Security/Fund ID, Quantity
 - FEE: Amount (required, non-zero), Description
 
 ### Step 2: Client-Side Validation
 Implement validation on blur and on submit:
 - Account format: /^\d{9}$/ and >= 100000000 → E001
 - Portfolio ID: /^[A-Z0-9]{8}$/ → VAL-INVALID-ID
-- Fund ID: /^[A-Z0-9]{6}$/ → E002
+- Security/Fund ID: /^[A-Z0-9]{10}$/ → E002
 - Transaction type: must be BU/SL/TR/FE → E003
 - Quantity > 0 for BUY/SELL
 - Price > 0 for BUY/SELL
