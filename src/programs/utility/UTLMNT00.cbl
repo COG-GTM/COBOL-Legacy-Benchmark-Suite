@@ -61,6 +61,14 @@
            05  WS-ARCH-STATUS       PIC XX.
            05  WS-REPORT-STATUS     PIC XX.
 
+       01  WS-FILE-FLAGS.
+           05  WS-CTL-OPENED        PIC X VALUE 'N'.
+               88  CTL-IS-OPEN             VALUE 'Y'.
+           05  WS-ARCH-OPENED       PIC X VALUE 'N'.
+               88  ARCH-IS-OPEN            VALUE 'Y'.
+           05  WS-REPORT-OPENED     PIC X VALUE 'N'.
+               88  REPORT-IS-OPEN          VALUE 'Y'.
+
        01  WS-PROCESSING-FLAGS.
            05  WS-END-OF-CTL        PIC X VALUE 'N'.
                88  END-OF-CONTROL   VALUE 'Y'.
@@ -101,6 +109,7 @@
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
            END-IF
+           SET CTL-IS-OPEN TO TRUE
 
            OPEN OUTPUT ARCHIVE-FILE
            IF WS-ARCH-STATUS NOT = '00'
@@ -108,13 +117,15 @@
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
            END-IF
+           SET ARCH-IS-OPEN TO TRUE
 
            OPEN OUTPUT REPORT-FILE
            IF WS-REPORT-STATUS NOT = '00'
                MOVE 'ERROR OPENING REPORT FILE'
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
-           END-IF.
+           END-IF
+           SET REPORT-IS-OPEN TO TRUE.
 
        1200-INIT-PROCESSING.
            INITIALIZE WS-COUNTERS.
@@ -173,10 +184,22 @@
                 ARCHIVE-FILE
                 REPORT-FILE.
 
+       9900-CLEANUP.
+           IF CTL-IS-OPEN
+               CLOSE CONTROL-FILE
+           END-IF
+           IF ARCH-IS-OPEN
+               CLOSE ARCHIVE-FILE
+           END-IF
+           IF REPORT-IS-OPEN
+               CLOSE REPORT-FILE
+           END-IF.
+
        9999-ERROR-HANDLER.
            ADD 1 TO WS-ERROR-COUNT
            DISPLAY WS-ERROR-MESSAGE UPON CONS
            IF WS-ERROR-COUNT > 100
                MOVE 12 TO RETURN-CODE
+               PERFORM 9900-CLEANUP
                GOBACK
-           END-IF. 
+           END-IF.   

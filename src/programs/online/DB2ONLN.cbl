@@ -35,6 +35,7 @@
            05 DB2-ERROR-INFO.
               10 DB2-SQLCODE          PIC S9(9) COMP.
               10 DB2-ERROR-MSG        PIC X(80).
+           05 DB2-ACTIVE-CONNECTIONS  PIC S9(8) COMP.
            
        PROCEDURE DIVISION USING DB2-REQUEST-AREA.
            EVALUATE TRUE
@@ -115,6 +116,6 @@
            END-IF.
            
            MOVE WS-ACTIVE-CONNECTIONS 
-             TO DB2-RESPONSE-CODE.
+             TO DB2-ACTIVE-CONNECTIONS.
        P300-EXIT.
            EXIT.

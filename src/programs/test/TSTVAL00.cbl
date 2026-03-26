@@ -73,6 +73,16 @@
            05  WS-ACT-STATUS        PIC XX.
            05  WS-RPT-STATUS        PIC XX.
 
+       01  WS-FILE-FLAGS.
+           05  WS-TEST-OPENED       PIC X VALUE 'N'.
+               88  TEST-IS-OPEN            VALUE 'Y'.
+           05  WS-EXP-OPENED        PIC X VALUE 'N'.
+               88  EXP-IS-OPEN             VALUE 'Y'.
+           05  WS-ACT-OPENED        PIC X VALUE 'N'.
+               88  ACT-IS-OPEN             VALUE 'Y'.
+           05  WS-RPT-OPENED        PIC X VALUE 'N'.
+               88  RPT-IS-OPEN             VALUE 'Y'.
+
        01  WS-TEST-TYPES.
            05  WS-FUNCTIONAL        PIC X(10) VALUE 'FUNCTIONAL'.
            05  WS-INTEGRATION       PIC X(10) VALUE 'INTEGRATE'.
@@ -143,6 +153,7 @@
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
            END-IF
+           SET TEST-IS-OPEN TO TRUE
 
            OPEN INPUT EXPECTED-RESULTS
            IF WS-EXP-STATUS NOT = '00'
@@ -150,6 +161,7 @@
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
            END-IF
+           SET EXP-IS-OPEN TO TRUE
 
            OPEN INPUT ACTUAL-RESULTS
            IF WS-ACT-STATUS NOT = '00'
@@ -157,13 +169,15 @@
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
            END-IF
+           SET ACT-IS-OPEN TO TRUE
 
            OPEN OUTPUT TEST-REPORT
            IF WS-RPT-STATUS NOT = '00'
                MOVE 'ERROR OPENING TEST REPORT'
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
-           END-IF.
+           END-IF
+           SET RPT-IS-OPEN TO TRUE.
 
        1200-WRITE-HEADERS.
            WRITE REPORT-RECORD FROM WS-HEADER1
@@ -219,7 +233,22 @@
                 ACTUAL-RESULTS
                 TEST-REPORT.
 
+       9900-CLEANUP.
+           IF TEST-IS-OPEN
+               CLOSE TEST-CASES
+           END-IF
+           IF EXP-IS-OPEN
+               CLOSE EXPECTED-RESULTS
+           END-IF
+           IF ACT-IS-OPEN
+               CLOSE ACTUAL-RESULTS
+           END-IF
+           IF RPT-IS-OPEN
+               CLOSE TEST-REPORT
+           END-IF.
+
        9999-ERROR-HANDLER.
            DISPLAY WS-ERROR-MESSAGE UPON CONS
            MOVE 12 TO RETURN-CODE
-           GOBACK. 
+           PERFORM 9900-CLEANUP
+           GOBACK.   

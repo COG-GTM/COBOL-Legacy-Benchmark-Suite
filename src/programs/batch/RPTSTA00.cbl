@@ -49,6 +49,14 @@
            05  WS-BCH-STATUS         PIC XX.
            05  WS-REPORT-STATUS      PIC XX.
 
+       01  WS-FILE-FLAGS.
+           05  WS-DB2-OPENED         PIC X VALUE 'N'.
+               88  DB2-IS-OPEN              VALUE 'Y'.
+           05  WS-BCH-OPENED         PIC X VALUE 'N'.
+               88  BCH-IS-OPEN              VALUE 'Y'.
+           05  WS-REPORT-OPENED      PIC X VALUE 'N'.
+               88  REPORT-IS-OPEN           VALUE 'Y'.
+
        01  WS-REPORT-HEADERS.
            05  WS-HEADER1.
                10  FILLER            PIC X(132) VALUE ALL '*'.
@@ -111,6 +119,7 @@
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
            END-IF
+           SET DB2-IS-OPEN TO TRUE
 
            OPEN INPUT BATCH-STATS
            IF WS-BCH-STATUS NOT = '00'
@@ -118,13 +127,15 @@
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
            END-IF
+           SET BCH-IS-OPEN TO TRUE
 
            OPEN OUTPUT REPORT-FILE
            IF WS-REPORT-STATUS NOT = '00'
                MOVE 'ERROR OPENING REPORT FILE'
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
-           END-IF.
+           END-IF
+           SET REPORT-IS-OPEN TO TRUE.
 
        1200-WRITE-HEADERS.
            ACCEPT WS-REPORT-DATE FROM DATE
@@ -179,7 +190,19 @@
                 BATCH-STATS
                 REPORT-FILE.
 
+       9900-CLEANUP.
+           IF DB2-IS-OPEN
+               CLOSE DB2-STATS
+           END-IF
+           IF BCH-IS-OPEN
+               CLOSE BATCH-STATS
+           END-IF
+           IF REPORT-IS-OPEN
+               CLOSE REPORT-FILE
+           END-IF.
+
        9999-ERROR-HANDLER.
            DISPLAY WS-ERROR-MESSAGE
            MOVE 12 TO RETURN-CODE
+           PERFORM 9900-CLEANUP
            GOBACK.

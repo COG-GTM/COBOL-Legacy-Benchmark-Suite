@@ -43,6 +43,12 @@
        01  WS-FILE-STATUS.
            05  WS-PSR-STATUS         PIC X(2).
            05  WS-BCT-STATUS         PIC X(2).
+
+       01  WS-FILE-FLAGS.
+           05  WS-PSR-OPENED         PIC X VALUE 'N'.
+               88  PSR-IS-OPEN              VALUE 'Y'.
+           05  WS-BCT-OPENED         PIC X VALUE 'N'.
+               88  BCT-IS-OPEN              VALUE 'Y'.
            
        01  WS-WORK-AREAS.
            05  WS-CURRENT-TIME       PIC X(26).
@@ -120,6 +126,13 @@
            MOVE 'PRCSEQ00' TO ERR-PROGRAM
            MOVE BCT-RC-ERROR TO LS-RETURN-CODE
            CALL 'ERRPROC' USING ERR-MESSAGE
+           
+           IF PSR-IS-OPEN
+               CLOSE PROCESS-SEQ-FILE
+           END-IF
+           IF BCT-IS-OPEN
+               CLOSE BATCH-CONTROL-FILE
+           END-IF
            .
       *================================================================*
       * Detailed procedures to be implemented:
@@ -144,12 +157,14 @@
                MOVE 'Error opening sequence file' TO ERR-TEXT
                PERFORM 9000-ERROR-ROUTINE
            END-IF
+           SET PSR-IS-OPEN TO TRUE
            
            OPEN I-O BATCH-CONTROL-FILE
            IF WS-BCT-STATUS NOT = '00'
                MOVE 'Error opening control file' TO ERR-TEXT
                PERFORM 9000-ERROR-ROUTINE
            END-IF
+           SET BCT-IS-OPEN TO TRUE
            .
            
        1200-BUILD-SEQUENCE.
