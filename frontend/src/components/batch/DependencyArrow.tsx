@@ -19,11 +19,7 @@ export default function DependencyArrow({
     pending: "stroke-gray-300",
     failed: "stroke-red-500",
   };
-  const dashMap = {
-    complete: "",
-    pending: "stroke-dasharray: 4 3;",
-    failed: "",
-  };
+  const isDashed = status === "pending";
 
   if (vertical) {
     return (
@@ -41,7 +37,7 @@ export default function DependencyArrow({
             y2="24"
             strokeWidth="2"
             fill="none"
-            style={{ [dashMap[status] ? "strokeDasharray" : ""]: dashMap[status] ? "4 3" : undefined } as React.CSSProperties}
+            strokeDasharray={isDashed ? "4 3" : undefined}
           />
           <polygon
             points="6,24 12,32 18,24"
@@ -76,7 +72,7 @@ export default function DependencyArrow({
           y2="12"
           strokeWidth="2"
           fill="none"
-          style={{ [dashMap[status] ? "strokeDasharray" : ""]: dashMap[status] ? "4 3" : undefined } as React.CSSProperties}
+          strokeDasharray={isDashed ? "4 3" : undefined}
         />
         <polygon
           points="38,6 48,12 38,18"

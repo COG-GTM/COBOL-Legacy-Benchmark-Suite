@@ -275,80 +275,80 @@ export default function RunHistoryTab() {
                 </th>
               </tr>
             </thead>
-            <tbody>
-              {filtered.map((run) => {
-                const isExpanded = expandedRunId === run.runId;
-                const badge = statusBadge[run.overallStatus];
-                return (
-                  <tbody key={run.runId}>
-                    <tr
-                      onClick={() =>
-                        setExpandedRunId(isExpanded ? null : run.runId)
-                      }
-                      className="cursor-pointer border-b border-gray-100 transition-colors hover:bg-blue-50"
-                    >
-                      <td className="px-3 py-2">
-                        <div className="flex items-center gap-1.5">
-                          {isExpanded ? (
-                            <ChevronUp size={12} className="text-gray-400" />
-                          ) : (
-                            <ChevronDown size={12} className="text-gray-400" />
-                          )}
-                          <div>
-                            <span className="font-mono font-medium text-gray-900">
-                              {run.runId}
-                            </span>
-                            <span className="ml-2 text-gray-500">
-                              {run.runDate}
-                            </span>
-                          </div>
+            {filtered.map((run) => {
+              const isExpanded = expandedRunId === run.runId;
+              const badge = statusBadge[run.overallStatus];
+              return (
+                <tbody key={run.runId}>
+                  <tr
+                    onClick={() =>
+                      setExpandedRunId(isExpanded ? null : run.runId)
+                    }
+                    className="cursor-pointer border-b border-gray-100 transition-colors hover:bg-blue-50"
+                  >
+                    <td className="px-3 py-2">
+                      <div className="flex items-center gap-1.5">
+                        {isExpanded ? (
+                          <ChevronUp size={12} className="text-gray-400" />
+                        ) : (
+                          <ChevronDown size={12} className="text-gray-400" />
+                        )}
+                        <div>
+                          <span className="font-mono font-medium text-gray-900">
+                            {run.runId}
+                          </span>
+                          <span className="ml-2 text-gray-500">
+                            {run.runDate}
+                          </span>
                         </div>
-                      </td>
-                      <td className="px-3 py-2 font-mono text-gray-700">
-                        {run.scheduledStart}
-                      </td>
-                      <td className="px-3 py-2 font-mono text-gray-700">
-                        {run.actualStart ?? "--"}
-                      </td>
-                      <td className="px-3 py-2 font-mono text-gray-700">
-                        {run.actualEnd ?? "--"}
-                      </td>
-                      <td className="px-3 py-2 font-mono text-gray-700">
-                        {computeDuration(run.actualStart, run.actualEnd)}
-                      </td>
-                      <td className="px-3 py-2">
-                        <span
-                          className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${badge.bg} ${badge.text}`}
-                        >
-                          {badge.label}
-                        </span>
-                      </td>
-                      <td className="px-3 py-2 font-mono text-gray-700">
-                        {run.totalRecordsProcessed.toLocaleString()}
-                      </td>
-                      <td className="px-3 py-2 font-mono">
-                        <span
-                          className={
-                            run.totalErrors > 0
-                              ? "text-red-600"
-                              : "text-gray-700"
-                          }
-                        >
-                          {run.totalErrors}
-                        </span>
+                      </div>
+                    </td>
+                    <td className="px-3 py-2 font-mono text-gray-700">
+                      {run.scheduledStart}
+                    </td>
+                    <td className="px-3 py-2 font-mono text-gray-700">
+                      {run.actualStart ?? "--"}
+                    </td>
+                    <td className="px-3 py-2 font-mono text-gray-700">
+                      {run.actualEnd ?? "--"}
+                    </td>
+                    <td className="px-3 py-2 font-mono text-gray-700">
+                      {computeDuration(run.actualStart, run.actualEnd)}
+                    </td>
+                    <td className="px-3 py-2">
+                      <span
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${badge.bg} ${badge.text}`}
+                      >
+                        {badge.label}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2 font-mono text-gray-700">
+                      {run.totalRecordsProcessed.toLocaleString()}
+                    </td>
+                    <td className="px-3 py-2 font-mono">
+                      <span
+                        className={
+                          run.totalErrors > 0
+                            ? "text-red-600"
+                            : "text-gray-700"
+                        }
+                      >
+                        {run.totalErrors}
+                      </span>
+                    </td>
+                  </tr>
+                  {isExpanded && (
+                    <tr>
+                      <td colSpan={8} className="p-0">
+                        <ExpandedRunDetail run={run} />
                       </td>
                     </tr>
-                    {isExpanded && (
-                      <tr>
-                        <td colSpan={8} className="p-0">
-                          <ExpandedRunDetail run={run} />
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                );
-              })}
-              {filtered.length === 0 && (
+                  )}
+                </tbody>
+              );
+            })}
+            {filtered.length === 0 && (
+              <tbody>
                 <tr>
                   <td
                     colSpan={8}
@@ -357,8 +357,8 @@ export default function RunHistoryTab() {
                     No runs match the selected filter.
                   </td>
                 </tr>
-              )}
-            </tbody>
+              </tbody>
+            )}
           </table>
         </div>
       </div>

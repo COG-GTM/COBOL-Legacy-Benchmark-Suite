@@ -285,81 +285,79 @@ export default function PipelineDefinitionTab() {
                 </th>
               </tr>
             </thead>
-            <tbody>
-              {pipelineDefinition.phases.map((phase) => {
-                const c = phaseColor[phase.name];
-                return (
-                  <tbody key={phase.name}>
-                    <tr className={c.bg}>
-                      <td
-                        colSpan={10}
-                        className={`px-3 py-1.5 text-xs font-semibold ${c.text}`}
-                      >
-                        {phase.name}
-                      </td>
-                    </tr>
-                    {phase.steps.map((step, idx) => {
-                      const seq =
-                        pipelineDefinition.phases
-                          .slice(
-                            0,
-                            pipelineDefinition.phases.indexOf(phase)
+            {pipelineDefinition.phases.map((phase) => {
+              const c = phaseColor[phase.name];
+              return (
+                <tbody key={phase.name}>
+                  <tr className={c.bg}>
+                    <td
+                      colSpan={10}
+                      className={`px-3 py-1.5 text-xs font-semibold ${c.text}`}
+                    >
+                      {phase.name}
+                    </td>
+                  </tr>
+                  {phase.steps.map((step, idx) => {
+                    const seq =
+                      pipelineDefinition.phases
+                        .slice(
+                          0,
+                          pipelineDefinition.phases.indexOf(phase)
+                        )
+                        .reduce((sum, p) => sum + p.steps.length, 0) +
+                      idx +
+                      1;
+                    const isHighlighted = highlightId === step.stepId;
+                    return (
+                      <tr
+                        key={step.stepId}
+                        onClick={() =>
+                          setHighlightId(
+                            highlightId === step.stepId
+                              ? null
+                              : step.stepId
                           )
-                          .reduce((sum, p) => sum + p.steps.length, 0) +
-                        idx +
-                        1;
-                      const isHighlighted = highlightId === step.stepId;
-                      return (
-                        <tr
-                          key={step.stepId}
-                          onClick={() =>
-                            setHighlightId(
-                              highlightId === step.stepId
-                                ? null
-                                : step.stepId
-                            )
-                          }
-                          className={`cursor-pointer border-b border-gray-100 transition-colors hover:bg-blue-50 ${isHighlighted ? "bg-blue-50" : ""}`}
-                        >
-                          <td className="px-3 py-2 font-mono text-gray-500">
-                            {seq}
-                          </td>
-                          <td className="px-3 py-2 font-mono font-medium text-gray-900">
-                            {step.stepId}
-                          </td>
-                          <td className="px-3 py-2 font-mono text-gray-700">
-                            {step.program}
-                          </td>
-                          <td className="max-w-xs px-3 py-2 text-gray-700">
-                            {step.description}
-                          </td>
-                          <td className={`px-3 py-2 ${c.text}`}>
-                            {phase.name}
-                          </td>
-                          <td className="px-3 py-2 font-mono text-gray-700">
-                            {step.prerequisite ?? "None"}
-                          </td>
-                          <td className="px-3 py-2 font-mono text-gray-700">
-                            {step.requiredMaxRC !== null
-                              ? `\u2264 ${step.requiredMaxRC}`
-                              : "N/A"}
-                          </td>
-                          <td className="px-3 py-2 font-mono text-gray-700">
-                            {step.timeWindow}
-                          </td>
-                          <td className="px-3 py-2 text-gray-700">
-                            {step.checkpointFrequency}
-                          </td>
-                          <td className="px-3 py-2 font-mono text-gray-700">
-                            {step.estimatedDuration}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                );
-              })}
-            </tbody>
+                        }
+                        className={`cursor-pointer border-b border-gray-100 transition-colors hover:bg-blue-50 ${isHighlighted ? "bg-blue-50" : ""}`}
+                      >
+                        <td className="px-3 py-2 font-mono text-gray-500">
+                          {seq}
+                        </td>
+                        <td className="px-3 py-2 font-mono font-medium text-gray-900">
+                          {step.stepId}
+                        </td>
+                        <td className="px-3 py-2 font-mono text-gray-700">
+                          {step.program}
+                        </td>
+                        <td className="max-w-xs px-3 py-2 text-gray-700">
+                          {step.description}
+                        </td>
+                        <td className={`px-3 py-2 ${c.text}`}>
+                          {phase.name}
+                        </td>
+                        <td className="px-3 py-2 font-mono text-gray-700">
+                          {step.prerequisite ?? "None"}
+                        </td>
+                        <td className="px-3 py-2 font-mono text-gray-700">
+                          {step.requiredMaxRC !== null
+                            ? `\u2264 ${step.requiredMaxRC}`
+                            : "N/A"}
+                        </td>
+                        <td className="px-3 py-2 font-mono text-gray-700">
+                          {step.timeWindow}
+                        </td>
+                        <td className="px-3 py-2 text-gray-700">
+                          {step.checkpointFrequency}
+                        </td>
+                        <td className="px-3 py-2 font-mono text-gray-700">
+                          {step.estimatedDuration}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              );
+            })}
           </table>
         </div>
       </div>
