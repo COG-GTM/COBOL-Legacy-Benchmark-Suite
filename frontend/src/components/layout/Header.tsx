@@ -1,18 +1,20 @@
 import { useLocation } from "react-router-dom";
 import { Bell, LogOut, User, ChevronRight } from "lucide-react";
 
-const routeNames: Record<string, string> = {
-  "/": "Dashboard",
-  "/portfolio-inquiry": "Portfolio Inquiry",
-  "/transaction-history": "Transaction History",
-  "/reports": "Reports",
-  "/batch-jobs": "Batch Jobs",
-  "/system-monitor": "System Monitor",
-};
+const routeNames: [string, string][] = [
+  ["/portfolio-inquiry", "Portfolio Inquiry"],
+  ["/transaction-history", "Transaction History"],
+  ["/reports", "Reports"],
+  ["/batch-jobs", "Batch Jobs"],
+  ["/system-monitor", "System Monitor"],
+  ["/", "Dashboard"],
+];
 
 export default function Header() {
   const location = useLocation();
-  const currentPage = routeNames[location.pathname] || "Page Not Found";
+  const currentPage =
+    routeNames.find(([prefix]) => location.pathname.startsWith(prefix))?.[1] ??
+    "Page Not Found";
 
   return (
     <header className="flex h-16 items-center justify-between border-b border-gray-200 bg-white px-6 pl-16 lg:pl-6">
