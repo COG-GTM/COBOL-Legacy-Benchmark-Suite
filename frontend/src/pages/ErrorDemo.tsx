@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { InlineError, ErrorDetailModal, OfflineState } from '../components/errors';
 import { useToast } from '../contexts/useToast';
 import { useError } from '../contexts/useError';
@@ -20,6 +20,10 @@ export default function ErrorDemo() {
   } = useError();
 
   const [accountNumber, setAccountNumber] = useState('');
+
+  useEffect(() => {
+    return () => clearInlineError('account');
+  }, [clearInlineError]);
 
   const validateAccount = (value: string) => {
     setAccountNumber(value);

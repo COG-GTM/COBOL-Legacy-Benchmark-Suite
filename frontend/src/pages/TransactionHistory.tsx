@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { InlineError } from '../components/errors';
 import { useError } from '../contexts/useError';
 
@@ -9,6 +9,10 @@ import { useError } from '../contexts/useError';
 export default function TransactionHistory() {
   const { inlineErrors, setInlineError, clearInlineError } = useError();
   const [accountNumber, setAccountNumber] = useState('');
+
+  useEffect(() => {
+    return () => clearInlineError('hisAccount');
+  }, [clearInlineError]);
 
   const validate = (value: string) => {
     setAccountNumber(value);
