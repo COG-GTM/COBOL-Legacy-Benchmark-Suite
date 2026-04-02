@@ -136,7 +136,8 @@ Comprehensive documentation is provided to facilitate understanding and translat
 
 ## Future Plans
 
-- **LLM Translation Training Pairs**: Create benchmark translations to modern languages like Java or C#.
+- **LLM Translation Training Pairs**: Create benchmark translations to modern languages like Java, C#, or Python.
+- **Python Migration Planning**: Assess feasibility and document a migration strategy for translating the COBOL benchmark suite to Python (see [COBOL-001](docs/tickets/COBOL-PYTHON-MIGRATION.md)).
 - **Fine-Tuning LLMs**: Use the project to enhance the capabilities of LLM translation tools in handling complex legacy codebases.
 - **Community Contribution**: Encourage collaboration within the COBOL modernization community to improve and expand the benchmark.
 
