@@ -1,0 +1,43 @@
+# ============================================================================
+# Portfolio Inquiry API - Application Configuration
+# Converted from CICS/DB2/VSAM configuration to Spring Boot
+# ============================================================================
+
+server:
+  port: 8080
+
+spring:
+  application:
+    name: portfolio-inquiry-api
+
+  # H2 in-memory database for demo/testing
+  # In production, replace with DB2/PostgreSQL/Oracle connection
+  # This replaces the DB2CONN.cbl connection management
+  # (src/programs/common/DB2CONN.cbl) which handled CONNECT/DISCONNECT/STATUS
+  datasource:
+    url: jdbc:h2:mem:portfoliodb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  # H2 console for development (accessible at /h2-console)
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  # JPA/Hibernate settings
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    # Defer datasource initialization so schema is created before data.sql runs
+    defer-datasource-initialization: true
+
+  # Load seed data on startup
+  sql:
+    init:
+      mode: always
