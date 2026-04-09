@@ -147,3 +147,5 @@ Comprehensive documentation is provided to facilitate understanding and translat
 ## Contributing
 
 Contributions are welcome, especially from those interested in COBOL modernization and LLM development. Please see the [Contributing Guidelines](CONTRIBUTING.md) for more information.
+
+<!-- Integration test: validated Devin push access 2026-04-09T00:57:01Z -->
