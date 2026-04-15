@@ -1,6 +1,13 @@
        *================================================================*
+      * Template: file-handling.cbl
       * Program Name: FILEHNDL
-      * Description: Template for VSAM and Sequential file handling
+      * Description: Template for VSAM and Sequential File Handling
+      *   Demonstrates standard file I/O patterns used in the system:
+      *   - VSAM KSDS: OPEN, keyed READ, WRITE with INVALID KEY
+      *   - Sequential: OPEN, READ with AT END, WRITE
+      *   - File-status checking (88-level conditions)
+      *   - Error routines for VSAM (9100) and sequential (9200)
+      *   Copy and adapt for new programs that read or write files.
       *================================================================*
        IDENTIFICATION DIVISION.
        PROGRAM-ID. FILEHNDL.

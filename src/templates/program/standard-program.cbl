@@ -1,6 +1,15 @@
       *================================================================*
-      * Program Name: PROGNAME
-      * Description: [Description of program purpose]
+      * Template: standard-program.cbl
+      * Program Name: PROGNAME  (replace with actual program name)
+      * Description: Skeleton for a New Batch COBOL Program
+      *   Provides the minimum structure every program should follow:
+      *   - IDENTIFICATION / ENVIRONMENT / DATA / PROCEDURE divisions
+      *   - Standard 0000-MAIN -> 1000-INIT -> 2000-PROCESS ->
+      *     3000-TERMINATE flow
+      *   - WS-CONSTANTS with program name and return codes
+      *   - WS-SWITCHES with end-of-file flag
+      *   - Placeholder 9000-HANDLE-ERROR routine
+      *   Fill in the bracketed placeholders before use.
       * Author: [Author name]
       * Date Written: [Date]
       * Maintenance Log:
@@ -87,4 +96,4 @@
        9000-HANDLE-ERROR.
            *> Error handling logic will go here
            MOVE WS-ERROR TO WS-RETURN-CODE
-           . 
+           .  

@@ -1,6 +1,15 @@
        *================================================================*
+      * Template: db2-handling.cbl
       * Program Name: DB2HNDL
-      * Description: Template for DB2 database interactions
+      * Description: Template for DB2 Database Interactions
+      *   Demonstrates standard patterns for embedding SQL in COBOL:
+      *   - SQLCA include and host-variable declarations
+      *   - Null-indicator usage
+      *   - INSERT, SELECT, cursor FETCH, UPDATE, DELETE examples
+      *   - Connect / disconnect lifecycle
+      *   - Error checking with rollback on negative SQLCODE
+      *   Copy and adapt these paragraphs when creating new DB2
+      *   programs in the portfolio system.
       *================================================================*
        IDENTIFICATION DIVISION.
        PROGRAM-ID. DB2HNDL.

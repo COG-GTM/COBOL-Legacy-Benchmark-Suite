@@ -1,3 +1,17 @@
+*****************************************************************
+* BMS Mapset: INQSET                                             *
+* Description: Screen definitions for Portfolio Inquiry System   *
+*   Contains four maps used by the online CICS inquiry programs: *
+*   MENMAP - Main menu: option selector (1=Position, 2=History,  *
+*            3=Exit) with error message line                     *
+*   POSMAP - Portfolio position display: account input, fund,    *
+*            units, cost basis, market value; PF3/7/8 navigation *
+*   HISMAP - Transaction history: account input, 10-row table    *
+*            with date/type/units/price/amount; PF3/7/8 nav      *
+*   ERRMAP - System error display: error code and detail text    *
+* Used By: INQONLN, INQPORT, INQHIST, ERRHNDL                  *
+* Defined In CSD: PORTDFN.csd (mapset INQSET in group PORTGRP)  *
+*****************************************************************
 PRINT NOGEN
 INQSET   DFHMSD TYPE=MAP,MODE=INOUT,LANG=COBOL,STORAGE=AUTO,              *
                TIOAPFX=YES,DSATTS=(COLOR,HILIGHT),MAPATTS=(COLOR,HILIGHT)
@@ -98,4 +112,4 @@ ERRDOUT  DFHMDF POS=(5,12),LENGTH=65,ATTRB=(PROT),COLOR=RED
          DFHMDF POS=(22,1),LENGTH=79,ATTRB=(PROT),                       *
                INITIAL='Press ENTER to continue'
          DFHMSD TYPE=FINAL
-         END 
+         END  

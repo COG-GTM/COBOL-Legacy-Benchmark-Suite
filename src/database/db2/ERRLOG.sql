@@ -1,5 +1,15 @@
 --=====================================================================
--- Error Logging Table Definition
+-- SQL File: ERRLOG.sql
+-- Description: Error Logging Table Definition
+--   Creates the ERRLOG tablespace and table in the POSMVP database.
+--   Stores application, system, and data errors with severity levels.
+--   Primary key: ERROR_TIMESTAMP + PROGRAM_ID
+--   Secondary index on PROCESS_DATE + ERROR_SEVERITY (descending)
+--   for efficient date-range / severity queries.
+--   Includes a cleanup stored procedure (ERRLOG_CLEANUP) that
+--   purges records older than a specified retention period.
+-- Grants: SELECT/INSERT to POSAPP, SELECT to POSRPT
+-- Used By: ERRHNDL, DB2ERR, RPTAUD00
 -- Version: 1.0
 -- Date: 2024
 --=====================================================================
@@ -62,4 +72,4 @@ CREATE PROCEDURE ERRLOG_CLEANUP
 BEGIN
   DELETE FROM ERRLOG
   WHERE PROCESS_DATE < CURRENT DATE - RETENTION_DAYS DAYS;
-END; 
+END;  
