@@ -1,7 +1,17 @@
+//******************************************************************
+//* JCL Name: UTLMON
+//* Description: Execute System Monitoring Utility
+//*   Runs UTLMON00 to continuously collect CPU, memory, DASD,
+//*   and DB2 metrics until 11 PM, logging status and generating
+//*   alerts when thresholds are exceeded.
+//* Program: UTLMON00
+//* Input:   MONCFG   - Monitor configuration/thresholds (SHR)
+//*          DB2STATS - DB2 statistics file (SHR)
+//* Output:  MONLOG   - Monitor log (NEW, FB/132)
+//*          ALERTS   - Alert records (NEW, FB/132)
+//******************************************************************
 //UTLMON00 JOB (ACCT#),'SYSTEM MONITOR',
 //             CLASS=A,MSGCLASS=X,MSGLEVEL=(1,1)
-//*
-//* System Monitoring Utility
 //*
 //STEP01   EXEC PGM=UTLMON00
 //STEPLIB  DD   DSN=PROD.LOAD.LIBRARY,DISP=SHR
@@ -17,4 +27,4 @@
 //DB2STATS DD   DSN=PROD.DB2.STATISTICS,DISP=SHR
 //SYSOUT   DD   SYSOUT=*
 //SYSUDUMP DD   SYSOUT=*
-//SYSPRINT DD   SYSOUT=* 
+//SYSPRINT DD   SYSOUT=*  

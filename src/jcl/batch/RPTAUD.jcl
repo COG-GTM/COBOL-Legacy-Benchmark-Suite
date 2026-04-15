@@ -1,7 +1,15 @@
+//******************************************************************
+//* JCL Name: RPTAUD
+//* Description: Execute System Audit Report Generator
+//*   Runs RPTAUD00 to read the audit log and error log,
+//*   then produces a formatted audit report dataset.
+//* Program: RPTAUD00
+//* Input:   AUDITLOG - Production audit log (SHR)
+//*          ERRLOG   - Production error log (SHR)
+//* Output:  RPTFILE  - Audit report (NEW, FB/132)
+//******************************************************************
 //RPTAUD00 JOB (ACCT#),'AUDIT REPORT',
 //             CLASS=A,MSGCLASS=X,MSGLEVEL=(1,1)
-//*
-//* System Audit Report Generator
 //*
 //STEP01   EXEC PGM=RPTAUD00
 //STEPLIB  DD   DSN=PROD.LOAD.LIBRARY,DISP=SHR
@@ -13,4 +21,4 @@
 //             DCB=(RECFM=FB,LRECL=132,BLKSIZE=0)
 //SYSOUT   DD   SYSOUT=*
 //SYSUDUMP DD   SYSOUT=*
-//SYSPRINT DD   SYSOUT=* 
+//SYSPRINT DD   SYSOUT=*  
