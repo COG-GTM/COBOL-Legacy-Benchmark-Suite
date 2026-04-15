@@ -1,14 +1,23 @@
       *****************************************************************
-      * HISTORY RECORD STRUCTURE
-      * VERSION: 1.0
-      * DATE: 2024
+      * Copybook Name: HISTREC                                         *
+      * Description:  History Record Structure                          *
+      * Version: 1.0                                                   *
+      * Date: 2024                                                     *
+      *                                                                *
+      * Defines the VSAM record layout for the position/transaction    *
+      * history file. Records are created by HISTLD00 during the       *
+      * batch processing cycle and queried by INQHIST for online       *
+      * history inquiries. Supports portfolio, position, and           *
+      * transaction record types with before/after change images.      *
       *****************************************************************
        01  HISTORY-RECORD.
+      *    Composite key: portfolio + date + time + sequence
            05  HIST-KEY.
                10  HIST-PORTFOLIO-ID  PIC X(08).
                10  HIST-DATE         PIC X(08).
                10  HIST-TIME         PIC X(06).
                10  HIST-SEQ-NO       PIC X(04).
+      *    Change details: type, action, before/after images
            05  HIST-DATA.
                10  HIST-RECORD-TYPE  PIC X(02).
                    88  HIST-TYPE-PORT    VALUE 'PT'.
@@ -21,6 +30,7 @@
                10  HIST-BEFORE-IMAGE PIC X(400).
                10  HIST-AFTER-IMAGE  PIC X(400).
                10  HIST-REASON-CODE  PIC X(04).
+      *    Processing metadata for audit trail
            05  HIST-AUDIT.
                10  HIST-PROCESS-DATE PIC X(26).
                10  HIST-PROCESS-USER PIC X(08).
@@ -36,4 +46,4 @@
       * HIST-BEFORE-IMAGE: RECORD IMAGE BEFORE CHANGE
       * HIST-AFTER-IMAGE : RECORD IMAGE AFTER CHANGE
       * HIST-REASON-CODE : REASON FOR CHANGE
-      ***************************************************************** 
+      *****************************************************************  

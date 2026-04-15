@@ -2,10 +2,26 @@
 -- DB2 TABLE DEFINITIONS FOR INVESTMENT PORTFOLIO MANAGEMENT SYSTEM
 -- VERSION: 1.0
 -- DATE: 2024
+--
+-- Master DDL script defining all core tables, indexes, and views
+-- for the portfolio management system. Tables use referential
+-- integrity (foreign keys) to enforce portfolio-to-position and
+-- portfolio-to-transaction relationships.
+--
+-- Table hierarchy:
+--   PORTFOLIO_MASTER   -> INVESTMENT_POSITIONS (1:N by PORTFOLIO_ID)
+--   PORTFOLIO_MASTER   -> TRANSACTION_HISTORY  (1:N by PORTFOLIO_ID)
+--
+-- See also: POSHIST.sql (partitioned history), ERRLOG.sql (errors),
+--           RTNCODES.sql (return codes), PORTPLAN.sql (DB2 plan)
 --********************************************************************
 
 --====================================================================
 -- PORTFOLIO MASTER TABLE
+-- Primary entity: one row per portfolio.
+-- Key: PORTFOLIO_ID (8-char, e.g., 'PORT0001')
+-- Status: A=Active, C=Closed, S=Suspended
+-- Risk: 1=Low, 2=Medium, 3=High, 4=Aggressive
 --====================================================================
 CREATE TABLE PORTFOLIO_MASTER (
     PORTFOLIO_ID      CHAR(8)         NOT NULL,
@@ -25,6 +41,9 @@ CREATE TABLE PORTFOLIO_MASTER (
 
 --====================================================================
 -- INVESTMENT POSITIONS TABLE
+-- One row per portfolio + investment + date combination.
+-- FK to PORTFOLIO_MASTER ensures referential integrity.
+-- Position date allows point-in-time valuation queries.
 --====================================================================
 CREATE TABLE INVESTMENT_POSITIONS (
     PORTFOLIO_ID      CHAR(8)         NOT NULL,
@@ -42,6 +61,10 @@ CREATE TABLE INVESTMENT_POSITIONS (
 
 --====================================================================
 -- TRANSACTION HISTORY TABLE
+-- One row per trade event. TRANSACTION_ID format:
+-- YYYYMMDDHHMMSS + 6-digit sequence number.
+-- Types: BU=Buy, SL=Sell, TR=Transfer, FE=Fee
+-- Status: P=Processed, F=Failed, R=Reversed
 --====================================================================
 CREATE TABLE TRANSACTION_HISTORY (
     TRANSACTION_ID    CHAR(20)        NOT NULL,
@@ -62,29 +85,35 @@ CREATE TABLE TRANSACTION_HISTORY (
 );
 
 --====================================================================
--- INDEXES
+-- INDEXES - Optimized for common query patterns
 --====================================================================
+-- Find all portfolios for a client, filtered by status
 CREATE INDEX IDX_PORT_MASTER_CLIENT 
     ON PORTFOLIO_MASTER (CLIENT_ID, STATUS);
 
+-- Point-in-time position lookups across portfolios
 CREATE INDEX IDX_POSITIONS_DATE 
     ON INVESTMENT_POSITIONS (POSITION_DATE, PORTFOLIO_ID);
 
+-- Transaction history by portfolio (date range queries)
 CREATE INDEX IDX_TRANS_HIST_PORT 
     ON TRANSACTION_HISTORY (PORTFOLIO_ID, TRANSACTION_DATE);
 
+-- Date-first index for daily processing and reporting
 CREATE INDEX IDX_TRANS_HIST_DATE 
     ON TRANSACTION_HISTORY (TRANSACTION_DATE, PORTFOLIO_ID);
 
 --====================================================================
--- VIEWS
+-- VIEWS - Convenience views for common query patterns
 --====================================================================
+-- All non-closed portfolios (excludes future-closed)
 CREATE VIEW ACTIVE_PORTFOLIOS AS
     SELECT *
     FROM PORTFOLIO_MASTER
     WHERE STATUS = 'A'
     AND (CLOSE_DATE IS NULL OR CLOSE_DATE > CURRENT DATE);
 
+-- Yesterday's positions joined with portfolio names (for T+1 reports)
 CREATE VIEW CURRENT_POSITIONS AS
     SELECT p.*, pm.PORTFOLIO_NAME, pm.CLIENT_ID
     FROM INVESTMENT_POSITIONS p
@@ -102,4 +131,4 @@ CREATE VIEW CURRENT_POSITIONS AS
 -- 4. Transaction types:
 --    - 'BU'=Buy, 'SL'=Sell, 'TR'=Transfer, 'FE'=Fee
 -- 5. Indexes optimized for common query patterns
---******************************************************************** 
+--********************************************************************  

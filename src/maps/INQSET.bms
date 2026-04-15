@@ -1,8 +1,28 @@
+*****************************************************************
+* BMS Map Set: INQSET                                            *
+* Description: CICS Screen Definitions for Portfolio Inquiry      *
+*                                                                *
+* Defines four 3270 screen maps for the online portfolio inquiry *
+* system running under CICS:                                     *
+*   MENMAP - Main menu with 3 options (position/history/exit)    *
+*   POSMAP - Portfolio position detail (fund, units, value)      *
+*   HISMAP - Transaction history list (10 scrollable rows)       *
+*   ERRMAP - Error display with code and description             *
+*                                                                *
+* All maps are 24x80 (standard 3270 terminal size).              *
+* Uses COLOR and HILIGHT extended attributes.                    *
+* STORAGE=AUTO generates unique DSECT names per map.             *
+*                                                                *
+* Used by: INQONLN (main controller), INQPORT, INQHIST          *
+*****************************************************************
 PRINT NOGEN
 INQSET   DFHMSD TYPE=MAP,MODE=INOUT,LANG=COBOL,STORAGE=AUTO,              *
                TIOAPFX=YES,DSATTS=(COLOR,HILIGHT),MAPATTS=(COLOR,HILIGHT)
 *****************************************************************
-* Main Menu Map                                                   *
+* MENMAP - Main Menu Map                                         *
+* Displays system title and 3 navigation options.                *
+* OPTION field (row 9) accepts numeric input (1-3).             *
+* ERRMSG field (row 23) displays validation errors in red.       *
 *****************************************************************
 MENMAP   DFHMDI SIZE=(24,80)
          DFHMDF POS=(1,1),LENGTH=40,ATTRB=(PROT,BRT),                     *
@@ -18,7 +38,11 @@ MENMAP   DFHMDI SIZE=(24,80)
 OPTION   DFHMDF POS=(9,3),LENGTH=1,ATTRB=(UNPROT,NUM,IC)
 ERRMSG   DFHMDF POS=(23,1),LENGTH=78,ATTRB=(PROT,BRT),COLOR=RED
 *****************************************************************
-* Portfolio Position Map                                          *
+* POSMAP - Portfolio Position Inquiry Map                         *
+* Accepts account number input, displays position details:       *
+*   Fund ID, Fund Name, Units held, Cost Basis, Market Value     *
+* Navigation: PF3=Exit, PF7=Previous, PF8=Next position          *
+* POSMSG field (row 23) for status/error messages in red.        *
 *****************************************************************
 POSMAP   DFHMDI SIZE=(24,80)
          DFHMDF POS=(1,1),LENGTH=40,ATTRB=(PROT,BRT),                     *
@@ -48,7 +72,11 @@ VALOUT   DFHMDF POS=(11,17),LENGTH=15,ATTRB=(PROT),COLOR=TURQUOISE
                INITIAL='PF3=Exit  PF7=Previous  PF8=Next'
 POSMSG   DFHMDF POS=(23,1),LENGTH=78,ATTRB=(PROT,BRT),COLOR=RED
 *****************************************************************
-* Transaction History Map                                         *
+* HISMAP - Transaction History Inquiry Map                        *
+* Accepts account number input, displays up to 10 transactions   *
+* in a scrollable list with columns: Date, Type, Units, Price,   *
+* Amount. ROW1-ROW10 are 65-char output fields in turquoise.     *
+* Navigation: PF3=Exit, PF7=Previous page, PF8=Next page         *
 *****************************************************************
 HISMAP   DFHMDI SIZE=(24,80)
          DFHMDF POS=(1,1),LENGTH=40,ATTRB=(PROT,BRT),                     *
@@ -84,7 +112,9 @@ ROW10    DFHMDF POS=(16,1),LENGTH=65,ATTRB=(PROT),COLOR=TURQUOISE
                INITIAL='PF3=Exit  PF7=Previous  PF8=Next'
 HISMSG   DFHMDF POS=(23,1),LENGTH=78,ATTRB=(PROT,BRT),COLOR=RED
 *****************************************************************
-* Error Message Map                                              *
+* ERRMAP - System Error Display Map                              *
+* Shows error code (ERRCOUT) and description (ERRDOUT) in red.   *
+* User presses ENTER to acknowledge and return to previous map.  *
 *****************************************************************
 ERRMAP   DFHMDI SIZE=(24,80)
          DFHMDF POS=(1,1),LENGTH=40,ATTRB=(PROT,BRT),                     *
@@ -98,4 +128,4 @@ ERRDOUT  DFHMDF POS=(5,12),LENGTH=65,ATTRB=(PROT),COLOR=RED
          DFHMDF POS=(22,1),LENGTH=79,ATTRB=(PROT),                       *
                INITIAL='Press ENTER to continue'
          DFHMSD TYPE=FINAL
-         END 
+         END  

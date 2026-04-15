@@ -1,11 +1,20 @@
       *================================================================*
-      * DB2 Table Definitions
-      * Version: 1.0
-      * Date: 2024
+      * Copybook Name: DBTBLS                                          *
+      * Description:  DB2 Table Host Variable Definitions                *
+      * Version: 1.0                                                   *
+      * Date: 2024                                                     *
+      *                                                                *
+      * COBOL host variable layouts matching DB2 table columns for      *
+      * the POSHIST (position history) and ERRLOG (error log) tables.   *
+      * These structures are used in EXEC SQL SELECT INTO, INSERT,     *
+      * and UPDATE statements. Field sizes and types must exactly       *
+      * match the DB2 table definitions in POSHIST.sql and ERRLOG.sql. *
+      *                                                                *
+      * Used by: HISTLD00, DB2ONLN, DB2CONN, INQHIST, ERRHNDL         *
       *================================================================*
       
       *----------------------------------------------------------------*
-      * Position History Table
+      * Position History Table - Maps to DB2 POSHIST table columns     *
       *----------------------------------------------------------------*
        01  POSHIST-RECORD.
            05  PH-ACCOUNT-NO        PIC X(8).
@@ -28,7 +37,7 @@
            05  PH-AUDIT-TIMESTAMP   PIC X(26).
       
       *----------------------------------------------------------------*
-      * Error Log Table
+      * Error Log Table - Maps to DB2 ERRLOG table columns             *
       *----------------------------------------------------------------*
        01  ERRLOG-RECORD.
            05  EL-ERROR-TIMESTAMP   PIC X(26).
@@ -47,4 +56,4 @@
            05  EL-PROCESS-DATE      PIC X(10).
            05  EL-PROCESS-TIME      PIC X(8).
            05  EL-USER-ID           PIC X(8).
-           05  EL-ADDITIONAL-INFO   PIC X(500). 
+           05  EL-ADDITIONAL-INFO   PIC X(500).  

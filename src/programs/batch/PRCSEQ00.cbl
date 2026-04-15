@@ -3,6 +3,23 @@
       * Description: Process Sequence Manager
       * Version: 1.0
       * Date: 2024
+      *
+      * Manages the execution sequence of batch processes. Builds an
+      * in-memory table of processes from the sequence file, creates
+      * corresponding batch control records, and determines which
+      * process is eligible to run next based on dependency status.
+      *
+      * Called By: JCL scheduler, batch orchestration
+      * Calls:    ERRPROC (error handler)
+      * Files:
+      *   PRCSEQ - Process Sequence VSAM KSDS (Dynamic I/O)
+      *   BCHCTL - Batch Control VSAM KSDS (Dynamic I/O)
+      *
+      * Function Codes (via Linkage):
+      *   INIT - Build sequence table and create control records
+      *   NEXT - Find the next ready process and check dependencies
+      *   STAT - Read control status and update sequence table
+      *   TERM - Check final status and close files
       *================================================================*
        IDENTIFICATION DIVISION.
        PROGRAM-ID. PRCSEQ00.
@@ -14,6 +31,7 @@
        
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
+      * Process sequence definitions - VSAM KSDS with dynamic access
            SELECT PROCESS-SEQ-FILE
                ASSIGN TO PRCSEQ
                ORGANIZATION IS INDEXED
@@ -21,6 +39,7 @@
                RECORD KEY IS PSR-KEY
                FILE STATUS IS WS-PSR-STATUS.
                
+      * Batch control records - VSAM KSDS with dynamic access
            SELECT BATCH-CONTROL-FILE
                ASSIGN TO BCHCTL
                ORGANIZATION IS INDEXED
@@ -50,6 +69,7 @@
            05  WS-PROCESS-COUNT      PIC 9(4) COMP.
            05  WS-ACTIVE-COUNT       PIC 9(4) COMP.
            05  WS-ERROR-COUNT        PIC 9(4) COMP.
+      * In-memory table of processes in the current sequence
            
        01  WS-PROCESS-TABLE.
            05  WS-PROC-ENTRY OCCURS 100 TIMES
@@ -72,6 +92,10 @@
            05  LS-RETURN-CODE      PIC S9(4) COMP.
        
        PROCEDURE DIVISION USING LS-SEQUENCE-REQUEST.
+      *----------------------------------------------------------------*
+      * 0000-MAIN: Dispatch to the appropriate function handler        *
+      *   based on the caller's request code.                          *
+      *----------------------------------------------------------------*
        0000-MAIN.
            EVALUATE TRUE
                WHEN FUNC-INIT
@@ -91,12 +115,20 @@
            GOBACK
            .
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE-SEQUENCE: Open files, build the in-memory      *
+      *   process table, and write batch control records.              *
+      *----------------------------------------------------------------*
        1000-INITIALIZE-SEQUENCE.
            PERFORM 1100-OPEN-FILES
            PERFORM 1200-BUILD-SEQUENCE
            PERFORM 1300-CREATE-CONTROL-RECORDS
            .
            
+      *----------------------------------------------------------------*
+      * 2000-GET-NEXT-PROCESS: Find the next READY process, verify     *
+      *   its dependencies are satisfied, and mark it ACTIVE.          *
+      *----------------------------------------------------------------*
        2000-GET-NEXT-PROCESS.
            PERFORM 2100-FIND-NEXT-READY
            PERFORM 2200-CHECK-DEPENDENCIES
@@ -105,38 +137,38 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 3000-CHECK-STATUS: Re-read a process's control record and      *
+      *   sync the in-memory table, then check overall completion.     *
+      *----------------------------------------------------------------*
        3000-CHECK-STATUS.
            PERFORM 3100-READ-CONTROL-STATUS
            PERFORM 3200-UPDATE-SEQUENCE-TABLE
            PERFORM 3300-CHECK-COMPLETION
            .
            
+      *----------------------------------------------------------------*
+      * 4000-TERMINATE-SEQUENCE: Determine overall success/failure     *
+      *   and close all files.                                         *
+      *----------------------------------------------------------------*
        4000-TERMINATE-SEQUENCE.
            PERFORM 4100-CHECK-FINAL-STATUS
            PERFORM 4200-CLOSE-FILES
            .
            
+      *----------------------------------------------------------------*
+      * 9000-ERROR-ROUTINE: Log error via ERRPROC, set ERROR RC.       *
+      *----------------------------------------------------------------*
        9000-ERROR-ROUTINE.
            MOVE 'PRCSEQ00' TO ERR-PROGRAM
            MOVE BCT-RC-ERROR TO LS-RETURN-CODE
            CALL 'ERRPROC' USING ERR-MESSAGE
            .
       *================================================================*
-      * Detailed procedures to be implemented:
-      * 1100-OPEN-FILES
-      * 1200-BUILD-SEQUENCE
-      * 1300-CREATE-CONTROL-RECORDS
-      * 2100-FIND-NEXT-READY
-      * 2200-CHECK-DEPENDENCIES
-      * 2300-UPDATE-PROCESS-STATUS
-      * 3100-READ-CONTROL-STATUS
-      * 3200-UPDATE-SEQUENCE-TABLE
-      * 3300-CHECK-COMPLETION
-      * 4100-CHECK-FINAL-STATUS
-      * 4200-CLOSE-FILES
+      * File and Initialization Procedures                              *
       *================================================================*
       *----------------------------------------------------------------*
-      * File and initialization procedures
+      * 1100-OPEN-FILES: Open both VSAM files for I/O.                 *
       *----------------------------------------------------------------*
        1100-OPEN-FILES.
            OPEN I-O PROCESS-SEQ-FILE
@@ -152,6 +184,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 1200-BUILD-SEQUENCE: Read sequence file from the given date    *
+      *   and load matching entries into the in-memory process table.  *
+      *----------------------------------------------------------------*
        1200-BUILD-SEQUENCE.
            INITIALIZE WS-PROCESS-TABLE
                       WS-PROCESS-COUNT
@@ -177,6 +213,10 @@
            END-PERFORM
            .
            
+      *----------------------------------------------------------------*
+      * 1210-ADD-TO-SEQUENCE: Copy one process definition into the     *
+      *   in-memory table with initial READY status.                   *
+      *----------------------------------------------------------------*
        1210-ADD-TO-SEQUENCE.
            ADD 1 TO WS-PROCESS-COUNT
            MOVE PSR-PROCESS-ID TO WS-PROC-ID(WS-PROC-IX)
@@ -185,6 +225,10 @@
            SET WS-PROC-IX UP BY 1
            .
            
+      *----------------------------------------------------------------*
+      * 1300-CREATE-CONTROL-RECORDS: Write a batch control record for  *
+      *   each process in the sequence table.                          *
+      *----------------------------------------------------------------*
        1300-CREATE-CONTROL-RECORDS.
            PERFORM VARYING WS-SEQUENCE-IX FROM 1 BY 1
                    UNTIL WS-SEQUENCE-IX > WS-PROCESS-COUNT
@@ -203,6 +247,10 @@
            END-PERFORM
            .
            
+      *----------------------------------------------------------------*
+      * 2100-FIND-NEXT-READY: Scan the in-memory table for the first  *
+      *   process still in READY status.                               *
+      *----------------------------------------------------------------*
        2100-FIND-NEXT-READY.
            PERFORM VARYING WS-SEQUENCE-IX FROM 1 BY 1
                    UNTIL WS-SEQUENCE-IX > WS-PROCESS-COUNT
@@ -218,6 +266,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2200-CHECK-DEPENDENCIES: Read the process definition and       *
+      *   verify all prerequisite processes have completed.            *
+      *----------------------------------------------------------------*
        2200-CHECK-DEPENDENCIES.
            MOVE LS-NEXT-PROCESS TO PSR-PROCESS-ID
            
@@ -236,6 +288,10 @@
            END-PERFORM
            .
            
+      *----------------------------------------------------------------*
+      * 2210-CHECK-DEP-STATUS: Check one dependency's control record.  *
+      *   Hard dependencies block; soft ones allow warnings.           *
+      *----------------------------------------------------------------*
        2210-CHECK-DEP-STATUS.
            MOVE PSR-DEP-ID(WS-SUB) TO BCT-JOB-NAME
            MOVE LS-PROCESS-DATE TO BCT-PROCESS-DATE
@@ -257,6 +313,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2300-UPDATE-PROCESS-STATUS: Mark the next process as ACTIVE    *
+      *   and record the start timestamp.                              *
+      *----------------------------------------------------------------*
        2300-UPDATE-PROCESS-STATUS.
            MOVE LS-NEXT-PROCESS TO BCT-JOB-NAME
            MOVE LS-PROCESS-DATE TO BCT-PROCESS-DATE
@@ -278,6 +338,10 @@
            END-REWRITE
            .
            
+      *----------------------------------------------------------------*
+      * 3100-READ-CONTROL-STATUS: Read the current batch control       *
+      *   record for the specified process.                            *
+      *----------------------------------------------------------------*
        3100-READ-CONTROL-STATUS.
            MOVE LS-NEXT-PROCESS TO BCT-JOB-NAME
            MOVE LS-PROCESS-DATE TO BCT-PROCESS-DATE
@@ -289,6 +353,10 @@
            END-READ
            .
            
+      *----------------------------------------------------------------*
+      * 3200-UPDATE-SEQUENCE-TABLE: Sync the in-memory table entry     *
+      *   with the latest control record values.                       *
+      *----------------------------------------------------------------*
        3200-UPDATE-SEQUENCE-TABLE.
            PERFORM VARYING WS-SEQUENCE-IX FROM 1 BY 1
                    UNTIL WS-SEQUENCE-IX > WS-PROCESS-COUNT
@@ -302,6 +370,10 @@
            END-PERFORM
            .
            
+      *----------------------------------------------------------------*
+      * 3300-CHECK-COMPLETION: Count active and error processes to     *
+      *   determine overall sequence status.                           *
+      *----------------------------------------------------------------*
        3300-CHECK-COMPLETION.
            MOVE ZERO TO WS-ACTIVE-COUNT
                        WS-ERROR-COUNT
@@ -319,6 +391,10 @@
            END-PERFORM
            .
            
+      *----------------------------------------------------------------*
+      * 4100-CHECK-FINAL-STATUS: Set return code based on whether      *
+      *   any errors or active processes remain.                       *
+      *----------------------------------------------------------------*
        4100-CHECK-FINAL-STATUS.
            PERFORM 3300-CHECK-COMPLETION
            
@@ -333,6 +409,9 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 4200-CLOSE-FILES: Close VSAM files and report any errors.      *
+      *----------------------------------------------------------------*
        4200-CLOSE-FILES.
            CLOSE PROCESS-SEQ-FILE
                  BATCH-CONTROL-FILE

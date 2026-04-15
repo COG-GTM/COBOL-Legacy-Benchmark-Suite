@@ -1,6 +1,23 @@
       *================================================================*
       * Program Name: AUDPROC
       * Description: Audit Trail Processing Subroutine
+      *             Callable service that appends a single audit
+      *             record to a sequential audit log file.
+      *
+      * Processing:  Opens the audit file in EXTEND mode, maps the
+      *              caller's request fields into the AUDITLOG
+      *              copybook layout, timestamps the entry, writes
+      *              the record, and closes the file.
+      *
+      * Files:       AUDFILE - Sequential audit log (EXTEND mode)
+      *
+      * Copybooks:   AUDITLOG - Audit record layout
+      *
+      * Called By:   PORTMSTR, PORTDEL, PORTTRAN, and any program
+      *              needing audit trail persistence.
+      *
+      * Return Codes: 0 = Success, 8 = File I/O error
+      *
       * Author: [Author name]
       * Date Written: 2024-03-20
       *================================================================*
@@ -31,24 +48,36 @@
        01  WS-FORMATTED-TIME       PIC X(26).
            
        LINKAGE SECTION.
+      *    Request area passed by calling program
        01  LS-AUDIT-REQUEST.
+      *    System context: who/what/where triggered the audit
            05  LS-SYSTEM-INFO.
                10  LS-SYSTEM-ID    PIC X(8).
                10  LS-USER-ID      PIC X(8).
                10  LS-PROGRAM      PIC X(8).
                10  LS-TERMINAL     PIC X(8).
+      *    Audit classification (e.g., CRUD, TRAN, SECU)
            05  LS-TYPE            PIC X(4).
+      *    Action performed (e.g., CREATE, UPDATE, DELETE)
            05  LS-ACTION          PIC X(8).
+      *    Result status (e.g., SUCC, FAIL)
            05  LS-STATUS          PIC X(4).
+      *    Portfolio key identifying the affected record
            05  LS-KEY-INFO.
                10  LS-PORT-ID     PIC X(8).
                10  LS-ACCT-NO     PIC X(10).
+      *    Before/after record images for change tracking
            05  LS-BEFORE-IMAGE    PIC X(100).
            05  LS-AFTER-IMAGE     PIC X(100).
+      *    Free-text message describing the event
            05  LS-MESSAGE         PIC X(100).
+      *    Return code set by this program (0=OK, 8=Error)
            05  LS-RETURN-CODE     PIC S9(4) COMP.
        
        PROCEDURE DIVISION USING LS-AUDIT-REQUEST.
+      *----------------------------------------------------------------*
+      * Main control: initialize, write audit record, close file.      *
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            PERFORM 2000-PROCESS-AUDIT
@@ -56,6 +85,10 @@
            GOBACK
            .
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Capture current timestamp and open audit      *
+      * file in EXTEND mode to append without overwriting.             *
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            ACCEPT WS-FORMATTED-TIME FROM TIME STAMP
            
@@ -68,6 +101,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2000-PROCESS-AUDIT: Map all request fields into the audit      *
+      * record layout and write the record to the audit file.          *
+      *----------------------------------------------------------------*
        2000-PROCESS-AUDIT.
            INITIALIZE AUDIT-RECORD
            
@@ -91,6 +128,9 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 3000-TERMINATE: Close the audit file.                          *
+      *----------------------------------------------------------------*
        3000-TERMINATE.
            CLOSE AUDIT-FILE
-           . 
+           .   

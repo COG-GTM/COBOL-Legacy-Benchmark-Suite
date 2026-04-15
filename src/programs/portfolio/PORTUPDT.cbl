@@ -1,7 +1,23 @@
        *================================================================*
       * Program Name: PORTUPDT
       * Description: Portfolio Update Program
-      *             Updates existing portfolio records
+      *             Applies field-level updates to existing portfolio
+      *             records from a sequential update instruction file.
+      *
+      * Processing:  Reads UPDTFILE for update instructions. Each
+      *              instruction specifies a target record key and
+      *              an action code:
+      *                S - Update portfolio status
+      *                V - Update total value (numeric)
+      *                N - Update client name
+      *
+      * Files:       PORTFILE - Indexed VSAM portfolio master (I-O)
+      *              UPDTFILE - Sequential update instructions
+      *
+      * Copybooks:   PORTFLIO - Portfolio record layout
+      *
+      * Return Codes: 0 = Success, 8 = File open error
+      *
       * Author: [Author name]
       * Date Written: 2024-03-20
       * Maintenance Log:
@@ -38,13 +54,16 @@
            
        FD  UPDATE-FILE.
        01  UPDATE-RECORD.
+      *    Composite key to locate the target portfolio record
            05  UPDT-KEY.
                10  UPDT-ID        PIC X(8).
                10  UPDT-ACCT-NO   PIC X(10).
+      *    Action code: S=Status, V=Value, N=Name
            05  UPDT-ACTION        PIC X(1).
                88  UPDT-STATUS    VALUE 'S'.
                88  UPDT-VALUE     VALUE 'V'.
                88  UPDT-NAME      VALUE 'N'.
+      *    New value to apply (interpreted based on action code)
            05  UPDT-NEW-VALUE     PIC X(50).
            
        WORKING-STORAGE SECTION.
@@ -80,6 +99,9 @@
            05  WS-NUMERIC-WORK     PIC S9(13)V99.
            
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control: open files, apply all updates, close and report. *
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            
@@ -90,6 +112,9 @@
            
            GOBACK.
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Open portfolio (I-O) and update (INPUT) files.*
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            INITIALIZE WS-WORK-AREAS
            
@@ -106,6 +131,9 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2000-PROCESS: Read next update instruction from input file.    *
+      *----------------------------------------------------------------*
        2000-PROCESS.
            READ UPDATE-FILE
                AT END
@@ -115,6 +143,9 @@
            END-READ
            .
            
+      *----------------------------------------------------------------*
+      * 2100-PROCESS-UPDATE: Locate target record by key in VSAM.      *
+      *----------------------------------------------------------------*
        2100-PROCESS-UPDATE.
            MOVE UPDT-KEY TO PORT-KEY
            
@@ -128,6 +159,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2200-APPLY-UPDATE: Apply the field change based on action      *
+      * code, then REWRITE the updated record back to VSAM.            *
+      *----------------------------------------------------------------*
        2200-APPLY-UPDATE.
            EVALUATE TRUE
                WHEN UPDT-STATUS
@@ -149,6 +184,9 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 3000-TERMINATE: Close files and display processing summary.    *
+      *----------------------------------------------------------------*
        3000-TERMINATE.
            CLOSE PORTFOLIO-FILE
                  UPDATE-FILE

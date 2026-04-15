@@ -1,11 +1,25 @@
        IDENTIFICATION DIVISION.
        PROGRAM-ID. RTNCDE00.
       *****************************************************************
-      * Standard Return Code Handler                                    *
-      * - Manages standardized return codes across system              *
-      * - Provides return code analysis and reporting                  *
-      * - Integrates with error handling framework                     *
-      * - Maintains return code audit trail                            *
+      * Program Name: RTNCDE00                                        *
+      * Description:  Standard Return Code Handler                     *
+      *                                                               *
+      * Provides a centralised return-code management service that    *
+      * other programs call via Linkage. Supports five operations:    *
+      *   RC-INITIALIZE - Reset all code fields to initial state      *
+      *   RC-SET-CODE   - Set a new code and track highest            *
+      *   RC-GET-CODE   - Retrieve current/highest codes and status   *
+      *   RC-LOG-CODE   - INSERT current state into DB2 RTNCODES      *
+      *   RC-ANALYZE    - Query DB2 for min/max/count by program      *
+      *                                                               *
+      * Called By: Any program needing return-code tracking            *
+      * Tables:   RTNCODES (DB2 - Insert/Select)                      *
+      *                                                               *
+      * Code Ranges:                                                  *
+      *   0       = Success                                           *
+      *   1 - 4   = Warning                                           *
+      *   5 - 8   = Error                                             *
+      *   9+      = Severe                                            *
       *****************************************************************
        
        ENVIRONMENT DIVISION.
@@ -22,14 +36,20 @@
            05 WS-CURRENT-SECONDS     PIC 9(2).
            05 WS-CURRENT-MILLISEC    PIC 9(2).
            
+      * DB2 communication area for SQL operations
        01  WS-DB2-AREA.
            EXEC SQL INCLUDE SQLCA END-EXEC.
            
        LINKAGE SECTION.
+      * Caller passes the request/response structure via Linkage
        01  RC-REQUEST-AREA.
            COPY RTNCODE.
            
        PROCEDURE DIVISION USING RC-REQUEST-AREA.
+      *----------------------------------------------------------------*
+      * Main dispatch: route to the appropriate handler based on the   *
+      * function flag set in the RC-REQUEST-AREA copybook.             *
+      *----------------------------------------------------------------*
            EVALUATE TRUE
                WHEN RC-INITIALIZE
                     PERFORM P100-INIT-RETURN-CODES
@@ -50,6 +70,9 @@
            
            GOBACK.
            
+      *----------------------------------------------------------------*
+      * P100: Reset all return-code fields to their initial state.     *
+      *----------------------------------------------------------------*
        P100-INIT-RETURN-CODES.
            INITIALIZE RC-CODES-AREA.
            MOVE SPACES TO RC-PROGRAM-ID.
@@ -60,6 +83,10 @@
        P100-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P200: Accept a new code from the caller, track the highest     *
+      *   code seen, and classify the severity bucket.                 *
+      *----------------------------------------------------------------*
        P200-SET-RETURN-CODE.
            IF RC-NEW-CODE > RC-HIGHEST-CODE
               MOVE RC-NEW-CODE TO RC-HIGHEST-CODE
@@ -82,6 +109,10 @@
        P200-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P300: Copy current/highest codes and status back to the        *
+      *   caller's return fields.                                      *
+      *----------------------------------------------------------------*
        P300-GET-RETURN-CODE.
            MOVE RC-CURRENT-CODE TO RC-RETURN-VALUE.
            MOVE RC-HIGHEST-CODE TO RC-HIGHEST-RETURN.
@@ -90,6 +121,10 @@
        P300-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P400: INSERT the current return-code state into DB2 RTNCODES   *
+      *   for audit trail purposes.                                    *
+      *----------------------------------------------------------------*
        P400-LOG-RETURN-CODE.
            MOVE FUNCTION CURRENT-DATE TO WS-CURRENT-TIME.
            
@@ -118,6 +153,10 @@
        P400-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P500: Query DB2 for count/max/min of return codes by program   *
+      *   within the specified time range.                             *
+      *----------------------------------------------------------------*
        P500-ANALYZE-CODES.
            EXEC SQL
                 SELECT COUNT(*),

@@ -1,12 +1,21 @@
 IDENTIFICATION DIVISION.
 PROGRAM-ID. ERRHNDL.
 *****************************************************************
-* Centralized Error Handler                                       *
-* - Processes all online errors                                  *
-* - Logs errors to DB2                                          *
-* - Formats error messages                                       *
-* - Controls error recovery                                      *
-****************************************************************
+* Program Name: ERRHNDL                                         *
+* Description:  Centralized Error Handler for Online Programs    *
+*                                                               *
+* Receives error details via DFHCOMMAREA (ERRHND copybook),     *
+* logs them to the DB2 ERRLOG table, formats a user-friendly    *
+* message with a unique trace ID, and determines the recovery    *
+* action based on severity:                                     *
+*   FATAL   -> set ERR-ABEND   (caller should ABEND)            *
+*   WARNING -> set ERR-CONTINUE (caller may continue)            *
+*   INFO    -> set ERR-CONTINUE                                  *
+*   OTHER   -> set ERR-RETURN   (return to caller normally)      *
+*                                                               *
+* Called By: INQONLN, DB2RECV, other online programs             *
+* Tables:   ERRLOG (DB2 - Insert)                                *
+*****************************************************************
 
 ENVIRONMENT DIVISION.
 
@@ -18,6 +27,7 @@ WORKING-STORAGE SECTION.
 01  WS-DB2-AREA.
    EXEC SQL INCLUDE SQLCA END-EXEC.
 
+* DB2 host variables for INSERT into ERRLOG
 01  WS-ERRLOG-RECORD.
    EXEC SQL BEGIN DECLARE SECTION END-EXEC.
    05 LOG-TIMESTAMP        PIC X(26).
@@ -35,6 +45,9 @@ LINKAGE SECTION.
    COPY ERRHND.
 
 PROCEDURE DIVISION.
+*----------------------------------------------------------------*
+* Main: Init, log to DB2, format message, determine action.      *
+*----------------------------------------------------------------*
    PERFORM P100-INIT-ERROR-HANDLER
       THRU P100-EXIT.
 
@@ -49,6 +62,9 @@ PROCEDURE DIVISION.
 
    EXEC CICS RETURN END-EXEC.
 
+*----------------------------------------------------------------*
+* P100: Copy COMMAREA, stamp timestamp, assign trace ID.         *
+*----------------------------------------------------------------*
 P100-INIT-ERROR-HANDLER.
    MOVE DFHCOMMAREA TO WS-ERROR-AREA.
 
@@ -60,6 +76,10 @@ P100-INIT-ERROR-HANDLER.
 P100-EXIT.
    EXIT.
 
+*----------------------------------------------------------------*
+* P200: Map error fields to host variables, INSERT into ERRLOG.  *
+*   If the INSERT itself fails, escalate to FATAL.               *
+*----------------------------------------------------------------*
 P200-LOG-ERROR.
    MOVE ERR-TIMESTAMP    TO LOG-TIMESTAMP.
    MOVE ERR-PROGRAM      TO LOG-PROGRAM.
@@ -89,6 +109,10 @@ P200-LOG-ERROR.
 P200-EXIT.
    EXIT.
 
+*----------------------------------------------------------------*
+* P300: Build human-readable message: "Error in <pgm> - <msg>    *
+*   (<trace-id>)" for display or return to the caller.           *
+*----------------------------------------------------------------*
 P300-FORMAT-MESSAGE.
    STRING 'Error in ' DELIMITED BY SIZE
           ERR-PROGRAM DELIMITED BY SPACE
@@ -101,6 +125,10 @@ P300-FORMAT-MESSAGE.
 P300-EXIT.
    EXIT.
 
+*----------------------------------------------------------------*
+* P400: Set recovery action flag based on severity, then copy    *
+*   WS-ERROR-AREA back to DFHCOMMAREA.                           *
+*----------------------------------------------------------------*
 P400-DETERMINE-ACTION.
    EVALUATE TRUE
        WHEN ERR-FATAL
@@ -115,4 +143,4 @@ P400-DETERMINE-ACTION.
 
    MOVE WS-ERROR-AREA TO DFHCOMMAREA.
 P400-EXIT.
-   EXIT. 
+   EXIT.  

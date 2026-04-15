@@ -1,11 +1,20 @@
        IDENTIFICATION DIVISION.
        PROGRAM-ID. DB2RECV.
       *****************************************************************
-      * DB2 Recovery Manager for Online Programs                        *
-      * - Handles DB2 connection failures                              *
-      * - Implements retry logic                                       *
-      * - Manages transaction rollback                                 *
-      * - Provides recovery status tracking                            *
+      * Program Name: DB2RECV                                         *
+      * Description:  DB2 Recovery Manager for Online Programs         *
+      *                                                               *
+      * Handles DB2 error recovery for CICS online programs.          *
+      * Callers pass a request type via Linkage:                      *
+      *   C - Connection recovery: retry via DB2ONLN up to 3 times   *
+      *       with a 2-second interval between attempts.              *
+      *   T - Transaction recovery: issue SQL ROLLBACK to undo the   *
+      *       current unit of work.                                   *
+      *   R - Cursor recovery: log the error via ERRHNDL and return  *
+      *       a retry/fail recommendation.                            *
+      *                                                               *
+      * Called By: INQHIST, other online programs                     *
+      * Calls:    DB2ONLN (reconnect), ERRHNDL (error logging)        *
       *****************************************************************
        
        ENVIRONMENT DIVISION.
@@ -15,6 +24,7 @@
        01  WS-DB2-AREA.
            EXEC SQL INCLUDE SQLCA END-EXEC.
            
+      * Retry policy constants and current attempt counter
        01  WS-RECOVERY-STATS.
            05 WS-RETRY-COUNT        PIC S9(4) COMP VALUE 0.
            05 WS-MAX-RETRIES        PIC S9(4) COMP VALUE 3.
@@ -45,6 +55,9 @@
               88 RECV-RETRY             VALUE 'R'.
            
        PROCEDURE DIVISION USING RECOVERY-REQUEST-AREA.
+      *----------------------------------------------------------------*
+      * Main dispatch: route to connection / transaction / cursor.      *
+      *----------------------------------------------------------------*
            EVALUATE TRUE
                WHEN RECV-CONNECTION
                     PERFORM P100-RECOVER-CONNECTION
@@ -59,6 +72,10 @@
            
            EXEC CICS RETURN END-EXEC.
            
+      *----------------------------------------------------------------*
+      * P100: Retry DB2 connection up to WS-MAX-RETRIES times.         *
+      *   Sets RECV-FAILED if all attempts exhausted.                  *
+      *----------------------------------------------------------------*
        P100-RECOVER-CONNECTION.
            MOVE 0 TO WS-RETRY-COUNT.
            
@@ -82,6 +99,9 @@
        P100-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P110: Single reconnect attempt via CICS LINK to DB2ONLN.       *
+      *----------------------------------------------------------------*
        P110-ATTEMPT-RECONNECT.
            MOVE 'C' TO DB2-REQUEST-TYPE OF WS-DB2-REQUEST.
            
@@ -101,6 +121,9 @@
        P110-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P120: CICS DELAY for WS-RETRY-INTERVAL seconds between tries.  *
+      *----------------------------------------------------------------*
        P120-WAIT-INTERVAL.
            EXEC CICS DELAY
                      INTERVAL(WS-RETRY-INTERVAL)
@@ -108,6 +131,9 @@
        P120-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P200: Issue SQL ROLLBACK; set success or failed accordingly.    *
+      *----------------------------------------------------------------*
        P200-RECOVER-TRANSACTION.
            EXEC SQL ROLLBACK END-EXEC.
            
@@ -122,6 +148,10 @@
        P200-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P300: Log the cursor error via ERRHNDL. If error handler says  *
+      *   continue, recommend retry; otherwise, mark as failed.        *
+      *----------------------------------------------------------------*
        P300-RECOVER-CURSOR.
            MOVE SPACES TO WS-ERROR-AREA.
            MOVE RECV-PROGRAM TO ERR-PROGRAM.
@@ -142,4 +172,4 @@
            
            MOVE ERR-MESSAGE TO RECV-MESSAGE.
        P300-EXIT.
-           EXIT. 
+           EXIT.  

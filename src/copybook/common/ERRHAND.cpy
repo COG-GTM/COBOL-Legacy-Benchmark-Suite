@@ -1,12 +1,17 @@
       *================================================================*
-      * Copybook Name: ERRHAND
-      * Description: Standard Error Handling Definitions
-      * Author: [Author name]
-      * Date Written: 2024-03-20
+      * Copybook Name: ERRHAND                                         *
+      * Description:  Standard Error Handling Definitions                *
+      * Author: [Author name]                                          *
+      * Date Written: 2024-03-20                                       *
+      *                                                                *
+      * Provides error category codes, return code constants, a         *
+      * structured error message layout for ERRPROC, and VSAM file      *
+      * status code translations. Included by all programs that need    *
+      * to report or handle errors consistently.                        *
       *================================================================*
       
       *----------------------------------------------------------------*
-      * Error Categories
+      * Error Categories - Two-char codes classifying error origin      *
       *----------------------------------------------------------------*
        01  ERR-CATEGORIES.
            05  ERR-CAT-VSAM        PIC X(2) VALUE 'VS'.
@@ -15,7 +20,7 @@
            05  ERR-CAT-SYSTEM      PIC X(2) VALUE 'SY'.
            
       *----------------------------------------------------------------*
-      * Standard Return Codes
+      * Standard Return Codes - z/OS convention (0/4/8/12/16)          *
       *----------------------------------------------------------------*
        01  ERR-RETURN-CODES.
            05  ERR-SUCCESS         PIC S9(4) COMP VALUE +0.
@@ -25,7 +30,7 @@
            05  ERR-TERMINAL        PIC S9(4) COMP VALUE +16.
            
       *----------------------------------------------------------------*
-      * Error Message Structure
+      * Error Message Structure - Passed to ERRPROC for logging        *
       *----------------------------------------------------------------*
        01  ERR-MESSAGE.
            05  ERR-TIMESTAMP.
@@ -39,7 +44,7 @@
            05  ERR-DETAILS         PIC X(256).
            
       *----------------------------------------------------------------*
-      * VSAM Status Handling
+      * VSAM Status Handling - Maps file status to readable messages   *
       *----------------------------------------------------------------*
        01  ERR-VSAM-STATUSES.
            05  ERR-VSAM-SUCCESS    PIC X(2) VALUE '00'.
@@ -53,4 +58,4 @@
            05  ERR-VSAM-23         PIC X(80) VALUE
                'Record not found'.
            05  ERR-OTHER           PIC X(80) VALUE
-               'Unexpected VSAM error'. 
+               'Unexpected VSAM error'.  

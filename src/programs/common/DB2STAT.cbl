@@ -1,6 +1,29 @@
        *================================================================*
       * Program Name: DB2STAT
       * Description: DB2 Statistics Collector
+      *             Callable service that tracks DB2 activity metrics
+      *             (rows read/inserted/updated/deleted, commits,
+      *             rollbacks) in a session-scoped temporary table
+      *             and calculates elapsed/CPU time at termination.
+      *
+      * Functions (via LS-FUNCTION):
+      *   INIT - Create temp table and record start timestamp
+      *   UPDT - Accumulate row and commit/rollback counts
+      *   TERM - Record end time, calculate elapsed/CPU, display
+      *   DISP - Display current statistics from temp table
+      *
+      * Storage:     SESSION.DBSTATS - Global temporary table
+      *              (preserved on commit, scoped to DB2 session)
+      *
+      * Copybooks:   SQLCA    - SQL communication area
+      *              DBPROC   - DB2 processing constants
+      *              ERRHAND  - Error handling data areas
+      *
+      * Called By:   Batch programs tracking DB2 performance
+      * Calls:       ERRPROC  - Error processing subroutine
+      *
+      * Return Codes: 0 = Success, 12 = Error
+      *
       * Version: 1.0
       * Date: 2024
       *================================================================*
@@ -15,16 +38,20 @@
        DATA DIVISION.
        WORKING-STORAGE SECTION.
            EXEC SQL BEGIN DECLARE SECTION END-EXEC.
+      *    Host variable record matching SESSION.DBSTATS columns
            01  WS-STATS-RECORD.
                05  WS-PROGRAM-ID      PIC X(8).
                05  WS-START-TIME      PIC X(26).
                05  WS-END-TIME        PIC X(26).
+      *        Cumulative row operation counters
                05  WS-ROWS-READ       PIC S9(9) COMP.
                05  WS-ROWS-INSERTED   PIC S9(9) COMP.
                05  WS-ROWS-UPDATED    PIC S9(9) COMP.
                05  WS-ROWS-DELETED    PIC S9(9) COMP.
+      *        Transaction control counters
                05  WS-COMMITS         PIC S9(9) COMP.
                05  WS-ROLLBACKS       PIC S9(9) COMP.
+      *        Timing metrics (calculated at TERM)
                05  WS-CPU-TIME        PIC S9(9)V99 COMP-3.
                05  WS-ELAPSED-TIME    PIC S9(9)V99 COMP-3.
            EXEC SQL END DECLARE SECTION END-EXEC.
@@ -55,6 +82,9 @@
            05  LS-RETURN-CODE      PIC S9(4) COMP.
        
        PROCEDURE DIVISION USING LS-STAT-REQUEST.
+      *----------------------------------------------------------------*
+      * Main dispatch: route to handler based on function code.        *
+      *----------------------------------------------------------------*
        0000-MAIN.
            EVALUATE TRUE
                WHEN FUNC-INIT
@@ -73,6 +103,10 @@
            GOBACK
            .
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Record program ID and start timestamp,        *
+      * create the session temp table, and insert an initial row.      *
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            INITIALIZE WS-STATS-RECORD
            MOVE LS-PROGRAM-ID TO WS-PROGRAM-ID
@@ -85,6 +119,11 @@
            PERFORM 1200-INSERT-INITIAL
            .
            
+      *----------------------------------------------------------------*
+      * 1100-CREATE-STATS-TABLE: Declare a global temporary table      *
+      * scoped to this DB2 session (ON COMMIT PRESERVE ROWS).          *
+      * Ignores SQLCODE -601 (table already exists).                   *
+      *----------------------------------------------------------------*
        1100-CREATE-STATS-TABLE.
            EXEC SQL
                DECLARE GLOBAL TEMPORARY TABLE SESSION.DBSTATS
@@ -108,6 +147,9 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 1200-INSERT-INITIAL: Insert a baseline row with zero counters. *
+      *----------------------------------------------------------------*
        1200-INSERT-INITIAL.
            EXEC SQL
                INSERT INTO SESSION.DBSTATS
@@ -127,6 +169,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2000-UPDATE-STATS: Copy caller's counters into host variables  *
+      * and update the temp table row for this program.                *
+      *----------------------------------------------------------------*
        2000-UPDATE-STATS.
            MOVE LS-ROWS-READ  TO WS-ROWS-READ
            MOVE LS-ROWS-INSRT TO WS-ROWS-INSERTED
@@ -154,6 +200,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 3000-TERMINATE: Capture end timestamp, calculate timing, and   *
+      * persist final metrics to the temp table before displaying.     *
+      *----------------------------------------------------------------*
        3000-TERMINATE.
            ACCEPT WS-CURRENT-TIMESTAMP FROM TIME STAMP
            MOVE WS-CURRENT-TIMESTAMP TO WS-END-TIME
@@ -177,6 +227,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 3100-CALC-TIMES: Derive elapsed wall-clock time from start/end *
+      * timestamps. Estimate CPU time as 65% of elapsed.               *
+      *----------------------------------------------------------------*
        3100-CALC-TIMES.
            COMPUTE WS-ELAPSED-TIME = FUNCTION
                NUMVAL(WS-END-TIME(1:15)) -
@@ -186,6 +240,10 @@
            MULTIPLY 0.65 BY WS-CPU-TIME
            .
            
+      *----------------------------------------------------------------*
+      * 4000-DISPLAY-STATS: Read metrics from temp table and display   *
+      * a formatted summary to SYSOUT.                                 *
+      *----------------------------------------------------------------*
        4000-DISPLAY-STATS.
            EXEC SQL
                SELECT ROWS_READ, ROWS_INSERTED,
@@ -221,6 +279,9 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 9000-ERROR-ROUTINE: Delegate to ERRPROC for logging.           *
+      *----------------------------------------------------------------*
        9000-ERROR-ROUTINE.
            MOVE 'DB2STAT' TO ERR-PROGRAM
            MOVE 12 TO LS-RETURN-CODE

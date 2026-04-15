@@ -1,10 +1,19 @@
         IDENTIFICATION DIVISION.
        PROGRAM-ID. INQHIST.
       *****************************************************************
-      * Transaction History Inquiry Handler                             *
-      * - Retrieves transaction history from DB2                       *
-      * - Formats history data for display                            *
-      * - Supports scrolling through history                          *
+      * Program Name: INQHIST                                         *
+      * Description:  Transaction History Inquiry Handler               *
+      *                                                               *
+      * Retrieves transaction history from DB2 POSHIST via a managed  *
+      * cursor (CURSMGR) and displays results via BMS map HISMAP.     *
+      * Connects to DB2 through the connection pool (DB2ONLN) with    *
+      * automatic recovery (DB2RECV) on connection failure.            *
+      *                                                               *
+      * Called By: INQONLN (via CICS LINK)                            *
+      * Calls:    DB2ONLN (connect), DB2RECV (recovery),              *
+      *           CURSMGR (cursor lifecycle)                           *
+      * Tables:   POSHIST (DB2 - Select via cursor)                   *
+      * Maps:     HISMAP (mapset INQSET)                              *
       *****************************************************************
        
        ENVIRONMENT DIVISION.
@@ -17,6 +26,7 @@
        01  WS-DB2-AREA.
            EXEC SQL INCLUDE SQLCA END-EXEC.
            
+      * Array of up to 10 history rows fetched from DB2
        01  WS-HISTORY-TABLE.
            05 WS-HISTORY-ENTRY OCCURS 10 TIMES.
               10 WS-TRANS-DATE    PIC X(10).
@@ -32,6 +42,7 @@
               88 NO-MORE-ROWS          VALUE 'N'.
            05 WS-ROW-COUNT        PIC S9(4) COMP.
            
+      * DB2 connection request passed to DB2ONLN via CICS LINK
        01  WS-DB2-REQUEST.
            05 DB2-REQUEST-TYPE        PIC X.
            05 DB2-RESPONSE-CODE       PIC S9(8) COMP.
@@ -40,6 +51,7 @@
               10 DB2-SQLCODE          PIC S9(9) COMP.
               10 DB2-ERROR-MSG        PIC X(80).
            
+      * Cursor lifecycle request passed to CURSMGR via CICS LINK
        01  WS-CURSOR-REQUEST.
            05 CURS-REQUEST-TYPE     PIC X.
            05 CURS-NAME             PIC X(18) VALUE 'HISTORY_CURSOR'.
@@ -49,6 +61,7 @@
            05 CURS-DATA-AREA        PIC X(3000).
            05 CURS-DATA-LENGTH      PIC S9(4) COMP.
            
+      * Recovery request passed to DB2RECV via CICS LINK
        01  WS-RECOVERY-REQUEST.
            05 RECV-REQUEST-TYPE     PIC X.
            05 RECV-RESPONSE-CODE    PIC S9(8) COMP.
@@ -67,6 +80,9 @@
            COPY INQCOM.
            
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main: Init + DB2 connect, fetch history, display, return.      *
+      *----------------------------------------------------------------*
            PERFORM P100-INIT-PROGRAM
               THRU P100-EXIT.
               
@@ -78,6 +94,9 @@
               
            EXEC CICS RETURN END-EXEC.
            
+      *----------------------------------------------------------------*
+      * P100: Copy COMMAREA, set error handler, connect to DB2.        *
+      *----------------------------------------------------------------*
        P100-INIT-PROGRAM.
            MOVE DFHCOMMAREA TO WS-COMMAREA.
            MOVE ZEROS TO WS-ROW-COUNT.
@@ -92,6 +111,10 @@
        P100-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P150: Request a DB2 connection via DB2ONLN. On failure,        *
+      *   attempt recovery through DB2RECV; recurse once on success.   *
+      *----------------------------------------------------------------*
        P150-DB2-CONNECT.
            MOVE 'C' TO DB2-REQUEST-TYPE.
            
@@ -126,6 +149,10 @@
        P150-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P200: Declare, open, fetch, and close cursor via CURSMGR.      *
+      *   The SQL selects from POSHIST ordered by date descending.     *
+      *----------------------------------------------------------------*
        P200-GET-HISTORY.
            MOVE 'SELECT TRANS_DATE, TRANS_TYPE, TRANS_UNITS, ' &
                 'TRANS_PRICE, TRANS_AMOUNT ' &
@@ -161,6 +188,9 @@
        P200-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P250: Fetch the next batch of rows into WS-HISTORY-TABLE.      *
+      *----------------------------------------------------------------*
        P250-FETCH-HISTORY.
            MOVE 'F' TO CURS-REQUEST-TYPE.
            EXEC CICS LINK PROGRAM('CURSMGR')
@@ -174,6 +204,9 @@
        P250-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P300: Send history data to the terminal via BMS map HISMAP.    *
+      *----------------------------------------------------------------*
        P300-FORMAT-DISPLAY.
            EXEC CICS SEND MAP('HISMAP')
                      MAPSET('INQSET')
@@ -185,6 +218,9 @@
        P300-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P999: Set SQLCODE and return error to caller via COMMAREA.     *
+      *----------------------------------------------------------------*
        P999-ERROR-ROUTINE.
            MOVE SQLCODE 
              TO INQCOM-RESPONSE-CODE OF WS-COMMAREA.

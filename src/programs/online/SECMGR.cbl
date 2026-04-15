@@ -1,11 +1,27 @@
        IDENTIFICATION DIVISION.
        PROGRAM-ID. SECMGR.
       *****************************************************************
-      * Security Manager for Online Programs                            *
-      * - Validates CICS user credentials                              *
-      * - Manages DB2 authorization                                    *
-      * - Implements access control                                    *
-      * - Maintains security audit trail                               *
+      * Program Name: SECMGR                                          *
+      * Description:  Security Manager for Online Programs             *
+      *                                                               *
+      * Provides authentication, authorization, and audit services    *
+      * for CICS online programs. Callers pass a request type via     *
+      * Linkage:                                                      *
+      *   V - Validate:  Confirm CICS user identity matches the      *
+      *                  provided SEC-USER-ID.                        *
+      *   A - Authorize: Check the DB2 AUTHFILE table for an entry   *
+      *                  granting SEC-ACCESS-TYPE on SEC-RESOURCE.    *
+      *   L - Log:       INSERT an audit record into the DB2         *
+      *                  AUDITLOG table.                              *
+      *                                                               *
+      * Called By: INQONLN, other online programs                     *
+      * Tables:   AUTHFILE (DB2 - Select), AUDITLOG (DB2 - Insert)   *
+      *                                                               *
+      * Response Codes:                                               *
+      *   0  - Success                                                *
+      *   8  - Validation/authorization denied                        *
+      *   12 - System error (unable to obtain credentials or DB2      *
+      *        failure)                                               *
       *****************************************************************
        
        ENVIRONMENT DIVISION.
@@ -15,6 +31,7 @@
        01  WS-DB2-AREA.
            EXEC SQL INCLUDE SQLCA END-EXEC.
            
+      * CICS context fields captured for audit logging
        01  WS-SECURITY-AREA.
            05 WS-USER-ID           PIC X(8).
            05 WS-TERMINAL-ID       PIC X(4).
@@ -39,6 +56,9 @@
            05 SEC-ERROR-INFO       PIC X(80).
            
        PROCEDURE DIVISION USING SECURITY-REQUEST-AREA.
+      *----------------------------------------------------------------*
+      * Main dispatch: route to validate / authorize / log.            *
+      *----------------------------------------------------------------*
            EVALUATE TRUE
                WHEN SEC-VALIDATE
                     PERFORM P100-VALIDATE-USER
@@ -53,6 +73,10 @@
            
            EXEC CICS RETURN END-EXEC.
            
+      *----------------------------------------------------------------*
+      * P100: Use CICS ASSIGN to get the real USERID, compare with     *
+      *   the SEC-USER-ID supplied by the caller.                      *
+      *----------------------------------------------------------------*
        P100-VALIDATE-USER.
            EXEC CICS ASSIGN
                      USERID(WS-USER-ID)
@@ -75,6 +99,10 @@
        P100-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P200: Query AUTHFILE for a matching (user, resource, access)   *
+      *   row. RC 0 = authorized, 8 = denied, 12 = DB2 error.         *
+      *----------------------------------------------------------------*
        P200-CHECK-AUTH.
            EXEC SQL
                 SELECT COUNT(*)
@@ -102,6 +130,10 @@
        P200-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P300: Capture CICS context (user, terminal, transaction) and   *
+      *   INSERT an audit row into AUDITLOG.                           *
+      *----------------------------------------------------------------*
        P300-LOG-ACCESS.
            MOVE FUNCTION CURRENT-DATE TO WS-TIMESTAMP.
            

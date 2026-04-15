@@ -1,6 +1,34 @@
       *================================================================*
       * Program Name: DB2ERR
       * Description: DB2 SQL Error Handler
+      *             Callable service that logs DB2 SQL errors to
+      *             the ERRLOG table, diagnoses error severity, and
+      *             determines whether the operation should be
+      *             retried (e.g., deadlock, timeout).
+      *
+      * Functions (via LS-FUNCTION):
+      *   LOG  - Insert error details into ERRLOG DB2 table
+      *   DIAG - Diagnose SQLCODE and return human-readable text
+      *   RETR - Retrieve the most recent error for a program
+      *
+      * Error Categories (SQLCODE mapping):
+      *   -911  Deadlock   (severity 2, retryable)
+      *   -913  Timeout    (severity 2, retryable)
+      *   -30081 Connection (severity 4, not retryable)
+      *   -803  Duplicate  (severity 1, not retryable)
+      *   +100  Not found  (severity 1, not retryable)
+      *
+      * Copybooks:   SQLCA    - SQL communication area
+      *              DBPROC   - DB2 processing constants
+      *              DBTBLS   - DB2 table record layouts
+      *              ERRHAND  - Error handling data areas
+      *
+      * Called By:   DB2CMT, DB2CONN, ERRHNDL, and other DB2 progs
+      * Calls:       ERRPROC  - Error processing subroutine
+      *
+      * Return Codes: 0 = Logged OK, 4 = Warning/retry,
+      *               8 = Data error, 12 = Severe/unrecoverable
+      *
       * Version: 1.0
       * Date: 2024
       *================================================================*
@@ -28,6 +56,7 @@
        01  WS-CURRENT-TIMESTAMP    PIC X(26).
        01  WS-FORMATTED-SQLCODE    PIC -Z(8)9.
        
+      *    Well-known SQLCODE values for error classification
        01  WS-ERROR-CATEGORIES.
            05  WS-DEADLOCK         PIC S9(8) VALUE -911.
            05  WS-TIMEOUT          PIC S9(8) VALUE -913.
@@ -36,23 +65,31 @@
            05  WS-NOT-FOUND        PIC S9(8) VALUE +100.
        
        LINKAGE SECTION.
+      *    Request area passed by calling program
        01  LS-ERROR-REQUEST.
+      *    Function code: LOG/DIAG/RETR
            05  LS-FUNCTION         PIC X(4).
                88  FUNC-LOG          VALUE 'LOG '.
                88  FUNC-DIAG         VALUE 'DIAG'.
                88  FUNC-RETR         VALUE 'RETR'.
+      *    Calling program ID (used for logging and retrieval)
            05  LS-PROGRAM-ID       PIC X(8).
            05  LS-ERROR-INFO.
                10  LS-SQLCODE      PIC S9(9) COMP.
                10  LS-SQLSTATE     PIC X(5).
                10  LS-ERROR-TEXT   PIC X(80).
+      *    Extra context about the failing operation
            05  LS-ADDITIONAL-INFO  PIC X(100).
            05  LS-RETURN-CODE      PIC S9(4) COMP.
+      *    Retry advisory: Y = caller should retry the operation
            05  LS-RETRY-FLAG       PIC X(1).
                88  LS-SHOULD-RETRY   VALUE 'Y'.
                88  LS-NO-RETRY       VALUE 'N'.
        
        PROCEDURE DIVISION USING LS-ERROR-REQUEST.
+      *----------------------------------------------------------------*
+      * Main dispatch: route to handler based on function code.        *
+      *----------------------------------------------------------------*
        0000-MAIN.
            EVALUATE TRUE
                WHEN FUNC-LOG
@@ -69,6 +106,10 @@
            GOBACK
            .
            
+      *----------------------------------------------------------------*
+      * 1000-LOG-ERROR: Build an error log record from the request     *
+      * fields, set severity, format SQLCODE, and insert into ERRLOG.  *
+      *----------------------------------------------------------------*
        1000-LOG-ERROR.
            INITIALIZE WS-ERRLOG-REC
            
@@ -97,6 +138,11 @@
            PERFORM 1200-INSERT-ERROR
            .
            
+      *----------------------------------------------------------------*
+      * 1100-SET-SEVERITY: Map SQLCODE to severity level and set the   *
+      * retry flag. Deadlock/timeout are retryable; others are not.    *
+      *   Severity: 1=Info, 2=Warning(retry), 3=Error, 4=Critical     *
+      *----------------------------------------------------------------*
        1100-SET-SEVERITY.
            EVALUATE LS-SQLCODE
                WHEN WS-DEADLOCK
@@ -123,6 +169,9 @@
            END-EVALUATE
            .
            
+      *----------------------------------------------------------------*
+      * 1200-INSERT-ERROR: Persist the error record to ERRLOG table.   *
+      *----------------------------------------------------------------*
        1200-INSERT-ERROR.
            EXEC SQL
                INSERT INTO ERRLOG
@@ -137,6 +186,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2000-DIAGNOSE-ERROR: Translate SQLCODE into a human-readable   *
+      * diagnostic message and appropriate return code.                 *
+      *----------------------------------------------------------------*
        2000-DIAGNOSE-ERROR.
            EVALUATE LS-SQLCODE
                WHEN WS-DEADLOCK
@@ -168,6 +221,10 @@
            END-EVALUATE
            .
            
+      *----------------------------------------------------------------*
+      * 3000-RETRIEVE-ERROR: Fetch the most recent error for a given   *
+      * program from the ERRLOG table using MAX(ERROR_TIMESTAMP).      *
+      *----------------------------------------------------------------*
        3000-RETRIEVE-ERROR.
            EXEC SQL
                SELECT ERROR_MESSAGE,
@@ -193,6 +250,9 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 9000-ERROR-ROUTINE: Delegate to ERRPROC for logging.           *
+      *----------------------------------------------------------------*
        9000-ERROR-ROUTINE.
            MOVE 'DB2ERR' TO ERR-PROGRAM
            MOVE 12 TO LS-RETURN-CODE

@@ -1,11 +1,22 @@
        IDENTIFICATION DIVISION.
        PROGRAM-ID. CURSMGR.
       *****************************************************************
-      * Cursor Management for Online Programs                           *
-      * - Manages cursor declarations and lifecycle                     *
-      * - Implements cursor optimization techniques                     *
-      * - Handles array fetching for performance                       *
-      * - Provides cursor status monitoring                            *
+      * Program Name: CURSMGR                                         *
+      * Description:  Cursor Management for Online Programs            *
+      *                                                               *
+      * Provides a generic cursor lifecycle service for CICS online   *
+      * programs. Callers pass a request type and SQL statement via    *
+      * Linkage; this program handles declare, open, fetch (single    *
+      * or array), and close operations.                              *
+      *                                                               *
+      * Request Types (CURS-REQUEST-TYPE):                            *
+      *   D - Declare cursor from supplied SQL statement               *
+      *   O - Open the declared cursor                                *
+      *   F - Fetch rows into CURS-DATA-AREA                          *
+      *   C - Close the cursor                                        *
+      *                                                               *
+      * Called By: INQHIST, other online programs                     *
+      * Tables:   Dynamic (based on CURS-STMT)                        *
       *****************************************************************
        
        ENVIRONMENT DIVISION.
@@ -15,6 +26,7 @@
        01  WS-DB2-AREA.
            EXEC SQL INCLUDE SQLCA END-EXEC.
            
+      * Cursor performance counters (reset on each OPEN)
        01  WS-CURSOR-STATS.
            05 WS-FETCH-COUNT         PIC S9(8) COMP VALUE 0.
            05 WS-ROWS-FETCHED       PIC S9(8) COMP VALUE 0.
@@ -41,6 +53,9 @@
            05 CURS-DATA-LENGTH      PIC S9(4) COMP.
            
        PROCEDURE DIVISION USING CURSOR-REQUEST-AREA.
+      *----------------------------------------------------------------*
+      * Main dispatch: route to declare / open / fetch / close.        *
+      *----------------------------------------------------------------*
            EVALUATE TRUE
                WHEN CURS-DECLARE
                     PERFORM P100-DECLARE-CURSOR
@@ -58,6 +73,9 @@
            
            EXEC CICS RETURN END-EXEC.
            
+      *----------------------------------------------------------------*
+      * P100: Declare a cursor. Sets array size based on fetch mode.   *
+      *----------------------------------------------------------------*
        P100-DECLARE-CURSOR.
            MOVE 0 TO CURS-RESPONSE-CODE.
            
@@ -77,6 +95,9 @@
        P100-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P200: Open the cursor and reset fetch counters.                *
+      *----------------------------------------------------------------*
        P200-OPEN-CURSOR.
            MOVE 0 TO WS-FETCH-COUNT.
            MOVE 0 TO WS-ROWS-FETCHED.

@@ -1,7 +1,17 @@
 --=====================================================================
--- Position History Table Definition
+-- Table Name:   POSHIST
+-- Description:  Position History Table Definition
+-- Database:     POSMVP
+-- Tablespace:   POSHIST (range-partitioned by TRANS_DATE quarterly)
 -- Version: 1.0
 -- Date: 2024
+--
+-- Stores all portfolio transaction history including buys, sells,
+-- and transfers with full financial details (quantity, price,
+-- amount, fees, cost basis, gain/loss). Partitioned by quarter
+-- for efficient archival and query performance.
+--
+-- Grants: POSAPP (SELECT, INSERT), POSRPT (SELECT)
 --=====================================================================
 
 CREATE DATABASE POSMVP
@@ -22,6 +32,21 @@ CREATE TABLESPACE POSHIST
    PARTITION 3 ENDING AT ('2024-09-30'),
    PARTITION 4 ENDING AT ('2024-12-31'));
 
+-- Column definitions:
+--   ACCOUNT_NO     - Account number (part of composite PK)
+--   PORTFOLIO_ID   - Portfolio identifier (part of composite PK)
+--   TRANS_DATE     - Transaction date (part of PK, partition key)
+--   TRANS_TIME     - Transaction time (part of composite PK)
+--   TRANS_TYPE     - BU=Buy, SL=Sell, TR=Transfer
+--   SECURITY_ID    - Security/investment identifier
+--   QUANTITY       - Number of units traded
+--   PRICE          - Price per unit at time of trade
+--   AMOUNT         - Trade amount before fees
+--   FEES           - Transaction fees (default 0)
+--   TOTAL_AMOUNT   - Amount + fees
+--   COST_BASIS     - Tax cost basis for the position
+--   GAIN_LOSS      - Realized gain or loss on sale
+--   AUDIT_TIMESTAMP- Auto-populated audit timestamp
 CREATE TABLE POSHIST
   (ACCOUNT_NO        CHAR(8)         NOT NULL,
    PORTFOLIO_ID      CHAR(10)        NOT NULL,
@@ -96,4 +121,4 @@ COMMENT ON COLUMN POSHIST.GAIN_LOSS IS
 
 -- Grants
 GRANT SELECT, INSERT ON POSHIST TO POSAPP;
-GRANT SELECT ON POSHIST TO POSRPT; 
+GRANT SELECT ON POSHIST TO POSRPT;  

@@ -1,6 +1,28 @@
        *================================================================*
       * Program Name: DB2CMT
       * Description: DB2 Commit Controller
+      *             Callable service providing centralized DB2
+      *             transaction control: commit, rollback, and
+      *             savepoint management with usage statistics.
+      *
+      * Functions (via LS-FUNCTION):
+      *   INIT - Reset internal counters
+      *   CMIT - Commit work (frequency-based or forced)
+      *   RBAK - Rollback current unit of work
+      *   SAVE - Create a named savepoint (retains cursors)
+      *   REST - Restore to a named savepoint
+      *   STAT - Display commit/rollback/savepoint counts
+      *
+      * Copybooks:   SQLCA    - SQL communication area
+      *              DBPROC   - DB2 processing constants
+      *              ERRHAND  - Error handling data areas
+      *
+      * Called By:   Batch and online programs needing DB2 commits
+      * Calls:       ERRPROC  - Error processing subroutine
+      *              DB2ERR   - DB2 error logging
+      *
+      * Return Codes: 0 = Success, 8 = SQL error, 12 = Invalid func
+      *
       * Version: 1.0
       * Date: 2024
       *================================================================*
@@ -22,6 +44,7 @@
            COPY DBPROC.
            COPY ERRHAND.
            
+      *    Running counters for commit controller activity
        01  WS-COMMIT-STATS.
            05  WS-COMMIT-COUNT      PIC S9(9) COMP VALUE 0.
            05  WS-ROLLBACK-COUNT    PIC S9(9) COMP VALUE 0.
@@ -30,7 +53,9 @@
        01  WS-CURRENT-TIMESTAMP    PIC X(26).
        
        LINKAGE SECTION.
+      *    Request area passed by calling program
        01  LS-COMMIT-REQUEST.
+      *    Function code: INIT/CMIT/RBAK/SAVE/REST/STAT
            05  LS-FUNCTION         PIC X(4).
                88  FUNC-INIT         VALUE 'INIT'.
                88  FUNC-CMIT         VALUE 'CMIT'.
@@ -38,10 +63,15 @@
                88  FUNC-SAVE         VALUE 'SAVE'.
                88  FUNC-REST         VALUE 'REST'.
                88  FUNC-STAT         VALUE 'STAT'.
+      *    Savepoint name for SAVE/REST functions
            05  LS-SAVEPOINT-NAME   PIC X(18).
+      *    Commit control parameters
            05  LS-COMMIT-PARMS.
+      *        Records processed since last commit
                10  LS-RECORDS-PROC PIC S9(9) COMP.
+      *        Commit every N records
                10  LS-COMMIT-FREQ  PIC S9(4) COMP.
+      *        Y = commit immediately regardless of frequency
                10  LS-FORCE-FLAG   PIC X(1).
                    88  LS-FORCE-COMMIT VALUE 'Y'.
            05  LS-RETURN-CODE      PIC S9(4) COMP.
@@ -50,6 +80,9 @@
                10  LS-ERROR-MSG    PIC X(80).
        
        PROCEDURE DIVISION USING LS-COMMIT-REQUEST.
+      *----------------------------------------------------------------*
+      * Main dispatch: route to handler based on function code.        *
+      *----------------------------------------------------------------*
        0000-MAIN.
            EVALUATE TRUE
                WHEN FUNC-INIT
@@ -72,11 +105,18 @@
            GOBACK
            .
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Reset all counters for a new processing run.  *
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            INITIALIZE WS-COMMIT-STATS
            MOVE 0 TO LS-RETURN-CODE
            .
            
+      *----------------------------------------------------------------*
+      * 2000-COMMIT: Issue commit only when record count reaches       *
+      * the configured frequency threshold or force flag is set.       *
+      *----------------------------------------------------------------*
        2000-COMMIT.
            IF LS-RECORDS-PROC >= LS-COMMIT-FREQ
            OR LS-FORCE-COMMIT
@@ -84,6 +124,9 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2100-ISSUE-COMMIT: Execute SQL COMMIT WORK and track result.   *
+      *----------------------------------------------------------------*
        2100-ISSUE-COMMIT.
            EXEC SQL
                COMMIT WORK
@@ -100,6 +143,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 3000-ROLLBACK: Execute SQL ROLLBACK WORK for the current       *
+      * unit of work. Logs failure via DB2ERR if rollback fails.       *
+      *----------------------------------------------------------------*
        3000-ROLLBACK.
            EXEC SQL
                ROLLBACK WORK
@@ -116,6 +163,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 4000-SAVEPOINT: Create a named savepoint that retains open     *
+      * cursors, enabling partial rollback within a transaction.       *
+      *----------------------------------------------------------------*
        4000-SAVEPOINT.
            MOVE LS-SAVEPOINT-NAME TO WS-SAVEPOINT-ID
            
@@ -134,6 +185,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 5000-RESTORE: Roll back to a previously created savepoint,     *
+      * undoing changes made after the savepoint was established.      *
+      *----------------------------------------------------------------*
        5000-RESTORE.
            MOVE LS-SAVEPOINT-NAME TO WS-SAVEPOINT-ID
            
@@ -152,6 +207,9 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 6000-STATISTICS: Display accumulated commit/rollback counts.   *
+      *----------------------------------------------------------------*
        6000-STATISTICS.
            DISPLAY 'DB2 Commit Controller Statistics:'
            DISPLAY '  Commits:    ' WS-COMMIT-COUNT
@@ -159,12 +217,18 @@
            DISPLAY '  Savepoints: ' WS-SAVEPOINT-COUNT
            .
            
+      *----------------------------------------------------------------*
+      * 9000-ERROR-ROUTINE: Delegate to ERRPROC for logging.           *
+      *----------------------------------------------------------------*
        9000-ERROR-ROUTINE.
            MOVE 'DB2CMT' TO ERR-PROGRAM
            MOVE 12 TO LS-RETURN-CODE
            CALL 'ERRPROC' USING ERR-MESSAGE
            .
            
+      *----------------------------------------------------------------*
+      * 9100-LOG-ERROR: Delegate SQL error to DB2ERR for persistence.  *
+      *----------------------------------------------------------------*
        9100-LOG-ERROR.
            CALL 'DB2ERR' USING LS-ERROR-INFO
            .

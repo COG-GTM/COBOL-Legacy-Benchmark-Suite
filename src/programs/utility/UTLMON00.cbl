@@ -5,11 +5,34 @@
       *****************************************************************
       * System Monitoring Utility                                      *
       *                                                               *
-      * Monitors system health and performance:                       *
-      * - Resource utilization tracking                              *
-      * - Performance metrics collection                             *
-      * - Threshold monitoring                                       *
-      * - Alert generation                                           *
+      * Long-running batch program that continuously monitors system   *
+      * health by collecting resource metrics, comparing them against  *
+      * configurable thresholds, and generating alerts when breached.  *
+      * Runs until hour 23 (11 PM), sleeping between cycles.           *
+      *                                                               *
+      * Resource Types Monitored:                                     *
+      *   CPU     - Processor utilization percentage                  *
+      *   MEMORY  - Memory utilization percentage                     *
+      *   DASD    - Direct access storage utilization                 *
+      *   DB2     - Database utilization, response time, queues       *
+      *                                                               *
+      * Threshold Types:                                              *
+      *   UTIL     - Utilization percentage threshold                 *
+      *   RESPONSE - Response time threshold (milliseconds)           *
+      *   QUEUE    - Queue depth threshold                            *
+      *   ERROR    - Error rate threshold                             *
+      *                                                               *
+      * Alert Levels: INFO, WARNING, CRITICAL                         *
+      *                                                               *
+      * Files:                                                        *
+      *   MONCFG   - Input  : Monitoring thresholds and config        *
+      *   MONLOG   - Output : Metric log entries with timestamps      *
+      *   ALERTS   - Output : Generated alert records                 *
+      *   DB2STATS - Input  : Indexed DB2 performance statistics      *
+      *                                                               *
+      * Copybooks: DB2STAT, RTNCODE, ERRHAND                         *
+      *                                                               *
+      * Return Codes: 0 = Normal end, 12 = Fatal error                *
       *****************************************************************
        ENVIRONMENT DIVISION.
        CONFIGURATION SECTION.
@@ -81,18 +104,21 @@
            05  WS-ALERT-STATUS      PIC XX.
            05  WS-DB2-STATUS        PIC XX.
 
+      *    Constants for resource type dispatch
        01  WS-RESOURCE-TYPES.
            05  WS-CPU               PIC X(10) VALUE 'CPU'.
            05  WS-MEMORY            PIC X(10) VALUE 'MEMORY'.
            05  WS-DASD              PIC X(10) VALUE 'DASD'.
            05  WS-DB2               PIC X(10) VALUE 'DB2'.
 
+      *    Constants for threshold comparison types
        01  WS-THRESHOLD-TYPES.
            05  WS-UTILIZATION       PIC X(10) VALUE 'UTIL'.
            05  WS-RESPONSE          PIC X(10) VALUE 'RESPONSE'.
            05  WS-QUEUE             PIC X(10) VALUE 'QUEUE'.
            05  WS-ERROR             PIC X(10) VALUE 'ERROR'.
 
+      *    Alert severity levels for escalation
        01  WS-ALERT-LEVELS.
            05  WS-INFO              PIC X(10) VALUE 'INFO'.
            05  WS-WARNING           PIC X(10) VALUE 'WARNING'.
@@ -104,6 +130,7 @@
            05  WS-THRESHOLD-MET     PIC X VALUE 'N'.
                88  THRESHOLD-MET    VALUE 'Y'.
 
+      *    Collected metric values for the current monitoring cycle
        01  WS-CURRENT-METRICS.
            05  WS-CPU-UTIL          PIC 9(3)V99.
            05  WS-MEMORY-UTIL       PIC 9(3)V99.
@@ -125,12 +152,19 @@
                10  WS-HUNDREDTH     PIC 9(2).
 
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control: initialize, loop monitoring cycles until 23:00,  *
+      * then clean up and exit.                                        *
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            PERFORM 2000-PROCESS UNTIL WS-HOUR = 23
            PERFORM 3000-CLEANUP
            GOBACK.
 
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Open files, record start time, load config.   *
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            PERFORM 1100-OPEN-FILES
            PERFORM 1200-INIT-PROCESSING
@@ -168,6 +202,10 @@
        1200-INIT-PROCESSING.
            ACCEPT WS-TIMESTAMP FROM TIME.
 
+      *----------------------------------------------------------------*
+      * 1300-READ-CONFIG: Load all threshold definitions from the      *
+      * config file for use during monitoring cycles.                   *
+      *----------------------------------------------------------------*
        1300-READ-CONFIG.
            PERFORM UNTIL END-OF-CONFIG
                READ MONITOR-CONFIG
@@ -178,6 +216,11 @@
                END-READ
            END-PERFORM.
 
+      *----------------------------------------------------------------*
+      * 2000-PROCESS: One monitoring cycle - collect metrics, check    *
+      * thresholds, log status, generate alerts if needed, then sleep  *
+      * for WS-MINUTE seconds before the next cycle.                   *
+      *----------------------------------------------------------------*
        2000-PROCESS.
            PERFORM 2100-COLLECT-METRICS
            PERFORM 2200-CHECK-THRESHOLDS
@@ -186,36 +229,58 @@
            CALL 'ILBOABN0' USING WS-MINUTE
            PERFORM 1200-INIT-PROCESSING.
 
+      *----------------------------------------------------------------*
+      * 2100-COLLECT-METRICS: Gather current utilization values from   *
+      * CPU, memory, DASD, and DB2 subsystems.                         *
+      *----------------------------------------------------------------*
        2100-COLLECT-METRICS.
            PERFORM 2110-GET-CPU-METRICS
            PERFORM 2120-GET-MEMORY-METRICS
            PERFORM 2130-GET-DASD-METRICS
            PERFORM 2140-GET-DB2-METRICS.
 
+      *----------------------------------------------------------------*
+      * 2200-CHECK-THRESHOLDS: Compare collected metrics against       *
+      * configured limits for utilization, response, queues, errors.   *
+      *----------------------------------------------------------------*
        2200-CHECK-THRESHOLDS.
            PERFORM 2210-CHECK-UTILIZATION
            PERFORM 2220-CHECK-RESPONSE
            PERFORM 2230-CHECK-QUEUES
            PERFORM 2240-CHECK-ERRORS.
 
+      *----------------------------------------------------------------*
+      * 2300-LOG-STATUS: Write timestamped resource and performance    *
+      * entries to the monitor log.                                    *
+      *----------------------------------------------------------------*
        2300-LOG-STATUS.
            MOVE WS-TIMESTAMP TO LOG-TIMESTAMP
            PERFORM 2310-LOG-RESOURCES
            PERFORM 2320-LOG-PERFORMANCE.
 
+      *----------------------------------------------------------------*
+      * 2400-GENERATE-ALERTS: If any threshold was breached, format    *
+      * an alert record and write it to the alerts file.               *
+      *----------------------------------------------------------------*
        2400-GENERATE-ALERTS.
            IF THRESHOLD-MET
                PERFORM 2410-FORMAT-ALERT
                PERFORM 2420-WRITE-ALERT
            END-IF.
 
+      *----------------------------------------------------------------*
+      * 3000-CLEANUP: Close all files at end of monitoring window.     *
+      *----------------------------------------------------------------*
        3000-CLEANUP.
            CLOSE MONITOR-CONFIG
                 MONITOR-LOG
                 ALERT-FILE
                 DB2-STATS.
 
+      *----------------------------------------------------------------*
+      * 9999-ERROR-HANDLER: Display error and abort with RC=12.        *
+      *----------------------------------------------------------------*
        9999-ERROR-HANDLER.
            DISPLAY WS-ERROR-MESSAGE UPON CONS
            MOVE 12 TO RETURN-CODE
-           GOBACK. 
+           GOBACK.  

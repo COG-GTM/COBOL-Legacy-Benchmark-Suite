@@ -1,7 +1,20 @@
        *================================================================*
       * Program Name: PORTADD
       * Description: Portfolio Addition Program
-      *             Creates new portfolio records from input file
+      *             Batch-loads new portfolio records from a sequential
+      *             input file into the indexed VSAM portfolio master.
+      *
+      * Processing:  Reads INPTFILE sequentially, validates each
+      *              record, and writes to PORTFILE. Tracks counts
+      *              of successful adds, duplicates, and errors.
+      *
+      * Files:       PORTFILE - Indexed VSAM portfolio master (I-O)
+      *              INPTFILE - Sequential input of new portfolios
+      *
+      * Copybooks:   PORTFLIO - Portfolio record layout
+      *
+      * Return Codes: 0 = Success, 8 = File open error
+      *
       * Author: [Author name]
       * Date Written: 2024-03-20
       * Maintenance Log:
@@ -49,11 +62,12 @@
            05  WS-ERROR            PIC S9(4) VALUE +8.
            
        01  WS-SWITCHES.
+      *    VSAM file status for portfolio master I/O
            05  WS-FILE-STATUS      PIC X(02).
                88  WS-SUCCESS-STATUS     VALUE '00'.
                88  WS-DUP-STATUS         VALUE '22'.
                88  WS-EOF-STATUS         VALUE '10'.
-           
+      *    Sequential input file status
            05  WS-INPUT-STATUS     PIC X(02).
                88  WS-INPUT-SUCCESS      VALUE '00'.
                88  WS-INPUT-EOF          VALUE '10'.
@@ -66,6 +80,7 @@
       * Work areas
       *----------------------------------------------------------------*
        01  WS-WORK-AREAS.
+      *    Counters for processing summary
            05  WS-ADD-COUNT        PIC 9(7) VALUE ZERO.
            05  WS-ERROR-COUNT      PIC 9(7) VALUE ZERO.
            05  WS-DUP-COUNT        PIC 9(7) VALUE ZERO.
@@ -73,6 +88,9 @@
            05  WS-CURRENT-DATE     PIC 9(8).
            
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control: open files, process all input records, close.    *
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            
@@ -83,6 +101,9 @@
            
            GOBACK.
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Open both files and validate file statuses.   *
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            INITIALIZE WS-WORK-AREAS
            
@@ -101,6 +122,9 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2000-PROCESS: Read next input record; delegate to validation.  *
+      *----------------------------------------------------------------*
        2000-PROCESS.
            READ INPUT-FILE INTO PORT-RECORD
                AT END
@@ -110,6 +134,10 @@
            END-READ
            .
            
+      *----------------------------------------------------------------*
+      * 2100-VALIDATE-AND-ADD: Reject records with blank ID/name or   *
+      * non-Active status, then write valid records to VSAM file.      *
+      *----------------------------------------------------------------*
        2100-VALIDATE-AND-ADD.
            IF PORT-ID EQUAL SPACES OR
               PORT-CLIENT-NAME EQUAL SPACES OR
@@ -136,6 +164,9 @@
            END-EVALUATE
            .
            
+      *----------------------------------------------------------------*
+      * 3000-TERMINATE: Close files and display processing summary.    *
+      *----------------------------------------------------------------*
        3000-TERMINATE.
            CLOSE PORTFOLIO-FILE
                  INPUT-FILE

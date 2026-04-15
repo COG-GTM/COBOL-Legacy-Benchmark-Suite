@@ -1,7 +1,20 @@
       *================================================================*
       * Program Name: PORTREAD
       * Description: Portfolio Record Reading Program
-      *             Demonstrates reading capabilities of Portfolio file
+      *             Sequentially reads and displays all records from
+      *             the indexed VSAM portfolio master file.
+      *
+      * Processing:  Opens PORTFILE for sequential input, reads every
+      *              record using READ NEXT, and displays key fields
+      *              for each portfolio to SYSOUT.
+      *
+      * Files:       PORTFILE - Indexed VSAM portfolio master (INPUT)
+      *              Access mode DYNAMIC allows sequential browsing.
+      *
+      * Copybooks:   PORTFLIO - Portfolio record layout
+      *
+      * Return Codes: 0 = Success, 8 = File open error
+      *
       * Author: [Author name]
       * Date Written: 2024-03-20
       * Maintenance Log:
@@ -41,6 +54,7 @@
            05  WS-ERROR            PIC S9(4) VALUE +8.
            
        01  WS-SWITCHES.
+      *    VSAM file status after each I/O operation
            05  WS-FILE-STATUS      PIC X(02).
                88  WS-SUCCESS-STATUS     VALUE '00'.
                88  WS-EOF-STATUS        VALUE '10'.
@@ -59,7 +73,7 @@
            
        PROCEDURE DIVISION.
       *----------------------------------------------------------------*
-      * Main process
+      * Main control: open file, read all records, display, close.     *
       *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
@@ -71,6 +85,9 @@
            
            GOBACK.
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Open portfolio file for sequential reading.   *
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            INITIALIZE WS-WORK-AREAS
            
@@ -82,6 +99,9 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2000-PROCESS: Read next sequential record from VSAM file.      *
+      *----------------------------------------------------------------*
        2000-PROCESS.
            READ PORTFOLIO-FILE NEXT RECORD
                AT END
@@ -92,6 +112,9 @@
            END-READ
            .
            
+      *----------------------------------------------------------------*
+      * 2100-DISPLAY-RECORD: Format and display portfolio fields.      *
+      *----------------------------------------------------------------*
        2100-DISPLAY-RECORD.
            DISPLAY 'Portfolio Record: ' WS-RECORD-COUNT
            DISPLAY '  ID: ' PORT-ID
@@ -102,10 +125,13 @@
            DISPLAY ' '
            .
            
+      *----------------------------------------------------------------*
+      * 3000-TERMINATE: Close file and display total record count.     *
+      *----------------------------------------------------------------*
        3000-TERMINATE.
            CLOSE PORTFOLIO-FILE
            
            DISPLAY 'Total Records Read: ' WS-RECORD-COUNT
            
            MOVE WS-RETURN-CODE TO RETURN-CODE
-           . 
+           .  
