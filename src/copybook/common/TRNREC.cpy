@@ -1,5 +1,11 @@
       *****************************************************************
-      * TRANSACTION RECORD STRUCTURE
+      * Copybook Name: TRNREC
+      * Description: Transaction Record Structure
+      *   Layout for the transaction VSAM file. Each record
+      *   represents a single financial transaction (buy, sell,
+      *   transfer, or fee) within a portfolio. Key is composite:
+      *   date + time + portfolio ID + sequence number.
+      * Used By: PORTTRAN, RCVPRC00, RTNANA00, UTLVAL00
       * VERSION: 1.0
       * DATE: 2024
       *****************************************************************
@@ -37,4 +43,4 @@
       * TRN-SEQUENCE-NO : SEQUENCE NUMBER FOR MULTIPLE TRANS
       * TRN-TYPE        : BU=BUY, SL=SELL, TR=TRANSFER, FE=FEE
       * TRN-STATUS      : P=PENDING, D=DONE, F=FAILED, R=REVERSED
-      ***************************************************************** 
+      *****************************************************************  

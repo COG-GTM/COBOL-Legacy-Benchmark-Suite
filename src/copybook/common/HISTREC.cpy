@@ -1,5 +1,12 @@
       *****************************************************************
-      * HISTORY RECORD STRUCTURE
+      * Copybook Name: HISTREC
+      * Description: History Record Structure
+      *   Layout for the history / change-log VSAM file.
+      *   Captures before- and after-images of portfolio, position,
+      *   and transaction records whenever they are added, changed,
+      *   or deleted. Key is composite: portfolio ID + date + time
+      *   + sequence number to allow multiple changes per second.
+      * Used By: HISTLD00, INQHIST, RPTAUD00
       * VERSION: 1.0
       * DATE: 2024
       *****************************************************************
@@ -36,4 +43,4 @@
       * HIST-BEFORE-IMAGE: RECORD IMAGE BEFORE CHANGE
       * HIST-AFTER-IMAGE : RECORD IMAGE AFTER CHANGE
       * HIST-REASON-CODE : REASON FOR CHANGE
-      ***************************************************************** 
+      *****************************************************************  

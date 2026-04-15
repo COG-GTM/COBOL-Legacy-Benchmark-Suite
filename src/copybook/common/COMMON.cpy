@@ -1,5 +1,15 @@
       *****************************************************************
-      * COMMON DEFINITIONS AND CONSTANTS
+      * Copybook Name: COMMON
+      * Description: Common Definitions and Constants
+      *   Shared data items used across the entire system:
+      *   RETURN-CODES       - standard RC values (0/4/8/12/16)
+      *   STATUS-CODES       - record-level status flags
+      *   TRANSACTION-TYPES  - BU/SL/TR/FE codes
+      *   COMMON-DATETIME    - current date and time fields
+      *   ERROR-HANDLING     - lightweight error context area
+      *   AUDIT-FIELDS       - user/terminal/program tracking
+      *   CURRENCY-CODES     - supported ISO currency codes
+      * Used By: Most batch and online programs
       * VERSION: 1.0
       * DATE: 2024
       *****************************************************************
@@ -61,4 +71,4 @@
            05  CURR-GBP                PIC X(03) VALUE 'GBP'.
            05  CURR-JPY                PIC X(03) VALUE 'JPY'.
            05  CURR-CAD                PIC X(03) VALUE 'CAD'.
-      ***************************************************************** 
+      *****************************************************************  

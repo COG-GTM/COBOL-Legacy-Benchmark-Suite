@@ -1,5 +1,11 @@
       *****************************************************************
-      * POSITION RECORD STRUCTURE
+      * Copybook Name: POSREC
+      * Description: Position Record Structure
+      *   Layout for the position master VSAM file. Each record
+      *   represents one investment holding within a portfolio on
+      *   a given date. Key is composite: portfolio ID + date +
+      *   investment ID.
+      * Used By: POSUPDT, RPTPOS00, UTLVAL00
       * VERSION: 1.0
       * DATE: 2024
       *****************************************************************
@@ -30,4 +36,4 @@
       * POS-COST-BASIS   : TOTAL COST BASIS
       * POS-MARKET-VALUE : CURRENT MARKET VALUE
       * POS-STATUS       : A=ACTIVE, C=CLOSED, P=PENDING
-      ***************************************************************** 
+      *****************************************************************  

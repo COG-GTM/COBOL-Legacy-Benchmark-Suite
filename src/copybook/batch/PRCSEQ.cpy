@@ -1,5 +1,16 @@
       *================================================================*
-      * Process Sequence Definitions
+      * Copybook Name: PRCSEQ
+      * Description: Process Sequence Definitions
+      *   Defines the record layout for batch process scheduling:
+      *   PSR-KEY        - process ID and version
+      *   PSR-DATA       - description, type, timing, dependencies,
+      *                    program to execute, and restart flag
+      *   PSR-SCHEDULE   - active days, month-end, holiday rules
+      *   PSR-RECOVERY   - recovery program and error limit
+      *   PSR-AUDIT      - create/update tracking
+      *   Also provides three standard hard-coded sequences:
+      *   start-of-day, main process, and end-of-day.
+      * Used By: PRCSEQ00, batch scheduler JCL
       * Version: 1.0
       * Date: 2024
       *================================================================*
@@ -72,4 +83,4 @@
            05  SEQ-END-OF-DAY.
                10  FILLER            PIC X(8) VALUE 'RPTGEN00'.
                10  FILLER            PIC X(8) VALUE 'BCKLOD00'.
-               10  FILLER            PIC X(8) VALUE 'ENDDAY  '. 
+               10  FILLER            PIC X(8) VALUE 'ENDDAY  '.  
