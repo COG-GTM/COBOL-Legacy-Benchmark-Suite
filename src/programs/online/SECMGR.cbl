@@ -39,6 +39,10 @@
            05 SEC-ERROR-INFO       PIC X(80).
            
        PROCEDURE DIVISION USING SECURITY-REQUEST-AREA.
+      *----------------------------------------------------------------*
+      * Main entry point - dispatches to Validate (V), Authorize
+      * (A), or Audit-log (L) based on the request type.
+      *----------------------------------------------------------------*
            EVALUATE TRUE
                WHEN SEC-VALIDATE
                     PERFORM P100-VALIDATE-USER
@@ -53,6 +57,10 @@
            
            EXEC CICS RETURN END-EXEC.
            
+      *----------------------------------------------------------------*
+      * P100-VALIDATE-USER: Retrieves the CICS terminal user ID
+      * and verifies it matches the requested SEC-USER-ID.
+      *----------------------------------------------------------------*
        P100-VALIDATE-USER.
            EXEC CICS ASSIGN
                      USERID(WS-USER-ID)
@@ -75,6 +83,10 @@
        P100-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P200-CHECK-AUTH: Queries the AUTHFILE DB2 table to verify
+      * the user has the requested access type to the resource.
+      *----------------------------------------------------------------*
        P200-CHECK-AUTH.
            EXEC SQL
                 SELECT COUNT(*)
@@ -102,6 +114,10 @@
        P200-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P300-LOG-ACCESS: Writes an audit record to the AUDITLOG
+      * DB2 table with timestamp, user, terminal, and access info.
+      *----------------------------------------------------------------*
        P300-LOG-ACCESS.
            MOVE FUNCTION CURRENT-DATE TO WS-TIMESTAMP.
            

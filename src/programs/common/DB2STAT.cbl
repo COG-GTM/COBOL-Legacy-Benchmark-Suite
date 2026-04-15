@@ -1,6 +1,13 @@
        *================================================================*
       * Program Name: DB2STAT
       * Description: DB2 Statistics Collector
+      *   Collects and reports DB2 operation statistics including
+      *   row counts (read, insert, update, delete), commit/
+      *   rollback counts, and CPU/elapsed time. Uses a DB2
+      *   Global Temporary Table (SESSION.DBSTATS) for storage.
+      * Called By: Batch programs
+      * Calls: ERRPROC (error handling)
+      * Copybooks: SQLCA, DBPROC, ERRHAND
       * Version: 1.0
       * Date: 2024
       *================================================================*
@@ -55,6 +62,10 @@
            05  LS-RETURN-CODE      PIC S9(4) COMP.
        
        PROCEDURE DIVISION USING LS-STAT-REQUEST.
+      *----------------------------------------------------------------*
+      * Main entry point - dispatches to Initialize, Update,
+      * Terminate, or Display based on the function code.
+      *----------------------------------------------------------------*
        0000-MAIN.
            EVALUATE TRUE
                WHEN FUNC-INIT
@@ -73,6 +84,10 @@
            GOBACK
            .
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Resets statistics, captures start time,
+      * creates the temp table, and inserts an initial row.
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            INITIALIZE WS-STATS-RECORD
            MOVE LS-PROGRAM-ID TO WS-PROGRAM-ID
@@ -85,6 +100,11 @@
            PERFORM 1200-INSERT-INITIAL
            .
            
+      *----------------------------------------------------------------*
+      * 1100-CREATE-STATS-TABLE: Creates a DB2 Global Temporary
+      * Table to hold statistics for the current session.
+      * Ignores -601 (table already exists).
+      *----------------------------------------------------------------*
        1100-CREATE-STATS-TABLE.
            EXEC SQL
                DECLARE GLOBAL TEMPORARY TABLE SESSION.DBSTATS
@@ -108,6 +128,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 1200-INSERT-INITIAL: Inserts the initial statistics row
+      * with zero counters and the current timestamp.
+      *----------------------------------------------------------------*
        1200-INSERT-INITIAL.
            EXEC SQL
                INSERT INTO SESSION.DBSTATS
@@ -127,6 +151,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2000-UPDATE-STATS: Updates the statistics row with the
+      * latest row counts from the calling program.
+      *----------------------------------------------------------------*
        2000-UPDATE-STATS.
            MOVE LS-ROWS-READ  TO WS-ROWS-READ
            MOVE LS-ROWS-INSRT TO WS-ROWS-INSERTED
@@ -154,6 +182,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 3000-TERMINATE: Captures end time, calculates elapsed
+      * and CPU times, updates the final stats row, and displays.
+      *----------------------------------------------------------------*
        3000-TERMINATE.
            ACCEPT WS-CURRENT-TIMESTAMP FROM TIME STAMP
            MOVE WS-CURRENT-TIMESTAMP TO WS-END-TIME
@@ -177,6 +209,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 3100-CALC-TIMES: Computes elapsed time from timestamps
+      * and estimates CPU time at 65% of elapsed.
+      *----------------------------------------------------------------*
        3100-CALC-TIMES.
            COMPUTE WS-ELAPSED-TIME = FUNCTION
                NUMVAL(WS-END-TIME(1:15)) -
@@ -186,6 +222,10 @@
            MULTIPLY 0.65 BY WS-CPU-TIME
            .
            
+      *----------------------------------------------------------------*
+      * 4000-DISPLAY-STATS: Reads statistics from the temp table
+      * and displays all counters and timing to the console.
+      *----------------------------------------------------------------*
        4000-DISPLAY-STATS.
            EXEC SQL
                SELECT ROWS_READ, ROWS_INSERTED,
@@ -221,6 +261,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 9000-ERROR-ROUTINE: Sets return code 12 and delegates to
+      * ERRPROC for standard error processing.
+      *----------------------------------------------------------------*
        9000-ERROR-ROUTINE.
            MOVE 'DB2STAT' TO ERR-PROGRAM
            MOVE 12 TO LS-RETURN-CODE

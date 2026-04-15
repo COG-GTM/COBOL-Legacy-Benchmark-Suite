@@ -1,5 +1,20 @@
 *****************************************************************
-* CICS Resource Definitions for Portfolio System                  *
+* CSD File: PORTDFN                                              *
+* Description: CICS Resource Definitions for Portfolio System    *
+*   All resources belong to group PORTGRP.                       *
+*   Transaction:  PINQ -> INQONLN (portfolio inquiry entry)      *
+*   Programs:     INQONLN  - main online controller              *
+*                 INQPORT  - portfolio position inquiry           *
+*                 INQHIST  - transaction history inquiry          *
+*                 DB2ONLN  - DB2 connection pool manager          *
+*                 CURSMGR  - cursor management service            *
+*                 DB2RECV  - DB2 recovery manager                 *
+*                 SECMGR   - security / access control            *
+*   Mapset:       INQSET   - BMS screen definitions              *
+*   File:         POSFILE  - portfolio position VSAM (read/browse)*
+*   DB2ENTRY:     PORTDB2  - DB2 plan binding (PORTPLAN)         *
+*   DB2TRAN:      PINQ     - maps transaction to DB2 entry       *
+*   List:         PORTLST  - group installation list              *
 *****************************************************************
 
 * Transaction Definitions
@@ -97,4 +112,4 @@ DEFINE DB2TRAN(PINQ)
 DEFINE LIST(PORTLST)
        DESCRIPTION(Portfolio System Group List)
        GROUP(PORTGRP)
-       STATUS(ENABLED) 
+       STATUS(ENABLED)  

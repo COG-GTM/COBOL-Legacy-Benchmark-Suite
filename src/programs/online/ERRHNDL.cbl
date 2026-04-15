@@ -35,6 +35,10 @@ LINKAGE SECTION.
    COPY ERRHND.
 
 PROCEDURE DIVISION.
+*----------------------------------------------------------------*
+* Main control flow: Initialize error context, log error to DB2,
+* format user message, and determine recovery action.
+*----------------------------------------------------------------*
    PERFORM P100-INIT-ERROR-HANDLER
       THRU P100-EXIT.
 
@@ -49,6 +53,11 @@ PROCEDURE DIVISION.
 
    EXEC CICS RETURN END-EXEC.
 
+*----------------------------------------------------------------*
+* P100-INIT-ERROR-HANDLER: Copies incoming error data from the
+* COMMAREA, captures timestamp, and generates a trace ID if
+* one was not already provided.
+*----------------------------------------------------------------*
 P100-INIT-ERROR-HANDLER.
    MOVE DFHCOMMAREA TO WS-ERROR-AREA.
 
@@ -60,6 +69,10 @@ P100-INIT-ERROR-HANDLER.
 P100-EXIT.
    EXIT.
 
+*----------------------------------------------------------------*
+* P200-LOG-ERROR: Writes the error details to the ERRLOG DB2
+* table. Sets FATAL severity if the insert itself fails.
+*----------------------------------------------------------------*
 P200-LOG-ERROR.
    MOVE ERR-TIMESTAMP    TO LOG-TIMESTAMP.
    MOVE ERR-PROGRAM      TO LOG-PROGRAM.
@@ -89,6 +102,10 @@ P200-LOG-ERROR.
 P200-EXIT.
    EXIT.
 
+*----------------------------------------------------------------*
+* P300-FORMAT-MESSAGE: Builds a human-readable error message
+* combining program name, description, and trace ID.
+*----------------------------------------------------------------*
 P300-FORMAT-MESSAGE.
    STRING 'Error in ' DELIMITED BY SIZE
           ERR-PROGRAM DELIMITED BY SPACE
@@ -101,6 +118,11 @@ P300-FORMAT-MESSAGE.
 P300-EXIT.
    EXIT.
 
+*----------------------------------------------------------------*
+* P400-DETERMINE-ACTION: Maps error severity to a recovery
+* action: FATAL->ABEND, WARNING/INFO->CONTINUE, OTHER->RETURN.
+* Copies final state back to the COMMAREA.
+*----------------------------------------------------------------*
 P400-DETERMINE-ACTION.
    EVALUATE TRUE
        WHEN ERR-FATAL
@@ -115,4 +137,4 @@ P400-DETERMINE-ACTION.
 
    MOVE WS-ERROR-AREA TO DFHCOMMAREA.
 P400-EXIT.
-   EXIT. 
+   EXIT.  

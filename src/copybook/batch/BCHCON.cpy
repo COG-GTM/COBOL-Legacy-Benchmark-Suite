@@ -1,5 +1,12 @@
       *================================================================*
-      * BATCH CONTROL CONSTANTS
+      * Copybook Name: BCHCON
+      * Description: Batch Control Constants
+      *   Defines system-wide constants used by all batch programs:
+      *   process status values, return-code thresholds, timing
+      *   parameters, process types, dependency types, special
+      *   process names, control-file record types, and standard
+      *   operator messages.
+      * Used By: BCHCTL00, PRCSEQ00, and batch JCL steps
       * Version: 1.0
       * Date: 2024
       *================================================================*
@@ -62,4 +69,4 @@
                10  BCT-MSG-FAILED     PIC X(30)
                    VALUE 'Process failed - check errors '.
                10  BCT-MSG-WAITING    PIC X(30)
-                   VALUE 'Waiting for prerequisites     '. 
+                   VALUE 'Waiting for prerequisites     '.  

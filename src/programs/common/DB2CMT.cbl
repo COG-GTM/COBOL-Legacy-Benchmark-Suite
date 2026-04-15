@@ -1,6 +1,12 @@
        *================================================================*
       * Program Name: DB2CMT
       * Description: DB2 Commit Controller
+      *   Manages DB2 transaction boundaries including commit,
+      *   rollback, savepoint creation, and savepoint restore.
+      *   Supports frequency-based and forced commit modes.
+      * Called By: Batch programs, portfolio programs
+      * Calls: ERRPROC (error handling), DB2ERR (error logging)
+      * Copybooks: SQLCA, DBPROC, ERRHAND
       * Version: 1.0
       * Date: 2024
       *================================================================*
@@ -50,6 +56,10 @@
                10  LS-ERROR-MSG    PIC X(80).
        
        PROCEDURE DIVISION USING LS-COMMIT-REQUEST.
+      *----------------------------------------------------------------*
+      * Main entry point - dispatches to the requested function:
+      * INIT, CMIT, RBAK, SAVE, REST, or STAT.
+      *----------------------------------------------------------------*
        0000-MAIN.
            EVALUATE TRUE
                WHEN FUNC-INIT
@@ -72,11 +82,19 @@
            GOBACK
            .
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Resets commit, rollback, and savepoint
+      * counters to zero.
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            INITIALIZE WS-COMMIT-STATS
            MOVE 0 TO LS-RETURN-CODE
            .
            
+      *----------------------------------------------------------------*
+      * 2000-COMMIT: Issues a commit when the record count reaches
+      * the configured frequency or when force-commit is set.
+      *----------------------------------------------------------------*
        2000-COMMIT.
            IF LS-RECORDS-PROC >= LS-COMMIT-FREQ
            OR LS-FORCE-COMMIT
@@ -84,6 +102,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2100-ISSUE-COMMIT: Executes SQL COMMIT WORK and increments
+      * the commit counter on success.
+      *----------------------------------------------------------------*
        2100-ISSUE-COMMIT.
            EXEC SQL
                COMMIT WORK
@@ -100,6 +122,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 3000-ROLLBACK: Executes SQL ROLLBACK WORK and increments
+      * the rollback counter on success.
+      *----------------------------------------------------------------*
        3000-ROLLBACK.
            EXEC SQL
                ROLLBACK WORK
@@ -116,6 +142,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 4000-SAVEPOINT: Creates a named DB2 savepoint that retains
+      * open cursors on rollback.
+      *----------------------------------------------------------------*
        4000-SAVEPOINT.
            MOVE LS-SAVEPOINT-NAME TO WS-SAVEPOINT-ID
            
@@ -134,6 +164,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 5000-RESTORE: Rolls back to the named savepoint, undoing
+      * changes made after the savepoint was created.
+      *----------------------------------------------------------------*
        5000-RESTORE.
            MOVE LS-SAVEPOINT-NAME TO WS-SAVEPOINT-ID
            
@@ -152,6 +186,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 6000-STATISTICS: Displays accumulated commit, rollback,
+      * and savepoint counts to the system console.
+      *----------------------------------------------------------------*
        6000-STATISTICS.
            DISPLAY 'DB2 Commit Controller Statistics:'
            DISPLAY '  Commits:    ' WS-COMMIT-COUNT
@@ -159,12 +197,19 @@
            DISPLAY '  Savepoints: ' WS-SAVEPOINT-COUNT
            .
            
+      *----------------------------------------------------------------*
+      * 9000-ERROR-ROUTINE: Sets return code 12 and delegates to
+      * ERRPROC for standard error processing.
+      *----------------------------------------------------------------*
        9000-ERROR-ROUTINE.
            MOVE 'DB2CMT' TO ERR-PROGRAM
            MOVE 12 TO LS-RETURN-CODE
            CALL 'ERRPROC' USING ERR-MESSAGE
            .
            
+      *----------------------------------------------------------------*
+      * 9100-LOG-ERROR: Logs DB2-specific error details via DB2ERR.
+      *----------------------------------------------------------------*
        9100-LOG-ERROR.
            CALL 'DB2ERR' USING LS-ERROR-INFO
            .

@@ -1,6 +1,15 @@
       *================================================================*
+      * Template: error-handling.cbl
       * Program Name: ERRHANDL
-      * Description: Template for standard error handling patterns
+      * Description: Template for Standard Error Handling Patterns
+      *   Demonstrates the project's tiered error-handling approach:
+      *   - Return codes: SUCCESS(0), WARNING(4), ERROR(8),
+      *     SEVERE(12), CRITICAL(16)
+      *   - Error message structure with prefix, number, and text
+      *   - Severity-specific handlers (warning, error, severe, abend)
+      *   - Cumulative error counting and final-status determination
+      *   - Controlled abend via CEE3ABD for unrecoverable errors
+      *   Copy and adapt these routines for new batch programs.
       *================================================================*
        IDENTIFICATION DIVISION.
        PROGRAM-ID. ERRHANDL.
@@ -184,4 +193,4 @@
       *----------------------------------------------------------------*
            DISPLAY 'ABNORMAL TERMINATION INITIATED'
            CALL 'CEE3ABD' USING RC-CRITICAL, 3
-           . 
+           .  

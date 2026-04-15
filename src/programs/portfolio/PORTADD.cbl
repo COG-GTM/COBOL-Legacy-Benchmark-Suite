@@ -1,7 +1,12 @@
        *================================================================*
       * Program Name: PORTADD
       * Description: Portfolio Addition Program
-      *             Creates new portfolio records from input file
+      *   Reads new portfolio records from a sequential input file
+      *   and writes them to an indexed VSAM portfolio file.
+      *   Validates required fields (ID, client name, status)
+      *   before writing. Tracks add, duplicate, and error counts.
+      * Files: PORTFILE (indexed VSAM I-O), INPTFILE (sequential)
+      * Copybooks: PORTFLIO
       * Author: [Author name]
       * Date Written: 2024-03-20
       * Maintenance Log:
@@ -73,6 +78,11 @@
            05  WS-CURRENT-DATE     PIC 9(8).
            
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control flow: Initialize files, read input records
+      * until EOF, validate and add each to the portfolio file,
+      * then report counts and close files.
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            
@@ -83,6 +93,10 @@
            
            GOBACK.
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Opens the portfolio VSAM file for I-O and
+      * the input file for reading. Aborts on file open errors.
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            INITIALIZE WS-WORK-AREAS
            
@@ -101,6 +115,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2000-PROCESS: Reads the next input record and delegates
+      * to validation and add logic. Sets EOF when done.
+      *----------------------------------------------------------------*
        2000-PROCESS.
            READ INPUT-FILE INTO PORT-RECORD
                AT END
@@ -110,6 +128,11 @@
            END-READ
            .
            
+      *----------------------------------------------------------------*
+      * 2100-VALIDATE-AND-ADD: Checks required fields (ID, name,
+      * status='A'), stamps dates, and writes the record. Handles
+      * duplicate key and write error conditions.
+      *----------------------------------------------------------------*
        2100-VALIDATE-AND-ADD.
            IF PORT-ID EQUAL SPACES OR
               PORT-CLIENT-NAME EQUAL SPACES OR
@@ -136,6 +159,10 @@
            END-EVALUATE
            .
            
+      *----------------------------------------------------------------*
+      * 3000-TERMINATE: Closes files and displays final counts
+      * for records added, duplicates, and errors.
+      *----------------------------------------------------------------*
        3000-TERMINATE.
            CLOSE PORTFOLIO-FILE
                  INPUT-FILE

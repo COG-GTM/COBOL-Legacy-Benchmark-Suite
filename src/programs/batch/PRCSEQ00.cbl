@@ -1,6 +1,17 @@
        *================================================================*
       * Program Name: PRCSEQ00
       * Description: Process Sequence Manager
+      *   Manages the ordering and execution of batch processes
+      *   within a processing date. Provides functions to:
+      *   - INIT: Build process sequence and create control records
+      *   - NEXT: Find next ready process after checking dependencies
+      *   - STAT: Check overall sequence completion status
+      *   - TERM: Verify final status and close files
+      * Called By: JCL batch scheduler
+      * Calls: ERRPROC (error handling)
+      * Files: PRCSEQ (Process Sequence indexed file),
+      *        BCHCTL (Batch Control indexed file)
+      * Copybooks: PRCSEQ, BCHCTL, BCHCON, ERRHAND
       * Version: 1.0
       * Date: 2024
       *================================================================*
@@ -72,6 +83,10 @@
            05  LS-RETURN-CODE      PIC S9(4) COMP.
        
        PROCEDURE DIVISION USING LS-SEQUENCE-REQUEST.
+      *----------------------------------------------------------------*
+      * Main entry point - routes to the requested sequence
+      * management function.
+      *----------------------------------------------------------------*
        0000-MAIN.
            EVALUATE TRUE
                WHEN FUNC-INIT
@@ -91,12 +106,22 @@
            GOBACK
            .
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE-SEQUENCE: Opens files, builds the process
+      * sequence table from the sequence file, and creates batch
+      * control records for each process in the sequence.
+      *----------------------------------------------------------------*
        1000-INITIALIZE-SEQUENCE.
            PERFORM 1100-OPEN-FILES
            PERFORM 1200-BUILD-SEQUENCE
            PERFORM 1300-CREATE-CONTROL-RECORDS
            .
            
+      *----------------------------------------------------------------*
+      * 2000-GET-NEXT-PROCESS: Scans the sequence table for the
+      * next process in READY status, verifies its dependencies
+      * are satisfied, and marks it as ACTIVE if ready to run.
+      *----------------------------------------------------------------*
        2000-GET-NEXT-PROCESS.
            PERFORM 2100-FIND-NEXT-READY
            PERFORM 2200-CHECK-DEPENDENCIES
@@ -105,12 +130,21 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 3000-CHECK-STATUS: Reads the current control record status,
+      * syncs it to the in-memory sequence table, and checks if
+      * all processes have completed.
+      *----------------------------------------------------------------*
        3000-CHECK-STATUS.
            PERFORM 3100-READ-CONTROL-STATUS
            PERFORM 3200-UPDATE-SEQUENCE-TABLE
            PERFORM 3300-CHECK-COMPLETION
            .
            
+      *----------------------------------------------------------------*
+      * 4000-TERMINATE-SEQUENCE: Checks final completion status
+      * of all processes and closes sequence and control files.
+      *----------------------------------------------------------------*
        4000-TERMINATE-SEQUENCE.
            PERFORM 4100-CHECK-FINAL-STATUS
            PERFORM 4200-CLOSE-FILES
@@ -152,6 +186,11 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 1200-BUILD-SEQUENCE: Reads process definitions from the
+      * sequence file for the given date and type, building an
+      * in-memory table of processes to execute.
+      *----------------------------------------------------------------*
        1200-BUILD-SEQUENCE.
            INITIALIZE WS-PROCESS-TABLE
                       WS-PROCESS-COUNT
@@ -185,6 +224,10 @@
            SET WS-PROC-IX UP BY 1
            .
            
+      *----------------------------------------------------------------*
+      * 1300-CREATE-CONTROL-RECORDS: Creates a batch control record
+      * for each process in the sequence table with READY status.
+      *----------------------------------------------------------------*
        1300-CREATE-CONTROL-RECORDS.
            PERFORM VARYING WS-SEQUENCE-IX FROM 1 BY 1
                    UNTIL WS-SEQUENCE-IX > WS-PROCESS-COUNT
@@ -203,6 +246,10 @@
            END-PERFORM
            .
            
+      *----------------------------------------------------------------*
+      * 2100-FIND-NEXT-READY: Scans the process table for the
+      * first entry still in READY status.
+      *----------------------------------------------------------------*
        2100-FIND-NEXT-READY.
            PERFORM VARYING WS-SEQUENCE-IX FROM 1 BY 1
                    UNTIL WS-SEQUENCE-IX > WS-PROCESS-COUNT
@@ -218,6 +265,11 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2200-CHECK-DEPENDENCIES: Verifies all prerequisite
+      * processes for the next candidate have completed. Checks
+      * both hard and soft dependencies with return code limits.
+      *----------------------------------------------------------------*
        2200-CHECK-DEPENDENCIES.
            MOVE LS-NEXT-PROCESS TO PSR-PROCESS-ID
            
@@ -257,6 +309,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2300-UPDATE-PROCESS-STATUS: Marks the next process as
+      * ACTIVE in the batch control file and records start time.
+      *----------------------------------------------------------------*
        2300-UPDATE-PROCESS-STATUS.
            MOVE LS-NEXT-PROCESS TO BCT-JOB-NAME
            MOVE LS-PROCESS-DATE TO BCT-PROCESS-DATE
@@ -302,6 +358,10 @@
            END-PERFORM
            .
            
+      *----------------------------------------------------------------*
+      * 3300-CHECK-COMPLETION: Counts active and errored processes
+      * in the sequence table to determine overall status.
+      *----------------------------------------------------------------*
        3300-CHECK-COMPLETION.
            MOVE ZERO TO WS-ACTIVE-COUNT
                        WS-ERROR-COUNT
@@ -319,6 +379,10 @@
            END-PERFORM
            .
            
+      *----------------------------------------------------------------*
+      * 4100-CHECK-FINAL-STATUS: Determines the final return code
+      * based on whether any processes errored or are still active.
+      *----------------------------------------------------------------*
        4100-CHECK-FINAL-STATUS.
            PERFORM 3300-CHECK-COMPLETION
            

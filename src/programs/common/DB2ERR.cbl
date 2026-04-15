@@ -1,6 +1,15 @@
       *================================================================*
       * Program Name: DB2ERR
       * Description: DB2 SQL Error Handler
+      *   Provides centralized DB2 error processing including:
+      *   - Error logging to the ERRLOG DB2 table
+      *   - Error diagnosis with retry recommendations
+      *   - Historical error retrieval by program
+      *   Categorizes errors by SQLCODE: deadlock (-911),
+      *   timeout (-913), connection (-30081), duplicate (-803).
+      * Called By: DB2CMT, DB2CONN, batch programs
+      * Calls: ERRPROC (general error handling)
+      * Copybooks: SQLCA, DBPROC, ERRHAND, DBTBLS
       * Version: 1.0
       * Date: 2024
       *================================================================*
@@ -53,6 +62,10 @@
                88  LS-NO-RETRY       VALUE 'N'.
        
        PROCEDURE DIVISION USING LS-ERROR-REQUEST.
+      *----------------------------------------------------------------*
+      * Main entry point - dispatches to Log, Diagnose, or
+      * Retrieve based on the function code.
+      *----------------------------------------------------------------*
        0000-MAIN.
            EVALUATE TRUE
                WHEN FUNC-LOG
@@ -69,6 +82,11 @@
            GOBACK
            .
            
+      *----------------------------------------------------------------*
+      * 1000-LOG-ERROR: Builds an error log record with timestamp,
+      * program ID, severity, SQLCODE, and message text, then
+      * inserts it into the ERRLOG table.
+      *----------------------------------------------------------------*
        1000-LOG-ERROR.
            INITIALIZE WS-ERRLOG-REC
            
@@ -97,6 +115,11 @@
            PERFORM 1200-INSERT-ERROR
            .
            
+      *----------------------------------------------------------------*
+      * 1100-SET-SEVERITY: Maps SQLCODE to severity level and
+      * sets the retry flag. Deadlock/timeout are retryable (sev 2),
+      * connection errors are sev 4, duplicates/not-found are sev 1.
+      *----------------------------------------------------------------*
        1100-SET-SEVERITY.
            EVALUATE LS-SQLCODE
                WHEN WS-DEADLOCK
@@ -123,6 +146,9 @@
            END-EVALUATE
            .
            
+      *----------------------------------------------------------------*
+      * 1200-INSERT-ERROR: Inserts the error record into DB2 ERRLOG.
+      *----------------------------------------------------------------*
        1200-INSERT-ERROR.
            EXEC SQL
                INSERT INTO ERRLOG
@@ -137,6 +163,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2000-DIAGNOSE-ERROR: Returns a human-readable diagnosis
+      * and appropriate return code based on the SQLCODE category.
+      *----------------------------------------------------------------*
        2000-DIAGNOSE-ERROR.
            EVALUATE LS-SQLCODE
                WHEN WS-DEADLOCK
@@ -168,6 +198,10 @@
            END-EVALUATE
            .
            
+      *----------------------------------------------------------------*
+      * 3000-RETRIEVE-ERROR: Fetches the most recent error record
+      * for the specified program from the ERRLOG table.
+      *----------------------------------------------------------------*
        3000-RETRIEVE-ERROR.
            EXEC SQL
                SELECT ERROR_MESSAGE,
@@ -193,6 +227,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 9000-ERROR-ROUTINE: Sets return code 12 and delegates to
+      * ERRPROC for standard error processing.
+      *----------------------------------------------------------------*
        9000-ERROR-ROUTINE.
            MOVE 'DB2ERR' TO ERR-PROGRAM
            MOVE 12 TO LS-RETURN-CODE

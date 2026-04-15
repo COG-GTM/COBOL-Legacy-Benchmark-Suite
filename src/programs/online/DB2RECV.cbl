@@ -45,6 +45,11 @@
               88 RECV-RETRY             VALUE 'R'.
            
        PROCEDURE DIVISION USING RECOVERY-REQUEST-AREA.
+      *----------------------------------------------------------------*
+      * Main entry point - dispatches to the appropriate recovery
+      * handler: Connection retry, Transaction rollback, or
+      * Cursor error recovery.
+      *----------------------------------------------------------------*
            EVALUATE TRUE
                WHEN RECV-CONNECTION
                     PERFORM P100-RECOVER-CONNECTION
@@ -59,6 +64,11 @@
            
            EXEC CICS RETURN END-EXEC.
            
+      *----------------------------------------------------------------*
+      * P100-RECOVER-CONNECTION: Attempts to re-establish a failed
+      * DB2 connection with up to 3 retries, waiting 2 seconds
+      * between each attempt via CICS DELAY.
+      *----------------------------------------------------------------*
        P100-RECOVER-CONNECTION.
            MOVE 0 TO WS-RETRY-COUNT.
            
@@ -82,6 +92,10 @@
        P100-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P110-ATTEMPT-RECONNECT: Links to DB2ONLN to establish
+      * a new connection and sets status accordingly.
+      *----------------------------------------------------------------*
        P110-ATTEMPT-RECONNECT.
            MOVE 'C' TO DB2-REQUEST-TYPE OF WS-DB2-REQUEST.
            
@@ -101,6 +115,10 @@
        P110-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P120-WAIT-INTERVAL: Pauses execution for the configured
+      * retry interval before the next reconnection attempt.
+      *----------------------------------------------------------------*
        P120-WAIT-INTERVAL.
            EXEC CICS DELAY
                      INTERVAL(WS-RETRY-INTERVAL)
@@ -108,6 +126,10 @@
        P120-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P200-RECOVER-TRANSACTION: Issues SQL ROLLBACK to undo
+      * the current transaction and reports success or failure.
+      *----------------------------------------------------------------*
        P200-RECOVER-TRANSACTION.
            EXEC SQL ROLLBACK END-EXEC.
            
@@ -122,6 +144,10 @@
        P200-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P300-RECOVER-CURSOR: Logs cursor error details via ERRHNDL
+      * and determines whether to retry or fail based on severity.
+      *----------------------------------------------------------------*
        P300-RECOVER-CURSOR.
            MOVE SPACES TO WS-ERROR-AREA.
            MOVE RECV-PROGRAM TO ERR-PROGRAM.
@@ -142,4 +168,4 @@
            
            MOVE ERR-MESSAGE TO RECV-MESSAGE.
        P300-EXIT.
-           EXIT. 
+           EXIT.  

@@ -1,5 +1,14 @@
       *****************************************************************
-      * RETURN CODE HANDLING DEFINITIONS
+      * Copybook Name: RETHND
+      * Description: Return Code Handling Definitions
+      *   Comprehensive return-code and error-reporting structure:
+      *   RETURN-STATUS  - current/highest RC, module and function
+      *   RETURN-DETAILS - error location, type, text, system info
+      *   RETURN-ACTIONS - continue/abort/retry flag with limits
+      *   STD-ERROR-CODES- standard E001..E010 error identifiers
+      *   Includes a usage example showing how to populate fields.
+      * Used By: ERRPROC, PORTMSTR, and any program needing
+      *          structured error reporting
       * VERSION: 1.0
       * DATE: 2024
       *****************************************************************
@@ -63,4 +72,4 @@
       *     SET ERR-VALIDATION TO TRUE
       *     SET RC-ERROR      TO TRUE
       *     MOVE 'Invalid portfolio ID' TO ERROR-TEXT
-      ***************************************************************** 
+      *****************************************************************  

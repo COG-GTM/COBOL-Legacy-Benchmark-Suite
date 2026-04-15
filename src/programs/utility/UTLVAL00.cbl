@@ -3,13 +3,18 @@
        AUTHOR. CLAUDE.
        DATE-WRITTEN. 2024-04-09.
       *****************************************************************
-      * Data Validation Utility                                        *
-      *                                                               *
-      * Performs comprehensive data validation:                       *
-      * - Data integrity checks                                      *
-      * - Cross-reference validation                                 *
-      * - Format verification                                        *
-      * - Balance reconciliation                                     *
+      * Program Name: UTLVAL00                                        *
+      * Description: Data Validation Utility                          *
+      *   Reads validation control records and performs the           *
+      *   requested checks across position and transaction files:    *
+      *   - INTEGRITY: field-level data integrity on each record     *
+      *   - XREF:      cross-reference between position/transaction  *
+      *   - FORMAT:    date, numeric, and field-format checks        *
+      *   - BALANCE:   accumulates positions and reconciles totals   *
+      *   Writes all discrepancies to an error report file.          *
+      * Files: VALCTL (control input), POSMSTRE (indexed position),  *
+      *        TRANHIST (indexed transaction), ERRRPT (report out)   *
+      * Copybooks: POSREC, TRNREC, RTNCODE, ERRHAND                 *
       *****************************************************************
        ENVIRONMENT DIVISION.
        CONFIGURATION SECTION.
@@ -93,16 +98,27 @@
            05  WS-ERR-DESC          PIC X(98).
 
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control flow: Open files, process each validation
+      * control record, then close files.
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            PERFORM 2000-PROCESS
            PERFORM 3000-CLEANUP
            GOBACK.
 
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Opens all files and resets totals.
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            PERFORM 1100-OPEN-FILES
            PERFORM 1200-INIT-PROCESSING.
 
+      *----------------------------------------------------------------*
+      * 1100-OPEN-FILES: Opens validation control, position master,
+      * and transaction history for input; error report for output.
+      *----------------------------------------------------------------*
        1100-OPEN-FILES.
            OPEN INPUT VALIDATION-CONTROL
            IF WS-VAL-STATUS NOT = '00'
@@ -132,9 +148,15 @@
                PERFORM 9999-ERROR-HANDLER
            END-IF.
 
+      *----------------------------------------------------------------*
+      * 1200-INIT-PROCESSING: Resets validation counters and totals.
+      *----------------------------------------------------------------*
        1200-INIT-PROCESSING.
            INITIALIZE WS-VALIDATION-TOTALS.
 
+      *----------------------------------------------------------------*
+      * 2000-PROCESS: Reads validation control records until EOF.
+      *----------------------------------------------------------------*
        2000-PROCESS.
            PERFORM UNTIL END-OF-VALIDATION
                READ VALIDATION-CONTROL
@@ -145,6 +167,10 @@
                END-READ
            END-PERFORM.
 
+      *----------------------------------------------------------------*
+      * 2100-PROCESS-VALIDATION: Dispatches to the validation
+      * routine matching the control record type.
+      *----------------------------------------------------------------*
        2100-PROCESS-VALIDATION.
            EVALUATE VAL-TYPE
                WHEN WS-INTEGRITY
@@ -161,28 +187,51 @@
                    PERFORM 9999-ERROR-HANDLER
            END-EVALUATE.
 
+      *----------------------------------------------------------------*
+      * 2200-CHECK-INTEGRITY: Verifies field-level data integrity
+      * on both position and transaction records.
+      *----------------------------------------------------------------*
        2200-CHECK-INTEGRITY.
            PERFORM 2210-CHECK-POSITION-INTEGRITY
            PERFORM 2220-CHECK-TRANSACTION-INTEGRITY.
 
+      *----------------------------------------------------------------*
+      * 2300-CHECK-XREF: Cross-references position and transaction
+      * records to ensure referential consistency.
+      *----------------------------------------------------------------*
        2300-CHECK-XREF.
            PERFORM 2310-CHECK-POSITION-XREF
            PERFORM 2320-CHECK-TRANSACTION-XREF.
 
+      *----------------------------------------------------------------*
+      * 2400-CHECK-FORMAT: Validates date, numeric, and field
+      * formats on position and transaction records.
+      *----------------------------------------------------------------*
        2400-CHECK-FORMAT.
            PERFORM 2410-CHECK-POSITION-FORMAT
            PERFORM 2420-CHECK-TRANSACTION-FORMAT.
 
+      *----------------------------------------------------------------*
+      * 2500-CHECK-BALANCE: Accumulates position totals and
+      * reconciles against control totals.
+      *----------------------------------------------------------------*
        2500-CHECK-BALANCE.
            PERFORM 2510-ACCUMULATE-POSITIONS
            PERFORM 2520-VERIFY-BALANCES.
 
+      *----------------------------------------------------------------*
+      * 3000-CLEANUP: Closes all files.
+      *----------------------------------------------------------------*
        3000-CLEANUP.
            CLOSE VALIDATION-CONTROL
                 POSITION-MASTER
                 TRANSACTION-HISTORY
                 ERROR-REPORT.
 
+      *----------------------------------------------------------------*
+      * 9999-ERROR-HANDLER: Increments error count, flags the
+      * error condition, and writes a detail line to the report.
+      *----------------------------------------------------------------*
        9999-ERROR-HANDLER.
            ADD 1 TO WS-RECORDS-ERROR
            SET ERROR-FOUND TO TRUE

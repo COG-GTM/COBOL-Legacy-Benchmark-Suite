@@ -1,3 +1,12 @@
+--=====================================================================
+-- SQL File: RTNCODES.sql
+-- Description: Return Code Logging Table
+--   Stores return-code history from batch programs.
+--   Primary key: TIMESTAMP + PROGRAM_ID
+--   Indexes: by PROGRAM_ID for per-program analysis,
+--           by STATUS_CODE for status-based queries.
+-- Used By: RTNCDE00, RTNANA00
+--=====================================================================
 -- Return Code Logging Table
 CREATE TABLE RTNCODES (
     TIMESTAMP       TIMESTAMP NOT NULL,
@@ -15,4 +24,4 @@ CREATE INDEX RTNCODES_PRG_IDX ON
 
 -- Index for status analysis
 CREATE INDEX RTNCODES_STS_IDX ON 
-    RTNCODES (STATUS_CODE, TIMESTAMP); 
+    RTNCODES (STATUS_CODE, TIMESTAMP);  

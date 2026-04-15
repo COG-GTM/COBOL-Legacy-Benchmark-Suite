@@ -38,6 +38,10 @@
            COPY INQCOM.
            
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control flow: Initialize, read position from VSAM
+      * POSFILE, and either display data or show not-found message.
+      *----------------------------------------------------------------*
            PERFORM P100-INIT-PROGRAM
               THRU P100-EXIT.
               
@@ -54,6 +58,10 @@
               
            EXEC CICS RETURN END-EXEC.
            
+      *----------------------------------------------------------------*
+      * P100-INIT-PROGRAM: Initializes position record, copies
+      * COMMAREA, and registers CICS error/not-found handlers.
+      *----------------------------------------------------------------*
        P100-INIT-PROGRAM.
            MOVE LOW-VALUES TO WS-POSITION-RECORD
            MOVE DFHCOMMAREA TO WS-COMMAREA.
@@ -65,6 +73,10 @@
        P100-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P200-GET-POSITION: Reads the portfolio position record
+      * from VSAM file POSFILE by account number (keyed read).
+      *----------------------------------------------------------------*
        P200-GET-POSITION.
            MOVE WS-COMMAREA-ACCOUNT-NO 
              TO POSITION-ACCOUNT OF WS-POSITION-RECORD.
@@ -83,6 +95,10 @@
        P200-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P300-FORMAT-DISPLAY: Sends position data to the POSMAP
+      * BMS screen for terminal display.
+      *----------------------------------------------------------------*
        P300-FORMAT-DISPLAY.
            EXEC CICS SEND MAP('POSMAP')
                      MAPSET('INQSET')
@@ -93,6 +109,10 @@
        P300-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P900-NOT-FOUND: Sets an error message in the COMMAREA
+      * when no position record exists for the given account.
+      *----------------------------------------------------------------*
        P900-NOT-FOUND.
            MOVE 'Position not found for account' 
              TO INQCOM-ERROR-MSG OF WS-COMMAREA.
@@ -100,6 +120,10 @@
        P900-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P999-ERROR-ROUTINE: Captures general CICS error info
+      * into the COMMAREA for return to the calling program.
+      *----------------------------------------------------------------*
        P999-ERROR-ROUTINE.
            MOVE 'Error accessing position data' 
              TO INQCOM-ERROR-MSG OF WS-COMMAREA.

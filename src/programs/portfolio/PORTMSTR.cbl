@@ -1,7 +1,14 @@
        *================================================================*
       * Program Name: PORTMSTR
       * Description: Portfolio Master File Maintenance Program
-      *             Handles CRUD operations for Portfolio records
+      *   Provides full CRUD operations on the indexed VSAM
+      *   portfolio file. Called as a subroutine with a command
+      *   code (C=Create, R=Read, U=Update, D=Delete) and a
+      *   portfolio record buffer in the linkage section.
+      *   Includes validation, audit logging, and VSAM error
+      *   handling examples.
+      * Files: PORTFILE (indexed VSAM, dynamic access)
+      * Calls: ERRPROC (error handling), AUDPROC (audit logging)
       * Author: [Author name]
       * Date Written: 2024-03-20
       * Maintenance Log:
@@ -80,6 +87,10 @@
            05  LS-RETURN-CODE      PIC S9(4) COMP.
            
        PROCEDURE DIVISION USING LS-COMMAND-AREA.
+      *----------------------------------------------------------------*
+      * Main entry point: Opens the portfolio file, dispatches
+      * to the appropriate CRUD operation, then closes the file.
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            
@@ -100,6 +111,10 @@
            PERFORM 6000-TERMINATE
            GOBACK.
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Opens the portfolio file for I-O with
+      * dynamic access mode.
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            INITIALIZE WS-WORK-AREAS
            
@@ -114,7 +129,8 @@
            
        2000-CREATE-PORTFOLIO.
       *----------------------------------------------------------------*
-      * Create new portfolio record
+      * 2000-CREATE-PORTFOLIO: Validates the record then writes it
+      * to the VSAM file. Handles duplicate key errors.
       *----------------------------------------------------------------*
            MOVE LS-PORTFOLIO TO PORTFOLIO-RECORD
            
@@ -137,7 +153,9 @@
            
        2100-VALIDATE-PORTFOLIO.
       *----------------------------------------------------------------*
-      * Validate portfolio data
+      * 2100-VALIDATE-PORTFOLIO: Checks ID format (PORT + 5 digits),
+      * non-blank name, and valid status (A=Active, I=Inactive,
+      * C=Closed).
       *----------------------------------------------------------------*
            IF PORT-ID(1:4) NOT = 'PORT'
               OR PORT-ID(5:5) IS NOT NUMERIC
@@ -162,7 +180,8 @@
            
        3000-READ-PORTFOLIO.
       *----------------------------------------------------------------*
-      * Read portfolio record
+      * 3000-READ-PORTFOLIO: Reads a portfolio record by key and
+      * returns it in the linkage area. Reports not-found errors.
       *----------------------------------------------------------------*
            MOVE LS-PORTFOLIO TO PORTFOLIO-RECORD
            
@@ -182,7 +201,8 @@
            
        4000-UPDATE-PORTFOLIO.
       *----------------------------------------------------------------*
-      * Update portfolio record
+      * 4000-UPDATE-PORTFOLIO: Validates updated data then rewrites
+      * the record. Logs the update via AUDPROC.
       *----------------------------------------------------------------*
            MOVE LS-PORTFOLIO TO PORTFOLIO-RECORD
            
@@ -208,7 +228,8 @@
            
        5000-DELETE-PORTFOLIO.
       *----------------------------------------------------------------*
-      * Delete portfolio record
+      * 5000-DELETE-PORTFOLIO: Deletes a portfolio record by key
+      * from the VSAM file.
       *----------------------------------------------------------------*
            MOVE LS-PORTFOLIO TO PORTFOLIO-RECORD
            
@@ -225,12 +246,19 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 6000-TERMINATE: Closes the portfolio file and returns
+      * the final return code to the caller.
+      *----------------------------------------------------------------*
        6000-TERMINATE.
            CLOSE PORTFOLIO-FILE
            
            MOVE WS-RETURN-CODE TO LS-RETURN-CODE
            .
            
+      *----------------------------------------------------------------*
+      * 9000-ERROR: Sets error return code and terminates.
+      *----------------------------------------------------------------*
        9000-ERROR.
            MOVE WS-ERROR TO WS-RETURN-CODE
            PERFORM 6000-TERMINATE
@@ -238,7 +266,8 @@
            .
 
       *----------------------------------------------------------------*
-      * Example error handling call
+      * 2100-HANDLE-VSAM-ERROR: Maps VSAM file status codes to
+      * error messages and calls ERRPROC for logging.
       *----------------------------------------------------------------*
        2100-HANDLE-VSAM-ERROR.
            MOVE 'PORTMSTR' TO LS-PROGRAM-ID
@@ -263,7 +292,8 @@
            .
 
       *----------------------------------------------------------------*
-      * Example audit logging call
+      * 2100-LOG-PORTFOLIO-UPDATE: Builds an audit request with
+      * before/after images and calls AUDPROC.
       *----------------------------------------------------------------*
        2100-LOG-PORTFOLIO-UPDATE.
            INITIALIZE LS-AUDIT-REQUEST

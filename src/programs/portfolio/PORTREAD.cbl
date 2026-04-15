@@ -1,7 +1,12 @@
       *================================================================*
       * Program Name: PORTREAD
       * Description: Portfolio Record Reading Program
-      *             Demonstrates reading capabilities of Portfolio file
+      *   Sequentially reads all records from the indexed VSAM
+      *   portfolio file using dynamic access and displays each
+      *   record's key fields (ID, account, client, status,
+      *   total value). Useful for data verification and testing.
+      * Files: PORTFILE (indexed VSAM, dynamic read)
+      * Copybooks: PORTFLIO
       * Author: [Author name]
       * Date Written: 2024-03-20
       * Maintenance Log:
@@ -59,7 +64,8 @@
            
        PROCEDURE DIVISION.
       *----------------------------------------------------------------*
-      * Main process
+      * Main control flow: Open portfolio file, read all records
+      * sequentially, display each, and report total count.
       *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
@@ -71,6 +77,9 @@
            
            GOBACK.
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Opens the portfolio file for input.
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            INITIALIZE WS-WORK-AREAS
            
@@ -82,6 +91,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2000-PROCESS: Reads the next sequential record and
+      * displays it. Sets EOF when no more records.
+      *----------------------------------------------------------------*
        2000-PROCESS.
            READ PORTFOLIO-FILE NEXT RECORD
                AT END
@@ -92,6 +105,10 @@
            END-READ
            .
            
+      *----------------------------------------------------------------*
+      * 2100-DISPLAY-RECORD: Formats and displays key portfolio
+      * fields to the console.
+      *----------------------------------------------------------------*
        2100-DISPLAY-RECORD.
            DISPLAY 'Portfolio Record: ' WS-RECORD-COUNT
            DISPLAY '  ID: ' PORT-ID
@@ -102,10 +119,13 @@
            DISPLAY ' '
            .
            
+      *----------------------------------------------------------------*
+      * 3000-TERMINATE: Closes portfolio file and displays total.
+      *----------------------------------------------------------------*
        3000-TERMINATE.
            CLOSE PORTFOLIO-FILE
            
            DISPLAY 'Total Records Read: ' WS-RECORD-COUNT
            
            MOVE WS-RETURN-CODE TO RETURN-CODE
-           . 
+           .  

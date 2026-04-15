@@ -1,6 +1,13 @@
       *================================================================*
       * Program Name: ERRPROC
       * Description: Standard Error Processing Subroutine
+      *   Provides centralized error logging for batch programs.
+      *   Accepts error details via linkage section, timestamps
+      *   them, writes to a sequential log file, and displays
+      *   a formatted error report to the console.
+      * Called By: All batch and common programs
+      * Files: ERRLOG (sequential error log output)
+      * Copybooks: ERRHAND
       * Author: [Author name]
       * Date Written: 2024-03-20
       *================================================================*
@@ -45,6 +52,10 @@
            05  LS-RETURN-CODE     PIC S9(4) COMP.
        
        PROCEDURE DIVISION USING LS-ERROR-REQUEST.
+      *----------------------------------------------------------------*
+      * Main control flow: Initialize and open log file, process
+      * the error (write + display), then close the file.
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            PERFORM 2000-PROCESS-ERROR
@@ -52,6 +63,10 @@
            GOBACK
            .
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Captures current timestamp and opens the
+      * error log file in EXTEND mode for appending.
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            INITIALIZE WS-WORK-AREAS
            ACCEPT WS-FORMATTED-TIME FROM TIME STAMP
@@ -80,6 +95,10 @@
            MOVE LS-SEVERITY TO LS-RETURN-CODE
            .
            
+      *----------------------------------------------------------------*
+      * 2100-WRITE-LOG: Writes the formatted error message to the
+      * sequential error log file.
+      *----------------------------------------------------------------*
        2100-WRITE-LOG.
            MOVE ERR-MESSAGE TO LOG-DATA
            
@@ -90,6 +109,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2200-DISPLAY-ERROR: Displays a formatted error report to
+      * the system console with all error fields.
+      *----------------------------------------------------------------*
        2200-DISPLAY-ERROR.
            DISPLAY '===================================================='
            DISPLAY 'ERROR DETECTED: ' ERR-TIMESTAMP
@@ -102,6 +125,9 @@
            DISPLAY '===================================================='
            .
            
+      *----------------------------------------------------------------*
+      * 3000-TERMINATE: Closes the error log file.
+      *----------------------------------------------------------------*
        3000-TERMINATE.
            CLOSE ERROR-LOG
-           . 
+           .  

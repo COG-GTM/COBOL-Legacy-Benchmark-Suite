@@ -1,5 +1,12 @@
       *================================================================*
-      * SQL Communication Area
+      * Copybook Name: SQLCA
+      * Description: SQL Communication Area and Status Codes
+      *   Includes the DB2 SQLCA via EXEC SQL INCLUDE, then
+      *   defines named constants for commonly checked SQLSTATE
+      *   values: success (00000), not-found (02000), duplicate
+      *   key (23505), deadlock (40001), timeout (40003),
+      *   connection error (08001), DB error (58004).
+      * Used By: All programs with embedded SQL
       * Version: 1.0
       * Date: 2024
       *================================================================*
@@ -12,4 +19,4 @@
            05  SQL-DEADLOCK         PIC X(5) VALUE '40001'.
            05  SQL-TIMEOUT          PIC X(5) VALUE '40003'.
            05  SQL-CONNECTION-ERROR PIC X(5) VALUE '08001'.
-           05  SQL-DB-ERROR         PIC X(5) VALUE '58004'. 
+           05  SQL-DB-ERROR         PIC X(5) VALUE '58004'.  

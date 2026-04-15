@@ -1,5 +1,16 @@
 --********************************************************************
--- DB2 TABLE DEFINITIONS FOR INVESTMENT PORTFOLIO MANAGEMENT SYSTEM
+-- SQL File: db2-definitions.sql
+-- Description: DB2 Table Definitions for Investment Portfolio
+--   Management System. Creates three core tables:
+--   PORTFOLIO_MASTER     - portfolio header records with client,
+--                          currency, risk level, and status
+--   INVESTMENT_POSITIONS - per-date holdings with quantity, cost
+--                          basis, and market value (FK to master)
+--   TRANSACTION_HISTORY  - individual buy/sell/transfer/fee records
+--                          (FK to master)
+--   Also creates secondary indexes and two convenience views:
+--   ACTIVE_PORTFOLIOS    - open portfolios (status A, not closed)
+--   CURRENT_POSITIONS    - yesterday's positions joined to master
 -- VERSION: 1.0
 -- DATE: 2024
 --********************************************************************
@@ -102,4 +113,4 @@ CREATE VIEW CURRENT_POSITIONS AS
 -- 4. Transaction types:
 --    - 'BU'=Buy, 'SL'=Sell, 'TR'=Transfer, 'FE'=Fee
 -- 5. Indexes optimized for common query patterns
---******************************************************************** 
+--********************************************************************  

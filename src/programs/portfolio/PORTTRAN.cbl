@@ -1,6 +1,15 @@
       *================================================================*
       * Program Name: PORTTRAN
       * Description: Portfolio Transaction Processing
+      *   Reads financial transactions from a sequential file and
+      *   applies them to the indexed VSAM portfolio file.
+      *   Supports Buy (BU), Sell (SL), Transfer (TR), and Fee
+      *   (FE) transaction types. Validates each transaction,
+      *   updates portfolio positions, and writes audit trail.
+      *   Halts after 100 cumulative errors.
+      * Files: TRANFILE (sequential input), PORTFILE (indexed I-O)
+      * Calls: ERRPROC (error handling), AUDPROC (audit logging)
+      * Copybooks: TRNREC, PORTREC, ERRHAND, AUDITLOG
       * Author: [Author name]
       * Date Written: 2024-03-20
       *================================================================*
@@ -57,6 +66,10 @@
            88  MORE-RECORDS         VALUE 'N'.
            
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control flow: Initialize files, process transactions
+      * until EOF or error threshold (100), then close and report.
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            
@@ -71,6 +84,10 @@
            GOBACK
            .
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Opens the transaction input file and the
+      * portfolio master file for I-O.
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            INITIALIZE WS-FILE-STATUS
                       WS-COUNTERS
@@ -89,6 +106,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2000-PROCESS-TRANSACTIONS: Reads the next transaction and
+      * dispatches to validation.
+      *----------------------------------------------------------------*
        2000-PROCESS-TRANSACTIONS.
            READ TRANSACTION-FILE
                AT END
@@ -99,6 +120,11 @@
            END-READ
            .
            
+      *----------------------------------------------------------------*
+      * 2100-VALIDATE-TRANSACTION: Runs validation checks on
+      * portfolio ID, transaction type, and amounts in sequence.
+      * Stops at the first failure.
+      *----------------------------------------------------------------*
        2100-VALIDATE-TRANSACTION.
            MOVE SPACES TO ERR-TEXT
            
@@ -117,6 +143,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2110-CHECK-PORTFOLIO: Verifies the portfolio ID exists in
+      * the VSAM file.
+      *----------------------------------------------------------------*
        2110-CHECK-PORTFOLIO.
            IF TRN-PORTFOLIO-ID = SPACES
                MOVE 'Portfolio ID is required' TO ERR-TEXT
@@ -133,6 +163,10 @@
            END-READ
            .
            
+      *----------------------------------------------------------------*
+      * 2120-CHECK-TRANSACTION-TYPE: Validates transaction type
+      * is one of BU (Buy), SL (Sell), TR (Transfer), FE (Fee).
+      *----------------------------------------------------------------*
        2120-CHECK-TRANSACTION-TYPE.
            EVALUATE TRN-TYPE
                WHEN 'BU'
@@ -148,6 +182,10 @@
            END-EVALUATE
            .
            
+      *----------------------------------------------------------------*
+      * 2130-CHECK-AMOUNTS: Validates quantity > 0, and price/
+      * amount > 0 for non-transfer transactions.
+      *----------------------------------------------------------------*
        2130-CHECK-AMOUNTS.
            IF TRN-QUANTITY <= ZERO
                MOVE 'Quantity must be greater than zero' TO ERR-TEXT
@@ -164,6 +202,11 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2200-UPDATE-POSITIONS: Dispatches to buy, sell, transfer,
+      * or fee processing based on transaction type, then writes
+      * an audit trail record.
+      *----------------------------------------------------------------*
        2200-UPDATE-POSITIONS.
            EVALUATE TRN-TYPE
                WHEN 'BU'
@@ -179,6 +222,10 @@
            PERFORM 2300-UPDATE-AUDIT-TRAIL
            .
            
+      *----------------------------------------------------------------*
+      * 2210-PROCESS-BUY: Adds transaction units and cost to the
+      * portfolio totals.
+      *----------------------------------------------------------------*
        2210-PROCESS-BUY.
            MOVE TRN-PORTFOLIO-ID TO PORT-ID
            READ PORTFOLIO-FILE
@@ -198,6 +245,10 @@
            END-REWRITE
            .
            
+      *----------------------------------------------------------------*
+      * 2220-PROCESS-SELL: Subtracts units and cost from portfolio
+      * totals after verifying sufficient units are held.
+      *----------------------------------------------------------------*
        2220-PROCESS-SELL.
            MOVE TRN-PORTFOLIO-ID TO PORT-ID
            READ PORTFOLIO-FILE
@@ -223,11 +274,18 @@
            END-REWRITE
            .
            
+      *----------------------------------------------------------------*
+      * 2230-PROCESS-TRANSFER: Stub - not yet implemented.
+      *----------------------------------------------------------------*
        2230-PROCESS-TRANSFER.
            MOVE 'Transfer processing not implemented' TO ERR-TEXT
            PERFORM 9000-ERROR-ROUTINE
            .
            
+      *----------------------------------------------------------------*
+      * 2240-PROCESS-FEE: Subtracts the fee amount from the
+      * portfolio total cost.
+      *----------------------------------------------------------------*
        2240-PROCESS-FEE.
            MOVE TRN-PORTFOLIO-ID TO PORT-ID
            READ PORTFOLIO-FILE
@@ -246,6 +304,10 @@
            END-REWRITE
            .
            
+      *----------------------------------------------------------------*
+      * 2300-UPDATE-AUDIT-TRAIL: Builds an audit record with the
+      * transaction details, before-image, and success/fail status.
+      *----------------------------------------------------------------*
        2300-UPDATE-AUDIT-TRAIL.
            INITIALIZE AUDIT-RECORD
            
@@ -289,8 +351,11 @@
            PERFORM 2310-WRITE-AUDIT-RECORD
            .
            
+      *----------------------------------------------------------------*
+      * 2310-WRITE-AUDIT-RECORD: Calls the AUDPROC subroutine to
+      * persist the audit record.
+      *----------------------------------------------------------------*
        2310-WRITE-AUDIT-RECORD.
-      *    Call the audit processor
            CALL 'AUDPROC' USING AUDIT-RECORD
            
            IF RETURN-CODE NOT = ZERO
@@ -299,6 +364,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 3000-TERMINATE: Closes files and displays processing
+      * counts for transactions read, processed, and errors.
+      *----------------------------------------------------------------*
        3000-TERMINATE.
            CLOSE TRANSACTION-FILE
                  PORTFOLIO-FILE
@@ -308,10 +377,14 @@
            DISPLAY 'Errors Encountered:   ' WS-ERROR-COUNT
            .
            
+      *----------------------------------------------------------------*
+      * 9000-ERROR-ROUTINE: Increments error counter and calls
+      * ERRPROC for standard error logging.
+      *----------------------------------------------------------------*
        9000-ERROR-ROUTINE.
            ADD 1 TO WS-ERROR-COUNT
            MOVE ERR-CAT-PROC TO ERR-CATEGORY
            MOVE 'PORTTRAN' TO ERR-PROGRAM
            
            CALL 'ERRPROC' USING ERR-MESSAGE
-           . 
+           .  

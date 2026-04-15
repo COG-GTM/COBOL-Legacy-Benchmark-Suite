@@ -1,5 +1,13 @@
       ******************************************************************
-      * Return Code Management Copybook                                 *
+      * Copybook Name: RTNCODE                                         *
+      * Description: Return Code Management Area                       *
+      *   Provides a standard interface for return-code tracking:      *
+      *   RC-REQUEST-TYPE - I=Initialize, S=Set, G=Get, L=Log,         *
+      *                     A=Analyze                                  *
+      *   RC-CODES-AREA   - current, highest, and new return codes     *
+      *   RC-ANALYSIS-DATA- start/end time, totals, min/max codes      *
+      *   RC-RETURN-DATA  - final return value and status              *
+      * Used By: RTNCDE00 and most batch/utility programs              *
       ******************************************************************
        01  RETURN-CODE-AREA.
            05 RC-REQUEST-TYPE        PIC X.

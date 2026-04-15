@@ -1,5 +1,13 @@
       ******************************************************************
-      * Online Error Handling Copybook                                  *
+      * Copybook Name: ERRHND                                          *
+      * Description: Online Error Handling Area                        *
+      *   Standard error context for CICS online programs:             *
+      *   ERR-PROGRAM/PARAGRAPH - where the error occurred             *
+      *   ERR-SQLCODE/CICS-RESP - DB2 and CICS response codes          *
+      *   ERR-SEVERITY          - F=Fatal, W=Warning, I=Info           *
+      *   ERR-ACTION            - R=Return, C=Continue, A=Abend        *
+      *   ERR-TRACE             - unique trace ID and timestamp        *
+      * Used By: ERRHNDL, INQONLN, INQPORT, INQHIST, SECMGR          *
       ******************************************************************
        01  ERROR-HANDLING.
            05 ERR-PROGRAM          PIC X(8).
@@ -18,4 +26,4 @@
               88 ERR-ABEND             VALUE 'A'.
            05 ERR-TRACE.
               10 ERR-TRACE-ID      PIC X(16).
-              10 ERR-TIMESTAMP     PIC X(26). 
+              10 ERR-TIMESTAMP     PIC X(26).  

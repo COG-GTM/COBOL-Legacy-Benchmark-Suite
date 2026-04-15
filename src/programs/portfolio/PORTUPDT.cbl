@@ -1,7 +1,12 @@
        *================================================================*
       * Program Name: PORTUPDT
       * Description: Portfolio Update Program
-      *             Updates existing portfolio records
+      *   Reads update requests from a sequential file and applies
+      *   field-level changes to the indexed VSAM portfolio file.
+      *   Supports three update actions: S=Status, V=Value,
+      *   N=Client Name. Tracks update and error counts.
+      * Files: PORTFILE (indexed VSAM I-O), UPDTFILE (sequential)
+      * Copybooks: PORTFLIO
       * Author: [Author name]
       * Date Written: 2024-03-20
       * Maintenance Log:
@@ -80,6 +85,10 @@
            05  WS-NUMERIC-WORK     PIC S9(13)V99.
            
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control flow: Initialize files, read update requests
+      * until EOF, apply each to the portfolio file, then report.
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            
@@ -90,6 +99,10 @@
            
            GOBACK.
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Opens the portfolio file for I-O and the
+      * update request file for input.
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            INITIALIZE WS-WORK-AREAS
            
@@ -106,6 +119,9 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2000-PROCESS: Reads the next update request record.
+      *----------------------------------------------------------------*
        2000-PROCESS.
            READ UPDATE-FILE
                AT END
@@ -115,6 +131,10 @@
            END-READ
            .
            
+      *----------------------------------------------------------------*
+      * 2100-PROCESS-UPDATE: Looks up the portfolio record by key
+      * and delegates to apply-update if found.
+      *----------------------------------------------------------------*
        2100-PROCESS-UPDATE.
            MOVE UPDT-KEY TO PORT-KEY
            
@@ -128,6 +148,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2200-APPLY-UPDATE: Applies the field-level change based on
+      * action code (S=Status, N=Name, V=Value) and rewrites.
+      *----------------------------------------------------------------*
        2200-APPLY-UPDATE.
            EVALUATE TRUE
                WHEN UPDT-STATUS
@@ -149,6 +173,9 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 3000-TERMINATE: Closes files and displays final counts.
+      *----------------------------------------------------------------*
        3000-TERMINATE.
            CLOSE PORTFOLIO-FILE
                  UPDATE-FILE

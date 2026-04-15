@@ -1,7 +1,15 @@
+//******************************************************************
+//* JCL Name: UTLMNT
+//* Description: Execute File Maintenance Utility
+//*   Runs UTLMNT00 to process maintenance control records.
+//*   Supports archive, cleanup, VSAM reorg, and file analysis.
+//* Program: UTLMNT00
+//* Input:   CTLFILE  - Maintenance control file (SHR)
+//* Output:  ARCHFILE - Archive dataset (NEW, VB/32756)
+//*          RPTFILE  - Maintenance report (NEW, FB/132)
+//******************************************************************
 //UTLMNT00 JOB (ACCT#),'FILE MAINTENANCE',
 //             CLASS=A,MSGCLASS=X,MSGLEVEL=(1,1)
-//*
-//* File Maintenance Utility
 //*
 //STEP01   EXEC PGM=UTLMNT00
 //STEPLIB  DD   DSN=PROD.LOAD.LIBRARY,DISP=SHR
@@ -16,4 +24,4 @@
 //             DCB=(RECFM=FB,LRECL=132,BLKSIZE=0)
 //SYSOUT   DD   SYSOUT=*
 //SYSUDUMP DD   SYSOUT=*
-//SYSPRINT DD   SYSOUT=* 
+//SYSPRINT DD   SYSOUT=*  

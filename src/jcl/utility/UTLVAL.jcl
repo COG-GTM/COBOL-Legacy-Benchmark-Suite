@@ -1,7 +1,17 @@
+//******************************************************************
+//* JCL Name: UTLVAL
+//* Description: Execute Data Validation Utility
+//*   Runs UTLVAL00 to perform integrity, cross-reference,
+//*   format, and balance checks on position and transaction
+//*   files, writing discrepancies to an error report.
+//* Program: UTLVAL00
+//* Input:   VALCTL   - Validation control records (SHR)
+//*          POSMSTRE - Position master file (SHR)
+//*          TRANHIST - Transaction history file (SHR)
+//* Output:  ERRRPT   - Validation error report (NEW, FB/132)
+//******************************************************************
 //UTLVAL00 JOB (ACCT#),'DATA VALIDATION',
 //             CLASS=A,MSGCLASS=X,MSGLEVEL=(1,1)
-//*
-//* Data Validation Utility
 //*
 //STEP01   EXEC PGM=UTLVAL00
 //STEPLIB  DD   DSN=PROD.LOAD.LIBRARY,DISP=SHR
@@ -14,4 +24,4 @@
 //             DCB=(RECFM=FB,LRECL=132,BLKSIZE=0)
 //SYSOUT   DD   SYSOUT=*
 //SYSUDUMP DD   SYSOUT=*
-//SYSPRINT DD   SYSOUT=* 
+//SYSPRINT DD   SYSOUT=*  

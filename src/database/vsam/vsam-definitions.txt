@@ -1,5 +1,17 @@
 *********************************************************************
-* VSAM DEFINITIONS FOR INVESTMENT PORTFOLIO MANAGEMENT SYSTEM
+* File: vsam-definitions.txt
+* Description: VSAM File Definitions for the Investment Portfolio
+*   Management System. Documents three KSDS files:
+*   PORTMSTR  - Portfolio master (key: portfolio ID + acct type
+*               + branch; 400-byte records; high freespace 20/20
+*               for frequent updates)
+*   TRANHIST  - Transaction history (key: date + time + portfolio
+*               + sequence; 300-byte records)
+*   POSHIST   - Position history (key: portfolio + date +
+*               investment ID; 350-byte records)
+*   Includes a sample IDCAMS DEFINE CLUSTER for PORTMSTR.
+*   All files use SHARE OPTIONS(2,3) for concurrent batch/online
+*   access and are defined as recoverable.
 * VERSION: 1.0
 * DATE: 2024
 *********************************************************************
@@ -97,4 +109,4 @@ DEFINE CLUSTER                                        -
 *    - TRANHIST/POSHIST: Lower (10,10) as mainly sequential writes
 * 3. Buffer space set to 65536 for optimal performance
 * 4. All files defined as recoverable for backup/restore capability
-********************************************************************* 
+*********************************************************************  

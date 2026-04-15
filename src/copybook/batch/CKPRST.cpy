@@ -1,5 +1,15 @@
        *****************************************************************
-      * CHECKPOINT/RESTART CONTROL STRUCTURE
+      * Copybook Name: CKPRST
+      * Description: Checkpoint/Restart Control Structure
+      *   Provides program-level checkpoint/restart capability.
+      *   CK-HEADER   - identifies the program run and its status
+      *   CK-COUNTERS - records read, processed, and error counts
+      *   CK-POSITION - last-processed key and current phase
+      *   CK-RESOURCES- per-file position tracking (up to 5 files)
+      *   CK-CONTROL-INFO - commit frequency, error/restart limits
+      *   CHECKPOINT-RECORD - VSAM record persisting the state
+      * Works With: BCHCTL.cpy for job-level control
+      * Used By: Batch programs requiring restart capability
       * VERSION: 1.0
       * DATE: 2024
       *****************************************************************

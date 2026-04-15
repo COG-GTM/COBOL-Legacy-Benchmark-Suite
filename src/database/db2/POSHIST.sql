@@ -1,5 +1,14 @@
 --=====================================================================
--- Position History Table Definition
+-- SQL File: POSHIST.sql
+-- Description: Position History Table Definition
+--   Creates the POSMVP database, POSHIST tablespace (range-
+--   partitioned by quarter on TRANS_DATE), and the POSHIST table.
+--   Each row records a portfolio transaction with quantity, price,
+--   amount, fees, cost basis, and realized gain/loss.
+--   Primary key: ACCOUNT_NO + PORTFOLIO_ID + TRANS_DATE + TRANS_TIME
+--   Secondary indexes on SECURITY_ID and PROCESS_DATE for reporting.
+-- Grants: SELECT/INSERT to POSAPP, SELECT to POSRPT
+-- Used By: HISTLD00, INQHIST, RPTPOS00, DB2ONLN
 -- Version: 1.0
 -- Date: 2024
 --=====================================================================
@@ -96,4 +105,4 @@ COMMENT ON COLUMN POSHIST.GAIN_LOSS IS
 
 -- Grants
 GRANT SELECT, INSERT ON POSHIST TO POSAPP;
-GRANT SELECT ON POSHIST TO POSRPT; 
+GRANT SELECT ON POSHIST TO POSRPT;  

@@ -1,5 +1,16 @@
       *================================================================*
-      * DB2 Standard Procedures
+      * Copybook Name: DBPROC
+      * Description: DB2 Standard Procedures
+      *   Reusable DB2 connection and error-handling paragraphs:
+      *   CONNECT-TO-DB2      - connects to the POSMVP subsystem
+      *   DISCONNECT-FROM-DB2 - commits and disconnects
+      *   DB2-ERROR-ROUTINE   - rolls back, formats SQLCODE/SQLSTATE,
+      *                         and calls ERRPROC
+      *   CHECK-SQL-STATUS    - convenience check after any SQL
+      *   Also declares retry-control fields (max 3 retries,
+      *   100 ms wait).
+      * Used By: DB2CONN, DB2ONLN, DB2RECV, and programs with
+      *          embedded SQL
       * Version: 1.0
       * Date: 2024
       *================================================================*
@@ -60,4 +71,4 @@
            IF SQLCODE NOT = 0
                PERFORM DB2-ERROR-ROUTINE
            END-IF
-           . 
+           .  

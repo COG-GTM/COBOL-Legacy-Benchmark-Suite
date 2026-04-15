@@ -1,6 +1,16 @@
        *================================================================*
       * Program Name: BCHCTL00
       * Description: Batch Control Processor
+      *   Manages job-level control and process sequencing for the
+      *   batch processing pipeline. Provides functions to:
+      *   - Initialize batch job processing (INIT)
+      *   - Check prerequisite job completion (CHEK)
+      *   - Update job execution status (UPDT)
+      *   - Terminate and finalize job processing (TERM)
+      * Called By: JCL batch jobs, PRCSEQ00 (Process Sequence Manager)
+      * Calls: ERRPROC (error handling)
+      * Files: BCHCTL (Batch Control indexed file)
+      * Copybooks: BCHCTL, BCHCON, ERRHAND
       * Version: 1.0
       * Date: 2024
       *================================================================*
@@ -57,6 +67,10 @@
            05  LS-RETURN-CODE      PIC S9(4) COMP.
        
        PROCEDURE DIVISION USING LS-CONTROL-REQUEST.
+      *----------------------------------------------------------------*
+      * Main entry point - dispatches to appropriate function based
+      * on the requested operation code in LS-FUNCTION.
+      *----------------------------------------------------------------*
        0000-MAIN.
            EVALUATE TRUE
                WHEN FUNC-INIT
@@ -80,6 +94,11 @@
            GOBACK
            .
            
+      *----------------------------------------------------------------*
+      * 1000-PROCESS-INITIALIZE: Opens control file, reads the
+      * control record for this job, validates the process is
+      * ready to run, and marks it as started.
+      *----------------------------------------------------------------*
        1000-PROCESS-INITIALIZE.
            PERFORM 1100-OPEN-FILES
            PERFORM 1200-READ-CONTROL-RECORD
@@ -87,6 +106,11 @@
            PERFORM 1400-UPDATE-START-STATUS
            .
            
+      *----------------------------------------------------------------*
+      * 2000-CHECK-PREREQUISITES: Reads the control record and
+      * verifies all prerequisite jobs have completed successfully
+      * before allowing this job to proceed.
+      *----------------------------------------------------------------*
        2000-CHECK-PREREQUISITES.
            PERFORM 2100-READ-CONTROL-RECORD
            PERFORM 2200-CHECK-DEPENDENCIES
@@ -97,17 +121,30 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 3000-UPDATE-STATUS: Reads the current control record,
+      * updates the process status, and writes the changes back
+      * to the control file.
+      *----------------------------------------------------------------*
        3000-UPDATE-STATUS.
            PERFORM 3100-READ-CONTROL-RECORD
            PERFORM 3200-UPDATE-PROCESS-STATUS
            PERFORM 3300-WRITE-CONTROL-RECORD
            .
            
+      *----------------------------------------------------------------*
+      * 4000-PROCESS-TERMINATE: Records final completion status
+      * and closes all open files.
+      *----------------------------------------------------------------*
        4000-PROCESS-TERMINATE.
            PERFORM 4100-UPDATE-COMPLETION
            PERFORM 4200-CLOSE-FILES
            .
            
+      *----------------------------------------------------------------*
+      * 9000-ERROR-ROUTINE: Centralized error handler. Sets the
+      * program name for error tracking and delegates to ERRPROC.
+      *----------------------------------------------------------------*
        9000-ERROR-ROUTINE.
            MOVE 'BCHCTL00' TO ERR-PROGRAM
            MOVE BCT-RC-ERROR TO LS-RETURN-CODE

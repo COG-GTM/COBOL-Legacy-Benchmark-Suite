@@ -93,12 +93,20 @@
                10  FILLER               PIC X(40) VALUE SPACES.
 
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control flow: Initialize, process DB2 and batch
+      * statistics, calculate metrics, and generate the report.
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            PERFORM 2000-PROCESS-REPORT
            PERFORM 3000-CLEANUP
            GOBACK.
 
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Opens statistics and report files, writes
+      * report headers, and initializes metric accumulators.
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            PERFORM 1100-OPEN-FILES
            PERFORM 1200-WRITE-HEADERS
@@ -135,12 +143,21 @@
        1300-INIT-ACCUMULATORS.
            INITIALIZE WS-PERFORMANCE-METRICS.
 
+      *----------------------------------------------------------------*
+      * 2000-PROCESS-REPORT: Accumulates DB2 and batch statistics,
+      * calculates derived performance metrics, and writes the
+      * full report with DB2, batch, and trend analysis sections.
+      *----------------------------------------------------------------*
        2000-PROCESS-REPORT.
            PERFORM 2100-PROCESS-DB2-STATS
            PERFORM 2200-PROCESS-BATCH-STATS
            PERFORM 2300-CALCULATE-METRICS
            PERFORM 2400-WRITE-REPORT.
 
+      *----------------------------------------------------------------*
+      * 2100-PROCESS-DB2-STATS: Reads all DB2 statistics records
+      * and accumulates call counts, elapsed time, and CPU usage.
+      *----------------------------------------------------------------*
        2100-PROCESS-DB2-STATS.
            READ DB2-STATS
                AT END SET END-OF-DB2-STATS TO TRUE
@@ -153,6 +170,10 @@
                END-READ
            END-PERFORM.
 
+      *----------------------------------------------------------------*
+      * 2200-PROCESS-BATCH-STATS: Reads all batch statistics
+      * records and accumulates job counts and success/fail rates.
+      *----------------------------------------------------------------*
        2200-PROCESS-BATCH-STATS.
            READ BATCH-STATS
                AT END SET END-OF-BATCH-STATS TO TRUE

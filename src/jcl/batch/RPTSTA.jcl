@@ -1,7 +1,15 @@
+//******************************************************************
+//* JCL Name: RPTSTA
+//* Description: Execute System Statistics Report Generator
+//*   Runs RPTSTA00 to read DB2 and batch statistics files,
+//*   then produces a system performance statistics report.
+//* Program: RPTSTA00
+//* Input:   DB2STATS - DB2 statistics file (SHR)
+//*          BCHSTATS - Batch statistics file (SHR)
+//* Output:  RPTFILE  - System stats report (NEW, FB/132)
+//******************************************************************
 //RPTSTA00 JOB (ACCT#),'SYSTEM STATS RPT',
 //             CLASS=A,MSGCLASS=X,MSGLEVEL=(1,1)
-//*
-//* System Statistics Report Generator
 //*
 //STEP01   EXEC PGM=RPTSTA00
 //STEPLIB  DD   DSN=PROD.LOAD.LIBRARY,DISP=SHR
@@ -13,4 +21,4 @@
 //             DCB=(RECFM=FB,LRECL=132,BLKSIZE=0)
 //SYSOUT   DD   SYSOUT=*
 //SYSUDUMP DD   SYSOUT=*
-//SYSPRINT DD   SYSOUT=* 
+//SYSPRINT DD   SYSOUT=*  

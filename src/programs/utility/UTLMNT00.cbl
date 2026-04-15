@@ -3,13 +3,18 @@
        AUTHOR. CLAUDE.
        DATE-WRITTEN. 2024-04-09.
       *****************************************************************
-      * File Maintenance Utility                                       *
-      *                                                               *
-      * Performs maintenance operations on system files:              *
-      * - Archive processing                                         *
-      * - File cleanup                                               *
-      * - VSAM reorganization                                        *
-      * - Space management                                           *
+      * Program Name: UTLMNT00                                        *
+      * Description: File Maintenance Utility                         *
+      *   Reads a control file specifying maintenance functions and   *
+      *   performs the requested operation on each target file:       *
+      *   - ARCHIVE:  copies aged records to an archive dataset      *
+      *   - CLEANUP:  reclaims space and purges expired records      *
+      *   - REORG:    exports, deletes/defines, and reimports VSAM   *
+      *   - ANALYZE:  collects file statistics for capacity reports  *
+      *   Halts after 100 cumulative errors.                         *
+      * Files: CTLFILE (control input), ARCHFILE (archive output),   *
+      *        RPTFILE (report output)                               *
+      * Copybooks: RTNCODE, ERRHAND                                  *
       *****************************************************************
        ENVIRONMENT DIVISION.
        CONFIGURATION SECTION.
@@ -84,16 +89,27 @@
            05  WS-VSAM-STATUS       PIC XX.
 
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control flow: Open files, process each maintenance
+      * function from the control file, then close files.
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            PERFORM 2000-PROCESS
            PERFORM 3000-CLEANUP
            GOBACK.
 
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Opens files and resets counters.
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            PERFORM 1100-OPEN-FILES
            PERFORM 1200-INIT-PROCESSING.
 
+      *----------------------------------------------------------------*
+      * 1100-OPEN-FILES: Opens control (input), archive (output),
+      * and report (output) files.
+      *----------------------------------------------------------------*
        1100-OPEN-FILES.
            OPEN INPUT CONTROL-FILE
            IF WS-CTL-STATUS NOT = '00'
@@ -116,9 +132,15 @@
                PERFORM 9999-ERROR-HANDLER
            END-IF.
 
+      *----------------------------------------------------------------*
+      * 1200-INIT-PROCESSING: Resets record and error counters.
+      *----------------------------------------------------------------*
        1200-INIT-PROCESSING.
            INITIALIZE WS-COUNTERS.
 
+      *----------------------------------------------------------------*
+      * 2000-PROCESS: Reads control records until EOF.
+      *----------------------------------------------------------------*
        2000-PROCESS.
            PERFORM UNTIL END-OF-CONTROL
                READ CONTROL-FILE
@@ -129,6 +151,10 @@
                END-READ
            END-PERFORM.
 
+      *----------------------------------------------------------------*
+      * 2100-PROCESS-FUNCTION: Dispatches to the maintenance
+      * operation matching the control record function code.
+      *----------------------------------------------------------------*
        2100-PROCESS-FUNCTION.
            EVALUATE CTL-FUNCTION
                WHEN WS-ARCHIVE
@@ -145,38 +171,61 @@
                    PERFORM 9999-ERROR-HANDLER
            END-EVALUATE.
 
+      *----------------------------------------------------------------*
+      * 2200-ARCHIVE-PROCESS: Opens the VSAM file, copies aged
+      * records to the archive, then closes.
+      *----------------------------------------------------------------*
        2200-ARCHIVE-PROCESS.
            MOVE CTL-FILE-NAME TO WS-VSAM-NAME
            PERFORM 2210-OPEN-VSAM
            PERFORM 2220-ARCHIVE-RECORDS
            PERFORM 2230-CLOSE-VSAM.
 
+      *----------------------------------------------------------------*
+      * 2300-CLEANUP-PROCESS: Analyzes space usage, purges
+      * expired records, and updates the catalog.
+      *----------------------------------------------------------------*
        2300-CLEANUP-PROCESS.
            MOVE CTL-FILE-NAME TO WS-VSAM-NAME
            PERFORM 2310-ANALYZE-SPACE
            PERFORM 2320-DELETE-OLD
            PERFORM 2330-UPDATE-CATALOG.
 
+      *----------------------------------------------------------------*
+      * 2400-REORG-PROCESS: Reorganizes a VSAM file by exporting
+      * data, deleting/redefining the cluster, and reimporting.
+      *----------------------------------------------------------------*
        2400-REORG-PROCESS.
            MOVE CTL-FILE-NAME TO WS-VSAM-NAME
            PERFORM 2410-EXPORT-DATA
            PERFORM 2420-DELETE-DEFINE
            PERFORM 2430-IMPORT-DATA.
 
+      *----------------------------------------------------------------*
+      * 2500-ANALYZE-PROCESS: Collects file statistics and writes
+      * a capacity/health report.
+      *----------------------------------------------------------------*
        2500-ANALYZE-PROCESS.
            MOVE CTL-FILE-NAME TO WS-VSAM-NAME
            PERFORM 2510-COLLECT-STATS
            PERFORM 2520-GENERATE-REPORT.
 
+      *----------------------------------------------------------------*
+      * 3000-CLEANUP: Closes all files.
+      *----------------------------------------------------------------*
        3000-CLEANUP.
            CLOSE CONTROL-FILE
                 ARCHIVE-FILE
                 REPORT-FILE.
 
+      *----------------------------------------------------------------*
+      * 9999-ERROR-HANDLER: Logs error to console and aborts
+      * (RC=12) after 100 cumulative errors.
+      *----------------------------------------------------------------*
        9999-ERROR-HANDLER.
            ADD 1 TO WS-ERROR-COUNT
            DISPLAY WS-ERROR-MESSAGE UPON CONS
            IF WS-ERROR-COUNT > 100
                MOVE 12 TO RETURN-CODE
                GOBACK
-           END-IF. 
+           END-IF.   

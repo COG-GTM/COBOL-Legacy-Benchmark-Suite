@@ -1,6 +1,12 @@
        *================================================================*
       * Program Name: DB2CONN
       * Description: DB2 Connection Manager
+      *   Manages DB2 database connections for batch programs.
+      *   Supports connect with retry (up to 3 attempts),
+      *   disconnect with auto-commit, and status checking.
+      * Called By: Batch and common programs
+      * Calls: ERRPROC (error handling), DELAY (retry wait)
+      * Copybooks: SQLCA, DBPROC, ERRHAND
       * Version: 1.0
       * Date: 2024
       *================================================================*
@@ -44,6 +50,10 @@
                10  LS-ERROR-MSG    PIC X(80).
        
        PROCEDURE DIVISION USING LS-DB2-REQUEST.
+      *----------------------------------------------------------------*
+      * Main entry point - dispatches to Connect, Disconnect, or
+      * Status check based on the function code.
+      *----------------------------------------------------------------*
        0000-MAIN.
            EVALUATE TRUE
                WHEN FUNC-CONN
@@ -60,6 +70,11 @@
            GOBACK
            .
            
+      *----------------------------------------------------------------*
+      * 1000-CONNECT: Attempts to connect to the specified DB2
+      * subsystem with up to 3 retries, using DELAY between
+      * each attempt.
+      *----------------------------------------------------------------*
        1000-CONNECT.
            SET WS-DISCONNECTED TO TRUE
            MOVE ZERO TO WS-RETRY-COUNT
@@ -88,6 +103,11 @@
            END-PERFORM
            .
            
+      *----------------------------------------------------------------*
+      * 1100-HANDLE-CONN-ERROR: Maps SQL error codes to
+      * descriptive messages (-30081=max connections,
+      * -99999=network error, OTHER=general error).
+      *----------------------------------------------------------------*
        1100-HANDLE-CONN-ERROR.
            MOVE SQLCODE TO LS-SQLCODE
            
@@ -106,6 +126,10 @@
            MOVE 12 TO LS-RETURN-CODE
            .
            
+      *----------------------------------------------------------------*
+      * 2000-DISCONNECT: Commits pending work and resets the DB2
+      * connection. Only acts when currently connected.
+      *----------------------------------------------------------------*
        2000-DISCONNECT.
            IF WS-CONNECTED
                EXEC SQL
@@ -128,6 +152,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 3000-CHECK-STATUS: Queries CURRENT SERVER from SYSIBM to
+      * verify the DB2 connection is active.
+      *----------------------------------------------------------------*
        3000-CHECK-STATUS.
            EXEC SQL
                SELECT CURRENT SERVER
@@ -147,6 +175,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 9000-ERROR-ROUTINE: Sets return code 12 and delegates to
+      * ERRPROC for standard error processing.
+      *----------------------------------------------------------------*
        9000-ERROR-ROUTINE.
            MOVE 'DB2CONN' TO ERR-PROGRAM
            MOVE 12 TO LS-RETURN-CODE

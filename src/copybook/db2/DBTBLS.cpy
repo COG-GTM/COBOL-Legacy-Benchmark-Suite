@@ -1,5 +1,14 @@
       *================================================================*
-      * DB2 Table Definitions
+      * Copybook Name: DBTBLS
+      * Description: DB2 Table Host-Variable Definitions
+      *   COBOL host-variable layouts matching DB2 tables:
+      *   POSHIST-RECORD (PH-)  - Position History table; records
+      *     every portfolio transaction with quantity, price, amount,
+      *     fees, cost basis, and gain/loss.
+      *   ERRLOG-RECORD  (EL-)  - Error Log table; captures
+      *     application, system, and data errors with severity,
+      *     code, and free-text detail.
+      * Used By: DB2ONLN, DB2RECV, RPTPOS00, RPTAUD00
       * Version: 1.0
       * Date: 2024
       *================================================================*
@@ -47,4 +56,4 @@
            05  EL-PROCESS-DATE      PIC X(10).
            05  EL-PROCESS-TIME      PIC X(8).
            05  EL-USER-ID           PIC X(8).
-           05  EL-ADDITIONAL-INFO   PIC X(500). 
+           05  EL-ADDITIONAL-INFO   PIC X(500).  

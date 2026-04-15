@@ -75,12 +75,20 @@
            05  FILLER               PIC X(40) VALUE SPACES.
 
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control flow: Initialize files/headers, generate the
+      * position report with transaction activity, then clean up.
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            PERFORM 2000-PROCESS-REPORT
            PERFORM 3000-CLEANUP
            GOBACK.
 
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Opens position master, transaction history,
+      * and report output files, then writes report headers.
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            PERFORM 1100-OPEN-FILES
            PERFORM 1200-WRITE-HEADERS.
@@ -113,6 +121,10 @@
            WRITE REPORT-RECORD FROM WS-HEADER2
            WRITE REPORT-RECORD FROM WS-HEADER3.
 
+      *----------------------------------------------------------------*
+      * 2000-PROCESS-REPORT: Reads and formats portfolio positions,
+      * processes transaction activity, and writes summary totals.
+      *----------------------------------------------------------------*
        2000-PROCESS-REPORT.
            PERFORM 2100-READ-POSITIONS
            PERFORM 2200-PROCESS-TRANSACTIONS
@@ -130,6 +142,11 @@
                END-READ
            END-PERFORM.
 
+      *----------------------------------------------------------------*
+      * 2110-FORMAT-POSITION: Maps position fields to report
+      * detail line and calculates percentage change from
+      * previous to current value.
+      *----------------------------------------------------------------*
        2110-FORMAT-POSITION.
            MOVE POS-PORTFOLIO-ID   TO WS-POS-PORTFOLIO
            MOVE POS-DESCRIPTION    TO WS-POS-DESCRIPTION
@@ -144,6 +161,10 @@
            PERFORM 2210-READ-TRANSACTIONS
            PERFORM 2220-SUMMARIZE-ACTIVITY.
 
+      *----------------------------------------------------------------*
+      * 2300-WRITE-SUMMARY: Writes portfolio totals, exception
+      * details, and performance metrics to the report.
+      *----------------------------------------------------------------*
        2300-WRITE-SUMMARY.
            PERFORM 2310-WRITE-TOTALS
            PERFORM 2320-WRITE-EXCEPTIONS
@@ -157,4 +178,4 @@
        9999-ERROR-HANDLER.
            DISPLAY WS-ERROR-MESSAGE
            MOVE 12 TO RETURN-CODE
-           GOBACK. 
+           GOBACK.  

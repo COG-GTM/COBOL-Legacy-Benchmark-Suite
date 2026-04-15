@@ -67,6 +67,11 @@
            COPY INQCOM.
            
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control flow: Initialize CICS context and DB2
+      * connection, retrieve transaction history via cursor,
+      * then format and send results to the BMS map.
+      *----------------------------------------------------------------*
            PERFORM P100-INIT-PROGRAM
               THRU P100-EXIT.
               
@@ -78,6 +83,10 @@
               
            EXEC CICS RETURN END-EXEC.
            
+      *----------------------------------------------------------------*
+      * P100-INIT-PROGRAM: Copies COMMAREA, resets row counters,
+      * registers error handlers, and establishes DB2 connection.
+      *----------------------------------------------------------------*
        P100-INIT-PROGRAM.
            MOVE DFHCOMMAREA TO WS-COMMAREA.
            MOVE ZEROS TO WS-ROW-COUNT.
@@ -92,6 +101,10 @@
        P100-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P150-DB2-CONNECT: Links to DB2ONLN for a connection. On
+      * failure, invokes DB2RECV for recovery with retry logic.
+      *----------------------------------------------------------------*
        P150-DB2-CONNECT.
            MOVE 'C' TO DB2-REQUEST-TYPE.
            
@@ -126,6 +139,11 @@
        P150-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P200-GET-HISTORY: Declares, opens, and fetches from a DB2
+      * cursor over the POSHIST table, then closes the cursor.
+      * Uses CURSMGR for all cursor lifecycle operations.
+      *----------------------------------------------------------------*
        P200-GET-HISTORY.
            MOVE 'SELECT TRANS_DATE, TRANS_TYPE, TRANS_UNITS, ' &
                 'TRANS_PRICE, TRANS_AMOUNT ' &
@@ -161,6 +179,10 @@
        P200-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P250-FETCH-HISTORY: Fetches the next batch of history
+      * rows via CURSMGR array fetch into WS-HISTORY-TABLE.
+      *----------------------------------------------------------------*
        P250-FETCH-HISTORY.
            MOVE 'F' TO CURS-REQUEST-TYPE.
            EXEC CICS LINK PROGRAM('CURSMGR')
@@ -174,6 +196,10 @@
        P250-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P300-FORMAT-DISPLAY: Sends the formatted history table
+      * to the HISMAP BMS map for terminal display.
+      *----------------------------------------------------------------*
        P300-FORMAT-DISPLAY.
            EXEC CICS SEND MAP('HISMAP')
                      MAPSET('INQSET')
@@ -185,6 +211,10 @@
        P300-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P999-ERROR-ROUTINE: Captures the SQL error code into the
+      * COMMAREA response and returns control to the caller.
+      *----------------------------------------------------------------*
        P999-ERROR-ROUTINE.
            MOVE SQLCODE 
              TO INQCOM-RESPONSE-CODE OF WS-COMMAREA.
