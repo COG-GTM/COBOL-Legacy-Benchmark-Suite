@@ -1,7 +1,25 @@
        *================================================================*
       * Program Name: PORTDEL
       * Description: Portfolio Deletion Program
-      *             Processes portfolio deletion requests
+      *             Processes portfolio deletion requests from a
+      *             sequential input file and writes audit trail.
+      *
+      * Processing:  Reads DELEFILE for deletion requests, each with
+      *              a reason code:
+      *                01 - Account closed
+      *                02 - Transferred to another portfolio
+      *                03 - Client-requested deletion
+      *              Deletes matching records from PORTFILE and logs
+      *              every deletion to AUDFILE with timestamp.
+      *
+      * Files:       PORTFILE - Indexed VSAM portfolio master (I-O)
+      *              DELEFILE - Sequential deletion request input
+      *              AUDFILE  - Sequential audit trail output
+      *
+      * Copybooks:   PORTFLIO - Portfolio record layout
+      *
+      * Return Codes: 0 = Success, 8 = File open error
+      *
       * Author: [Author name]
       * Date Written: 2024-03-20
       * Maintenance Log:
@@ -43,9 +61,11 @@
            
        FD  DELETE-FILE.
        01  DELETE-RECORD.
+      *    Composite key identifying the portfolio to delete
            05  DEL-KEY.
                10  DEL-ID          PIC X(8).
                10  DEL-ACCT-NO     PIC X(10).
+      *    Reason for deletion (01=Closed, 02=Transfer, 03=Requested)
            05  DEL-REASON-CODE     PIC X(2).
                88  DEL-CLOSED        VALUE '01'.
                88  DEL-TRANSFERRED   VALUE '02'.
@@ -53,6 +73,7 @@
            05  DEL-FILLER         PIC X(60).
            
        FD  AUDIT-FILE.
+      *    Audit trail record capturing each deletion event
        01  AUDIT-RECORD.
            05  AUD-TIMESTAMP      PIC X(26).
            05  AUD-ACTION         PIC X(6).
@@ -98,6 +119,9 @@
            05  WS-TIMESTAMP        PIC X(26).
            
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control: open files, process deletions, close and report. *
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            
@@ -108,6 +132,9 @@
            
            GOBACK.
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Open all three files and validate statuses.   *
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            INITIALIZE WS-WORK-AREAS
            
@@ -127,6 +154,9 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2000-PROCESS: Read next deletion request from input file.      *
+      *----------------------------------------------------------------*
        2000-PROCESS.
            READ DELETE-FILE
                AT END
@@ -136,6 +166,10 @@
            END-READ
            .
            
+      *----------------------------------------------------------------*
+      * 2100-PROCESS-DELETE: Look up portfolio by key. If found,       *
+      * delete it; otherwise tally as not-found or error.              *
+      *----------------------------------------------------------------*
        2100-PROCESS-DELETE.
            MOVE DEL-KEY TO PORT-KEY
            
@@ -153,6 +187,9 @@
            END-EVALUATE
            .
            
+      *----------------------------------------------------------------*
+      * 2200-DELETE-RECORD: Issue DELETE and write audit on success.    *
+      *----------------------------------------------------------------*
        2200-DELETE-RECORD.
            DELETE PORTFOLIO-FILE
            
@@ -165,6 +202,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2300-WRITE-AUDIT: Capture timestamp and write audit record     *
+      * with deletion details (key, reason code, prior status).        *
+      *----------------------------------------------------------------*
        2300-WRITE-AUDIT.
            ACCEPT WS-TIMESTAMP FROM TIME STAMP
            
@@ -181,6 +222,9 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 3000-TERMINATE: Close all files and display summary counts.    *
+      *----------------------------------------------------------------*
        3000-TERMINATE.
            CLOSE PORTFOLIO-FILE
                  DELETE-FILE

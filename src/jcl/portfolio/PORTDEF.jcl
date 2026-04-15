@@ -1,13 +1,21 @@
 //******************************************************************
-//* JCL Name: PORTDEF
-//* Description: Define Portfolio Master VSAM File
-//* Author: [Author name]
-//* Date Written: 2024-03-20
-//*
-//* Maintenance Log:
-//* Date       Author        Description
-//* ---------- ------------- -------------------------------------
-//* 2024-03-20 [Author]     Initial Creation
+//* JCL Name:    PORTDEF                                           *
+//* Description: Define Portfolio Master VSAM File                 *
+//* Author: [Author name]                                          *
+//* Date Written: 2024-03-20                                       *
+//*                                                                *
+//* Uses IDCAMS to delete (if exists) and redefine the Portfolio   *
+//* Master VSAM KSDS cluster. The file is defined as indexed with  *
+//* an 18-byte key (PORT-ID + ACCOUNT-NO), 200-byte fixed records, *
+//* 10% free space, and share options (2,3) for concurrent access. *
+//*                                                                *
+//* WARNING: Running this job will delete all existing portfolio   *
+//*          data. Use only for initial setup or full rebuilds.    *
+//*                                                                *
+//* Maintenance Log:                                               *
+//* Date       Author        Description                          *
+//* ---------- ------------- ------------------------------------ *
+//* 2024-03-20 [Author]     Initial Creation                      *
 //******************************************************************
 //PORTDEF   JOB (ACCT),'DEFINE PORTFOLIO',
 //          CLASS=A,MSGCLASS=X,NOTIFY=&SYSUID

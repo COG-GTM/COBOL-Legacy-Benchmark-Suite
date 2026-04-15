@@ -1,9 +1,22 @@
        *****************************************************************
-      * CHECKPOINT/RESTART CONTROL STRUCTURE
-      * VERSION: 1.0
-      * DATE: 2024
+      * Copybook Name: CKPRST                                         *
+      * Description:  Checkpoint/Restart Control Structure              *
+      * Version: 1.0                                                   *
+      * Date: 2024                                                     *
+      *                                                                *
+      * Defines the data structures for program-level checkpointing    *
+      * and restart. Works with BCHCTL.cpy which handles job-level     *
+      * sequencing. Programs save their processing state at intervals   *
+      * so that after a failure, the job can be restarted from the     *
+      * last committed checkpoint rather than from the beginning.      *
+      *                                                                *
+      * Contains:                                                      *
+      *   CHECKPOINT-CONTROL - In-memory state tracker                 *
+      *   CHECKPOINT-RECORD  - VSAM record layout for persistence     *
+      *   Standard routine call signatures (CKPINIT, CKPTAKE, etc.)   *
       *****************************************************************
        01  CHECKPOINT-CONTROL.
+      *    Program identification and current run state
            05  CK-HEADER.
                10  CK-PROGRAM-ID       PIC X(8).
                10  CK-RUN-DATE         PIC X(8).
@@ -15,12 +28,14 @@
                    88  CK-FAILED       VALUE 'F'.
                    88  CK-RESTARTED    VALUE 'R'.
            
+      *    Running counts saved at each checkpoint
            05  CK-COUNTERS.
                10  CK-RECORDS-READ     PIC 9(9) COMP.
                10  CK-RECORDS-PROC     PIC 9(9) COMP.
                10  CK-RECORDS-ERROR    PIC 9(9) COMP.
                10  CK-RESTART-COUNT    PIC 9(2) COMP.
            
+      *    Last-processed position for restart repositioning
            05  CK-POSITION.
                10  CK-LAST-KEY         PIC X(50).
                10  CK-LAST-TIME        PIC X(26).
@@ -31,12 +46,14 @@
                    88  CK-PHASE-UPDT   VALUE '30'.
                    88  CK-PHASE-TERM   VALUE '40'.
            
+      *    Open file positions saved at checkpoint (up to 5 files)
            05  CK-RESOURCES.
                10  CK-FILE-STATUS OCCURS 5 TIMES.
                    15  CK-FILE-NAME    PIC X(8).
                    15  CK-FILE-POS     PIC X(50).
                    15  CK-FILE-STATUS  PIC X(2).
            
+      *    Tuning parameters and restart mode flag
            05  CK-CONTROL-INFO.
                10  CK-COMMIT-FREQ      PIC 9(5) COMP VALUE 1000.
                10  CK-MAX-ERRORS       PIC 9(3) COMP VALUE 100.

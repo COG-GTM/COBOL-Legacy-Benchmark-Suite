@@ -1,10 +1,16 @@
         IDENTIFICATION DIVISION.
        PROGRAM-ID. INQPORT.
       *****************************************************************
-      * Portfolio Position Inquiry Handler                              *
-      * - Retrieves current portfolio positions                        *
-      * - Formats position data for display                            *
-      * - Handles VSAM and DB2 access                                  *
+      * Program Name: INQPORT                                         *
+      * Description:  Portfolio Position Inquiry Handler                *
+      *                                                               *
+      * Retrieves a single portfolio position from the POSFILE VSAM   *
+      * file by account number (passed in COMMAREA) and sends the     *
+      * result to the terminal via BMS map POSMAP.                    *
+      *                                                               *
+      * Called By: INQONLN (via CICS LINK)                            *
+      * Files:    POSFILE - Position VSAM KSDS (Input, keyed read)    *
+      * Maps:     POSMAP (mapset INQSET)                              *
       *****************************************************************
        
        ENVIRONMENT DIVISION.
@@ -26,6 +32,7 @@
               88 POSITION-EXISTS           VALUE 'Y'.
               88 NO-POSITION               VALUE 'N'.
               
+      * Static labels for the position display map
        01  WS-MAP-FIELDS.
            05 WS-ACCOUNT-LABEL        PIC X(10) VALUE 'Account:'.
            05 WS-FUND-LABEL          PIC X(10) VALUE 'Fund ID:'.
@@ -38,6 +45,9 @@
            COPY INQCOM.
            
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main: Init, read position, display or report not-found.        *
+      *----------------------------------------------------------------*
            PERFORM P100-INIT-PROGRAM
               THRU P100-EXIT.
               
@@ -54,6 +64,9 @@
               
            EXEC CICS RETURN END-EXEC.
            
+      *----------------------------------------------------------------*
+      * P100: Copy COMMAREA, set CICS error handlers.                  *
+      *----------------------------------------------------------------*
        P100-INIT-PROGRAM.
            MOVE LOW-VALUES TO WS-POSITION-RECORD
            MOVE DFHCOMMAREA TO WS-COMMAREA.
@@ -65,6 +78,10 @@
        P100-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P200: Keyed read of POSFILE by account number. Sets            *
+      *   POSITION-EXISTS or NO-POSITION based on CICS response.      *
+      *----------------------------------------------------------------*
        P200-GET-POSITION.
            MOVE WS-COMMAREA-ACCOUNT-NO 
              TO POSITION-ACCOUNT OF WS-POSITION-RECORD.
@@ -83,6 +100,9 @@
        P200-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P300: Send position data to the terminal via BMS map.          *
+      *----------------------------------------------------------------*
        P300-FORMAT-DISPLAY.
            EXEC CICS SEND MAP('POSMAP')
                      MAPSET('INQSET')
@@ -93,6 +113,9 @@
        P300-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P900: Set 'not found' message in COMMAREA and return.          *
+      *----------------------------------------------------------------*
        P900-NOT-FOUND.
            MOVE 'Position not found for account' 
              TO INQCOM-ERROR-MSG OF WS-COMMAREA.
@@ -100,6 +123,9 @@
        P900-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P999: Set error message and response code in COMMAREA.         *
+      *----------------------------------------------------------------*
        P999-ERROR-ROUTINE.
            MOVE 'Error accessing position data' 
              TO INQCOM-ERROR-MSG OF WS-COMMAREA.

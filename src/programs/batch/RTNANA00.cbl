@@ -1,11 +1,21 @@
        IDENTIFICATION DIVISION.
        PROGRAM-ID. RTNANA00.
       *****************************************************************
-      * Return Code Analysis Utility                                    *
-      * - Analyzes return codes across system                          *
-      * - Generates trend analysis                                     *
-      * - Identifies error patterns                                    *
-      * - Produces analysis reports                                    *
+      * Program Name: RTNANA00                                        *
+      * Description:  Return Code Analysis Utility                     *
+      *                                                               *
+      * Queries the DB2 RTNCODES table to produce a per-program       *
+      * breakdown of return code categories (Success / Warning /      *
+      * Error / Severe) and writes the results to a fixed-format      *
+      * (133-col) report with totals.                                 *
+      *                                                               *
+      * Called By: JCL batch job                                      *
+      * Tables:   RTNCODES (DB2 - Input via cursor PRGCUR)            *
+      * Files:    RPTFILE  - Report output (Sequential, FB)           *
+      *                                                               *
+      * Return Codes:                                                 *
+      *   0  - Report generated successfully                          *
+      *   12 - Fatal error (file open failure)                        *
       *****************************************************************
        
        ENVIRONMENT DIVISION.
@@ -42,6 +52,7 @@
               10 WS-CURRENT-SECOND   PIC 9(2).
               10 WS-CURRENT-MS       PIC 9(2).
            
+      * Running totals accumulated across all programs
        01  WS-ANALYSIS-AREA.
            05 WS-START-TIME          PIC X(26).
            05 WS-END-TIME            PIC X(26).
@@ -94,6 +105,9 @@
               10 FILLER              PIC X(65) VALUE SPACES.
               
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main driver: init, analyze via DB2, write totals, close.       *
+      *----------------------------------------------------------------*
            PERFORM P100-INIT-PROGRAM
               THRU P100-EXIT.
               
@@ -108,6 +122,9 @@
               
            GOBACK.
            
+      *----------------------------------------------------------------*
+      * P100: Get current date/time, open report file, zero counters.  *
+      *----------------------------------------------------------------*
        P100-INIT-PROGRAM.
            MOVE FUNCTION CURRENT-DATE TO WS-CURRENT-DATE-DATA.
            
@@ -122,6 +139,10 @@
        P100-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P200: Declare and open DB2 cursor, write headers, fetch each   *
+      *   program's totals, and close the cursor.                      *
+      *----------------------------------------------------------------*
        P200-PROCESS-ANALYSIS.
            EXEC SQL
                 DECLARE PRGCUR CURSOR FOR
@@ -149,6 +170,9 @@
        P200-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P210: Write report banner, date/time, and column headers.      *
+      *----------------------------------------------------------------*
        P210-WRITE-HEADERS.
            WRITE REPORT-RECORD FROM WS-HEADER1.
            WRITE REPORT-RECORD FROM WS-HEADER2.
@@ -166,6 +190,10 @@
        P210-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P220: Fetch one row from PRGCUR, write the detail line, and    *
+      *   accumulate running totals for the summary.                   *
+      *----------------------------------------------------------------*
        P220-PROCESS-DETAIL.
            EXEC SQL
                 FETCH PRGCUR
@@ -189,6 +217,9 @@
        P220-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P300: Write the grand-total summary line at end of report.     *
+      *----------------------------------------------------------------*
        P300-GENERATE-REPORT.
            WRITE REPORT-RECORD FROM WS-HEADER1.
            
@@ -204,7 +235,10 @@
        P300-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P900: Close the report file.                                   *
+      *----------------------------------------------------------------*
        P900-CLOSE-FILES.
            CLOSE REPORT-FILE.
        P900-EXIT.
-           EXIT. 
+           EXIT.  

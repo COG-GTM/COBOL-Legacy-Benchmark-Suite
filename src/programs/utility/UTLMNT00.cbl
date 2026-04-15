@@ -5,11 +5,24 @@
       *****************************************************************
       * File Maintenance Utility                                       *
       *                                                               *
-      * Performs maintenance operations on system files:              *
-      * - Archive processing                                         *
-      * - File cleanup                                               *
-      * - VSAM reorganization                                        *
-      * - Space management                                           *
+      * Batch program that performs scheduled maintenance tasks on     *
+      * system files, driven by a control file specifying which       *
+      * operation to perform on which dataset.                         *
+      *                                                               *
+      * Functions (via CTL-FUNCTION):                                 *
+      *   ARCHIVE  - Copy aged records to archive file                *
+      *   CLEANUP  - Analyze space, delete old data, update catalog   *
+      *   REORG    - Export, delete/define, and reimport VSAM data    *
+      *   ANALYZE  - Collect statistics and produce a health report   *
+      *                                                               *
+      * Files:                                                        *
+      *   CTLFILE  - Input  : Control file (function + dataset name)  *
+      *   ARCHFILE - Output : Archive destination (variable-length)   *
+      *   RPTFILE  - Output : Maintenance activity report             *
+      *                                                               *
+      * Copybooks: RTNCODE, ERRHAND                                  *
+      *                                                               *
+      * Return Codes: 0 = Success, 12 = Excessive errors (>100)       *
       *****************************************************************
        ENVIRONMENT DIVISION.
        CONFIGURATION SECTION.
@@ -67,6 +80,7 @@
            05  WS-FUNCTION-FLAG     PIC X VALUE 'N'.
                88  VALID-FUNCTION   VALUE 'Y'.
 
+      *    Constants for maintenance function dispatch
        01  WS-FUNCTIONS.
            05  WS-ARCHIVE           PIC X(8) VALUE 'ARCHIVE'.
            05  WS-CLEANUP           PIC X(8) VALUE 'CLEANUP'.
@@ -78,18 +92,25 @@
            05  WS-RECORDS-WRITTEN   PIC 9(9) VALUE ZERO.
            05  WS-ERROR-COUNT       PIC 9(9) VALUE ZERO.
 
+      *    Work area for VSAM operations (reorg, analyze)
        01  WS-VSAM-CONTROL.
            05  WS-VSAM-NAME         PIC X(44).
            05  WS-VSAM-FUNCTION     PIC X(8).
            05  WS-VSAM-STATUS       PIC XX.
 
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control: initialize, process control file, clean up.      *
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            PERFORM 2000-PROCESS
            PERFORM 3000-CLEANUP
            GOBACK.
 
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Open files and reset counters.                *
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            PERFORM 1100-OPEN-FILES
            PERFORM 1200-INIT-PROCESSING.
@@ -119,6 +140,10 @@
        1200-INIT-PROCESSING.
            INITIALIZE WS-COUNTERS.
 
+      *----------------------------------------------------------------*
+      * 2000-PROCESS: Read control records and dispatch to the         *
+      * appropriate maintenance function handler.                      *
+      *----------------------------------------------------------------*
        2000-PROCESS.
            PERFORM UNTIL END-OF-CONTROL
                READ CONTROL-FILE
@@ -129,6 +154,9 @@
                END-READ
            END-PERFORM.
 
+      *----------------------------------------------------------------*
+      * 2100-PROCESS-FUNCTION: Route to handler based on function.     *
+      *----------------------------------------------------------------*
        2100-PROCESS-FUNCTION.
            EVALUATE CTL-FUNCTION
                WHEN WS-ARCHIVE
@@ -145,38 +173,60 @@
                    PERFORM 9999-ERROR-HANDLER
            END-EVALUATE.
 
+      *----------------------------------------------------------------*
+      * 2200-ARCHIVE-PROCESS: Open source VSAM, copy eligible aged     *
+      * records to the archive file, then close the source.            *
+      *----------------------------------------------------------------*
        2200-ARCHIVE-PROCESS.
            MOVE CTL-FILE-NAME TO WS-VSAM-NAME
            PERFORM 2210-OPEN-VSAM
            PERFORM 2220-ARCHIVE-RECORDS
            PERFORM 2230-CLOSE-VSAM.
 
+      *----------------------------------------------------------------*
+      * 2300-CLEANUP-PROCESS: Analyze space usage, purge obsolete      *
+      * records, and update the system catalog.                        *
+      *----------------------------------------------------------------*
        2300-CLEANUP-PROCESS.
            MOVE CTL-FILE-NAME TO WS-VSAM-NAME
            PERFORM 2310-ANALYZE-SPACE
            PERFORM 2320-DELETE-OLD
            PERFORM 2330-UPDATE-CATALOG.
 
+      *----------------------------------------------------------------*
+      * 2400-REORG-PROCESS: Full VSAM reorganization via export,       *
+      * delete/define to reclaim space, and reimport data.             *
+      *----------------------------------------------------------------*
        2400-REORG-PROCESS.
            MOVE CTL-FILE-NAME TO WS-VSAM-NAME
            PERFORM 2410-EXPORT-DATA
            PERFORM 2420-DELETE-DEFINE
            PERFORM 2430-IMPORT-DATA.
 
+      *----------------------------------------------------------------*
+      * 2500-ANALYZE-PROCESS: Collect dataset statistics and produce   *
+      * a health/capacity report.                                      *
+      *----------------------------------------------------------------*
        2500-ANALYZE-PROCESS.
            MOVE CTL-FILE-NAME TO WS-VSAM-NAME
            PERFORM 2510-COLLECT-STATS
            PERFORM 2520-GENERATE-REPORT.
 
+      *----------------------------------------------------------------*
+      * 3000-CLEANUP: Close all files.                                 *
+      *----------------------------------------------------------------*
        3000-CLEANUP.
            CLOSE CONTROL-FILE
                 ARCHIVE-FILE
                 REPORT-FILE.
 
+      *----------------------------------------------------------------*
+      * 9999-ERROR-HANDLER: Display error; abort if count > 100.       *
+      *----------------------------------------------------------------*
        9999-ERROR-HANDLER.
            ADD 1 TO WS-ERROR-COUNT
            DISPLAY WS-ERROR-MESSAGE UPON CONS
            IF WS-ERROR-COUNT > 100
                MOVE 12 TO RETURN-CODE
                GOBACK
-           END-IF. 
+           END-IF.  

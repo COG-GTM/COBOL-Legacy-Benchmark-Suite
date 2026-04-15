@@ -1,9 +1,17 @@
       *****************************************************************
-      * RETURN CODE HANDLING DEFINITIONS
-      * VERSION: 1.0
-      * DATE: 2024
+      * Copybook Name: RETHND                                          *
+      * Description:  Return Code Handling Definitions                  *
+      * Version: 1.0                                                   *
+      * Date: 2024                                                     *
+      *                                                                *
+      * Comprehensive return-code management structure used across all  *
+      * programs. Provides severity-based return codes, error location  *
+      * tracking, error classification by type, retry/abort action      *
+      * control, and a library of standard error codes (E001-E010).    *
+      * Includes a usage example showing the standard calling pattern.  *
       *****************************************************************
        01  RETURN-HANDLING.
+      *    Current return code, reason, and originating module
            05  RETURN-STATUS.
                10  RETURN-CODE         PIC S9(4) COMP.
                    88  RC-SUCCESS      VALUE +0.
@@ -15,6 +23,7 @@
                10  MODULE-ID           PIC X(8).
                10  FUNCTION-ID         PIC X(8).
            
+      *    Detailed error context: location and classification
            05  RETURN-DETAILS.
                10  ERROR-LOCATION.
                    15  PROGRAM-NAME    PIC X(8).
@@ -33,6 +42,7 @@
                    15  SYSTEM-CODE     PIC X(4).
                    15  SYSTEM-MSG      PIC X(80).
 
+      *    Recovery action to take: continue, abort, or retry
            05  RETURN-ACTIONS.
                10  ACTION-FLAG         PIC X(1).
                    88  ACTION-CONTINUE VALUE 'C'.
@@ -41,7 +51,7 @@
                10  RETRY-COUNT         PIC 9(2) COMP.
                10  MAX-RETRIES         PIC 9(2) COMP VALUE 3.
       *****************************************************************
-      * STANDARD ERROR CODES
+      * STANDARD ERROR CODES - Predefined codes for common failures    *
       *****************************************************************
        01  STD-ERROR-CODES.
            05  ERR-INVALID-DATA    PIC X(4) VALUE 'E001'.
@@ -63,4 +73,4 @@
       *     SET ERR-VALIDATION TO TRUE
       *     SET RC-ERROR      TO TRUE
       *     MOVE 'Invalid portfolio ID' TO ERROR-TEXT
-      ***************************************************************** 
+      *****************************************************************  

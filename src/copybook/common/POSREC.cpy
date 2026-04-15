@@ -1,13 +1,22 @@
       *****************************************************************
-      * POSITION RECORD STRUCTURE
-      * VERSION: 1.0
-      * DATE: 2024
+      * Copybook Name: POSREC                                          *
+      * Description:  Position Record Structure                         *
+      * Version: 1.0                                                   *
+      * Date: 2024                                                     *
+      *                                                                *
+      * Defines the VSAM KSDS record for investment positions within   *
+      * a portfolio. Each record tracks the quantity, cost basis, and   *
+      * current market value of a single security held on a given      *
+      * date. Updated by POSUPD00 during batch processing and read     *
+      * by INQPORT for online position inquiries.                      *
       *****************************************************************
        01  POSITION-RECORD.
+      *    Composite key: portfolio + date + investment identifier
            05  POS-KEY.
                10  POS-PORTFOLIO-ID   PIC X(08).
                10  POS-DATE           PIC X(08).
                10  POS-INVESTMENT-ID  PIC X(10).
+      *    Holding details: quantity, valuation, and currency
            05  POS-DATA.
                10  POS-QUANTITY       PIC S9(11)V9(4) COMP-3.
                10  POS-COST-BASIS     PIC S9(13)V9(2) COMP-3.
@@ -30,4 +39,4 @@
       * POS-COST-BASIS   : TOTAL COST BASIS
       * POS-MARKET-VALUE : CURRENT MARKET VALUE
       * POS-STATUS       : A=ACTIVE, C=CLOSED, P=PENDING
-      ***************************************************************** 
+      *****************************************************************  

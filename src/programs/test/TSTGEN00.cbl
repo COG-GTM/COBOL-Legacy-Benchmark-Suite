@@ -5,11 +5,27 @@
       *****************************************************************
       * Test Data Generator                                           *
       *                                                               *
-      * Generates test data for system testing:                      *
-      * - Portfolio test data                                        *
-      * - Transaction test scenarios                                 *
-      * - Error condition data                                       *
-      * - Performance test volumes                                   *
+      * Generates synthetic test data for system testing and           *
+      * benchmarking of LLM translation tools. Reads a config file    *
+      * that specifies test type and volume, then produces matching    *
+      * portfolio and/or transaction records.                          *
+      *                                                               *
+      * Test Types (via CFG-TEST-TYPE):                               *
+      *   PORTFOLIO  - Generate synthetic portfolio records            *
+      *   TRANSACTN  - Generate synthetic transaction records          *
+      *   ERROR      - Generate intentionally invalid data for         *
+      *                error-handling verification                     *
+      *   VOLUME     - Generate large datasets for performance tests   *
+      *                                                               *
+      * Files:                                                        *
+      *   TSTCFG   - Input  : Test configuration (type + volume)      *
+      *   PORTOUT  - Output : Generated portfolio records              *
+      *   TRANOUT  - Output : Generated transaction records            *
+      *   RANDSEED - Input  : Seed value for reproducible random gen   *
+      *                                                               *
+      * Copybooks: PORTFLIO, TRNREC, RTNCODE, ERRHAND                *
+      *                                                               *
+      * Return Codes: 0 = Success, 12 = Excessive errors (>100)       *
       *****************************************************************
        ENVIRONMENT DIVISION.
        CONFIGURATION SECTION.
@@ -66,12 +82,14 @@
            COPY RTNCODE.
            COPY ERRHAND.
 
+      *    File status indicators for all I/O operations
        01  WS-FILE-STATUS.
            05  WS-CFG-STATUS        PIC XX.
            05  WS-PORT-STATUS       PIC XX.
            05  WS-TRAN-STATUS       PIC XX.
            05  WS-RAND-STATUS       PIC XX.
 
+      *    Constants for test type dispatch
        01  WS-TEST-TYPES.
            05  WS-PORTFOLIO         PIC X(10) VALUE 'PORTFOLIO'.
            05  WS-TRANSACTION       PIC X(10) VALUE 'TRANSACTN'.
@@ -86,11 +104,13 @@
            05  WS-RECORDS-WRITTEN   PIC 9(9) VALUE ZERO.
            05  WS-ERROR-COUNT       PIC 9(9) VALUE ZERO.
 
+      *    Pseudo-random number generation state
        01  WS-RANDOM-VALUES.
            05  WS-RANDOM-SEED       PIC 9(9).
            05  WS-RANDOM-NUM        PIC 9(9).
            05  WS-RANDOM-DECIMAL    PIC 9(9)V99.
 
+      *    Work area for building portfolio output records
        01  WS-PORTFOLIO-DATA.
            05  WS-PORT-ID           PIC X(10).
            05  WS-PORT-NAME         PIC X(30).
@@ -98,6 +118,7 @@
            05  WS-PORT-STATUS       PIC X(1).
            05  WS-PORT-BALANCE      PIC 9(15)V99.
 
+      *    Work area for building transaction output records
        01  WS-TRANSACTION-DATA.
            05  WS-TRAN-ID           PIC X(12).
            05  WS-TRAN-TYPE         PIC X(2).
@@ -106,17 +127,27 @@
            05  WS-TRAN-STATUS       PIC X(1).
 
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control: initialize files, generate data, clean up.       *
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            PERFORM 2000-PROCESS
            PERFORM 3000-CLEANUP
            GOBACK.
 
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Open all files, load random seed, reset       *
+      * counters for the generation run.                               *
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            PERFORM 1100-OPEN-FILES
            PERFORM 1200-INIT-RANDOM
            PERFORM 1300-INIT-COUNTERS.
 
+      *----------------------------------------------------------------*
+      * 1100-OPEN-FILES: Open config (input), output files, and seed.  *
+      *----------------------------------------------------------------*
        1100-OPEN-FILES.
            OPEN INPUT TEST-CONFIG
            IF WS-CFG-STATUS NOT = '00'
@@ -146,6 +177,10 @@
                PERFORM 9999-ERROR-HANDLER
            END-IF.
 
+      *----------------------------------------------------------------*
+      * 1200-INIT-RANDOM: Read the seed file to initialize the         *
+      * pseudo-random number generator for reproducible output.        *
+      *----------------------------------------------------------------*
        1200-INIT-RANDOM.
            READ RANDOM-SEED
            MOVE SEED-RECORD TO WS-RANDOM-SEED.
@@ -153,6 +188,10 @@
        1300-INIT-COUNTERS.
            INITIALIZE WS-COUNTERS.
 
+      *----------------------------------------------------------------*
+      * 2000-PROCESS: Read config records and dispatch to the          *
+      * appropriate generator for each test type.                      *
+      *----------------------------------------------------------------*
        2000-PROCESS.
            PERFORM UNTIL END-OF-CONFIG
                READ TEST-CONFIG
@@ -163,6 +202,9 @@
                END-READ
            END-PERFORM.
 
+      *----------------------------------------------------------------*
+      * 2100-GENERATE-TEST-DATA: Route to generator based on type.     *
+      *----------------------------------------------------------------*
        2100-GENERATE-TEST-DATA.
            EVALUATE CFG-TEST-TYPE
                WHEN WS-PORTFOLIO
@@ -179,6 +221,9 @@
                    PERFORM 9999-ERROR-HANDLER
            END-EVALUATE.
 
+      *----------------------------------------------------------------*
+      * 2200-GEN-PORTFOLIO: Generate CFG-VOLUME portfolio records.     *
+      *----------------------------------------------------------------*
        2200-GEN-PORTFOLIO.
            PERFORM VARYING WS-RECORDS-WRITTEN FROM 1 BY 1
                    UNTIL WS-RECORDS-WRITTEN > CFG-VOLUME
@@ -186,6 +231,9 @@
                PERFORM 2220-WRITE-PORT-RECORD
            END-PERFORM.
 
+      *----------------------------------------------------------------*
+      * 2300-GEN-TRANSACTION: Generate CFG-VOLUME transaction records. *
+      *----------------------------------------------------------------*
        2300-GEN-TRANSACTION.
            PERFORM VARYING WS-RECORDS-WRITTEN FROM 1 BY 1
                    UNTIL WS-RECORDS-WRITTEN > CFG-VOLUME
@@ -193,24 +241,38 @@
                PERFORM 2320-WRITE-TRAN-RECORD
            END-PERFORM.
 
+      *----------------------------------------------------------------*
+      * 2400-GEN-ERROR-DATA: Generate intentionally invalid records    *
+      * to exercise error-handling paths in downstream programs.        *
+      *----------------------------------------------------------------*
        2400-GEN-ERROR-DATA.
            PERFORM 2410-GEN-DATA-ERRORS
            PERFORM 2420-GEN-PROCESS-ERRORS.
 
+      *----------------------------------------------------------------*
+      * 2500-GEN-VOLUME-DATA: Generate large datasets for performance  *
+      * benchmarking and stress testing.                                *
+      *----------------------------------------------------------------*
        2500-GEN-VOLUME-DATA.
            PERFORM 2510-GEN-LARGE-PORTFOLIO
            PERFORM 2520-GEN-LARGE-TRANSACTION.
 
+      *----------------------------------------------------------------*
+      * 3000-CLEANUP: Close all files.                                 *
+      *----------------------------------------------------------------*
        3000-CLEANUP.
            CLOSE TEST-CONFIG
                 PORTFOLIO-OUT
                 TRANSACTION-OUT
                 RANDOM-SEED.
 
+      *----------------------------------------------------------------*
+      * 9999-ERROR-HANDLER: Display error; abort if count > 100.       *
+      *----------------------------------------------------------------*
        9999-ERROR-HANDLER.
            ADD 1 TO WS-ERROR-COUNT
            DISPLAY WS-ERROR-MESSAGE UPON CONS
            IF WS-ERROR-COUNT > 100
                MOVE 12 TO RETURN-CODE
                GOBACK
-           END-IF. 
+           END-IF.  

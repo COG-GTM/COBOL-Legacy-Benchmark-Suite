@@ -1,12 +1,23 @@
       *================================================================*
-      * Process Sequence Definitions
-      * Version: 1.0
-      * Date: 2024
+      * Copybook Name: PRCSEQ                                          *
+      * Description:  Process Sequence Definitions                      *
+      * Version: 1.0                                                   *
+      * Date: 2024                                                     *
+      *                                                                *
+      * Defines batch process scheduling metadata including process     *
+      * types, timing, dependencies (hard/soft), recovery programs,     *
+      * and active day schedules. Used by the batch controller          *
+      * (BCHCTL00/PRCSEQ00) to determine execution order and manage    *
+      * inter-job dependencies across the processing pipeline.          *
+      *                                                                *
+      * Also contains STANDARD-SEQUENCES defining the default          *
+      * start-of-day, main processing, and end-of-day job chains.      *
       *================================================================*
        01  PROCESS-SEQUENCE-RECORD.
            05  PSR-KEY.
                10  PSR-PROCESS-ID    PIC X(8).
                10  PSR-VERSION       PIC 9(2).
+      *    Process metadata and type classification
            05  PSR-DATA.
                10  PSR-DESCRIPTION   PIC X(30).
                10  PSR-TYPE         PIC X(3).
@@ -14,6 +25,7 @@
                    88  PSR-TYPE-PROC    VALUE 'PRC'.
                    88  PSR-TYPE-RPT     VALUE 'RPT'.
                    88  PSR-TYPE-TERM    VALUE 'TRM'.
+      *        Scheduling frequency and time window
                10  PSR-TIMING.
                    15  PSR-FREQ        PIC X(1).
                        88  PSR-DAILY      VALUE 'D'.
@@ -21,6 +33,7 @@
                        88  PSR-MONTHLY    VALUE 'M'.
                    15  PSR-START-TIME  PIC 9(4).
                    15  PSR-MAX-TIME    PIC 9(4).
+      *        Prerequisite jobs (up to 10) with dependency type
                10  PSR-DEPENDENCIES.
                    15  PSR-DEP-COUNT   PIC 9(2) COMP.
                    15  PSR-DEP-ENTRY OCCURS 10 TIMES.
@@ -36,6 +49,7 @@
                    15  PSR-RESTART     PIC X(1).
                        88  PSR-RESTARTABLE  VALUE 'Y'.
                        88  PSR-NO-RESTART   VALUE 'N'.
+      *    Day-of-week schedule (Mon-Sun, Y/N per position)
            05  PSR-SCHEDULE.
                10  PSR-ACTIVE-DAYS    PIC X(7).
                    88  PSR-WEEKDAY      VALUE 'YYYYYNN'.
@@ -46,6 +60,7 @@
                10  PSR-HOLIDAY-RUN    PIC X(1).
                    88  PSR-SKIP-HOL     VALUE 'N'.
                    88  PSR-RUN-HOL      VALUE 'Y'.
+      *    Recovery program to invoke on failure
            05  PSR-RECOVERY.
                10  PSR-RECOVERY-PGM   PIC X(8).
                10  PSR-RECOVERY-PARM  PIC X(50).
@@ -58,7 +73,9 @@
            05  PSR-FILLER            PIC X(50).
 
       *================================================================*
-      * Standard Process Sequences
+      * Standard Process Sequences - predefined job chains for         *
+      * start-of-day initialization, main processing, and end-of-day   *
+      * cleanup/reporting.                                             *
       *================================================================*
        01  STANDARD-SEQUENCES.
            05  SEQ-START-OF-DAY.
@@ -72,4 +89,4 @@
            05  SEQ-END-OF-DAY.
                10  FILLER            PIC X(8) VALUE 'RPTGEN00'.
                10  FILLER            PIC X(8) VALUE 'BCKLOD00'.
-               10  FILLER            PIC X(8) VALUE 'ENDDAY  '. 
+               10  FILLER            PIC X(8) VALUE 'ENDDAY  '.  

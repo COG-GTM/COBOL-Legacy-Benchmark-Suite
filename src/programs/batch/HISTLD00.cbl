@@ -1,6 +1,30 @@
        *================================================================*
       * Program Name: HISTLD00
       * Description: Position History DB2 Load Program
+      *   Reads transaction history records from a VSAM KSDS file
+      *   and bulk-inserts them into the DB2 POSHIST table.
+      *   Implements checkpoint/restart logic by committing every
+      *   WS-COMMIT-THRESHOLD records and updating the batch
+      *   control file with progress counters.
+      *
+      * Called By: JCL batch job
+      * Calls:    ERRPROC (error handler), DB2 (embedded SQL)
+      * Files:    TRANHIST (Transaction History VSAM KSDS - Input)
+      *           BCHCTL   (Batch Control VSAM KSDS - I/O)
+      * Tables:   POSHIST  (DB2 position history - Insert)
+      *
+      * Processing Flow:
+      *   1. Open VSAM files and connect to DB2
+      *   2. Read history records sequentially
+      *   3. Map VSAM fields to DB2 host variables
+      *   4. INSERT into POSHIST; skip duplicates (SQLCODE -803)
+      *   5. Commit every 1000 records and update checkpoint
+      *   6. Final commit, display statistics, disconnect
+      *
+      * Abend Conditions:
+      *   - Error opening files -> ERRPROC
+      *   - >100 DB2 insert errors -> stops processing
+      *
       * Version: 1.0
       * Date: 2024
       *================================================================*
@@ -14,6 +38,8 @@
        
        INPUT-OUTPUT SECTION.
        FILE-CONTROL.
+      *    Transaction History: Source VSAM file containing records
+      *    to be loaded into DB2. Read sequentially from beginning.
            SELECT TRANSACTION-HISTORY
                ASSIGN TO TRANHIST
                ORGANIZATION IS INDEXED
@@ -21,6 +47,8 @@
                RECORD KEY IS TH-KEY
                FILE STATUS IS WS-TH-STATUS.
                
+      *    Batch Control: Tracks checkpoint/restart state for this
+      *    load job. Updated with record counts after each commit.
            SELECT BATCH-CONTROL-FILE
                ASSIGN TO BCHCTL
                ORGANIZATION IS INDEXED
@@ -37,25 +65,32 @@
            COPY BCHCTL.
        
        WORKING-STORAGE SECTION.
+      *    DB2 host variable declarations for INSERT operations
            EXEC SQL BEGIN DECLARE SECTION END-EXEC.
            COPY DBTBLS.
            EXEC SQL END DECLARE SECTION END-EXEC.
            
+      *    SQLCA: DB2 SQL communication area for return codes
            COPY SQLCA.
+      *    DBPROC: DB2 connection/disconnect procedures
            COPY DBPROC.
+      *    ERRHAND: Shared error handling fields
            COPY ERRHAND.
+      *    BCHCON: Batch control constants (statuses, return codes)
            COPY BCHCON.
            
        01  WS-FILE-STATUS.
            05  WS-TH-STATUS          PIC X(2).
            05  WS-BCT-STATUS         PIC X(2).
            
+      *    Processing counters for statistics and checkpoint tracking
        01  WS-COUNTERS.
            05  WS-RECORDS-READ       PIC S9(9) COMP VALUE 0.
            05  WS-RECORDS-WRITTEN    PIC S9(9) COMP VALUE 0.
            05  WS-ERROR-COUNT        PIC S9(9) COMP VALUE 0.
            05  WS-COMMIT-COUNT       PIC S9(4) COMP VALUE 0.
            
+      *    Number of records between DB2 commits (for restartability)
        01  WS-COMMIT-THRESHOLD       PIC S9(4) COMP VALUE 1000.
        
        01  WS-SWITCHES.
@@ -64,6 +99,11 @@
                88  MORE-RECORDS        VALUE 'N'.
                
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * 0000-MAIN: Driver loop - initialize, process all records,
+      *   then terminate. Stops early if error count exceeds 100.
+      *   Sets RETURN-CODE to the total error count for JCL checking.
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            
@@ -77,12 +117,20 @@
            GOBACK
            .
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Open input files, connect to DB2, and
+      *   read the checkpoint control record for restart support.
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            PERFORM 1100-OPEN-FILES
            PERFORM 1200-CONNECT-DB2
            PERFORM 1300-INIT-CHECKPOINTS
            .
            
+      *----------------------------------------------------------------*
+      * 2000-PROCESS: Read one history record and, if not at EOF,
+      *   insert it into DB2 and check whether a commit is due.
+      *----------------------------------------------------------------*
        2000-PROCESS.
            PERFORM 2100-READ-HISTORY
            
@@ -92,6 +140,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 3000-TERMINATE: Issue final commit, close files, disconnect
+      *   from DB2, and display processing statistics.
+      *----------------------------------------------------------------*
        3000-TERMINATE.
            PERFORM 3100-FINAL-COMMIT
            PERFORM 3200-CLOSE-FILES
@@ -99,6 +151,10 @@
            PERFORM 3400-DISPLAY-STATS
            .
            
+      *----------------------------------------------------------------*
+      * 1100-OPEN-FILES: Open the transaction history file for
+      *   sequential input and the batch control file for I/O.
+      *----------------------------------------------------------------*
        1100-OPEN-FILES.
            OPEN INPUT TRANSACTION-HISTORY
            IF WS-TH-STATUS NOT = '00'
@@ -117,6 +173,10 @@
            PERFORM CONNECT-TO-DB2
            .
            
+      *----------------------------------------------------------------*
+      * 1300-INIT-CHECKPOINTS: Read this job's control record and
+      *   mark it ACTIVE so other jobs can see it is running.
+      *----------------------------------------------------------------*
        1300-INIT-CHECKPOINTS.
            MOVE SPACES TO BCT-KEY
            MOVE 'HISTLD00' TO BCT-JOB-NAME
@@ -131,6 +191,10 @@
            REWRITE BATCH-CONTROL-RECORD
            .
            
+      *----------------------------------------------------------------*
+      * 2100-READ-HISTORY: Read next sequential record from VSAM.
+      *   Sets END-OF-FILE when no more records remain.
+      *----------------------------------------------------------------*
        2100-READ-HISTORY.
            READ TRANSACTION-HISTORY
                AT END
@@ -140,6 +204,12 @@
            END-READ
            .
            
+      *----------------------------------------------------------------*
+      * 2200-LOAD-TO-DB2: Map VSAM transaction fields to DB2 host
+      *   variables and INSERT into POSHIST. Duplicate keys
+      *   (SQLCODE -803) are silently skipped; other errors are
+      *   counted and logged via DB2-ERROR-ROUTINE.
+      *----------------------------------------------------------------*
        2200-LOAD-TO-DB2.
            INITIALIZE POSHIST-RECORD
            
@@ -174,6 +244,11 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2300-CHECK-COMMIT: Implements interval-based commits.
+      *   After every WS-COMMIT-THRESHOLD inserts, issues a DB2
+      *   COMMIT and saves progress to the batch control file.
+      *----------------------------------------------------------------*
        2300-CHECK-COMMIT.
            ADD 1 TO WS-COMMIT-COUNT
            
@@ -188,6 +263,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2310-UPDATE-CHECKPOINT: Persist current record counts to
+      *   the batch control file so a restart can resume from here.
+      *----------------------------------------------------------------*
        2310-UPDATE-CHECKPOINT.
            MOVE WS-RECORDS-READ TO BCT-RECORDS-READ
            MOVE WS-RECORDS-WRITTEN TO BCT-RECORDS-WRITTEN
@@ -199,6 +278,10 @@
            END-REWRITE
            .
            
+      *----------------------------------------------------------------*
+      * 3100-FINAL-COMMIT: Commit any remaining uncommitted rows
+      *   and save final checkpoint before termination.
+      *----------------------------------------------------------------*
        3100-FINAL-COMMIT.
            EXEC SQL
                COMMIT WORK
@@ -223,6 +306,10 @@
            DISPLAY '  Errors:         ' WS-ERROR-COUNT
            .
            
+      *----------------------------------------------------------------*
+      * 9000-ERROR-ROUTINE: Log the error via ERRPROC and issue a
+      *   DB2 ROLLBACK to undo any uncommitted changes.
+      *----------------------------------------------------------------*
        9000-ERROR-ROUTINE.
            MOVE 'HISTLD00' TO ERR-PROGRAM
            CALL 'ERRPROC' USING ERR-MESSAGE

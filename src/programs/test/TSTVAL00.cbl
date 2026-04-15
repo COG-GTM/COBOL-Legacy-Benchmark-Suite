@@ -5,11 +5,27 @@
       *****************************************************************
       * Test Validation Suite                                         *
       *                                                               *
-      * Validates test results and system behavior:                   *
-      * - Test case execution                                        *
-      * - Result validation                                          *
-      * - Error condition testing                                    *
-      * - Performance benchmarking                                   *
+      * Compares actual program output against expected results to     *
+      * verify correctness of translated or modified COBOL programs.   *
+      *                                                               *
+      * Test Categories (via TEST-TYPE):                              *
+      *   FUNCTIONAL - Unit-level output comparisons                  *
+      *   INTEGRATE  - Cross-program data flow validation             *
+      *   PERFORM    - Execution time within acceptable bounds        *
+      *   ERROR      - Verify correct error handling behavior         *
+      *                                                               *
+      * Files:                                                        *
+      *   TESTCASE - Input  : Test case definitions (ID, type, desc)  *
+      *   EXPECTED - Input  : Expected result records                 *
+      *   ACTUAL   - Input  : Actual result records to validate       *
+      *   TESTRPT  - Output : Validation report with pass/fail status *
+      *                                                               *
+      * Copybooks: RTNCODE, ERRHAND                                  *
+      *                                                               *
+      * Report:    Produces a summary line with total, passed,        *
+      *            failed counts, and success rate percentage.         *
+      *                                                               *
+      * Return Codes: 0 = All tests passed, 12 = Fatal error          *
       *****************************************************************
        ENVIRONMENT DIVISION.
        CONFIGURATION SECTION.
@@ -67,12 +83,14 @@
            COPY RTNCODE.
            COPY ERRHAND.
 
+      *    File status indicators for all I/O operations
        01  WS-FILE-STATUS.
            05  WS-TEST-STATUS       PIC XX.
            05  WS-EXP-STATUS        PIC XX.
            05  WS-ACT-STATUS        PIC XX.
            05  WS-RPT-STATUS        PIC XX.
 
+      *    Constants for test type dispatch
        01  WS-TEST-TYPES.
            05  WS-FUNCTIONAL        PIC X(10) VALUE 'FUNCTIONAL'.
            05  WS-INTEGRATION       PIC X(10) VALUE 'INTEGRATE'.
@@ -85,10 +103,12 @@
            05  WS-TEST-PASSED       PIC X VALUE 'N'.
                88  TEST-PASSED      VALUE 'Y'.
 
+      *    Running test execution metrics
        01  WS-TEST-METRICS.
            05  WS-TOTAL-TESTS       PIC 9(5) VALUE ZERO.
            05  WS-TESTS-PASSED      PIC 9(5) VALUE ZERO.
            05  WS-TESTS-FAILED      PIC 9(5) VALUE ZERO.
+      *    Wall-clock timing for performance benchmarking
            05  WS-START-TIME        PIC 9(8) VALUE ZERO.
            05  WS-END-TIME          PIC 9(8) VALUE ZERO.
            05  WS-ELAPSED-TIME      PIC 9(8) VALUE ZERO.
@@ -125,17 +145,27 @@
            05  FILLER               PIC X(40) VALUE SPACES.
 
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control: initialize, run all tests, produce report.       *
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            PERFORM 2000-PROCESS
            PERFORM 3000-CLEANUP
            GOBACK.
 
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Open files, write report headers, start timer.*
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            PERFORM 1100-OPEN-FILES
            PERFORM 1200-WRITE-HEADERS
            PERFORM 1300-INIT-METRICS.
 
+      *----------------------------------------------------------------*
+      * 1100-OPEN-FILES: Open test cases + expected/actual results     *
+      * as input, and test report as output.                           *
+      *----------------------------------------------------------------*
        1100-OPEN-FILES.
            OPEN INPUT TEST-CASES
            IF WS-TEST-STATUS NOT = '00'
@@ -165,6 +195,9 @@
                PERFORM 9999-ERROR-HANDLER
            END-IF.
 
+      *----------------------------------------------------------------*
+      * 1200-WRITE-HEADERS: Write report banner to output file.        *
+      *----------------------------------------------------------------*
        1200-WRITE-HEADERS.
            WRITE REPORT-RECORD FROM WS-HEADER1
            WRITE REPORT-RECORD FROM WS-HEADER2.
@@ -173,6 +206,10 @@
            INITIALIZE WS-TEST-METRICS
            ACCEPT WS-START-TIME FROM TIME.
 
+      *----------------------------------------------------------------*
+      * 2000-PROCESS: Iterate through test cases, execute each,        *
+      * validate results, then write the final summary line.           *
+      *----------------------------------------------------------------*
        2000-PROCESS.
            PERFORM UNTIL END-OF-TESTS
                READ TEST-CASES
@@ -184,6 +221,10 @@
            END-PERFORM
            PERFORM 2900-WRITE-SUMMARY.
 
+      *----------------------------------------------------------------*
+      * 2100-EXECUTE-TEST: Dispatch to the appropriate test runner,    *
+      * then validate results, update metrics, and write detail line.  *
+      *----------------------------------------------------------------*
        2100-EXECUTE-TEST.
            EVALUATE TEST-TYPE
                WHEN WS-FUNCTIONAL
@@ -203,6 +244,10 @@
            PERFORM 2700-UPDATE-METRICS
            PERFORM 2800-WRITE-TEST-DETAIL.
 
+      *----------------------------------------------------------------*
+      * 2900-WRITE-SUMMARY: Calculate elapsed time and success rate,   *
+      * then write the summary totals line to the report.              *
+      *----------------------------------------------------------------*
        2900-WRITE-SUMMARY.
            ACCEPT WS-END-TIME FROM TIME
            COMPUTE WS-ELAPSED-TIME = WS-END-TIME - WS-START-TIME
@@ -213,13 +258,19 @@
                (WS-TESTS-PASSED / WS-TOTAL-TESTS) * 100
            WRITE REPORT-RECORD FROM WS-SUMMARY-LINE.
 
+      *----------------------------------------------------------------*
+      * 3000-CLEANUP: Close all files.                                 *
+      *----------------------------------------------------------------*
        3000-CLEANUP.
            CLOSE TEST-CASES
                 EXPECTED-RESULTS
                 ACTUAL-RESULTS
                 TEST-REPORT.
 
+      *----------------------------------------------------------------*
+      * 9999-ERROR-HANDLER: Display error and abort with RC=12.        *
+      *----------------------------------------------------------------*
        9999-ERROR-HANDLER.
            DISPLAY WS-ERROR-MESSAGE UPON CONS
            MOVE 12 TO RETURN-CODE
-           GOBACK. 
+           GOBACK.  

@@ -1,7 +1,17 @@
 --=====================================================================
--- Error Logging Table Definition
+-- Table Name:   ERRLOG
+-- Description:  Error Logging Table Definition
+-- Database:     POSMVP
+-- Tablespace:   ERRLOG
 -- Version: 1.0
 -- Date: 2024
+--
+-- Stores application, system, and data errors logged by ERRPROC.
+-- Indexed by timestamp+program (primary) and date+severity
+-- (secondary) for efficient error analysis and cleanup.
+--
+-- Grants: POSAPP (SELECT, INSERT), POSRPT (SELECT)
+-- Cleanup: ERRLOG_CLEANUP stored procedure purges by retention.
 --=====================================================================
 
 CREATE TABLESPACE ERRLOG
@@ -12,6 +22,17 @@ CREATE TABLESPACE ERRLOG
   SEGSIZE 32
   COMPRESS YES;
 
+-- Column definitions:
+--   ERROR_TIMESTAMP - When the error occurred (part of PK)
+--   PROGRAM_ID      - Which program raised the error (part of PK)
+--   ERROR_TYPE      - S=System, A=Application, D=Data
+--   ERROR_SEVERITY  - 1=Info, 2=Warning, 3=Error, 4=Severe
+--   ERROR_CODE      - Application-specific error code
+--   ERROR_MESSAGE   - Human-readable error description
+--   PROCESS_DATE    - Business processing date
+--   PROCESS_TIME    - Time within the processing cycle
+--   USER_ID         - User or batch job that triggered the error
+--   ADDITIONAL_INFO - Optional extended diagnostic data
 CREATE TABLE ERRLOG
   (ERROR_TIMESTAMP   TIMESTAMP       NOT NULL,
    PROGRAM_ID        CHAR(8)         NOT NULL,
@@ -62,4 +83,4 @@ CREATE PROCEDURE ERRLOG_CLEANUP
 BEGIN
   DELETE FROM ERRLOG
   WHERE PROCESS_DATE < CURRENT DATE - RETENTION_DAYS DAYS;
-END; 
+END;  

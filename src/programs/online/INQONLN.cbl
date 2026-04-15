@@ -1,11 +1,27 @@
        IDENTIFICATION DIVISION.
        PROGRAM-ID. INQONLN.
       *****************************************************************
-      * Portfolio Online Inquiry Main Handler                           *
-      * - Handles CICS portfolio inquiry transactions                   *
-      * - Manages screen interactions                                   *
-      * - Processes portfolio lookups                                   *
-      * - Interfaces with DB2 for history                              *
+      * Program Name: INQONLN                                         *
+      * Description:  Portfolio Online Inquiry Main Handler             *
+      *                                                               *
+      * Top-level CICS transaction handler for the portfolio inquiry   *
+      * application. Receives BMS map input from the user, dispatches  *
+      * to the appropriate sub-program, and enforces security.        *
+      *                                                               *
+      * Transaction Flow:                                             *
+      *   1. Set CICS error handler                                   *
+      *   2. RECEIVE user input via BMS map INQMAP/INQSET             *
+      *   3. Dispatch based on function code:                         *
+      *      MENU -> P200 (display main menu)                         *
+      *      INQP -> P300 (LINK to INQPORT for positions)             *
+      *      INQH -> P400 (LINK to INQHIST for history)               *
+      *      EXIT -> terminate session                                *
+      *   4. Validate user via SECMGR (V=validate, A=authorize,       *
+      *      L=log access)                                            *
+      *                                                               *
+      * Called By: CICS transaction (terminal user)                   *
+      * Calls:    INQPORT, INQHIST, SECMGR, ERRHNDL                  *
+      * Maps:     INQMAP, INQMNU (mapset INQSET)                     *
       *****************************************************************
        
        ENVIRONMENT DIVISION.
@@ -15,6 +31,7 @@
        01  WS-COMMAREA.
            COPY INQCOM.
            
+      * Session control flags
        01  WS-FLAGS.
            05 WS-END-OF-SESSION       PIC X VALUE 'N'.
               88 SESSION-ACTIVE             VALUE 'N'.
@@ -24,6 +41,7 @@
        01  WS-ERROR-AREA.
            COPY ERRHND.
            
+      * Security request passed to SECMGR via CICS LINK
        01  WS-SECURITY-REQUEST.
            05 SEC-REQUEST-TYPE     PIC X.
            05 SEC-USER-ID          PIC X(8).
@@ -37,6 +55,9 @@
            COPY INQCOM.
            
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main: Set error handler, loop on requests until EXIT.          *
+      *----------------------------------------------------------------*
            EXEC CICS HANDLE CONDITION
                      ERROR(P900-ERROR-ROUTINE)
                      PGMIDERR(P900-ERROR-ROUTINE)
@@ -50,6 +71,9 @@
            EXEC CICS RETURN 
            END-EXEC.
            
+      *----------------------------------------------------------------*
+      * P100: Receive map input, dispatch to handler, check security.  *
+      *----------------------------------------------------------------*
        P100-PROCESS-REQUEST.
            MOVE LOW-VALUES TO WS-COMMAREA.
            
@@ -89,6 +113,9 @@
        P100-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P200: Send the main menu map to the terminal.                  *
+      *----------------------------------------------------------------*
        P200-DISPLAY-MENU.
            EXEC CICS SEND MAP('INQMNU')
                      MAPSET('INQSET')
@@ -98,6 +125,9 @@
        P200-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P300: LINK to INQPORT to retrieve and display positions.       *
+      *----------------------------------------------------------------*
        P300-PORTFOLIO-INQUIRY.
            EXEC CICS LINK PROGRAM('INQPORT')
                      COMMAREA(WS-COMMAREA)
@@ -107,6 +137,9 @@
        P300-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P400: LINK to INQHIST to retrieve and display history.         *
+      *----------------------------------------------------------------*
        P400-HISTORY-INQUIRY.
            EXEC CICS LINK PROGRAM('INQHIST')
                      COMMAREA(WS-COMMAREA)
@@ -116,6 +149,9 @@
        P400-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P900: Log error via ERRHNDL; abend if fatal.                   *
+      *----------------------------------------------------------------*
        P900-ERROR-ROUTINE.
            MOVE 'INQONLN' TO ERR-PROGRAM.
            MOVE 'P900-ERROR-ROUTINE' TO ERR-PARAGRAPH.
@@ -136,6 +172,12 @@
        P900-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P050: Three-step security check via SECMGR:                    *
+      *   1. Validate user (V) - confirm CICS user identity            *
+      *   2. Authorize (A)     - check READ access to INQONLN         *
+      *   3. Log access (L)    - write audit trail entry               *
+      *----------------------------------------------------------------*
        P050-SECURITY-CHECK.
            MOVE 'V' TO SEC-REQUEST-TYPE.
            
@@ -168,4 +210,4 @@
               END-IF
            END-IF.
        P050-EXIT.
-           EXIT. 
+           EXIT.  

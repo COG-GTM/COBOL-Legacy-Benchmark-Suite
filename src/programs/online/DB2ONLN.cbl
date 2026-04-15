@@ -1,11 +1,21 @@
         IDENTIFICATION DIVISION.
        PROGRAM-ID. DB2ONLN.
       *****************************************************************
-      * Online DB2 Connection Manager                                   *
-      * - Manages DB2 connection pool                                  *
-      * - Optimizes connection reuse                                   *
-      * - Handles connection errors                                    *
-      * - Monitors connection status                                   *
+      * Program Name: DB2ONLN                                         *
+      * Description:  Online DB2 Connection Pool Manager               *
+      *                                                               *
+      * Provides a connection-pooling service for CICS online          *
+      * programs. Callers pass a request type via Linkage:            *
+      *   C - Connect:    Establish a new DB2 connection if the pool  *
+      *                   has not reached WS-MAX-CONNECTIONS (100).   *
+      *                   Returns a connection token.                 *
+      *   D - Disconnect: Release a DB2 connection and decrement the  *
+      *                   active count.                               *
+      *   S - Status:     Probe the DB2 subsystem (CURRENT SERVER)   *
+      *                   and return the active connection count.     *
+      *                                                               *
+      * Called By: INQHIST, DB2RECV, other online programs            *
+      * Tables:   N/A (uses DB2 CONNECT/DISCONNECT/SELECT)            *
       *****************************************************************
        
        ENVIRONMENT DIVISION.
@@ -15,6 +25,7 @@
        01  WS-DB2-AREA.
            EXEC SQL INCLUDE SQLCA END-EXEC.
            
+      * Pool counters - persist across CICS invocations
        01  WS-POOL-STATS.
            05 WS-TOTAL-CONNECTIONS    PIC S9(8) COMP VALUE 0.
            05 WS-ACTIVE-CONNECTIONS   PIC S9(8) COMP VALUE 0.
@@ -37,6 +48,9 @@
               10 DB2-ERROR-MSG        PIC X(80).
            
        PROCEDURE DIVISION USING DB2-REQUEST-AREA.
+      *----------------------------------------------------------------*
+      * Main dispatch: route to connect / disconnect / status.         *
+      *----------------------------------------------------------------*
            EVALUATE TRUE
                WHEN DB2-CONNECT
                     PERFORM P100-PROCESS-CONNECT
@@ -51,6 +65,9 @@
            
            EXEC CICS RETURN END-EXEC.
            
+      *----------------------------------------------------------------*
+      * P100: Guard against pool exhaustion, then establish connection. *
+      *----------------------------------------------------------------*
        P100-PROCESS-CONNECT.
            IF WS-ACTIVE-CONNECTIONS < WS-MAX-CONNECTIONS
               PERFORM P110-ESTABLISH-CONNECTION
@@ -63,6 +80,10 @@
        P100-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P110: Issue SQL CONNECT TO POSMVP. On success, increment the   *
+      *   active count and generate a unique connection token.         *
+      *----------------------------------------------------------------*
        P110-ESTABLISH-CONNECTION.
            EXEC SQL CONNECT TO POSMVP END-EXEC.
            
@@ -80,6 +101,9 @@
        P110-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P120: Build a unique token from timestamp + connection count.   *
+      *----------------------------------------------------------------*
        P120-GENERATE-TOKEN.
            MOVE FUNCTION CURRENT-DATE TO DB2-CONNECTION-TOKEN.
            STRING DB2-CONNECTION-TOKEN DELIMITED BY SIZE
@@ -88,6 +112,9 @@
        P120-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P200: Issue SQL DISCONNECT, decrement active count on success.  *
+      *----------------------------------------------------------------*
        P200-PROCESS-DISCONNECT.
            EXEC SQL DISCONNECT END-EXEC.
            
@@ -102,6 +129,9 @@
        P200-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P300: Probe DB2 with CURRENT SERVER, return active count.      *
+      *----------------------------------------------------------------*
        P300-CHECK-STATUS.
            EXEC SQL SELECT CURRENT SERVER 
                     INTO :DB2-ERROR-MSG
