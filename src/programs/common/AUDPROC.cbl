@@ -1,6 +1,13 @@
       *================================================================*
       * Program Name: AUDPROC
       * Description: Audit Trail Processing Subroutine
+      *   Writes audit records to a sequential file capturing
+      *   system activity, user actions, and data changes.
+      *   Supports before/after image tracking for data
+      *   modification auditing.
+      * Called By: Portfolio programs, online programs
+      * Files: AUDFILE (sequential audit trail output)
+      * Copybooks: AUDITLOG
       * Author: [Author name]
       * Date Written: 2024-03-20
       *================================================================*
@@ -49,6 +56,10 @@
            05  LS-RETURN-CODE     PIC S9(4) COMP.
        
        PROCEDURE DIVISION USING LS-AUDIT-REQUEST.
+      *----------------------------------------------------------------*
+      * Main control flow: Initialize timestamp and open audit file,
+      * write the audit record, then close the file.
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            PERFORM 2000-PROCESS-AUDIT
@@ -56,6 +67,10 @@
            GOBACK
            .
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Captures current timestamp and opens the
+      * audit file in EXTEND mode for appending new records.
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            ACCEPT WS-FORMATTED-TIME FROM TIME STAMP
            
@@ -68,6 +83,11 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2000-PROCESS-AUDIT: Maps linkage section fields (system
+      * info, action, before/after images) to the audit record
+      * layout and writes it to the audit file.
+      *----------------------------------------------------------------*
        2000-PROCESS-AUDIT.
            INITIALIZE AUDIT-RECORD
            
@@ -91,6 +111,9 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 3000-TERMINATE: Closes the audit file.
+      *----------------------------------------------------------------*
        3000-TERMINATE.
            CLOSE AUDIT-FILE
-           . 
+           .  

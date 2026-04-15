@@ -1,7 +1,12 @@
       *================================================================*
       * Program Name: PORTVALD
       * Description: Portfolio Validation Subroutine
-      *             Validates portfolio data elements
+      *   Reusable validation module for portfolio data elements.
+      *   Called as a subroutine with a validation type code:
+      *   I=Portfolio ID, A=Account Number, T=Investment Type,
+      *   M=Amount. Returns a return code and error message.
+      * Called By: PORTMSTR, PORTADD, PORTUPDT
+      * Copybooks: PORTVAL
       * Author: [Author name]
       * Date Written: 2024-03-20
       *================================================================*
@@ -29,6 +34,10 @@
            05  LS-ERROR-MSG        PIC X(50).
        
        PROCEDURE DIVISION USING LS-VALIDATION-REQUEST.
+      *----------------------------------------------------------------*
+      * Main entry point: Dispatches to the appropriate validation
+      * routine based on the type code (I/A/T/M).
+      *----------------------------------------------------------------*
        0000-MAIN.
            INITIALIZE VAL-WORK-AREAS
            
@@ -51,7 +60,8 @@
            
        1000-VALIDATE-ID.
       *----------------------------------------------------------------*
-      * Portfolio ID must start with 'PORT' and have 4 numeric digits
+      * 1000-VALIDATE-ID: Portfolio ID must start with 'PORT'
+      * followed by exactly 4 numeric digits.
       *----------------------------------------------------------------*
            IF LS-INPUT-VALUE(1:4) NOT = VAL-ID-PREFIX
                MOVE VAL-INVALID-ID TO LS-RETURN-CODE
@@ -72,7 +82,8 @@
            
        2000-VALIDATE-ACCOUNT.
       *----------------------------------------------------------------*
-      * Account number must be 10 numeric digits
+      * 2000-VALIDATE-ACCOUNT: Account number must be exactly
+      * 10 numeric digits and non-zero.
       *----------------------------------------------------------------*
            IF LS-INPUT-VALUE IS NOT NUMERIC
            OR LS-INPUT-VALUE = ZEROS
@@ -87,7 +98,8 @@
            
        3000-VALIDATE-TYPE.
       *----------------------------------------------------------------*
-      * Investment type must be valid value
+      * 3000-VALIDATE-TYPE: Investment type must be one of:
+      * STK (Stock), BND (Bond), MMF (Money Market), ETF.
       *----------------------------------------------------------------*
            IF LS-INPUT-VALUE NOT = 'STK'
               AND NOT = 'BND'
@@ -104,7 +116,8 @@
            
        4000-VALIDATE-AMOUNT.
       *----------------------------------------------------------------*
-      * Amount must be within valid range
+      * 4000-VALIDATE-AMOUNT: Amount must fall within the
+      * configured minimum and maximum range.
       *----------------------------------------------------------------*
            MOVE LS-INPUT-VALUE TO VAL-TEMP-NUM
            
@@ -117,4 +130,4 @@
            
            MOVE VAL-SUCCESS TO LS-RETURN-CODE
            MOVE SPACES TO LS-ERROR-MSG
-           . 
+           .  

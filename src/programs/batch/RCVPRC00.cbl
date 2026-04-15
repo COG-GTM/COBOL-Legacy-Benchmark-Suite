@@ -1,6 +1,17 @@
        *================================================================*
       * Program Name: RCVPRC00
       * Description: Process Recovery Handler
+      *   Manages recovery of failed batch processes. Supports
+      *   three recovery modes:
+      *   - Process (P): Recover a single failed process
+      *   - Sequence (S): Recover all processes for a date
+      *   - All (A): Recover all failed processes system-wide
+      *   Recovery actions include restart, bypass, or terminate
+      *   based on process restartability and retry counts.
+      * Called By: JCL recovery jobs, operator commands
+      * Calls: ERRPROC (error handling)
+      * Files: BCHCTL (Batch Control), PRCSEQ (Process Sequence)
+      * Copybooks: BCHCTL, PRCSEQ, BCHCON, ERRHAND
       * Version: 1.0
       * Date: 2024
       *================================================================*
@@ -68,6 +79,10 @@
            05  LS-RETURN-CODE      PIC S9(4) COMP.
        
        PROCEDURE DIVISION USING LS-RECOVERY-REQUEST.
+      *----------------------------------------------------------------*
+      * Main entry point - dispatches to the requested recovery
+      * function: initialize, process recovery, or terminate.
+      *----------------------------------------------------------------*
        0000-MAIN.
            EVALUATE TRUE
                WHEN FUNC-INIT
@@ -85,12 +100,21 @@
            GOBACK
            .
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE-RECOVERY: Opens control and sequence files,
+      * validates the recovery request parameters, and sets the
+      * recovery mode (process, sequence, or all).
+      *----------------------------------------------------------------*
        1000-INITIALIZE-RECOVERY.
            PERFORM 1100-OPEN-FILES
            PERFORM 1200-VALIDATE-REQUEST
            PERFORM 1300-SET-RECOVERY-MODE
            .
            
+      *----------------------------------------------------------------*
+      * 2000-PROCESS-RECOVERY: Executes recovery based on the
+      * selected mode - single process, date sequence, or all.
+      *----------------------------------------------------------------*
        2000-PROCESS-RECOVERY.
            EVALUATE WS-RECOVERY-MODE
                WHEN 'P'
@@ -156,6 +180,11 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2100-RECOVER-PROCESS: Recovers a single process by reading
+      * its control record, determining the appropriate action
+      * (restart, bypass, or terminate), and executing it.
+      *----------------------------------------------------------------*
        2100-RECOVER-PROCESS.
            MOVE LS-PROCESS-ID   TO BCT-JOB-NAME
            MOVE LS-PROCESS-DATE TO BCT-PROCESS-DATE
@@ -170,6 +199,11 @@
            PERFORM 2120-EXECUTE-RECOVERY
            .
            
+      *----------------------------------------------------------------*
+      * 2110-DETERMINE-ACTION: Reads the process definition to
+      * determine if the process is restartable. If not, checks
+      * the restart count against the maximum allowed.
+      *----------------------------------------------------------------*
        2110-DETERMINE-ACTION.
            MOVE LS-PROCESS-ID TO PSR-PROCESS-ID
            
@@ -201,6 +235,10 @@
            END-EVALUATE
            .
            
+      *----------------------------------------------------------------*
+      * 2121-RESTART-PROCESS: Resets process to READY status,
+      * increments the restart count, and timestamps the attempt.
+      *----------------------------------------------------------------*
        2121-RESTART-PROCESS.
            MOVE BCT-STAT-READY TO BCT-STATUS
            ADD 1 TO BCT-RESTART-COUNT
@@ -214,6 +252,10 @@
            END-REWRITE
            .
            
+      *----------------------------------------------------------------*
+      * 2122-BYPASS-PROCESS: Marks process as DONE with a WARNING
+      * return code, allowing dependent processes to continue.
+      *----------------------------------------------------------------*
        2122-BYPASS-PROCESS.
            MOVE BCT-STAT-DONE  TO BCT-STATUS
            MOVE BCT-RC-WARNING TO BCT-RETURN-CODE
@@ -226,6 +268,10 @@
            END-REWRITE
            .
            
+      *----------------------------------------------------------------*
+      * 2123-TERMINATE-PROCESS: Marks process as ERROR with an
+      * error return code, halting dependent processes.
+      *----------------------------------------------------------------*
        2123-TERMINATE-PROCESS.
            MOVE BCT-STAT-ERROR TO BCT-STATUS
            MOVE BCT-RC-ERROR  TO BCT-RETURN-CODE
@@ -238,6 +284,10 @@
            END-REWRITE
            .
            
+      *----------------------------------------------------------------*
+      * 2200-RECOVER-SEQUENCE: Iterates through all batch control
+      * records for the given process date and recovers each one.
+      *----------------------------------------------------------------*
        2200-RECOVER-SEQUENCE.
            MOVE LS-PROCESS-DATE TO BCT-PROCESS-DATE
            MOVE LOW-VALUES TO BCT-JOB-NAME
@@ -260,6 +310,10 @@
            END-PERFORM
            .
            
+      *----------------------------------------------------------------*
+      * 2300-RECOVER-ALL: Scans all batch control records and
+      * recovers every failed process regardless of date.
+      *----------------------------------------------------------------*
        2300-RECOVER-ALL.
            MOVE LOW-VALUES TO BCT-KEY
            

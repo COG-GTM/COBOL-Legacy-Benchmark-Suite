@@ -1,7 +1,13 @@
        *================================================================*
       * Program Name: PORTDEL
       * Description: Portfolio Deletion Program
-      *             Processes portfolio deletion requests
+      *   Reads deletion requests from a sequential file, locates
+      *   each portfolio in the indexed VSAM file, deletes it,
+      *   and writes an audit trail record. Supports reason codes:
+      *   01=Closed, 02=Transferred, 03=Client-Requested.
+      * Files: PORTFILE (indexed VSAM I-O), DELEFILE (sequential
+      *        input), AUDFILE (sequential audit output)
+      * Copybooks: PORTFLIO
       * Author: [Author name]
       * Date Written: 2024-03-20
       * Maintenance Log:
@@ -98,6 +104,10 @@
            05  WS-TIMESTAMP        PIC X(26).
            
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control flow: Initialize files, process each deletion
+      * request until EOF, then report counts and close files.
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            
@@ -108,6 +118,10 @@
            
            GOBACK.
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Opens portfolio (I-O), delete request
+      * (input), and audit (output) files.
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            INITIALIZE WS-WORK-AREAS
            
@@ -127,6 +141,9 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2000-PROCESS: Reads next deletion request record.
+      *----------------------------------------------------------------*
        2000-PROCESS.
            READ DELETE-FILE
                AT END
@@ -136,6 +153,10 @@
            END-READ
            .
            
+      *----------------------------------------------------------------*
+      * 2100-PROCESS-DELETE: Looks up the portfolio by key and
+      * dispatches to delete or logs not-found/error.
+      *----------------------------------------------------------------*
        2100-PROCESS-DELETE.
            MOVE DEL-KEY TO PORT-KEY
            
@@ -153,6 +174,10 @@
            END-EVALUATE
            .
            
+      *----------------------------------------------------------------*
+      * 2200-DELETE-RECORD: Deletes the portfolio record from VSAM
+      * and writes an audit trail entry on success.
+      *----------------------------------------------------------------*
        2200-DELETE-RECORD.
            DELETE PORTFOLIO-FILE
            
@@ -165,6 +190,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2300-WRITE-AUDIT: Timestamps and writes a deletion audit
+      * record with the reason code and portfolio status.
+      *----------------------------------------------------------------*
        2300-WRITE-AUDIT.
            ACCEPT WS-TIMESTAMP FROM TIME STAMP
            
@@ -181,6 +210,9 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 3000-TERMINATE: Closes all files and displays final counts.
+      *----------------------------------------------------------------*
        3000-TERMINATE.
            CLOSE PORTFOLIO-FILE
                  DELETE-FILE

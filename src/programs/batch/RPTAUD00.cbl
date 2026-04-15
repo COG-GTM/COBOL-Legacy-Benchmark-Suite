@@ -80,6 +80,10 @@
            05  WS-ERR-MESSAGE       PIC X(80).
 
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control flow: Initialize files and headers, process
+      * audit trail and error log data, then clean up resources.
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            PERFORM 2000-PROCESS-REPORT
@@ -118,19 +122,35 @@
            WRITE REPORT-RECORD FROM WS-HEADER2
            WRITE REPORT-RECORD FROM WS-HEADER3.
 
+      *----------------------------------------------------------------*
+      * 2000-PROCESS-REPORT: Processes both audit trail and error
+      * log records, then writes the combined summary section.
+      *----------------------------------------------------------------*
        2000-PROCESS-REPORT.
            PERFORM 2100-PROCESS-AUDIT-TRAIL
            PERFORM 2200-PROCESS-ERROR-LOG
            PERFORM 2300-WRITE-SUMMARY.
 
+      *----------------------------------------------------------------*
+      * 2100-PROCESS-AUDIT-TRAIL: Reads all audit records from
+      * the indexed audit file and produces an audit summary.
+      *----------------------------------------------------------------*
        2100-PROCESS-AUDIT-TRAIL.
            PERFORM 2110-READ-AUDIT-RECORDS
            PERFORM 2120-SUMMARIZE-AUDIT.
 
+      *----------------------------------------------------------------*
+      * 2200-PROCESS-ERROR-LOG: Reads all error log records and
+      * produces an error frequency and severity summary.
+      *----------------------------------------------------------------*
        2200-PROCESS-ERROR-LOG.
            PERFORM 2210-READ-ERROR-RECORDS
            PERFORM 2220-SUMMARIZE-ERRORS.
 
+      *----------------------------------------------------------------*
+      * 2300-WRITE-SUMMARY: Writes audit summary, error summary,
+      * and control verification summary sections to the report.
+      *----------------------------------------------------------------*
        2300-WRITE-SUMMARY.
            PERFORM 2310-WRITE-AUDIT-SUMMARY
            PERFORM 2320-WRITE-ERROR-SUMMARY

@@ -37,6 +37,10 @@
               10 DB2-ERROR-MSG        PIC X(80).
            
        PROCEDURE DIVISION USING DB2-REQUEST-AREA.
+      *----------------------------------------------------------------*
+      * Main entry point - dispatches to Connect, Disconnect, or
+      * Status check based on the request type flag.
+      *----------------------------------------------------------------*
            EVALUATE TRUE
                WHEN DB2-CONNECT
                     PERFORM P100-PROCESS-CONNECT
@@ -51,6 +55,10 @@
            
            EXEC CICS RETURN END-EXEC.
            
+      *----------------------------------------------------------------*
+      * P100-PROCESS-CONNECT: Validates pool capacity (max 100)
+      * before establishing a new DB2 connection to POSMVP.
+      *----------------------------------------------------------------*
        P100-PROCESS-CONNECT.
            IF WS-ACTIVE-CONNECTIONS < WS-MAX-CONNECTIONS
               PERFORM P110-ESTABLISH-CONNECTION
@@ -63,6 +71,10 @@
        P100-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P110-ESTABLISH-CONNECTION: Issues SQL CONNECT and, on
+      * success, increments pool count and generates a token.
+      *----------------------------------------------------------------*
        P110-ESTABLISH-CONNECTION.
            EXEC SQL CONNECT TO POSMVP END-EXEC.
            
@@ -80,6 +92,10 @@
        P110-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P120-GENERATE-TOKEN: Creates a unique connection token
+      * from the current timestamp plus the active connection count.
+      *----------------------------------------------------------------*
        P120-GENERATE-TOKEN.
            MOVE FUNCTION CURRENT-DATE TO DB2-CONNECTION-TOKEN.
            STRING DB2-CONNECTION-TOKEN DELIMITED BY SIZE
@@ -88,6 +104,10 @@
        P120-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P200-PROCESS-DISCONNECT: Disconnects from DB2 and
+      * decrements the active connection pool count.
+      *----------------------------------------------------------------*
        P200-PROCESS-DISCONNECT.
            EXEC SQL DISCONNECT END-EXEC.
            
@@ -102,6 +122,10 @@
        P200-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P300-CHECK-STATUS: Verifies DB2 connectivity by querying
+      * CURRENT SERVER and returns the active connection count.
+      *----------------------------------------------------------------*
        P300-CHECK-STATUS.
            EXEC SQL SELECT CURRENT SERVER 
                     INTO :DB2-ERROR-MSG

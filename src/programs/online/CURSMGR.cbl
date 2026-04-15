@@ -41,6 +41,11 @@
            05 CURS-DATA-LENGTH      PIC S9(4) COMP.
            
        PROCEDURE DIVISION USING CURSOR-REQUEST-AREA.
+      *----------------------------------------------------------------*
+      * Main entry point - dispatches to the appropriate cursor
+      * lifecycle operation based on request type:
+      * D=Declare, O=Open, F=Fetch, C=Close.
+      *----------------------------------------------------------------*
            EVALUATE TRUE
                WHEN CURS-DECLARE
                     PERFORM P100-DECLARE-CURSOR
@@ -58,6 +63,11 @@
            
            EXEC CICS RETURN END-EXEC.
            
+      *----------------------------------------------------------------*
+      * P100-DECLARE-CURSOR: Prepares a DB2 cursor from the SQL
+      * statement provided in CURS-STMT. Configures array fetch
+      * size when USE-ARRAY-FETCH is enabled (up to 20 rows).
+      *----------------------------------------------------------------*
        P100-DECLARE-CURSOR.
            MOVE 0 TO CURS-RESPONSE-CODE.
            
@@ -77,6 +87,10 @@
        P100-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P200-OPEN-CURSOR: Opens the named cursor and resets fetch
+      * statistics counters for the new result set.
+      *----------------------------------------------------------------*
        P200-OPEN-CURSOR.
            MOVE 0 TO WS-FETCH-COUNT.
            MOVE 0 TO WS-ROWS-FETCHED.

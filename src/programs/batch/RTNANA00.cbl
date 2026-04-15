@@ -94,6 +94,11 @@
               10 FILLER              PIC X(65) VALUE SPACES.
               
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control flow: Initialize program and open report file,
+      * query DB2 for return code analysis, generate the report
+      * with per-program and summary totals, then close files.
+      *----------------------------------------------------------------*
            PERFORM P100-INIT-PROGRAM
               THRU P100-EXIT.
               
@@ -108,6 +113,10 @@
               
            GOBACK.
            
+      *----------------------------------------------------------------*
+      * P100-INIT-PROGRAM: Captures current date/time, opens the
+      * report output file, and initializes analysis counters.
+      *----------------------------------------------------------------*
        P100-INIT-PROGRAM.
            MOVE FUNCTION CURRENT-DATE TO WS-CURRENT-DATE-DATA.
            
@@ -122,6 +131,11 @@
        P100-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P200-PROCESS-ANALYSIS: Declares and opens a DB2 cursor to
+      * aggregate return codes by program. Writes headers and
+      * iterates through results to build the detail report.
+      *----------------------------------------------------------------*
        P200-PROCESS-ANALYSIS.
            EXEC SQL
                 DECLARE PRGCUR CURSOR FOR
@@ -166,6 +180,11 @@
        P210-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P220-PROCESS-DETAIL: Fetches one row from the cursor and
+      * writes it to the report. Accumulates running totals for
+      * each return code category (success, warning, error, severe).
+      *----------------------------------------------------------------*
        P220-PROCESS-DETAIL.
            EXEC SQL
                 FETCH PRGCUR
@@ -189,6 +208,10 @@
        P220-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P300-GENERATE-REPORT: Writes the summary totals line with
+      * accumulated counts across all programs.
+      *----------------------------------------------------------------*
        P300-GENERATE-REPORT.
            WRITE REPORT-RECORD FROM WS-HEADER1.
            
@@ -207,4 +230,4 @@
        P900-CLOSE-FILES.
            CLOSE REPORT-FILE.
        P900-EXIT.
-           EXIT. 
+           EXIT.  

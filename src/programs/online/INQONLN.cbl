@@ -37,6 +37,11 @@
            COPY INQCOM.
            
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control: Registers CICS error handlers and loops
+      * through user requests (MENU, INQP, INQH, EXIT) until
+      * the session is terminated.
+      *----------------------------------------------------------------*
            EXEC CICS HANDLE CONDITION
                      ERROR(P900-ERROR-ROUTINE)
                      PGMIDERR(P900-ERROR-ROUTINE)
@@ -50,6 +55,11 @@
            EXEC CICS RETURN 
            END-EXEC.
            
+      *----------------------------------------------------------------*
+      * P100-PROCESS-REQUEST: Receives map input from the terminal,
+      * dispatches to the requested function, then performs a
+      * security check (validate, authorize, log).
+      *----------------------------------------------------------------*
        P100-PROCESS-REQUEST.
            MOVE LOW-VALUES TO WS-COMMAREA.
            
@@ -89,6 +99,10 @@
        P100-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P200-DISPLAY-MENU: Sends the main inquiry menu map to
+      * the terminal.
+      *----------------------------------------------------------------*
        P200-DISPLAY-MENU.
            EXEC CICS SEND MAP('INQMNU')
                      MAPSET('INQSET')
@@ -98,6 +112,10 @@
        P200-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P300-PORTFOLIO-INQUIRY: Links to INQPORT to retrieve
+      * and display current portfolio position data.
+      *----------------------------------------------------------------*
        P300-PORTFOLIO-INQUIRY.
            EXEC CICS LINK PROGRAM('INQPORT')
                      COMMAREA(WS-COMMAREA)
@@ -107,6 +125,10 @@
        P300-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P400-HISTORY-INQUIRY: Links to INQHIST to retrieve
+      * and display transaction history.
+      *----------------------------------------------------------------*
        P400-HISTORY-INQUIRY.
            EXEC CICS LINK PROGRAM('INQHIST')
                      COMMAREA(WS-COMMAREA)
@@ -116,6 +138,10 @@
        P400-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P900-ERROR-ROUTINE: Logs the error via ERRHNDL and abends
+      * with code 'IERR' if the error is fatal.
+      *----------------------------------------------------------------*
        P900-ERROR-ROUTINE.
            MOVE 'INQONLN' TO ERR-PROGRAM.
            MOVE 'P900-ERROR-ROUTINE' TO ERR-PARAGRAPH.
@@ -136,6 +162,11 @@
        P900-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P050-SECURITY-CHECK: Three-step security via SECMGR:
+      * 1) Validate user credentials, 2) Authorize READ access
+      * to INQONLN, 3) Log the access to the audit trail.
+      *----------------------------------------------------------------*
        P050-SECURITY-CHECK.
            MOVE 'V' TO SEC-REQUEST-TYPE.
            
@@ -168,4 +199,4 @@
               END-IF
            END-IF.
        P050-EXIT.
-           EXIT. 
+           EXIT.  

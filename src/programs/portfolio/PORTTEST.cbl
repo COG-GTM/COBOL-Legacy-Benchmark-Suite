@@ -1,6 +1,12 @@
   *================================================================*
       * Program Name: PORTTEST
       * Description: Portfolio Test Data Generator
+      *   Generates synthetic portfolio test records with random
+      *   client types, statuses, and financial values. Creates
+      *   up to 100 records with sequentially numbered IDs
+      *   (PORT00001..PORT00100) for testing and benchmarking.
+      * Files: TESTFILE (sequential output)
+      * Copybooks: PORTFLIO, ERRHAND
       * Author: [Author name]
       * Date Written: 2024-03-20
       *================================================================*
@@ -43,6 +49,10 @@
            05  WS-STATUS-SUB       PIC 9(1).
            
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main control flow: Initialize, generate records up to
+      * the configured maximum, then close and report count.
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            PERFORM 2000-GENERATE-RECORDS
@@ -51,6 +61,10 @@
            GOBACK
            .
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Gets current date and opens the output
+      * test file.
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            ACCEPT WS-CURRENT-DATE FROM DATE YYYYMMDD
            
@@ -62,6 +76,11 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2000-GENERATE-RECORDS: Builds one test record by
+      * generating key, client info, portfolio info, and
+      * financial data, then writes it to the output file.
+      *----------------------------------------------------------------*
        2000-GENERATE-RECORDS.
            INITIALIZE PORT-RECORD
            
@@ -79,6 +98,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2100-GENERATE-KEY: Creates a portfolio ID (PORT + count)
+      * and a sequential 10-digit account number.
+      *----------------------------------------------------------------*
        2100-GENERATE-KEY.
            STRING 'PORT' WS-RECORD-COUNT
                DELIMITED BY SIZE
@@ -88,6 +111,10 @@
            COMPUTE PORT-ACCOUNT-NO = WS-RECORD-COUNT + 1000000000
            .
            
+      *----------------------------------------------------------------*
+      * 2200-GENERATE-CLIENT-INFO: Generates a client name and
+      * randomly assigns a client type (I/C/T).
+      *----------------------------------------------------------------*
        2200-GENERATE-CLIENT-INFO.
            STRING WS-NAME-PREFIX WS-RECORD-COUNT
                DELIMITED BY SIZE
@@ -96,6 +123,10 @@
            MOVE WS-CLIENT-TYPES(WS-TYPE-SUB:1) TO PORT-CLIENT-TYPE
            .
            
+      *----------------------------------------------------------------*
+      * 2300-GENERATE-PORTFOLIO-INFO: Sets creation and last-
+      * maintenance dates; randomly assigns status (A/C/S).
+      *----------------------------------------------------------------*
        2300-GENERATE-PORTFOLIO-INFO.
            MOVE WS-CURRENT-DATE TO PORT-CREATE-DATE
            MOVE WS-CURRENT-DATE TO PORT-LAST-MAINT
@@ -104,6 +135,10 @@
            MOVE WS-STATUS-TYPES(WS-STATUS-SUB:1) TO PORT-STATUS
            .
            
+      *----------------------------------------------------------------*
+      * 2400-GENERATE-FINANCIAL-INFO: Generates random total
+      * value (up to 1M) and sets cash balance at 10%.
+      *----------------------------------------------------------------*
        2400-GENERATE-FINANCIAL-INFO.
            COMPUTE PORT-TOTAL-VALUE = 
                FUNCTION RANDOM * 1000000
@@ -112,8 +147,11 @@
                PORT-TOTAL-VALUE * .10
            .
            
+      *----------------------------------------------------------------*
+      * 3000-TERMINATE: Closes output file and displays count.
+      *----------------------------------------------------------------*
        3000-TERMINATE.
            CLOSE TEST-FILE
            
            DISPLAY 'Records generated: ' WS-RECORD-COUNT
-           . 
+           .  

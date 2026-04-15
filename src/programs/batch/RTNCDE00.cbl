@@ -30,6 +30,10 @@
            COPY RTNCODE.
            
        PROCEDURE DIVISION USING RC-REQUEST-AREA.
+      *----------------------------------------------------------------*
+      * Main entry point - dispatches to the appropriate return
+      * code management function based on the request type.
+      *----------------------------------------------------------------*
            EVALUATE TRUE
                WHEN RC-INITIALIZE
                     PERFORM P100-INIT-RETURN-CODES
@@ -50,6 +54,10 @@
            
            GOBACK.
            
+      *----------------------------------------------------------------*
+      * P100-INIT-RETURN-CODES: Resets the return code tracking
+      * area to initial values (all zeros, SUCCESS status).
+      *----------------------------------------------------------------*
        P100-INIT-RETURN-CODES.
            INITIALIZE RC-CODES-AREA.
            MOVE SPACES TO RC-PROGRAM-ID.
@@ -60,6 +68,11 @@
        P100-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P200-SET-RETURN-CODE: Sets the current return code and
+      * tracks the highest code seen. Maps numeric codes to status:
+      * 0=SUCCESS, 1-4=WARNING, 5-8=ERROR, 9+=SEVERE.
+      *----------------------------------------------------------------*
        P200-SET-RETURN-CODE.
            IF RC-NEW-CODE > RC-HIGHEST-CODE
               MOVE RC-NEW-CODE TO RC-HIGHEST-CODE
@@ -82,6 +95,10 @@
        P200-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P300-GET-RETURN-CODE: Returns the current code, highest
+      * code seen, and current status to the caller.
+      *----------------------------------------------------------------*
        P300-GET-RETURN-CODE.
            MOVE RC-CURRENT-CODE TO RC-RETURN-VALUE.
            MOVE RC-HIGHEST-CODE TO RC-HIGHEST-RETURN.
@@ -90,6 +107,10 @@
        P300-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P400-LOG-RETURN-CODE: Inserts the current return code data
+      * into the DB2 RTNCODES table with a timestamp for audit.
+      *----------------------------------------------------------------*
        P400-LOG-RETURN-CODE.
            MOVE FUNCTION CURRENT-DATE TO WS-CURRENT-TIME.
            
@@ -118,6 +139,11 @@
        P400-EXIT.
            EXIT.
            
+      *----------------------------------------------------------------*
+      * P500-ANALYZE-CODES: Queries DB2 for aggregate return code
+      * statistics (count, max, min) for a specific program within
+      * a given time range.
+      *----------------------------------------------------------------*
        P500-ANALYZE-CODES.
            EXEC SQL
                 SELECT COUNT(*),

@@ -1,6 +1,17 @@
        *================================================================*
       * Program Name: HISTLD00
       * Description: Position History DB2 Load Program
+      *   Reads transaction history records from VSAM and loads
+      *   them into the DB2 POSHIST table. Features:
+      *   - Batch commit processing (every 1000 records)
+      *   - Checkpoint/restart integration via BCHCTL
+      *   - Duplicate record handling (SQLCODE -803)
+      *   - Error threshold monitoring (max 100 errors)
+      * Called By: JCL batch job
+      * Calls: ERRPROC, DB2 (CONNECT, INSERT, COMMIT, ROLLBACK)
+      * Files: TRANHIST (input), BCHCTL (checkpoint tracking)
+      * Copybooks: HISTREC, BCHCTL, DBTBLS, SQLCA, DBPROC,
+      *            ERRHAND, BCHCON
       * Version: 1.0
       * Date: 2024
       *================================================================*
@@ -64,6 +75,11 @@
                88  MORE-RECORDS        VALUE 'N'.
                
        PROCEDURE DIVISION.
+      *----------------------------------------------------------------*
+      * Main processing loop: Initialize, process records until
+      * EOF or error threshold exceeded, then terminate.
+      * Return code is set to the error count.
+      *----------------------------------------------------------------*
        0000-MAIN.
            PERFORM 1000-INITIALIZE
            
@@ -77,12 +93,20 @@
            GOBACK
            .
            
+      *----------------------------------------------------------------*
+      * 1000-INITIALIZE: Opens input files, connects to DB2, and
+      * initializes checkpoint tracking in the batch control file.
+      *----------------------------------------------------------------*
        1000-INITIALIZE.
            PERFORM 1100-OPEN-FILES
            PERFORM 1200-CONNECT-DB2
            PERFORM 1300-INIT-CHECKPOINTS
            .
            
+      *----------------------------------------------------------------*
+      * 2000-PROCESS: Reads next history record and, if available,
+      * inserts it into DB2 and checks if a commit is needed.
+      *----------------------------------------------------------------*
        2000-PROCESS.
            PERFORM 2100-READ-HISTORY
            
@@ -92,6 +116,10 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 3000-TERMINATE: Performs final DB2 commit, closes files,
+      * disconnects from DB2, and displays processing statistics.
+      *----------------------------------------------------------------*
        3000-TERMINATE.
            PERFORM 3100-FINAL-COMMIT
            PERFORM 3200-CLOSE-FILES
@@ -140,6 +168,11 @@
            END-READ
            .
            
+      *----------------------------------------------------------------*
+      * 2200-LOAD-TO-DB2: Maps VSAM history fields to DB2 host
+      * variables and inserts into POSHIST table. Skips duplicate
+      * records (SQLCODE -803) without counting as errors.
+      *----------------------------------------------------------------*
        2200-LOAD-TO-DB2.
            INITIALIZE POSHIST-RECORD
            
@@ -174,6 +207,11 @@
            END-IF
            .
            
+      *----------------------------------------------------------------*
+      * 2300-CHECK-COMMIT: Tracks records since last commit.
+      * Issues DB2 COMMIT every 1000 records and updates the
+      * checkpoint in the batch control file.
+      *----------------------------------------------------------------*
        2300-CHECK-COMMIT.
            ADD 1 TO WS-COMMIT-COUNT
            
@@ -223,6 +261,10 @@
            DISPLAY '  Errors:         ' WS-ERROR-COUNT
            .
            
+      *----------------------------------------------------------------*
+      * 9000-ERROR-ROUTINE: Logs error via ERRPROC and rolls back
+      * the current DB2 transaction to maintain data integrity.
+      *----------------------------------------------------------------*
        9000-ERROR-ROUTINE.
            MOVE 'HISTLD00' TO ERR-PROGRAM
            CALL 'ERRPROC' USING ERR-MESSAGE
