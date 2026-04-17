@@ -9,6 +9,8 @@ import { PortfolioDetailPage } from '@/pages/portfolios/PortfolioDetailPage';
 import { PortfolioEditPage } from '@/pages/portfolios/PortfolioEditPage';
 import { TransactionListPage } from '@/pages/transactions/TransactionListPage';
 import { TransactionNewPage } from '@/pages/transactions/TransactionNewPage';
+import { TransactionConfirmation } from '@/pages/transactions/TransactionConfirmation';
+import { TransactionProvider } from '@/context/TransactionContext';
 import { PositionReportPage } from '@/pages/reports/PositionReportPage';
 import { AuditReportPage } from '@/pages/reports/AuditReportPage';
 import { StatisticsReportPage } from '@/pages/reports/StatisticsReportPage';
@@ -18,6 +20,7 @@ import { ErrorLogPage } from '@/pages/errors/ErrorLogPage';
 function App() {
   return (
     <AuthProvider>
+      <TransactionProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
@@ -29,6 +32,7 @@ function App() {
             <Route path="/portfolios/:id/edit" element={<PortfolioEditPage />} />
             <Route path="/transactions" element={<TransactionListPage />} />
             <Route path="/transactions/new" element={<TransactionNewPage />} />
+            <Route path="/transactions/confirmation" element={<TransactionConfirmation />} />
             <Route path="/reports/positions" element={<PositionReportPage />} />
             <Route path="/reports/audit" element={<AuditReportPage />} />
             <Route path="/reports/statistics" element={<StatisticsReportPage />} />
@@ -37,6 +41,7 @@ function App() {
           </Route>
         </Routes>
       </BrowserRouter>
+      </TransactionProvider>
     </AuthProvider>
   );
 }
