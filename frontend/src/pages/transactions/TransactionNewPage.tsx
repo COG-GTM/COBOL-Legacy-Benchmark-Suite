@@ -62,7 +62,7 @@ const TRANS_TYPE_CONFIG: {
   disabled?: boolean;
   tooltip?: string;
 }[] = [
-  { value: 'BY', label: 'Buy', code: 'BU', color: 'text-emerald-700', bgColor: 'bg-emerald-50', ringColor: 'ring-emerald-300' },
+  { value: 'BY', label: 'Buy', code: 'BY', color: 'text-emerald-700', bgColor: 'bg-emerald-50', ringColor: 'ring-emerald-300' },
   { value: 'SL', label: 'Sell', code: 'SL', color: 'text-red-700', bgColor: 'bg-red-50', ringColor: 'ring-red-300' },
   { value: 'TR', label: 'Transfer', code: 'TR', color: 'text-blue-700', bgColor: 'bg-blue-50', ringColor: 'ring-blue-300', disabled: true, tooltip: 'Coming soon' },
   { value: 'FE', label: 'Fee', code: 'FE', color: 'text-amber-700', bgColor: 'bg-amber-50', ringColor: 'ring-amber-300' },
@@ -208,7 +208,11 @@ export function TransactionNewPage() {
   }, [currentStep]);
 
   const handleSubmit = useCallback(() => {
-    if (!accountNo) return;
+    if (!accountNo) {
+      setErrors({ portfolioId: 'No account mapping found for this portfolio. Please select a different portfolio.' });
+      setCurrentStep(0);
+      return;
+    }
 
     const result = submitTransaction({
       accountNo,

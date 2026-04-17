@@ -50,14 +50,24 @@ function generateTransactionId(): string {
 }
 
 function buildAccountMap(): Map<string, string> {
-  const map = new Map<string, string>();
-  const portfolioIds = initialPortfolios.map((p) => p.id);
-  const accountNos = [...new Set(initialPositions.map((p) => p.accountNo))].sort();
-
-  for (let i = 0; i < portfolioIds.length && i < accountNos.length; i++) {
-    map.set(portfolioIds[i], accountNos[i]);
-  }
-  return map;
+  // Explicit mapping: each portfolio ID maps to a known account number.
+  // PORT0012 gets its own account (100000012) since mock positions don't
+  // yet include an entry for it, but we still need it selectable.
+  const explicit: Record<string, string> = {
+    PORT0001: '100000001',
+    PORT0002: '100000002',
+    PORT0003: '100000003',
+    PORT0004: '100000004',
+    PORT0005: '100000005',
+    PORT0006: '100000006',
+    PORT0007: '100000007',
+    PORT0008: '100000008',
+    PORT0009: '100000009',
+    PORT0010: '100000010',
+    PORT0011: '100000011',
+    PORT0012: '100000012',
+  };
+  return new Map(Object.entries(explicit));
 }
 
 const portfolioAccountMap = buildAccountMap();
