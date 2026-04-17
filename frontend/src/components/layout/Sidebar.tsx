@@ -4,6 +4,7 @@ import {
   LayoutDashboard,
   Briefcase,
   ArrowLeftRight,
+  Search,
   FileText,
   Activity,
   AlertTriangle,
@@ -22,6 +23,7 @@ interface NavItem {
 const navItems: NavItem[] = [
   { label: 'Dashboard', path: '/', icon: <LayoutDashboard className="w-5 h-5" /> },
   { label: 'Portfolios', path: '/portfolios', icon: <Briefcase className="w-5 h-5" /> },
+  { label: 'Positions', path: '/positions', icon: <Search className="w-5 h-5" /> },
   { label: 'Transactions', path: '/transactions', icon: <ArrowLeftRight className="w-5 h-5" /> },
   {
     label: 'Reports',
