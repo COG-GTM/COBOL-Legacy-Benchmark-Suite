@@ -13,18 +13,22 @@ interface PositionRow {
 }
 
 function buildPositionRows(): PositionRow[] {
+  // Map each portfolio to its positions via account number.
+  // Account numbers follow the pattern 1000000XX where XX = portfolio index (01-based).
   return portfolios
     .filter((p) => p.status !== 'C')
     .map((p) => {
+      const portIndex = parseInt(p.id.replace('PORT', ''), 10);
+      const accountNo = `1000000${String(portIndex).padStart(2, '0')}`;
       const portPositions = positions.filter(
-        (pos) => pos.status === 'A' && pos.accountNo.startsWith('1000000')
+        (pos) => pos.status === 'A' && pos.accountNo === accountNo
       );
       const totalQty = portPositions.reduce((sum, pos) => sum + pos.shareBalance, 0);
-      const mockChange = ((Math.sin(parseInt(p.id.replace('PORT', ''), 10) * 3.7) * 15) * 100) / 100;
+      const mockChange = ((Math.sin(portIndex * 3.7) * 15) * 100) / 100;
       return {
         portfolioId: p.id,
         description: p.name,
-        quantity: totalQty / portfolios.filter((pp) => pp.status !== 'C').length,
+        quantity: totalQty,
         marketValue: p.totalValue,
         changePercent: parseFloat(mockChange.toFixed(2)),
       };
