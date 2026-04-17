@@ -7,7 +7,8 @@ import { PortfolioListPage } from '@/pages/portfolios/PortfolioListPage';
 import { PortfolioNewPage } from '@/pages/portfolios/PortfolioNewPage';
 import { PortfolioDetailPage } from '@/pages/portfolios/PortfolioDetailPage';
 import { PortfolioEditPage } from '@/pages/portfolios/PortfolioEditPage';
-import { TransactionListPage } from '@/pages/transactions/TransactionListPage';
+import { TransactionHistory } from '@/pages/transactions/TransactionHistory';
+import { PositionSearch } from '@/pages/positions/PositionSearch';
 import { TransactionNewPage } from '@/pages/transactions/TransactionNewPage';
 import { PositionReportPage } from '@/pages/reports/PositionReportPage';
 import { AuditReportPage } from '@/pages/reports/AuditReportPage';
@@ -27,7 +28,8 @@ function App() {
             <Route path="/portfolios/new" element={<PortfolioNewPage />} />
             <Route path="/portfolios/:id" element={<PortfolioDetailPage />} />
             <Route path="/portfolios/:id/edit" element={<PortfolioEditPage />} />
-            <Route path="/transactions" element={<TransactionListPage />} />
+            <Route path="/positions" element={<PositionSearch />} />
+            <Route path="/transactions" element={<TransactionHistory />} />
             <Route path="/transactions/new" element={<TransactionNewPage />} />
             <Route path="/reports/positions" element={<PositionReportPage />} />
             <Route path="/reports/audit" element={<AuditReportPage />} />
