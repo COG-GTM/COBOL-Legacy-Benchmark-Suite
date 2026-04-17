@@ -15,9 +15,16 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [auth, setAuth] = useState<AuthState>(() => {
-    const stored = sessionStorage.getItem('auth');
-    if (stored) {
-      return JSON.parse(stored) as AuthState;
+    try {
+      const stored = sessionStorage.getItem('auth');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (typeof parsed.isAuthenticated === 'boolean' && (parsed.userId === null || typeof parsed.userId === 'string')) {
+          return parsed as AuthState;
+        }
+      }
+    } catch {
+      sessionStorage.removeItem('auth');
     }
     return { isAuthenticated: false, userId: null };
   });

@@ -26,7 +26,7 @@ function formatAmount(value: number): string {
 export function DashboardPage() {
   const stats = useMemo(() => {
     const totalPortfolios = portfolios.filter((p) => p.status === 'A').length;
-    const totalValue = portfolios.reduce((sum, p) => sum + p.totalValue, 0);
+    const totalValue = portfolios.filter((p) => p.status === 'A').reduce((sum, p) => sum + p.totalValue, 0);
     const activePositions = positions.filter((p) => p.status === 'A').length;
     const pendingTransactions = transactions.filter((t) => t.status === 'P').length;
     return { totalPortfolios, totalValue, activePositions, pendingTransactions };
