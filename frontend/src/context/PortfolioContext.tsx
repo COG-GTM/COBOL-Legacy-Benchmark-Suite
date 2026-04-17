@@ -1,4 +1,4 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useRef } from 'react';
 import type { ReactNode } from 'react';
 import type { Portfolio, Position, Transaction } from '@/data/types';
 import {
@@ -90,12 +90,16 @@ export function PortfolioProvider({ children }: { children: ReactNode }) {
     [transactions],
   );
 
+  const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   const showNotification = useCallback((message: string, type: 'success' | 'error') => {
+    if (timerRef.current) clearTimeout(timerRef.current);
     setNotification({ message, type });
-    setTimeout(() => setNotification(null), 4000);
+    timerRef.current = setTimeout(() => setNotification(null), 4000);
   }, []);
 
   const clearNotification = useCallback(() => {
+    if (timerRef.current) clearTimeout(timerRef.current);
     setNotification(null);
   }, []);
 

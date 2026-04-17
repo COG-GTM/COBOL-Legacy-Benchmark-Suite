@@ -26,18 +26,18 @@ export function validatePortfolioId(id: string): ValidationResult {
 
 /**
  * Validates an Account Number.
- * Must be exactly 10 numeric digits and non-zero.
+ * Must be exactly 9 numeric digits and non-zero.
  */
 export function validateAccountNumber(accountNo: string): ValidationResult {
   const trimmed = accountNo.trim();
   if (!trimmed) {
     return { valid: false, error: 'Account number is required' };
   }
-  const pattern = /^\d{10}$/;
+  const pattern = /^\d{9}$/;
   if (!pattern.test(trimmed)) {
-    return { valid: false, error: 'Account number must be exactly 10 numeric digits' };
+    return { valid: false, error: 'Account number must be exactly 9 numeric digits' };
   }
-  if (trimmed === '0000000000') {
+  if (trimmed === '000000000') {
     return { valid: false, error: 'Account number cannot be all zeros' };
   }
   return { valid: true, error: null };
