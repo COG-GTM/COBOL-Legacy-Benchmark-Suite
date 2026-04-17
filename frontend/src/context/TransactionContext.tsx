@@ -101,48 +101,55 @@ export function TransactionProvider({ children }: { children: ReactNode }) {
   const submitTransaction = useCallback(
     (params: SubmitTransactionParams): SubmitTransactionResult => {
       const transId = generateTransactionId();
-      const beforeBalance = state.positions.find(
-        (p) => p.accountNo === params.accountNo && p.fundId === params.fundId && p.status === 'A'
-      )?.shareBalance ?? 0;
 
-      let afterBalance = beforeBalance;
-
-      if (params.transType === 'BY') {
-        afterBalance = beforeBalance + params.shareQty;
-      } else if (params.transType === 'SL') {
-        afterBalance = beforeBalance - params.shareQty;
-      }
-      // Fee: no share balance change
-
-      const newTransaction: Transaction = {
-        transId,
-        accountNo: params.accountNo,
-        fundId: params.fundId,
-        transType: params.transType,
-        transDate: params.transDate,
-        shareQty: params.shareQty,
-        price: params.price,
-        amount: params.amount,
-        status: 'P',
-        beforeBalance,
-        afterBalance,
-      };
-
-      const auditAction = params.transType === 'BY' ? 'CREATE' : params.transType === 'SL' ? 'DELETE' : 'UPDATE';
-      const newAudit: AuditEntry = {
-        timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
-        program: 'PORTTRAN',
-        type: 'TRANSACTION',
-        action: auditAction,
-        status: 'SUCC',
-        portfolioId: '',
-        accountNo: params.accountNo,
-        message: `Transaction: ${params.transType} Amount: ${params.amount.toFixed(2)} Units: ${params.shareQty.toFixed(3)}`,
-      };
+      // Computed inside setState updater to avoid stale closure reads
+      let computedBefore = 0;
+      let computedAfter = 0;
 
       setState((prev) => {
+        const existingPosition = prev.positions.find(
+          (p) => p.accountNo === params.accountNo && p.fundId === params.fundId && p.status === 'A'
+        );
+        computedBefore = existingPosition?.shareBalance ?? 0;
+        computedAfter = computedBefore;
+
+        if (params.transType === 'BY') {
+          computedAfter = computedBefore + params.shareQty;
+        } else if (params.transType === 'SL') {
+          computedAfter = computedBefore - params.shareQty;
+        }
+        // Fee: no share balance change
+
+        const newTransaction: Transaction = {
+          transId,
+          accountNo: params.accountNo,
+          fundId: params.fundId,
+          transType: params.transType,
+          transDate: params.transDate,
+          shareQty: params.shareQty,
+          price: params.price,
+          amount: params.amount,
+          status: 'P',
+          beforeBalance: computedBefore,
+          afterBalance: computedAfter,
+        };
+
+        const auditAction = params.transType === 'BY' ? 'CREATE' : params.transType === 'SL' ? 'DELETE' : 'UPDATE';
+        const newAudit: AuditEntry = {
+          timestamp: new Date().toISOString().replace('T', ' ').substring(0, 19),
+          program: 'PORTTRAN',
+          type: 'TRANSACTION',
+          action: auditAction,
+          status: 'SUCC',
+          portfolioId: '',
+          accountNo: params.accountNo,
+          message: `Transaction: ${params.transType} Amount: ${params.amount.toFixed(2)} Units: ${params.shareQty.toFixed(3)}`,
+        };
+
+        let positionUpdated = false;
         const updatedPositions = prev.positions.map((p) => {
           if (p.accountNo === params.accountNo && p.fundId === params.fundId && p.status === 'A') {
+            positionUpdated = true;
             const updated = { ...p, lastDate: params.transDate, lastTrans: params.transType };
             if (params.transType === 'BY') {
               updated.shareBalance = p.shareBalance + params.shareQty;
@@ -158,6 +165,22 @@ export function TransactionProvider({ children }: { children: ReactNode }) {
           return p;
         });
 
+        // Create new position record on first Buy (mirrors COBOL PORTTRAN behavior)
+        if (!positionUpdated && params.transType === 'BY') {
+          const newPosition: Position = {
+            accountNo: params.accountNo,
+            fundId: params.fundId,
+            cusip: '000000000',
+            shareBalance: params.shareQty,
+            avgCost: params.price,
+            costBasis: params.amount,
+            lastDate: params.transDate,
+            lastTrans: 'BY',
+            status: 'A',
+          };
+          updatedPositions.push(newPosition);
+        }
+
         return {
           transactions: [newTransaction, ...prev.transactions],
           positions: updatedPositions,
@@ -165,9 +188,9 @@ export function TransactionProvider({ children }: { children: ReactNode }) {
         };
       });
 
-      return { transId, beforeBalance, afterBalance };
+      return { transId, beforeBalance: computedBefore, afterBalance: computedAfter };
     },
-    [state.positions]
+    []
   );
 
   return (
