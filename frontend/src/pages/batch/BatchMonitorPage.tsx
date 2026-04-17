@@ -228,7 +228,7 @@ export function BatchMonitorPage() {
                     <td className="px-3 py-2 text-xs font-mono text-slate-600">{job?.startTime || '\u2014'}</td>
                     <td className="px-3 py-2 text-xs font-mono text-slate-600">{job?.endTime || '\u2014'}</td>
                     <td className="px-3 py-2 text-xs font-mono text-slate-600">{calcDuration(job?.startTime ?? '', job?.endTime ?? '')}</td>
-                    <td className="px-3 py-2 text-xs text-slate-700 text-right tabular-nums">{job?.recordCount ? job.recordCount.toLocaleString() : '\u2014'}</td>
+                    <td className="px-3 py-2 text-xs text-slate-700 text-right tabular-nums">{job?.recordCount !== undefined ? job.recordCount.toLocaleString() : '\u2014'}</td>
                     <td className={`px-3 py-2 text-xs text-right tabular-nums ${(job?.errorCount ?? 0) > 0 ? 'text-red-600 font-medium' : 'text-slate-700'}`}>
                       {job?.errorCount !== undefined ? job.errorCount : '\u2014'}
                     </td>
