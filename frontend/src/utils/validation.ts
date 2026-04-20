@@ -19,7 +19,7 @@ function makeResult(code: ValidationCode): ValidationResult {
  * Mirrors PORTVALD.cbl lines 52-70
  */
 export function validatePortfolioId(id: string): ValidationResult {
-  if (!id || id.length < 8) {
+  if (!id || id.length !== 8) {
     return makeResult(ValidationCode.INVALID_ID);
   }
   const prefix = id.substring(0, 4);

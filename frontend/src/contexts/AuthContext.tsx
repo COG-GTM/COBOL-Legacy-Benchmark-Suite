@@ -18,8 +18,13 @@ const STORAGE_KEY = 'portfolio-auth-user';
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    return stored ? JSON.parse(stored) : null;
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      return stored ? JSON.parse(stored) : null;
+    } catch {
+      localStorage.removeItem(STORAGE_KEY);
+      return null;
+    }
   });
 
   const login = useCallback((username: string, _password: string): boolean => {
