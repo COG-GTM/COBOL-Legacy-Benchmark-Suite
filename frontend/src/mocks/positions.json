@@ -1,0 +1,39 @@
+{
+  "1000000001": [
+    { "fundId": "VFIAX", "fundName": "Vanguard 500 Index Fund", "units": 150.000, "costBasis": 52500.00, "marketValue": 63750.00 },
+    { "fundId": "VBTLX", "fundName": "Vanguard Total Bond Market", "units": 500.000, "costBasis": 5250.00, "marketValue": 5100.00 },
+    { "fundId": "VTIAX", "fundName": "Vanguard Total Intl Stock", "units": 300.000, "costBasis": 9000.00, "marketValue": 9600.00 }
+  ],
+  "1000000002": [
+    { "fundId": "SPY", "fundName": "SPDR S&P 500 ETF Trust", "units": 1200.000, "costBasis": 480000.00, "marketValue": 564000.00 },
+    { "fundId": "QQQ", "fundName": "Invesco QQQ Trust", "units": 800.000, "costBasis": 320000.00, "marketValue": 368000.00 },
+    { "fundId": "AGG", "fundName": "iShares Core US Aggregate Bond", "units": 2000.000, "costBasis": 220000.00, "marketValue": 212000.00 },
+    { "fundId": "VWO", "fundName": "Vanguard FTSE Emerging Mkts", "units": 1500.000, "costBasis": 60000.00, "marketValue": 57000.00 }
+  ],
+  "1000000003": [
+    { "fundId": "VFIAX", "fundName": "Vanguard 500 Index Fund", "units": 400.000, "costBasis": 140000.00, "marketValue": 170000.00 },
+    { "fundId": "VBTLX", "fundName": "Vanguard Total Bond Market", "units": 1000.000, "costBasis": 105000.00, "marketValue": 102000.00 }
+  ],
+  "1000000004": [
+    { "fundId": "AAPL", "fundName": "Apple Inc", "units": 200.000, "costBasis": 30000.00, "marketValue": 34000.00 },
+    { "fundId": "MSFT", "fundName": "Microsoft Corporation", "units": 100.000, "costBasis": 35000.00, "marketValue": 42000.00 },
+    { "fundId": "GOOGL", "fundName": "Alphabet Inc Class A", "units": 50.000, "costBasis": 7000.00, "marketValue": 8500.00 }
+  ],
+  "1000000007": [
+    { "fundId": "VTI", "fundName": "Vanguard Total Stock Market", "units": 250.000, "costBasis": 55000.00, "marketValue": 62500.00 },
+    { "fundId": "BND", "fundName": "Vanguard Total Bond Market ETF", "units": 300.000, "costBasis": 22500.00, "marketValue": 21900.00 }
+  ],
+  "1000000008": [
+    { "fundId": "SPY", "fundName": "SPDR S&P 500 ETF Trust", "units": 5000.000, "costBasis": 2000000.00, "marketValue": 2350000.00 },
+    { "fundId": "IWM", "fundName": "iShares Russell 2000 ETF", "units": 3000.000, "costBasis": 600000.00, "marketValue": 570000.00 },
+    { "fundId": "EFA", "fundName": "iShares MSCI EAFE ETF", "units": 4000.000, "costBasis": 280000.00, "marketValue": 296000.00 }
+  ],
+  "1000000009": [
+    { "fundId": "VFIAX", "fundName": "Vanguard 500 Index Fund", "units": 80.000, "costBasis": 28000.00, "marketValue": 34000.00 }
+  ],
+  "1000000010": [
+    { "fundId": "VTI", "fundName": "Vanguard Total Stock Market", "units": 600.000, "costBasis": 132000.00, "marketValue": 150000.00 },
+    { "fundId": "VXUS", "fundName": "Vanguard Total Intl Stock ETF", "units": 400.000, "costBasis": 22000.00, "marketValue": 20800.00 },
+    { "fundId": "BND", "fundName": "Vanguard Total Bond Market ETF", "units": 800.000, "costBasis": 60000.00, "marketValue": 58400.00 }
+  ]
+}
