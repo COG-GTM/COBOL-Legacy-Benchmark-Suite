@@ -60,7 +60,7 @@ export function validateInvestmentType(type: string): ValidationResult {
  * Mirrors PORTVALD.cbl lines 107-120
  */
 export function validateAmount(amount: number): ValidationResult {
-  if (amount < MIN_AMOUNT || amount > MAX_AMOUNT) {
+  if (isNaN(amount) || amount < MIN_AMOUNT || amount > MAX_AMOUNT) {
     return makeResult(ValidationCode.INVALID_AMOUNT);
   }
   return makeResult(ValidationCode.SUCCESS);
