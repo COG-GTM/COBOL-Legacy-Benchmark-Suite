@@ -13,6 +13,7 @@ export function TransactionEntryPage() {
   const [portfolioId, setPortfolioId] = useState('');
   const [transType, setTransType] = useState<TransactionType>('BU');
   const [investmentType, setInvestmentType] = useState<InvestmentType>('STK');
+  const [investmentId, setInvestmentId] = useState('');
   const [units, setUnits] = useState('');
   const [price, setPrice] = useState('');
   const [amount, setAmount] = useState('');
@@ -47,9 +48,16 @@ export function TransactionEntryPage() {
     }
 
     if (transType === 'SL') {
-      const totalHoldings = positions.reduce((sum, p) => sum + p.quantity, 0);
-      if (unitsVal > totalHoldings) {
-        errs.units = `Sell cannot exceed holdings (${totalHoldings} units available)`;
+      if (!investmentId.trim()) {
+        errs.investmentId = 'Investment ID required for sell orders';
+      } else {
+        const matchingPositions = positions.filter(p => p.investmentId === investmentId);
+        const holdings = matchingPositions.reduce((sum, p) => sum + p.quantity, 0);
+        if (holdings === 0) {
+          errs.investmentId = `No holdings found for ${investmentId}`;
+        } else if (unitsVal > holdings) {
+          errs.units = `Sell cannot exceed holdings (${holdings} units available for ${investmentId})`;
+        }
       }
     }
 
@@ -78,6 +86,7 @@ export function TransactionEntryPage() {
     setUnits('');
     setPrice('');
     setAmount('');
+    setInvestmentId('');
     setTargetPortfolio('');
   };
 
@@ -128,6 +137,24 @@ export function TransactionEntryPage() {
               <option key={k} value={k}>{v}</option>
             ))}
           </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">Investment ID</label>
+          <input
+            type="text"
+            value={investmentId}
+            onChange={e => setInvestmentId(e.target.value.toUpperCase())}
+            maxLength={10}
+            placeholder="e.g. AAPL, VBOND1"
+            className="border border-gray-300 rounded-md px-3 py-2 text-sm w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <InlineError message={errors.investmentId ?? ''} />
+          {portfolioId && positions.length > 0 && (
+            <p className="text-xs text-gray-500 mt-1">
+              Available: {positions.map(p => p.investmentId).join(', ')}
+            </p>
+          )}
         </div>
 
         <div>

@@ -13,6 +13,7 @@ export function TransactionHistoryPage() {
   const [history, setHistory] = useState<HistoryEntry[]>([]);
   const [error, setError] = useState('');
   const [searched, setSearched] = useState(false);
+  const [searchKey, setSearchKey] = useState(0);
 
   const handleSearch = () => {
     setError('');
@@ -31,6 +32,7 @@ export function TransactionHistoryPage() {
     }
 
     setHistory(records);
+    setSearchKey(k => k + 1);
   };
 
   return (
@@ -61,7 +63,7 @@ export function TransactionHistoryPage() {
 
       {error && <InlineError message={error} />}
 
-      {history.length > 0 && <TransactionTable data={history} />}
+      {history.length > 0 && <TransactionTable key={searchKey} data={history} />}
 
       {searched && history.length === 0 && !error && (
         <p className="text-gray-500 text-sm">No records found.</p>
