@@ -32,10 +32,10 @@ export function TransactionEntryPage() {
     else if (!portfolio) errs.portfolioId = 'Portfolio not found';
 
     const unitsVal = parseFloat(units);
-    if (isNaN(unitsVal) || unitsVal <= 0) errs.units = 'Quantity must be greater than zero';
+    if (transType !== 'FE' && (isNaN(unitsVal) || unitsVal <= 0)) errs.units = 'Quantity must be greater than zero';
 
     const priceVal = parseFloat(price);
-    if (transType !== 'TR' && (isNaN(priceVal) || priceVal <= 0)) {
+    if (transType !== 'TR' && transType !== 'FE' && (isNaN(priceVal) || priceVal <= 0)) {
       errs.price = 'Price must be greater than zero';
     }
 

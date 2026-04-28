@@ -49,11 +49,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!auth.isAuthenticated || !auth.loginTime) return;
     const remaining = SESSION_TIMEOUT_MS - (Date.now() - auth.loginTime);
-    if (remaining <= 0) return;
+    const delay = Math.max(0, remaining);
     const timer = setTimeout(() => {
       sessionStorage.removeItem('auth');
       setAuth(LOGGED_OUT);
-    }, remaining);
+    }, delay);
     return () => clearTimeout(timer);
   }, [auth.isAuthenticated, auth.loginTime]);
 
