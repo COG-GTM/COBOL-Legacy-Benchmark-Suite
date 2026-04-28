@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useAuth } from '../hooks/useAuth';
 import type { UserRole } from '../context/authContextDef';
 import { InlineError } from '../components/InlineError';
@@ -12,8 +12,7 @@ export function LoginPage() {
   const navigate = useNavigate();
 
   if (isAuthenticated) {
-    navigate('/', { replace: true });
-    return null;
+    return <Navigate to="/" replace />;
   }
 
   const handleSubmit = (e: FormEvent) => {

@@ -30,7 +30,7 @@ export function PortfolioForm({ initial, onSubmit, onCancel, isEdit = false }: P
     const errs: Record<string, string> = {};
 
     if (!isEdit) {
-      const idResult = validatePortfolioId(portfolioId);
+      const idResult = validatePortfolioId(portfolioId.toUpperCase());
       if (!idResult.valid) errs.portfolioId = idResult.error;
     }
 
