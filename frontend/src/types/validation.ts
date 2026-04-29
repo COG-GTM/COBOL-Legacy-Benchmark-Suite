@@ -3,13 +3,15 @@
  * Error codes: 0=success, 1=invalid ID, 2=invalid account, 3=invalid type, 4=invalid amount
  */
 
-export enum ValidationCode {
-  SUCCESS = 0,
-  INVALID_ID = 1,
-  INVALID_ACCOUNT = 2,
-  INVALID_TYPE = 3,
-  INVALID_AMOUNT = 4,
-}
+export const ValidationCode = {
+  SUCCESS: 0,
+  INVALID_ID: 1,
+  INVALID_ACCOUNT: 2,
+  INVALID_TYPE: 3,
+  INVALID_AMOUNT: 4,
+} as const;
+
+export type ValidationCode = (typeof ValidationCode)[keyof typeof ValidationCode];
 
 export const VALIDATION_MESSAGES: Record<ValidationCode, string> = {
   [ValidationCode.SUCCESS]: 'Validation successful',
