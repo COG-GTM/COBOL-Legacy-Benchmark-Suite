@@ -191,6 +191,8 @@ export function Component() {
                         validateField('portfolioId', () =>
                           validatePortfolioId(e.target.value),
                         );
+                      } else {
+                        clearFieldError('portfolioId');
                       }
                     }}
                   />
@@ -223,6 +225,8 @@ export function Component() {
                         validateField('accountNo', () =>
                           validateAccountNumber(e.target.value),
                         );
+                      } else {
+                        clearFieldError('accountNo');
                       }
                     }}
                   />
@@ -349,6 +353,8 @@ export function Component() {
                       const num = parseFloat(raw);
                       if (!isNaN(num) && num > 0) {
                         validateField('amount', () => validateAmount(num));
+                      } else {
+                        clearFieldError('amount');
                       }
                     }}
                   />
