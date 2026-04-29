@@ -1,4 +1,5 @@
-import { ValidationCode, ValidationResult, VALIDATION_MESSAGES } from '../types/validation';
+import { ValidationCode, VALIDATION_MESSAGES } from '../types/validation';
+import type { ValidationResult } from '../types/validation';
 import type { InvestmentType } from '../types/transaction';
 
 /**
