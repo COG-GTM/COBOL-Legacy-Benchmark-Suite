@@ -23,7 +23,7 @@ export function Component() {
       .map((r) => ({
         ...r,
         changeAmount: r.currentValue - r.previousValue,
-        changePercent: ((r.currentValue - r.previousValue) / r.previousValue) * 100,
+        changePercent: r.previousValue !== 0 ? ((r.currentValue - r.previousValue) / r.previousValue) * 100 : 0,
       }))
       .sort((a, b) => b.changePercent - a.changePercent);
   }, []);

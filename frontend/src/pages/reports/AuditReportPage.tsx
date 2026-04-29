@@ -4,6 +4,7 @@ import type { TableProps } from 'antd';
 import type { AuditAction, AuditRecord, AuditStatus } from '../../types/audit';
 import { formatDateTime } from '../../utils/formatters';
 import auditData from '../../mocks/auditRecords.json';
+import dayjs from 'dayjs';
 
 const { Title, Text } = Typography;
 
@@ -145,7 +146,7 @@ export function Component() {
                 const val = typeof ds === 'string' ? ds : '';
                 setWorking((f) => ({ ...f, startDate: val }));
               }}
-              value={undefined}
+              value={working.startDate ? dayjs(working.startDate) : null}
             />
           </Col>
           <Col xs={24} sm={12} md={5}>
@@ -156,7 +157,7 @@ export function Component() {
                 const val = typeof ds === 'string' ? ds : '';
                 setWorking((f) => ({ ...f, endDate: val }));
               }}
-              value={undefined}
+              value={working.endDate ? dayjs(working.endDate) : null}
             />
           </Col>
           <Col xs={24} sm={12} md={4}>
