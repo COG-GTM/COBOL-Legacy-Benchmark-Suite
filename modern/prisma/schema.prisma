@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Portfolio Master Record — migrated from PORTFLIO.cpy / PORTMSTR.cbl
+model Portfolio {
+  id            String          @id @db.VarChar(8)       // PORT-ID  (PORTnnnn)
+  accountNo     String          @unique @db.VarChar(10)   // PORT-ACCOUNT-NO
+  clientName    String          @db.VarChar(30)           // PORT-CLIENT-NAME
+  clientType    ClientType      @default(INDIVIDUAL)      // PORT-CLIENT-TYPE
+  status        PortfolioStatus @default(ACTIVE)          // PORT-STATUS
+  totalValue    Decimal         @default(0) @db.Decimal(15, 2)  // PORT-TOTAL-VALUE
+  cashBalance   Decimal         @default(0) @db.Decimal(15, 2)  // PORT-CASH-BALANCE
+  lastUser      String?         @db.VarChar(8)            // PORT-LAST-USER
+  lastTransDate DateTime?                                  // PORT-LAST-TRANS
+  createdAt     DateTime        @default(now())           // PORT-CREATE-DATE
+  updatedAt     DateTime        @updatedAt                // PORT-LAST-MAINT
+
+  positions     Position[]
+  transactions  Transaction[]
+
+  @@map("portfolios")
+}
+
+enum ClientType {
+  INDIVIDUAL   // I
+  CORPORATE    // C
+  TRUST        // T
+}
+
+enum PortfolioStatus {
+  ACTIVE       // A
+  CLOSED       // C
+  SUSPENDED    // S
+}
+
+/// Position Record — migrated from POSREC.cpy / POSUPDT (batch)
+model Position {
+  id            String         @id @default(cuid())
+  portfolioId   String         @db.VarChar(8)
+  investmentId  String         @db.VarChar(10)       // POS-INVESTMENT-ID
+  quantity      Decimal        @default(0) @db.Decimal(15, 4)  // POS-QUANTITY
+  costBasis     Decimal        @default(0) @db.Decimal(15, 2)  // POS-COST-BASIS
+  marketValue   Decimal        @default(0) @db.Decimal(15, 2)  // POS-MARKET-VALUE
+  currency      String         @default("USD") @db.VarChar(3)  // POS-CURRENCY
+  status        PositionStatus @default(ACTIVE)       // POS-STATUS
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt             // POS-LAST-MAINT-DATE
+
+  portfolio     Portfolio      @relation(fields: [portfolioId], references: [id])
+
+  @@unique([portfolioId, investmentId])
+  @@map("positions")
+}
+
+enum PositionStatus {
+  ACTIVE   // A
+  CLOSED   // C
+  PENDING  // P
+}
+
+/// Transaction Record — migrated from TRNREC.cpy / PORTTRAN.cbl
+model Transaction {
+  id            String            @id @default(cuid())
+  portfolioId   String            @db.VarChar(8)
+  investmentId  String            @db.VarChar(10)        // TRN-INVESTMENT-ID
+  type          TransactionType                           // TRN-TYPE
+  quantity      Decimal           @db.Decimal(15, 4)      // TRN-QUANTITY
+  price         Decimal           @db.Decimal(15, 4)      // TRN-PRICE
+  amount        Decimal           @db.Decimal(15, 2)      // TRN-AMOUNT
+  currency      String            @default("USD") @db.VarChar(3) // TRN-CURRENCY
+  status        TransactionStatus @default(PENDING)       // TRN-STATUS
+  sequenceNo    String?           @db.VarChar(6)          // TRN-SEQUENCE-NO
+  processDate   DateTime?                                  // TRN-PROCESS-DATE
+  processUser   String?           @db.VarChar(8)          // TRN-PROCESS-USER
+  createdAt     DateTime          @default(now())         // TRN-DATE + TRN-TIME
+
+  portfolio     Portfolio         @relation(fields: [portfolioId], references: [id])
+
+  @@map("transactions")
+}
+
+enum TransactionType {
+  BUY       // BU
+  SELL      // SL
+  TRANSFER  // TR
+  FEE       // FE
+}
+
+enum TransactionStatus {
+  PENDING   // P
+  DONE      // D
+  FAILED    // F
+  REVERSED  // R
+}
+
+/// Batch Job Control — migrated from BCHCTL.cpy / BCHCTL00.cbl
+model BatchJob {
+  id            String        @id @default(cuid())
+  jobName       String        @db.VarChar(8)            // BCT-JOB-NAME
+  processDate   String        @db.VarChar(8)            // BCT-PROCESS-DATE
+  sequenceNo    Int           @default(1)               // BCT-SEQUENCE-NO
+  status        BatchStatus   @default(READY)           // BCT-STATUS
+  stepName      String?       @db.VarChar(8)            // BCT-STEP-NAME
+  programName   String?       @db.VarChar(8)            // BCT-PROGRAM-NAME
+  returnCode    Int           @default(0)               // BCT-RETURN-CODE
+  errorDesc     String?       @db.VarChar(80)           // BCT-ERROR-DESC
+  restartCount  Int           @default(0)               // BCT-RESTART-COUNT
+  recordsRead   Int           @default(0)
+  recordsWritten Int          @default(0)
+  errorCount    Int           @default(0)
+  startedAt     DateTime?                                // BCT-START-TIME
+  completedAt   DateTime?                                // BCT-COMPLETE-TS
+  createdAt     DateTime      @default(now())
+
+  @@unique([jobName, processDate, sequenceNo])
+  @@map("batch_jobs")
+}
+
+enum BatchStatus {
+  READY    // R
+  ACTIVE   // A
+  WAITING  // W
+  DONE     // D
+  ERROR    // E
+}
+
+/// Audit Log — migrated from AUDITLOG.cpy / AUDPROC.cbl
+model AuditLog {
+  id            String   @id @default(cuid())
+  program       String   @db.VarChar(8)                 // AUD-PROGRAM
+  userId        String?  @db.VarChar(8)                 // AUD-USER-ID
+  action        String   @db.VarChar(8)                 // AUD-ACTION
+  auditType     String   @db.VarChar(4)                 // AUD-TYPE
+  status        String   @db.VarChar(4)                 // AUD-STATUS
+  portfolioId   String?  @db.VarChar(8)                 // AUD-PORTFOLIO-ID
+  accountNo     String?  @db.VarChar(10)                // AUD-ACCOUNT-NO
+  message       String?                                  // AUD-MESSAGE
+  createdAt     DateTime @default(now())                // AUD-TIMESTAMP
+
+  @@map("audit_logs")
+}
