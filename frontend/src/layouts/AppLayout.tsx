@@ -65,7 +65,12 @@ const menuItems: MenuItem[] = [
   },
 ];
 
+const MENU_KEYS = ['/', '/portfolios', '/portfolios/new', '/positions', '/history', '/transactions/new', '/reports/valuation', '/reports/audit', '/reports/statistics'];
+
 function getSelectedKeys(pathname: string): string[] {
+  if (MENU_KEYS.includes(pathname)) return [pathname];
+  if (pathname.startsWith('/portfolios')) return ['/portfolios'];
+  if (pathname.startsWith('/transactions')) return ['/transactions/new'];
   return [pathname];
 }
 

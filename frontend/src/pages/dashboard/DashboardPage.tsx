@@ -7,10 +7,9 @@ import {
   SwapOutlined,
 } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
-import type { Portfolio } from '../../types/portfolio';
 import type { TransactionHistory, TransactionType } from '../../types/transaction';
 import { formatCurrency, formatDate } from '../../utils/formatters';
-import portfoliosData from '../../mocks/portfolios.json';
+import { getPortfolios } from '../../mocks/portfolioStore';
 import transactionsData from '../../mocks/transactions.json';
 
 const { Title } = Typography;
@@ -27,7 +26,7 @@ interface RecentTransaction extends TransactionHistory {
 }
 
 export function Component() {
-  const portfolios = portfoliosData as Portfolio[];
+  const portfolios = getPortfolios();
 
   const totalPortfolios = portfolios.length;
   const totalAUM = portfolios.reduce((sum, p) => sum + p.totalValue, 0);
