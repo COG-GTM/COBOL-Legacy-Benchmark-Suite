@@ -1,0 +1,140 @@
+// Prisma schema for COBOL Legacy Benchmark Suite modernization
+// Translated from COBOL copybooks: PORTFLIO.cpy, POSREC.cpy, TRNREC.cpy, HISTREC.cpy, BCHCTL.cpy, CKPRST.cpy
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// From PORTFLIO.cpy - Portfolio Master Record
+model Portfolio {
+  id            String   @id @default(cuid())
+  portfolioId   String   @unique @map("portfolio_id") @db.VarChar(8)
+  accountNo     String   @map("account_no") @db.VarChar(10)
+  clientName    String   @map("client_name") @db.VarChar(30)
+  clientType    String   @map("client_type") @db.Char(1) // I=Individual, C=Corporate, T=Trust
+  createDate    DateTime @map("create_date")
+  lastMaint     DateTime @map("last_maint")
+  status        String   @default("A") @db.Char(1) // A=Active, C=Closed, S=Suspended
+  totalValue    Decimal  @map("total_value") @db.Decimal(15, 2)
+  cashBalance   Decimal  @map("cash_balance") @db.Decimal(15, 2)
+  lastUser      String   @map("last_user") @db.VarChar(8)
+  lastTrans     DateTime @map("last_trans")
+
+  positions    Position[]
+  transactions Transaction[]
+
+  @@map("portfolios")
+}
+
+// From POSREC.cpy - Position Record
+model Position {
+  id            String   @id @default(cuid())
+  portfolioId   String   @map("portfolio_id") @db.VarChar(8)
+  posDate       DateTime @map("pos_date")
+  investmentId  String   @map("investment_id") @db.VarChar(10)
+  quantity      Decimal  @map("quantity") @db.Decimal(15, 4)
+  costBasis     Decimal  @map("cost_basis") @db.Decimal(15, 2)
+  marketValue   Decimal  @map("market_value") @db.Decimal(15, 2)
+  currency      String   @default("USD") @db.Char(3)
+  status        String   @default("A") @db.Char(1) // A=Active, C=Closed, P=Pending
+  lastMaintDate DateTime @map("last_maint_date")
+  lastMaintUser String   @map("last_maint_user") @db.VarChar(8)
+
+  portfolio Portfolio @relation(fields: [portfolioId], references: [portfolioId])
+
+  @@unique([portfolioId, investmentId])
+  @@map("positions")
+}
+
+// From TRNREC.cpy - Transaction Record
+model Transaction {
+  id            String   @id @default(cuid())
+  trnDate       DateTime @map("trn_date")
+  trnTime       String   @map("trn_time") @db.VarChar(6)
+  portfolioId   String   @map("portfolio_id") @db.VarChar(8)
+  sequenceNo    String   @map("sequence_no") @db.VarChar(6)
+  investmentId  String   @map("investment_id") @db.VarChar(10)
+  type          String   @db.Char(2) // BU=Buy, SL=Sell, TR=Transfer, FE=Fee
+  quantity      Decimal  @db.Decimal(15, 4)
+  price         Decimal  @db.Decimal(15, 4)
+  amount        Decimal  @db.Decimal(15, 2)
+  currency      String   @default("USD") @db.Char(3)
+  status        String   @default("P") @db.Char(1) // P=Pending, D=Done, F=Failed, R=Reversed
+  processDate   DateTime? @map("process_date")
+  processUser   String?  @map("process_user") @db.VarChar(8)
+
+  // For transfer transactions: target portfolio
+  targetPortfolioId String? @map("target_portfolio_id") @db.VarChar(8)
+
+  portfolio Portfolio @relation(fields: [portfolioId], references: [portfolioId])
+
+  @@unique([trnDate, trnTime, portfolioId, sequenceNo])
+  @@map("transactions")
+}
+
+// From HISTREC.cpy - Position History Record
+model PositionHistory {
+  id            String   @id @default(cuid())
+  portfolioId   String   @map("portfolio_id") @db.VarChar(8)
+  histDate      DateTime @map("hist_date")
+  histTime      String   @map("hist_time") @db.VarChar(6)
+  seqNo         String   @map("seq_no") @db.VarChar(4)
+  recordType    String   @map("record_type") @db.Char(2) // PT=Portfolio, PS=Position, TR=Transaction
+  actionCode    String   @map("action_code") @db.Char(1) // A=Add, C=Change, D=Delete
+  beforeImage   Json?    @map("before_image")
+  afterImage    Json?    @map("after_image")
+  reasonCode    String?  @map("reason_code") @db.VarChar(4)
+  processDate   DateTime @map("process_date")
+  processUser   String   @map("process_user") @db.VarChar(8)
+
+  @@unique([portfolioId, histDate, histTime, seqNo])
+  @@map("position_history")
+}
+
+// From BCHCTL.cpy - Batch Control Record
+model BatchJob {
+  id            String   @id @default(cuid())
+  jobName       String   @map("job_name") @db.VarChar(8)
+  processDate   DateTime @map("process_date")
+  sequenceNo    Int      @map("sequence_no")
+  status        String   @default("R") @db.Char(1) // R=Ready, A=Active, W=Waiting, D=Done, E=Error
+  stepName      String?  @map("step_name") @db.VarChar(8)
+  programName   String?  @map("program_name") @db.VarChar(8)
+  startTime     DateTime? @map("start_time")
+  endTime       DateTime? @map("end_time")
+  returnCode    Int?     @map("return_code")
+  errorDesc     String?  @map("error_desc") @db.VarChar(80)
+  restartCount  Int      @default(0) @map("restart_count")
+  attemptTs     DateTime? @map("attempt_ts")
+  completeTs    DateTime? @map("complete_ts")
+
+  @@unique([jobName, processDate, sequenceNo])
+  @@map("batch_jobs")
+}
+
+// From CKPRST.cpy - Checkpoint/Restart Control
+model Checkpoint {
+  id            String   @id @default(cuid())
+  programId     String   @map("program_id") @db.VarChar(8)
+  runDate       DateTime @map("run_date")
+  runTime       String   @map("run_time") @db.VarChar(6)
+  status        String   @default("I") @db.Char(1) // I=Initial, A=Active, C=Complete, F=Failed, R=Restarted
+  recordsRead   Int      @default(0) @map("records_read")
+  recordsProc   Int      @default(0) @map("records_proc")
+  recordsError  Int      @default(0) @map("records_error")
+  restartCount  Int      @default(0) @map("restart_count")
+  lastKey       String?  @map("last_key") @db.VarChar(50)
+  lastTime      DateTime? @map("last_time")
+  phase         String   @default("00") @db.Char(2) // 00=Init, 10=Read, 20=Proc, 30=Updt, 40=Term
+  commitFreq    Int      @default(1000) @map("commit_freq")
+  maxErrors     Int      @default(100) @map("max_errors")
+  maxRestarts   Int      @default(3) @map("max_restarts")
+
+  @@unique([programId, runDate])
+  @@map("checkpoints")
+}
