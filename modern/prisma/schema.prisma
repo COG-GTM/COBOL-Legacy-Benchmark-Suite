@@ -1,0 +1,170 @@
+// Prisma schema migrated from COBOL/DB2 table definitions
+// Source: src/database/db2/db2-definitions.sql, ERRLOG.sql, POSHIST.sql, RTNCODES.sql
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Portfolio Master - migrated from PORTFOLIO_MASTER (db2-definitions.sql)
+/// COBOL copybook: PORTFLIO.cpy (PORT-RECORD)
+model PortfolioMaster {
+  portfolioId    String   @id @map("portfolio_id") @db.Char(8)
+  accountType    String   @map("account_type") @db.Char(2)
+  branchId       String   @map("branch_id") @db.Char(2)
+  clientId       String   @map("client_id") @db.Char(10)
+  portfolioName  String   @map("portfolio_name") @db.VarChar(50)
+  currencyCode   String   @map("currency_code") @db.Char(3)
+  riskLevel      String   @map("risk_level") @db.Char(1)
+  status         String   @db.Char(1)
+  openDate       DateTime @map("open_date") @db.Date
+  closeDate      DateTime? @map("close_date") @db.Date
+  lastMaintDate  DateTime @map("last_maint_date") @db.Timestamp()
+  lastMaintUser  String   @map("last_maint_user") @db.VarChar(8)
+
+  positions     InvestmentPosition[]
+  transactions  TransactionHistory[]
+  auditLogs     AuditLog[]
+
+  @@index([clientId, status])
+  @@map("portfolio_master")
+}
+
+/// Investment Positions - migrated from INVESTMENT_POSITIONS (db2-definitions.sql)
+/// COBOL copybook: POSREC.cpy (POSITION-RECORD)
+model InvestmentPosition {
+  portfolioId   String   @map("portfolio_id") @db.Char(8)
+  investmentId  String   @map("investment_id") @db.Char(10)
+  positionDate  DateTime @map("position_date") @db.Date
+  quantity      Decimal  @db.Decimal(18, 4)
+  costBasis     Decimal  @map("cost_basis") @db.Decimal(18, 2)
+  marketValue   Decimal  @map("market_value") @db.Decimal(18, 2)
+  currencyCode  String   @map("currency_code") @db.Char(3)
+  lastMaintDate DateTime @map("last_maint_date") @db.Timestamp()
+  lastMaintUser String   @map("last_maint_user") @db.VarChar(8)
+
+  portfolio     PortfolioMaster @relation(fields: [portfolioId], references: [portfolioId])
+
+  @@id([portfolioId, investmentId, positionDate])
+  @@index([positionDate, portfolioId])
+  @@map("investment_positions")
+}
+
+/// Transaction History - migrated from TRANSACTION_HISTORY (db2-definitions.sql)
+/// COBOL copybook: TRNREC.cpy (TRANSACTION-RECORD)
+model TransactionHistory {
+  transactionId   String   @id @map("transaction_id") @db.Char(20)
+  portfolioId     String   @map("portfolio_id") @db.Char(8)
+  transactionDate DateTime @map("transaction_date") @db.Date
+  transactionTime DateTime @map("transaction_time") @db.Time()
+  investmentId    String   @map("investment_id") @db.Char(10)
+  transactionType String   @map("transaction_type") @db.Char(2)
+  quantity        Decimal  @db.Decimal(18, 4)
+  price           Decimal  @db.Decimal(18, 4)
+  amount          Decimal  @db.Decimal(18, 2)
+  currencyCode    String   @map("currency_code") @db.Char(3)
+  status          String   @db.Char(1)
+  processDate     DateTime @map("process_date") @db.Timestamp()
+  processUser     String   @map("process_user") @db.VarChar(8)
+
+  portfolio       PortfolioMaster @relation(fields: [portfolioId], references: [portfolioId])
+
+  @@index([portfolioId, transactionDate])
+  @@index([transactionDate, portfolioId])
+  @@map("transaction_history")
+}
+
+/// Position History - migrated from POSHIST table (POSHIST.sql)
+/// COBOL copybook: DBTBLS.cpy (POSHIST-RECORD)
+model PositionHistory {
+  accountNo      String   @map("account_no") @db.Char(8)
+  portfolioId    String   @map("portfolio_id") @db.Char(10)
+  transDate      DateTime @map("trans_date") @db.Date
+  transTime      DateTime @map("trans_time") @db.Time()
+  transType      String   @map("trans_type") @db.Char(2)
+  securityId     String   @map("security_id") @db.Char(12)
+  quantity       Decimal  @db.Decimal(15, 3)
+  price          Decimal  @db.Decimal(15, 3)
+  amount         Decimal  @db.Decimal(15, 2)
+  fees           Decimal  @default(0) @db.Decimal(15, 2)
+  totalAmount    Decimal  @map("total_amount") @db.Decimal(15, 2)
+  costBasis      Decimal  @map("cost_basis") @db.Decimal(15, 2)
+  gainLoss       Decimal  @map("gain_loss") @db.Decimal(15, 2)
+  processDate    DateTime @map("process_date") @db.Date
+  processTime    DateTime @map("process_time") @db.Time()
+  programId      String   @map("program_id") @db.Char(8)
+  userId         String   @map("user_id") @db.Char(8)
+  auditTimestamp DateTime @default(now()) @map("audit_timestamp") @db.Timestamp()
+
+  @@id([accountNo, portfolioId, transDate, transTime])
+  @@index([securityId, transDate])
+  @@index([processDate, programId])
+  @@map("poshist")
+}
+
+/// Error Log - migrated from ERRLOG table (ERRLOG.sql)
+/// COBOL copybook: DBTBLS.cpy (ERRLOG-RECORD), ERRHAND.cpy
+model ErrorLog {
+  id             Int      @id @default(autoincrement())
+  errorTimestamp DateTime @map("error_timestamp") @db.Timestamp()
+  programId      String   @map("program_id") @db.Char(8)
+  errorType      String   @map("error_type") @db.Char(1)
+  errorSeverity  Int      @map("error_severity")
+  errorCode      String   @map("error_code") @db.Char(8)
+  errorMessage   String   @map("error_message") @db.VarChar(200)
+  processDate    DateTime @map("process_date") @db.Date
+  processTime    DateTime @map("process_time") @db.Time()
+  userId         String   @map("user_id") @db.Char(8)
+  additionalInfo String?  @map("additional_info") @db.VarChar(500)
+
+  @@index([errorTimestamp, programId])
+  @@index([processDate, errorSeverity])
+  @@map("error_log")
+}
+
+/// Audit Log - migrated from AUDITLOG.cpy (AUDIT-RECORD)
+/// Source: AUDPROC.cbl audit trail processing
+model AuditLog {
+  id             Int      @id @default(autoincrement())
+  timestamp      DateTime @db.Timestamp()
+  systemId       String   @map("system_id") @db.Char(8)
+  userId         String   @map("user_id") @db.Char(8)
+  programId      String   @map("program_id") @db.Char(8)
+  terminal       String?  @db.Char(8)
+  auditType      String   @map("audit_type") @db.Char(4)
+  action         String   @db.Char(8)
+  status         String   @db.Char(4)
+  portfolioId    String?  @map("portfolio_id") @db.Char(8)
+  accountNo      String?  @map("account_no") @db.Char(10)
+  beforeImage    String?  @map("before_image") @db.VarChar(500)
+  afterImage     String?  @map("after_image") @db.VarChar(500)
+  message        String?  @db.VarChar(500)
+
+  portfolio      PortfolioMaster? @relation(fields: [portfolioId], references: [portfolioId])
+
+  @@index([timestamp])
+  @@index([userId, timestamp])
+  @@index([portfolioId, timestamp])
+  @@index([action, timestamp])
+  @@map("audit_log")
+}
+
+/// Return Codes - migrated from RTNCODES table (RTNCODES.sql)
+/// COBOL copybook: RTNCODE.cpy
+model ReturnCode {
+  id           Int      @id @default(autoincrement())
+  timestamp    DateTime @db.Timestamp()
+  programId    String   @map("program_id") @db.Char(8)
+  returnCode   Int      @map("return_code")
+  highestCode  Int      @map("highest_code")
+  statusCode   String   @map("status_code") @db.Char(1)
+  messageText  String?  @map("message_text") @db.VarChar(80)
+
+  @@index([programId, timestamp])
+  @@index([statusCode, timestamp])
+  @@map("return_codes")
+}
