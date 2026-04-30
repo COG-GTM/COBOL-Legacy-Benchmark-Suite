@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Portfolio {
+  id          String   @id @default(cuid())
+  accountNo   String   @unique
+  clientName  String
+  clientType  String   @default("I") // I=Individual, C=Corporate, T=Trust
+  status      String   @default("A") // A=Active, C=Closed, S=Suspended
+  totalValue  Float    @default(0)
+  cashBalance Float    @default(0)
+  lastUser    String   @default("SYSTEM")
+  lastTrans   String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  positions    Position[]
+  transactions Transaction[]
+  auditLogs    AuditLog[]
+}
+
+model Position {
+  id          String @id @default(cuid())
+  fundId      String
+  fundName    String
+  units       Float
+  costBasis   Float
+  marketValue Float
+  portfolioId String
+
+  portfolio Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@unique([portfolioId, fundId])
+}
+
+model Transaction {
+  id              String   @id @default(cuid())
+  transactionType String   // BUY, SELL, TRANSFER, FEE
+  investmentType  String   @default("STK") // STK, BND, MMF, ETF
+  units           Float    @default(0)
+  price           Float    @default(0)
+  amount          Float
+  sequenceNo      String   @default("")
+  portfolioId     String
+  createdAt       DateTime @default(now())
+
+  portfolio Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+}
+
+model AuditLog {
+  id          String   @id @default(cuid())
+  action      String   // CREATE, UPDATE, DELETE, INQUIRE
+  key         String
+  reason      String   @default("")
+  status      String   @default("SUCC") // SUCC, FAIL, WARN
+  portfolioId String?
+  createdAt   DateTime @default(now())
+
+  portfolio Portfolio? @relation(fields: [portfolioId], references: [id], onDelete: SetNull)
+}
+
+model BatchRun {
+  id          String   @id @default(cuid())
+  status      String   @default("PENDING") // PENDING, RUNNING, COMPLETED, FAILED
+  totalItems  Int      @default(0)
+  processed   Int      @default(0)
+  errors      Int      @default(0)
+  startedAt   DateTime @default(now())
+  completedAt DateTime?
+}
