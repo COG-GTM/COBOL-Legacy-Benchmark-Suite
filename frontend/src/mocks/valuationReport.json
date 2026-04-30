@@ -1,0 +1,11 @@
+[
+  { "portfolioId": "PORT0001", "currentValue": 1250000.50, "previousValue": 1180000.00 },
+  { "portfolioId": "PORT0002", "currentValue": 5780000.75, "previousValue": 5650000.00 },
+  { "portfolioId": "PORT0003", "currentValue": 3200000.00, "previousValue": 3100000.00 },
+  { "portfolioId": "PORT0004", "currentValue": 890000.25, "previousValue": 850000.00 },
+  { "portfolioId": "PORT0005", "currentValue": 12500000.00, "previousValue": 12800000.00 },
+  { "portfolioId": "PORT0007", "currentValue": 675000.00, "previousValue": 640000.00 },
+  { "portfolioId": "PORT0008", "currentValue": 8900000.00, "previousValue": 8600000.00 },
+  { "portfolioId": "PORT0009", "currentValue": 420000.75, "previousValue": 400000.00 },
+  { "portfolioId": "PORT0010", "currentValue": 2100000.00, "previousValue": 2050000.00 }
+]

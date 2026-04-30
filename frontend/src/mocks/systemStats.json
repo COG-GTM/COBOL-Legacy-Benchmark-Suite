@@ -1,0 +1,20 @@
+{
+  "db2Metrics": {
+    "totalCalls": 1547823,
+    "avgResponseMs": 12.5,
+    "cpuTimeMs": 8945.32,
+    "waitTimeMs": 3201.15
+  },
+  "batchMetrics": {
+    "totalJobs": 4521,
+    "successfulJobs": 4389,
+    "failedJobs": 132,
+    "avgElapsedSeconds": 245.7
+  },
+  "processingMetrics": {
+    "transactionsProcessed": 89453,
+    "portfoliosUpdated": 12567,
+    "positionsRecalculated": 34521,
+    "auditRecordsWritten": 156789
+  }
+}
