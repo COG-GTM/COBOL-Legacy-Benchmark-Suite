@@ -1,0 +1,174 @@
+// =============================================================================
+// Prisma Schema for Investment Portfolio Management System
+// Translated from COBOL/DB2 legacy definitions:
+//   - src/database/db2/db2-definitions.sql (Portfolio, InvestmentPosition, TransactionHistory)
+//   - src/database/db2/POSHIST.sql (PositionHistory)
+//   - src/database/db2/ERRLOG.sql (ErrorLog)
+//   - src/copybook/common/HISTREC.cpy (AuditLog)
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// =============================================================================
+// From db2-definitions.sql lines 10-24: PORTFOLIO_MASTER table
+// Status codes: A=Active, C=Closed, S=Suspended
+// =============================================================================
+model Portfolio {
+  portfolioId   String   @id @map("portfolio_id") @db.Char(8)
+  accountType   String   @map("account_type") @db.Char(2)
+  branchId      String   @map("branch_id") @db.Char(2)
+  clientId      String   @map("client_id") @db.Char(10)
+  portfolioName String   @map("portfolio_name") @db.VarChar(50)
+  currencyCode  String   @map("currency_code") @db.Char(3)
+  riskLevel     String   @map("risk_level") @db.Char(1)
+  status        String   @map("status") @db.Char(1)
+  openDate      DateTime @map("open_date") @db.Date
+  closeDate     DateTime? @map("close_date") @db.Date
+  lastMaintDate DateTime @map("last_maint_date") @db.Timestamp()
+  lastMaintUser String   @map("last_maint_user") @db.VarChar(8)
+
+  positions     InvestmentPosition[]
+  transactions  TransactionHistory[]
+  positionHistories PositionHistory[]
+  auditLogs     AuditLog[]
+
+  @@index([clientId, status], map: "idx_port_master_client")
+  @@map("portfolio_master")
+}
+
+// =============================================================================
+// From db2-definitions.sql lines 29-41: INVESTMENT_POSITIONS table
+// Composite PK: (portfolioId, investmentId, positionDate)
+// =============================================================================
+model InvestmentPosition {
+  portfolioId   String   @map("portfolio_id") @db.Char(8)
+  investmentId  String   @map("investment_id") @db.Char(10)
+  positionDate  DateTime @map("position_date") @db.Date
+  quantity      Decimal  @map("quantity") @db.Decimal(18, 4)
+  costBasis     Decimal  @map("cost_basis") @db.Decimal(18, 2)
+  marketValue   Decimal  @map("market_value") @db.Decimal(18, 2)
+  currencyCode  String   @map("currency_code") @db.Char(3)
+  lastMaintDate DateTime @map("last_maint_date") @db.Timestamp()
+  lastMaintUser String   @map("last_maint_user") @db.VarChar(8)
+
+  portfolio     Portfolio @relation(fields: [portfolioId], references: [portfolioId])
+
+  @@id([portfolioId, investmentId, positionDate])
+  @@index([positionDate, portfolioId], map: "idx_positions_date")
+  @@map("investment_positions")
+}
+
+// =============================================================================
+// From db2-definitions.sql lines 46-62: TRANSACTION_HISTORY table
+// Transaction types: BU=Buy, SL=Sell, TR=Transfer, FE=Fee
+// Status codes: P=Pending, D=Done, F=Failed, R=Reversed
+// =============================================================================
+model TransactionHistory {
+  transactionId   String   @id @map("transaction_id") @db.Char(20)
+  portfolioId     String   @map("portfolio_id") @db.Char(8)
+  transactionDate DateTime @map("transaction_date") @db.Date
+  transactionTime DateTime @map("transaction_time") @db.Time()
+  investmentId    String   @map("investment_id") @db.Char(10)
+  transactionType String   @map("transaction_type") @db.Char(2)
+  quantity        Decimal  @map("quantity") @db.Decimal(18, 4)
+  price           Decimal  @map("price") @db.Decimal(18, 4)
+  amount          Decimal  @map("amount") @db.Decimal(18, 2)
+  currencyCode    String   @map("currency_code") @db.Char(3)
+  status          String   @map("status") @db.Char(1)
+  processDate     DateTime @map("process_date") @db.Timestamp()
+  processUser     String   @map("process_user") @db.VarChar(8)
+
+  portfolio       Portfolio @relation(fields: [portfolioId], references: [portfolioId])
+
+  @@index([portfolioId, transactionDate], map: "idx_trans_hist_port")
+  @@index([transactionDate, portfolioId], map: "idx_trans_hist_date")
+  @@map("transaction_history")
+}
+
+// =============================================================================
+// From POSHIST.sql lines 25-44: Position History table
+// Includes fees, gain_loss, cost_basis
+// Composite PK: (accountNo, portfolioId, transDate, transTime)
+// =============================================================================
+model PositionHistory {
+  accountNo      String   @map("account_no") @db.Char(8)
+  portfolioId    String   @map("portfolio_id") @db.Char(10)
+  transDate      DateTime @map("trans_date") @db.Date
+  transTime      DateTime @map("trans_time") @db.Time()
+  transType      String   @map("trans_type") @db.Char(2)
+  securityId     String   @map("security_id") @db.Char(12)
+  quantity       Decimal  @map("quantity") @db.Decimal(15, 3)
+  price          Decimal  @map("price") @db.Decimal(15, 3)
+  amount         Decimal  @map("amount") @db.Decimal(15, 2)
+  fees           Decimal  @default(0) @map("fees") @db.Decimal(15, 2)
+  totalAmount    Decimal  @map("total_amount") @db.Decimal(15, 2)
+  costBasis      Decimal  @map("cost_basis") @db.Decimal(15, 2)
+  gainLoss       Decimal  @map("gain_loss") @db.Decimal(15, 2)
+  processDate    DateTime @map("process_date") @db.Date
+  processTime    DateTime @map("process_time") @db.Time()
+  programId      String   @map("program_id") @db.Char(8)
+  userId         String   @map("user_id") @db.Char(8)
+  auditTimestamp DateTime @default(now()) @map("audit_timestamp") @db.Timestamp()
+
+  portfolio      Portfolio @relation(fields: [portfolioId], references: [portfolioId])
+
+  @@id([accountNo, portfolioId, transDate, transTime])
+  @@index([securityId, transDate], map: "poshist_ix1")
+  @@index([processDate, programId], map: "poshist_ix2")
+  @@map("poshist")
+}
+
+// =============================================================================
+// From ERRLOG.sql lines 15-26: Error Logging table
+// Error types: S=System, A=Application, D=Data
+// Severity: 1=Info, 2=Warning, 3=Error, 4=Severe
+// Composite PK: (errorTimestamp, programId)
+// =============================================================================
+model ErrorLog {
+  errorTimestamp  DateTime @map("error_timestamp") @db.Timestamp()
+  programId       String   @map("program_id") @db.Char(8)
+  errorType       String   @map("error_type") @db.Char(1)
+  errorSeverity   Int      @map("error_severity")
+  errorCode       String   @map("error_code") @db.Char(8)
+  errorMessage    String   @map("error_message") @db.VarChar(200)
+  processDate     DateTime @map("process_date") @db.Date
+  processTime     DateTime @map("process_time") @db.Time()
+  userId          String   @map("user_id") @db.Char(8)
+  additionalInfo  String?  @map("additional_info") @db.VarChar(500)
+
+  @@id([errorTimestamp, programId])
+  @@index([processDate, errorSeverity(sort: Desc)], map: "errlog_ix1")
+  @@map("errlog")
+}
+
+// =============================================================================
+// From HISTREC.cpy lines 6-27: Audit Log model
+// Record types: PT=Portfolio, PS=Position, TR=Transaction
+// Action codes: A=Add, C=Change, D=Delete
+// =============================================================================
+model AuditLog {
+  id             String   @id @default(cuid())
+  portfolioId    String   @map("portfolio_id") @db.Char(8)
+  histDate       String   @map("hist_date") @db.Char(8)
+  histTime       String   @map("hist_time") @db.Char(6)
+  seqNo          String   @map("seq_no") @db.Char(4)
+  recordType     String   @map("record_type") @db.Char(2)
+  actionCode     String   @map("action_code") @db.Char(1)
+  beforeImage    String?  @map("before_image") @db.VarChar(400)
+  afterImage     String?  @map("after_image") @db.VarChar(400)
+  reasonCode     String?  @map("reason_code") @db.Char(4)
+  processDate    DateTime @map("process_date") @db.Timestamp()
+  processUser    String   @map("process_user") @db.VarChar(8)
+
+  portfolio      Portfolio @relation(fields: [portfolioId], references: [portfolioId])
+
+  @@index([portfolioId, histDate], map: "idx_audit_log_port_date")
+  @@index([recordType, actionCode], map: "idx_audit_log_type_action")
+  @@map("audit_log")
+}
