@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: clbs-postgres
+    environment:
+      POSTGRES_USER: clbs_user
+      POSTGRES_PASSWORD: clbs_password
+      POSTGRES_DB: clbs_portfolio
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U clbs_user -d clbs_portfolio']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: clbs-pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@clbs.local
+      PGADMIN_DEFAULT_PASSWORD: admin
+    ports:
+      - '5050:80'
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  redis:
+    image: redis:7-alpine
+    container_name: clbs-redis
+    ports:
+      - '6379:6379'
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  pgdata:
