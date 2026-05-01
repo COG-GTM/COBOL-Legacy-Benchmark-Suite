@@ -1,0 +1,140 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Models will be fully defined in Wave 1 (Session 1)
+// Placeholder to ensure Prisma is configured correctly
+
+model Portfolio {
+  id             String   @id @default(uuid())
+  portfolioId    String   @unique @map("portfolio_id") @db.VarChar(8)
+  accountType    String   @map("account_type") @db.VarChar(4)
+  branchId       String   @map("branch_id") @db.VarChar(4)
+  clientId       String   @map("client_id") @db.VarChar(10)
+  portfolioName  String   @map("portfolio_name") @db.VarChar(50)
+  currencyCode   String   @map("currency_code") @db.VarChar(3)
+  riskLevel      String   @map("risk_level") @db.VarChar(1)
+  status         String   @default("A") @db.VarChar(1)
+  openDate       DateTime @map("open_date")
+  closeDate      DateTime? @map("close_date")
+  lastMaintDate  DateTime @map("last_maint_date")
+  lastMaintUser  String   @map("last_maint_user") @db.VarChar(8)
+
+  positions     InvestmentPosition[]
+  transactions  TransactionHistory[]
+
+  @@map("portfolio_master")
+}
+
+model InvestmentPosition {
+  id             String   @id @default(uuid())
+  portfolioId    String   @map("portfolio_id") @db.VarChar(8)
+  investmentId   String   @map("investment_id") @db.VarChar(6)
+  positionDate   DateTime @map("position_date")
+  quantity       Decimal  @db.Decimal(15, 4)
+  costBasis      Decimal  @map("cost_basis") @db.Decimal(15, 2)
+  marketValue    Decimal  @map("market_value") @db.Decimal(15, 2)
+  currencyCode   String   @map("currency_code") @db.VarChar(3)
+
+  portfolio      Portfolio @relation(fields: [portfolioId], references: [portfolioId])
+
+  @@unique([portfolioId, investmentId, positionDate])
+  @@index([portfolioId])
+  @@index([investmentId])
+  @@map("investment_positions")
+}
+
+model TransactionHistory {
+  id              String   @id @default(uuid())
+  transactionId   String   @unique @map("transaction_id") @db.VarChar(20)
+  portfolioId     String   @map("portfolio_id") @db.VarChar(8)
+  transactionDate DateTime @map("transaction_date")
+  transactionTime String   @map("transaction_time") @db.VarChar(8)
+  investmentId    String   @map("investment_id") @db.VarChar(6)
+  transactionType String   @map("transaction_type") @db.VarChar(2)
+  quantity        Decimal  @db.Decimal(15, 4)
+  price           Decimal  @db.Decimal(15, 4)
+  amount          Decimal  @db.Decimal(15, 2)
+  currencyCode    String   @map("currency_code") @db.VarChar(3)
+  status          String   @default("P") @db.VarChar(1)
+  processDate     DateTime? @map("process_date")
+  processUser     String?  @map("process_user") @db.VarChar(8)
+
+  portfolio       Portfolio @relation(fields: [portfolioId], references: [portfolioId])
+
+  @@index([portfolioId])
+  @@index([transactionDate])
+  @@index([status])
+  @@map("transaction_history")
+}
+
+model PositionHistory {
+  id           String   @id @default(uuid())
+  accountNo    String   @map("account_no") @db.VarChar(10)
+  portfolioId  String   @map("portfolio_id") @db.VarChar(8)
+  transDate    DateTime @map("trans_date")
+  transTime    String   @map("trans_time") @db.VarChar(8)
+  transType    String   @map("trans_type") @db.VarChar(2)
+  securityId   String   @map("security_id") @db.VarChar(6)
+  quantity     Decimal  @db.Decimal(15, 4)
+  price        Decimal  @db.Decimal(15, 4)
+  amount       Decimal  @db.Decimal(15, 2)
+  fees         Decimal  @db.Decimal(15, 2)
+  totalAmount  Decimal  @map("total_amount") @db.Decimal(15, 2)
+  costBasis    Decimal  @map("cost_basis") @db.Decimal(15, 2)
+  gainLoss     Decimal  @map("gain_loss") @db.Decimal(15, 2)
+
+  @@index([portfolioId])
+  @@index([transDate])
+  @@map("position_history")
+}
+
+model ErrorLog {
+  id             String   @id @default(uuid())
+  errorTimestamp DateTime @map("error_timestamp")
+  programId      String   @map("program_id") @db.VarChar(8)
+  errorType      String   @map("error_type") @db.VarChar(4)
+  errorSeverity  String   @map("error_severity") @db.VarChar(1)
+  errorCode      String   @map("error_code") @db.VarChar(4)
+  errorMessage   String   @map("error_message") @db.VarChar(80)
+
+  @@index([errorTimestamp])
+  @@index([errorSeverity])
+  @@map("error_log")
+}
+
+model BatchControl {
+  id           String    @id @default(uuid())
+  processDate  DateTime  @map("process_date")
+  processId    String    @map("process_id") @db.VarChar(10)
+  status       String    @default("P") @db.VarChar(1)
+  startTime    DateTime? @map("start_time")
+  endTime      DateTime? @map("end_time")
+  recordCount  Int       @default(0) @map("record_count")
+  errorCount   Int       @default(0) @map("error_count")
+  returnCode   Int       @default(0) @map("return_code")
+  message      String    @default("") @db.VarChar(80)
+
+  @@index([processDate])
+  @@index([status])
+  @@map("batch_control")
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  actionCode  String   @map("action_code") @db.VarChar(1)
+  beforeImage String?  @map("before_image") @db.Text
+  afterImage  String?  @map("after_image") @db.Text
+  timestamp   DateTime @default(now())
+  userId      String   @map("user_id") @db.VarChar(8)
+  programId   String   @map("program_id") @db.VarChar(8)
+
+  @@index([timestamp])
+  @@index([actionCode])
+  @@map("audit_log")
+}
