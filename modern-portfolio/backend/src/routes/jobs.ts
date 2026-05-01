@@ -23,6 +23,19 @@ const jobStore = new Map<string, JobState>();
 // Replaces: TRNVAL00 -> POSUPD00 -> HISTLD00
 jobRouter.post('/process-transactions', authorize('ADMIN'), async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
+    // Prevent concurrent processing — reject if a job is already running
+    const runningJob = Array.from(jobStore.values()).find(
+      (j) => j.type === 'process-transactions' && j.status === 'RUNNING'
+    );
+    if (runningJob) {
+      res.status(409).json({
+        success: false,
+        error: { code: 'PR01', message: 'Transaction processing is already running', category: 'PR', severity: 4 },
+        data: runningJob,
+      });
+      return;
+    }
+
     const jobId = `job-${Date.now()}`;
     const job: JobState = {
       id: jobId,
@@ -131,6 +144,15 @@ async function processTransactions(jobId: string, userId: string): Promise<void>
 
   for (const txn of pendingTransactions) {
     try {
+      // Optimistic concurrency: only process if still PENDING
+      const claimed = await prisma.transaction.updateMany({
+        where: { id: txn.id, status: 'PENDING' },
+        data: { status: 'PROCESSING' },
+      });
+      if (claimed.count === 0) {
+        continue;
+      }
+
       // Step 2: Update positions (POSUPD00)
       job.progress = 10 + Math.floor((processed / pendingTransactions.length) * 70);
 

@@ -11,16 +11,20 @@ reportRouter.get('/positions', async (req: AuthRequest, res: Response, next: Nex
   try {
     const { portfolioId } = req.query;
 
-    const where: Record<string, unknown> = { status: 'ACTIVE' };
+    let portfolioFilter: Record<string, unknown> = { status: 'ACTIVE' };
     if (portfolioId) {
       const portfolio = await prisma.portfolio.findFirst({
         where: { OR: [{ id: String(portfolioId) }, { portfolioId: String(portfolioId) }] },
       });
-      if (portfolio) where.portfolioId = portfolio.id;
+      if (!portfolio) {
+        res.json({ success: true, data: [] });
+        return;
+      }
+      portfolioFilter = { id: portfolio.id };
     }
 
     const portfolios = await prisma.portfolio.findMany({
-      where: portfolioId ? { id: where.portfolioId as string } : { status: 'ACTIVE' },
+      where: portfolioFilter,
       include: {
         positions: { where: { status: 'ACTIVE' }, orderBy: { investmentId: 'asc' } },
       },

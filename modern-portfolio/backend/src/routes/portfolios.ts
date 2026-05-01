@@ -194,7 +194,7 @@ portfolioRouter.put('/:id', authorize('UPDATE', 'ADMIN'), async (req: AuthReques
         ...(currencyCode !== undefined && { currencyCode }),
         ...(riskLevel !== undefined && { riskLevel }),
         lastUser: req.userId?.substring(0, 8) || 'SYSTEM',
-        closeDate: status === 'CLOSED' ? new Date() : undefined,
+        closeDate: (status === 'CLOSED' && portfolio.status !== 'CLOSED') ? new Date() : undefined,
       },
     });
 
