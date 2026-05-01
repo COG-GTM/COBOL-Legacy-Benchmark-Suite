@@ -15,7 +15,7 @@ datasource db {
 // ============================================================
 model Portfolio {
   id            String   @id @default(cuid())
-  portfolioId   String   @unique @map("portfolio_id") @db.VarChar(8)
+  portfolioId   String   @unique @map("portfolio_id") @db.VarChar(9)
   accountNo     String   @map("account_no") @db.VarChar(10)
   clientName    String   @map("client_name") @db.VarChar(50)
   clientType    ClientType @map("client_type")

@@ -83,7 +83,7 @@ authRouter.post('/register', async (req: Request, res: Response, next: NextFunct
 
     const passwordHash = await bcrypt.hash(password, 10);
     const user = await prisma.user.create({
-      data: { username, email, passwordHash, role: role || 'READ' },
+      data: { username, email, passwordHash, role: 'READ' },
     });
 
     const { passwordHash: _, ...userWithoutPassword } = user;
