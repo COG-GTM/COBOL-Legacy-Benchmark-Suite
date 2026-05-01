@@ -145,9 +145,14 @@ async function processTransactions(jobId: string, userId: string): Promise<void>
 
       if (txn.type === 'BUY' || txn.type === 'SELL') {
         const qtyChange = txn.type === 'BUY' ? Number(txn.quantity) : -Number(txn.quantity);
-        const newQty = (existingPosition ? Number(existingPosition.quantity) : 0) + qtyChange;
-        const newCostBasis = (existingPosition ? Number(existingPosition.costBasis) : 0) +
-          (txn.type === 'BUY' ? Number(txn.amount) : -Number(txn.amount));
+        const existingQty = existingPosition ? Number(existingPosition.quantity) : 0;
+        const existingCost = existingPosition ? Number(existingPosition.costBasis) : 0;
+        const avgCostPerUnit = existingQty > 0 ? existingCost / existingQty : 0;
+        const newQty = existingQty + qtyChange;
+        const costDeducted = txn.type === 'SELL' ? avgCostPerUnit * Number(txn.quantity) : 0;
+        const newCostBasis = txn.type === 'BUY'
+          ? existingCost + Number(txn.amount)
+          : existingCost - costDeducted;
 
         await prisma.position.upsert({
           where: existingPosition
@@ -180,8 +185,24 @@ async function processTransactions(jobId: string, userId: string): Promise<void>
           amount: txn.amount,
           fees: 0,
           totalAmount: txn.amount,
-          costBasis: existingPosition ? existingPosition.costBasis : txn.amount,
-          gainLoss: existingPosition ? Number(txn.amount) - Number(existingPosition.costBasis) : 0,
+          costBasis: (() => {
+            if (!existingPosition) return txn.amount;
+            if (txn.type === 'SELL') {
+              const avg = Number(existingPosition.quantity) > 0
+                ? Number(existingPosition.costBasis) / Number(existingPosition.quantity)
+                : 0;
+              return avg * Number(txn.quantity);
+            }
+            return txn.amount;
+          })(),
+          gainLoss: (() => {
+            if (txn.type !== 'SELL' || !existingPosition) return 0;
+            const avg = Number(existingPosition.quantity) > 0
+              ? Number(existingPosition.costBasis) / Number(existingPosition.quantity)
+              : 0;
+            const proportionalCost = avg * Number(txn.quantity);
+            return Number(txn.amount) - proportionalCost;
+          })(),
           processDate: new Date(),
           programId: 'HISTLD00',
           userId: userId.substring(0, 8),
