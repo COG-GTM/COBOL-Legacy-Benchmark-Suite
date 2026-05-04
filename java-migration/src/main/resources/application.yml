@@ -1,0 +1,59 @@
+spring:
+  application:
+    name: portfolio-management
+
+  datasource:
+    url: jdbc:h2:mem:portfoliodb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE;MODE=PostgreSQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.H2Dialect
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+
+  security:
+    user:
+      name: admin
+      password: admin
+      roles: ADMIN
+
+  thymeleaf:
+    cache: false
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    com.portfolio: DEBUG
+    org.springframework.batch: INFO

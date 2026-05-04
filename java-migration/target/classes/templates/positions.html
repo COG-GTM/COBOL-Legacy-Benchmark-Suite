@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Portfolio Positions</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background: #000; color: #0f0; padding: 20px; }
+        h1 { color: #0ff; }
+        h2 { color: #0ff; border-bottom: 1px solid #0ff; padding-bottom: 5px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+        th, td { padding: 8px 12px; text-align: left; border: 1px solid #0f0; }
+        th { background: #003; color: #0ff; }
+        a { color: #ff0; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .nav { margin-top: 20px; }
+        .nav a { margin-right: 20px; padding: 5px 10px; border: 1px solid #0f0; }
+        .info { margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+<!-- POSMAP - Portfolio Position Inquiry (replaces BMS map POSMAP from INQSET.bms) -->
+<h1>PORTFOLIO POSITION INQUIRY</h1>
+
+<div class="info" th:if="${portfolio != null}">
+    <p>Account: <span th:text="${portfolio.portfolioId}"></span> |
+       Client: <span th:text="${portfolio.clientName}"></span> |
+       Status: <span th:text="${portfolio.status}"></span></p>
+    <p>Total Value: <span th:text="${#numbers.formatDecimal(portfolio.totalValue, 1, 2)}"></span> |
+       Cash Balance: <span th:text="${#numbers.formatDecimal(portfolio.cashBalance, 1, 2)}"></span></p>
+</div>
+
+<h2>Current Positions</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Investment ID</th>
+            <th>Position Date</th>
+            <th>Quantity</th>
+            <th>Cost Basis</th>
+            <th>Market Value</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="pos : ${positions}">
+            <td th:text="${pos.investmentId}"></td>
+            <td th:text="${pos.positionDate}"></td>
+            <td th:text="${#numbers.formatDecimal(pos.quantity, 1, 4)}"></td>
+            <td th:text="${#numbers.formatDecimal(pos.costBasis, 1, 2)}"></td>
+            <td th:text="${#numbers.formatDecimal(pos.marketValue, 1, 2)}"></td>
+            <td th:text="${pos.status}"></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(positions)}">
+            <td colspan="6">No positions found for this portfolio.</td>
+        </tr>
+    </tbody>
+</table>
+
+<div class="nav">
+    <a th:href="@{/menu}">PF3=Menu</a>
+    <a th:href="@{/portfolio/{id}/history(id=${accountNo})}">View History</a>
+</div>
+</body>
+</html>

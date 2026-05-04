@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Error</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background: #000; color: #f00; padding: 20px; }
+        h1 { color: #f00; border-bottom: 2px solid #f00; padding-bottom: 10px; }
+        .error-box { border: 2px solid #f00; padding: 20px; margin: 20px 0; }
+        .error-code { color: #ff0; font-size: 1.2em; }
+        a { color: #ff0; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .nav { margin-top: 20px; }
+        .nav a { margin-right: 20px; padding: 5px 10px; border: 1px solid #f00; }
+    </style>
+</head>
+<body>
+<!-- ERRMAP - Error Display (replaces BMS map ERRMAP from INQSET.bms) -->
+<h1>SYSTEM ERROR</h1>
+
+<div class="error-box">
+    <p class="error-code">Error Code: <span th:text="${errorCode}">E999</span></p>
+    <p><strong th:text="${errorTitle}">Error</strong></p>
+    <p th:text="${errorMessage}">An unexpected error occurred.</p>
+</div>
+
+<div class="nav">
+    <a th:href="@{/menu}">Return to Main Menu</a>
+</div>
+</body>
+</html>
