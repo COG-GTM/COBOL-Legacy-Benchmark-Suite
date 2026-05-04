@@ -5,8 +5,8 @@ package com.coggtm.portfolio.domain.enums;
  */
 public enum PortfolioStatus {
     A("Active"),
-    I("Inactive"),
-    C("Closed");
+    C("Closed"),
+    S("Suspended");
 
     private final String description;
 
