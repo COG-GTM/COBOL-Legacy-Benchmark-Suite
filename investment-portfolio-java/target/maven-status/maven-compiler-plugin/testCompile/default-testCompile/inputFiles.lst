@@ -1,0 +1,7 @@
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/investment-portfolio-java/src/test/java/com/portfolio/InvestmentPortfolioApplicationTests.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/investment-portfolio-java/src/test/java/com/portfolio/controller/InquiryControllerTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/investment-portfolio-java/src/test/java/com/portfolio/controller/PortfolioControllerTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/investment-portfolio-java/src/test/java/com/portfolio/service/ErrorServiceTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/investment-portfolio-java/src/test/java/com/portfolio/service/PortfolioServiceTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/investment-portfolio-java/src/test/java/com/portfolio/service/SecurityServiceTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/investment-portfolio-java/src/test/java/com/portfolio/service/TransactionServiceTest.java
