@@ -23,6 +23,11 @@ public class PortfolioException extends RuntimeException {
         this.returnCode = returnCode;
     }
 
+    public PortfolioException(String message, Throwable cause, int returnCode) {
+        super(message, cause);
+        this.returnCode = returnCode;
+    }
+
     public int getReturnCode() {
         return returnCode;
     }

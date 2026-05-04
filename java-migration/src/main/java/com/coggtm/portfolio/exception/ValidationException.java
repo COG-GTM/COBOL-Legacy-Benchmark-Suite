@@ -11,6 +11,6 @@ public class ValidationException extends PortfolioException {
     }
 
     public ValidationException(String message, Throwable cause) {
-        super(message, cause);
+        super(message, cause, 4);
     }
 }

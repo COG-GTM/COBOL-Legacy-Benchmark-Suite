@@ -11,6 +11,6 @@ public class SevereException extends PortfolioException {
     }
 
     public SevereException(String message, Throwable cause) {
-        super(message, cause);
+        super(message, cause, 12);
     }
 }
