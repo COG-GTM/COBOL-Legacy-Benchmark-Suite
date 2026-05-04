@@ -1,0 +1,1135 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://maven.apache.org/surefire/maven-surefire-plugin/xsd/surefire-test-report-3.0.xsd" version="3.0" name="com.portfolio.service.PortfolioServiceTest" time="9.964" tests="10" errors="0" skipped="0" failures="0">
+  <properties>
+    <property name="java.specification.version" value="21"/>
+    <property name="sun.jnu.encoding" value="UTF-8"/>
+    <property name="java.class.path" value="/home/ubuntu/COBOL-Legacy-Benchmark-Suite/java-migration/target/test-classes:/home/ubuntu/COBOL-Legacy-Benchmark-Suite/java-migration/target/classes:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-web/3.2.5/spring-boot-starter-web-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter/3.2.5/spring-boot-starter-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot/3.2.5/spring-boot-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/3.2.5/spring-boot-autoconfigure-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-logging/3.2.5/spring-boot-starter-logging-3.2.5.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-classic/1.4.14/logback-classic-1.4.14.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-core/1.4.14/logback-core-1.4.14.jar:/home/ubuntu/.m2/repository/org/apache/logging/log4j/log4j-to-slf4j/2.21.1/log4j-to-slf4j-2.21.1.jar:/home/ubuntu/.m2/repository/org/apache/logging/log4j/log4j-api/2.21.1/log4j-api-2.21.1.jar:/home/ubuntu/.m2/repository/org/slf4j/jul-to-slf4j/2.0.13/jul-to-slf4j-2.0.13.jar:/home/ubuntu/.m2/repository/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar:/home/ubuntu/.m2/repository/org/yaml/snakeyaml/2.2/snakeyaml-2.2.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-json/3.2.5/spring-boot-starter-json-3.2.5.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.4/jackson-databind-2.15.4.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.4/jackson-annotations-2.15.4.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.15.4/jackson-datatype-jdk8-2.15.4.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.15.4/jackson-datatype-jsr310-2.15.4.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/module/jackson-module-parameter-names/2.15.4/jackson-module-parameter-names-2.15.4.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat/3.2.5/spring-boot-starter-tomcat-3.2.5.jar:/home/ubuntu/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/10.1.20/tomcat-embed-core-10.1.20.jar:/home/ubuntu/.m2/repository/org/apache/tomcat/embed/tomcat-embed-websocket/10.1.20/tomcat-embed-websocket-10.1.20.jar:/home/ubuntu/.m2/repository/org/springframework/spring-web/6.1.6/spring-web-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-beans/6.1.6/spring-beans-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-webmvc/6.1.6/spring-webmvc-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-context/6.1.6/spring-context-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-expression/6.1.6/spring-expression-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-data-jpa/3.2.5/spring-boot-starter-data-jpa-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-aop/3.2.5/spring-boot-starter-aop-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-jdbc/3.2.5/spring-boot-starter-jdbc-3.2.5.jar:/home/ubuntu/.m2/repository/com/zaxxer/HikariCP/5.0.1/HikariCP-5.0.1.jar:/home/ubuntu/.m2/repository/org/hibernate/orm/hibernate-core/6.4.4.Final/hibernate-core-6.4.4.Final.jar:/home/ubuntu/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.1.0/jakarta.persistence-api-3.1.0.jar:/home/ubuntu/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/jboss/logging/jboss-logging/3.5.3.Final/jboss-logging-3.5.3.Final.jar:/home/ubuntu/.m2/repository/org/hibernate/common/hibernate-commons-annotations/6.0.6.Final/hibernate-commons-annotations-6.0.6.Final.jar:/home/ubuntu/.m2/repository/io/smallrye/jandex/3.1.2/jandex-3.1.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/classmate/1.6.0/classmate-1.6.0.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy/1.14.13/byte-buddy-1.14.13.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.5/jaxb-runtime-4.0.5.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.5/jaxb-core-4.0.5.jar:/home/ubuntu/.m2/repository/org/eclipse/angus/angus-activation/2.0.2/angus-activation-2.0.2.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/txw2/4.0.5/txw2-4.0.5.jar:/home/ubuntu/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.2/istack-commons-runtime-4.1.2.jar:/home/ubuntu/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/antlr/antlr4-runtime/4.13.0/antlr4-runtime-4.13.0.jar:/home/ubuntu/.m2/repository/org/springframework/data/spring-data-jpa/3.2.5/spring-data-jpa-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/data/spring-data-commons/3.2.5/spring-data-commons-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/spring-orm/6.1.6/spring-orm-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-tx/6.1.6/spring-tx-6.1.6.jar:/home/ubuntu/.m2/repository/org/slf4j/slf4j-api/2.0.13/slf4j-api-2.0.13.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-batch/3.2.5/spring-boot-starter-batch-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/batch/spring-batch-core/5.1.1/spring-batch-core-5.1.1.jar:/home/ubuntu/.m2/repository/org/springframework/batch/spring-batch-infrastructure/5.1.1/spring-batch-infrastructure-5.1.1.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-security/3.2.5/spring-boot-starter-security-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/spring-aop/6.1.6/spring-aop-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/security/spring-security-config/6.2.4/spring-security-config-6.2.4.jar:/home/ubuntu/.m2/repository/org/springframework/security/spring-security-web/6.2.4/spring-security-web-6.2.4.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-thymeleaf/3.2.5/spring-boot-starter-thymeleaf-3.2.5.jar:/home/ubuntu/.m2/repository/org/thymeleaf/thymeleaf-spring6/3.1.2.RELEASE/thymeleaf-spring6-3.1.2.RELEASE.jar:/home/ubuntu/.m2/repository/org/thymeleaf/thymeleaf/3.1.2.RELEASE/thymeleaf-3.1.2.RELEASE.jar:/home/ubuntu/.m2/repository/org/attoparser/attoparser/2.0.7.RELEASE/attoparser-2.0.7.RELEASE.jar:/home/ubuntu/.m2/repository/org/unbescape/unbescape/1.1.6.RELEASE/unbescape-1.1.6.RELEASE.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-actuator/3.2.5/spring-boot-starter-actuator-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-actuator-autoconfigure/3.2.5/spring-boot-actuator-autoconfigure-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-actuator/3.2.5/spring-boot-actuator-3.2.5.jar:/home/ubuntu/.m2/repository/io/micrometer/micrometer-observation/1.12.5/micrometer-observation-1.12.5.jar:/home/ubuntu/.m2/repository/io/micrometer/micrometer-commons/1.12.5/micrometer-commons-1.12.5.jar:/home/ubuntu/.m2/repository/io/micrometer/micrometer-jakarta9/1.12.5/micrometer-jakarta9-1.12.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-validation/3.2.5/spring-boot-starter-validation-3.2.5.jar:/home/ubuntu/.m2/repository/org/apache/tomcat/embed/tomcat-embed-el/10.1.20/tomcat-embed-el-10.1.20.jar:/home/ubuntu/.m2/repository/org/hibernate/validator/hibernate-validator/8.0.1.Final/hibernate-validator-8.0.1.Final.jar:/home/ubuntu/.m2/repository/jakarta/validation/jakarta.validation-api/3.0.2/jakarta.validation-api-3.0.2.jar:/home/ubuntu/.m2/repository/org/springframework/retry/spring-retry/2.0.5/spring-retry-2.0.5.jar:/home/ubuntu/.m2/repository/org/springframework/spring-aspects/6.1.6/spring-aspects-6.1.6.jar:/home/ubuntu/.m2/repository/org/aspectj/aspectjweaver/1.9.22/aspectjweaver-1.9.22.jar:/home/ubuntu/.m2/repository/org/flywaydb/flyway-core/9.22.3/flyway-core-9.22.3.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/dataformat/jackson-dataformat-toml/2.15.4/jackson-dataformat-toml-2.15.4.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.4/jackson-core-2.15.4.jar:/home/ubuntu/.m2/repository/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar:/home/ubuntu/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar:/home/ubuntu/.m2/repository/org/postgresql/postgresql/42.6.2/postgresql-42.6.2.jar:/home/ubuntu/.m2/repository/org/checkerframework/checker-qual/3.31.0/checker-qual-3.31.0.jar:/home/ubuntu/.m2/repository/io/micrometer/micrometer-registry-prometheus/1.12.5/micrometer-registry-prometheus-1.12.5.jar:/home/ubuntu/.m2/repository/io/micrometer/micrometer-core/1.12.5/micrometer-core-1.12.5.jar:/home/ubuntu/.m2/repository/org/hdrhistogram/HdrHistogram/2.1.12/HdrHistogram-2.1.12.jar:/home/ubuntu/.m2/repository/org/latencyutils/LatencyUtils/2.0.3/LatencyUtils-2.0.3.jar:/home/ubuntu/.m2/repository/io/prometheus/simpleclient_common/0.16.0/simpleclient_common-0.16.0.jar:/home/ubuntu/.m2/repository/io/prometheus/simpleclient/0.16.0/simpleclient-0.16.0.jar:/home/ubuntu/.m2/repository/io/prometheus/simpleclient_tracer_otel/0.16.0/simpleclient_tracer_otel-0.16.0.jar:/home/ubuntu/.m2/repository/io/prometheus/simpleclient_tracer_common/0.16.0/simpleclient_tracer_common-0.16.0.jar:/home/ubuntu/.m2/repository/io/prometheus/simpleclient_tracer_otel_agent/0.16.0/simpleclient_tracer_otel_agent-0.16.0.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-test/3.2.5/spring-boot-starter-test-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-test/3.2.5/spring-boot-test-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-test-autoconfigure/3.2.5/spring-boot-test-autoconfigure-3.2.5.jar:/home/ubuntu/.m2/repository/com/jayway/jsonpath/json-path/2.9.0/json-path-2.9.0.jar:/home/ubuntu/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.2/jakarta.xml.bind-api-4.0.2.jar:/home/ubuntu/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.3/jakarta.activation-api-2.1.3.jar:/home/ubuntu/.m2/repository/net/minidev/json-smart/2.5.1/json-smart-2.5.1.jar:/home/ubuntu/.m2/repository/net/minidev/accessors-smart/2.5.1/accessors-smart-2.5.1.jar:/home/ubuntu/.m2/repository/org/ow2/asm/asm/9.6/asm-9.6.jar:/home/ubuntu/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:/home/ubuntu/.m2/repository/org/awaitility/awaitility/4.2.1/awaitility-4.2.1.jar:/home/ubuntu/.m2/repository/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.2/junit-jupiter-5.10.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar:/home/ubuntu/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-commons/1.10.2/junit-platform-commons-1.10.2.jar:/home/ubuntu/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.2/junit-jupiter-params-5.10.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.2/junit-jupiter-engine-5.10.2.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-engine/1.10.2/junit-platform-engine-1.10.2.jar:/home/ubuntu/.m2/repository/org/mockito/mockito-core/5.7.0/mockito-core-5.7.0.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.13/byte-buddy-agent-1.14.13.jar:/home/ubuntu/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/ubuntu/.m2/repository/org/mockito/mockito-junit-jupiter/5.7.0/mockito-junit-jupiter-5.7.0.jar:/home/ubuntu/.m2/repository/org/skyscreamer/jsonassert/1.5.1/jsonassert-1.5.1.jar:/home/ubuntu/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar:/home/ubuntu/.m2/repository/org/springframework/spring-core/6.1.6/spring-core-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-jcl/6.1.6/spring-jcl-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-test/6.1.6/spring-test-6.1.6.jar:/home/ubuntu/.m2/repository/org/xmlunit/xmlunit-core/2.9.1/xmlunit-core-2.9.1.jar:/home/ubuntu/.m2/repository/org/springframework/batch/spring-batch-test/5.1.1/spring-batch-test-5.1.1.jar:/home/ubuntu/.m2/repository/org/springframework/spring-jdbc/6.1.6/spring-jdbc-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/security/spring-security-test/6.2.4/spring-security-test-6.2.4.jar:/home/ubuntu/.m2/repository/org/springframework/security/spring-security-core/6.2.4/spring-security-core-6.2.4.jar:/home/ubuntu/.m2/repository/org/springframework/security/spring-security-crypto/6.2.4/spring-security-crypto-6.2.4.jar:"/>
+    <property name="java.vm.vendor" value="Ubuntu"/>
+    <property name="sun.arch.data.model" value="64"/>
+    <property name="java.vendor.url" value="https://ubuntu.com/"/>
+    <property name="user.timezone" value="Etc/UTC"/>
+    <property name="org.jboss.logging.provider" value="slf4j"/>
+    <property name="os.name" value="Linux"/>
+    <property name="java.vm.specification.version" value="21"/>
+    <property name="sun.java.launcher" value="SUN_STANDARD"/>
+    <property name="sun.boot.library.path" value="/usr/lib/jvm/java-21-openjdk-amd64/lib"/>
+    <property name="sun.java.command" value="/home/ubuntu/COBOL-Legacy-Benchmark-Suite/java-migration/target/surefire/surefirebooter-20260504142100376_3.jar /home/ubuntu/COBOL-Legacy-Benchmark-Suite/java-migration/target/surefire 2026-05-04T14-21-00_281-jvmRun1 surefire-20260504142100376_1tmp surefire_0-20260504142100376_2tmp"/>
+    <property name="jdk.debug" value="release"/>
+    <property name="surefire.test.class.path" value="/home/ubuntu/COBOL-Legacy-Benchmark-Suite/java-migration/target/test-classes:/home/ubuntu/COBOL-Legacy-Benchmark-Suite/java-migration/target/classes:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-web/3.2.5/spring-boot-starter-web-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter/3.2.5/spring-boot-starter-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot/3.2.5/spring-boot-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-autoconfigure/3.2.5/spring-boot-autoconfigure-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-logging/3.2.5/spring-boot-starter-logging-3.2.5.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-classic/1.4.14/logback-classic-1.4.14.jar:/home/ubuntu/.m2/repository/ch/qos/logback/logback-core/1.4.14/logback-core-1.4.14.jar:/home/ubuntu/.m2/repository/org/apache/logging/log4j/log4j-to-slf4j/2.21.1/log4j-to-slf4j-2.21.1.jar:/home/ubuntu/.m2/repository/org/apache/logging/log4j/log4j-api/2.21.1/log4j-api-2.21.1.jar:/home/ubuntu/.m2/repository/org/slf4j/jul-to-slf4j/2.0.13/jul-to-slf4j-2.0.13.jar:/home/ubuntu/.m2/repository/jakarta/annotation/jakarta.annotation-api/2.1.1/jakarta.annotation-api-2.1.1.jar:/home/ubuntu/.m2/repository/org/yaml/snakeyaml/2.2/snakeyaml-2.2.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-json/3.2.5/spring-boot-starter-json-3.2.5.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-databind/2.15.4/jackson-databind-2.15.4.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-annotations/2.15.4/jackson-annotations-2.15.4.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jdk8/2.15.4/jackson-datatype-jdk8-2.15.4.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/datatype/jackson-datatype-jsr310/2.15.4/jackson-datatype-jsr310-2.15.4.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/module/jackson-module-parameter-names/2.15.4/jackson-module-parameter-names-2.15.4.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-tomcat/3.2.5/spring-boot-starter-tomcat-3.2.5.jar:/home/ubuntu/.m2/repository/org/apache/tomcat/embed/tomcat-embed-core/10.1.20/tomcat-embed-core-10.1.20.jar:/home/ubuntu/.m2/repository/org/apache/tomcat/embed/tomcat-embed-websocket/10.1.20/tomcat-embed-websocket-10.1.20.jar:/home/ubuntu/.m2/repository/org/springframework/spring-web/6.1.6/spring-web-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-beans/6.1.6/spring-beans-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-webmvc/6.1.6/spring-webmvc-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-context/6.1.6/spring-context-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-expression/6.1.6/spring-expression-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-data-jpa/3.2.5/spring-boot-starter-data-jpa-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-aop/3.2.5/spring-boot-starter-aop-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-jdbc/3.2.5/spring-boot-starter-jdbc-3.2.5.jar:/home/ubuntu/.m2/repository/com/zaxxer/HikariCP/5.0.1/HikariCP-5.0.1.jar:/home/ubuntu/.m2/repository/org/hibernate/orm/hibernate-core/6.4.4.Final/hibernate-core-6.4.4.Final.jar:/home/ubuntu/.m2/repository/jakarta/persistence/jakarta.persistence-api/3.1.0/jakarta.persistence-api-3.1.0.jar:/home/ubuntu/.m2/repository/jakarta/transaction/jakarta.transaction-api/2.0.1/jakarta.transaction-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/jboss/logging/jboss-logging/3.5.3.Final/jboss-logging-3.5.3.Final.jar:/home/ubuntu/.m2/repository/org/hibernate/common/hibernate-commons-annotations/6.0.6.Final/hibernate-commons-annotations-6.0.6.Final.jar:/home/ubuntu/.m2/repository/io/smallrye/jandex/3.1.2/jandex-3.1.2.jar:/home/ubuntu/.m2/repository/com/fasterxml/classmate/1.6.0/classmate-1.6.0.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy/1.14.13/byte-buddy-1.14.13.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-runtime/4.0.5/jaxb-runtime-4.0.5.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/jaxb-core/4.0.5/jaxb-core-4.0.5.jar:/home/ubuntu/.m2/repository/org/eclipse/angus/angus-activation/2.0.2/angus-activation-2.0.2.jar:/home/ubuntu/.m2/repository/org/glassfish/jaxb/txw2/4.0.5/txw2-4.0.5.jar:/home/ubuntu/.m2/repository/com/sun/istack/istack-commons-runtime/4.1.2/istack-commons-runtime-4.1.2.jar:/home/ubuntu/.m2/repository/jakarta/inject/jakarta.inject-api/2.0.1/jakarta.inject-api-2.0.1.jar:/home/ubuntu/.m2/repository/org/antlr/antlr4-runtime/4.13.0/antlr4-runtime-4.13.0.jar:/home/ubuntu/.m2/repository/org/springframework/data/spring-data-jpa/3.2.5/spring-data-jpa-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/data/spring-data-commons/3.2.5/spring-data-commons-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/spring-orm/6.1.6/spring-orm-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-tx/6.1.6/spring-tx-6.1.6.jar:/home/ubuntu/.m2/repository/org/slf4j/slf4j-api/2.0.13/slf4j-api-2.0.13.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-batch/3.2.5/spring-boot-starter-batch-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/batch/spring-batch-core/5.1.1/spring-batch-core-5.1.1.jar:/home/ubuntu/.m2/repository/org/springframework/batch/spring-batch-infrastructure/5.1.1/spring-batch-infrastructure-5.1.1.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-security/3.2.5/spring-boot-starter-security-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/spring-aop/6.1.6/spring-aop-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/security/spring-security-config/6.2.4/spring-security-config-6.2.4.jar:/home/ubuntu/.m2/repository/org/springframework/security/spring-security-web/6.2.4/spring-security-web-6.2.4.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-thymeleaf/3.2.5/spring-boot-starter-thymeleaf-3.2.5.jar:/home/ubuntu/.m2/repository/org/thymeleaf/thymeleaf-spring6/3.1.2.RELEASE/thymeleaf-spring6-3.1.2.RELEASE.jar:/home/ubuntu/.m2/repository/org/thymeleaf/thymeleaf/3.1.2.RELEASE/thymeleaf-3.1.2.RELEASE.jar:/home/ubuntu/.m2/repository/org/attoparser/attoparser/2.0.7.RELEASE/attoparser-2.0.7.RELEASE.jar:/home/ubuntu/.m2/repository/org/unbescape/unbescape/1.1.6.RELEASE/unbescape-1.1.6.RELEASE.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-actuator/3.2.5/spring-boot-starter-actuator-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-actuator-autoconfigure/3.2.5/spring-boot-actuator-autoconfigure-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-actuator/3.2.5/spring-boot-actuator-3.2.5.jar:/home/ubuntu/.m2/repository/io/micrometer/micrometer-observation/1.12.5/micrometer-observation-1.12.5.jar:/home/ubuntu/.m2/repository/io/micrometer/micrometer-commons/1.12.5/micrometer-commons-1.12.5.jar:/home/ubuntu/.m2/repository/io/micrometer/micrometer-jakarta9/1.12.5/micrometer-jakarta9-1.12.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-validation/3.2.5/spring-boot-starter-validation-3.2.5.jar:/home/ubuntu/.m2/repository/org/apache/tomcat/embed/tomcat-embed-el/10.1.20/tomcat-embed-el-10.1.20.jar:/home/ubuntu/.m2/repository/org/hibernate/validator/hibernate-validator/8.0.1.Final/hibernate-validator-8.0.1.Final.jar:/home/ubuntu/.m2/repository/jakarta/validation/jakarta.validation-api/3.0.2/jakarta.validation-api-3.0.2.jar:/home/ubuntu/.m2/repository/org/springframework/retry/spring-retry/2.0.5/spring-retry-2.0.5.jar:/home/ubuntu/.m2/repository/org/springframework/spring-aspects/6.1.6/spring-aspects-6.1.6.jar:/home/ubuntu/.m2/repository/org/aspectj/aspectjweaver/1.9.22/aspectjweaver-1.9.22.jar:/home/ubuntu/.m2/repository/org/flywaydb/flyway-core/9.22.3/flyway-core-9.22.3.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/dataformat/jackson-dataformat-toml/2.15.4/jackson-dataformat-toml-2.15.4.jar:/home/ubuntu/.m2/repository/com/fasterxml/jackson/core/jackson-core/2.15.4/jackson-core-2.15.4.jar:/home/ubuntu/.m2/repository/com/google/code/gson/gson/2.10.1/gson-2.10.1.jar:/home/ubuntu/.m2/repository/com/h2database/h2/2.2.224/h2-2.2.224.jar:/home/ubuntu/.m2/repository/org/postgresql/postgresql/42.6.2/postgresql-42.6.2.jar:/home/ubuntu/.m2/repository/org/checkerframework/checker-qual/3.31.0/checker-qual-3.31.0.jar:/home/ubuntu/.m2/repository/io/micrometer/micrometer-registry-prometheus/1.12.5/micrometer-registry-prometheus-1.12.5.jar:/home/ubuntu/.m2/repository/io/micrometer/micrometer-core/1.12.5/micrometer-core-1.12.5.jar:/home/ubuntu/.m2/repository/org/hdrhistogram/HdrHistogram/2.1.12/HdrHistogram-2.1.12.jar:/home/ubuntu/.m2/repository/org/latencyutils/LatencyUtils/2.0.3/LatencyUtils-2.0.3.jar:/home/ubuntu/.m2/repository/io/prometheus/simpleclient_common/0.16.0/simpleclient_common-0.16.0.jar:/home/ubuntu/.m2/repository/io/prometheus/simpleclient/0.16.0/simpleclient-0.16.0.jar:/home/ubuntu/.m2/repository/io/prometheus/simpleclient_tracer_otel/0.16.0/simpleclient_tracer_otel-0.16.0.jar:/home/ubuntu/.m2/repository/io/prometheus/simpleclient_tracer_common/0.16.0/simpleclient_tracer_common-0.16.0.jar:/home/ubuntu/.m2/repository/io/prometheus/simpleclient_tracer_otel_agent/0.16.0/simpleclient_tracer_otel_agent-0.16.0.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-starter-test/3.2.5/spring-boot-starter-test-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-test/3.2.5/spring-boot-test-3.2.5.jar:/home/ubuntu/.m2/repository/org/springframework/boot/spring-boot-test-autoconfigure/3.2.5/spring-boot-test-autoconfigure-3.2.5.jar:/home/ubuntu/.m2/repository/com/jayway/jsonpath/json-path/2.9.0/json-path-2.9.0.jar:/home/ubuntu/.m2/repository/jakarta/xml/bind/jakarta.xml.bind-api/4.0.2/jakarta.xml.bind-api-4.0.2.jar:/home/ubuntu/.m2/repository/jakarta/activation/jakarta.activation-api/2.1.3/jakarta.activation-api-2.1.3.jar:/home/ubuntu/.m2/repository/net/minidev/json-smart/2.5.1/json-smart-2.5.1.jar:/home/ubuntu/.m2/repository/net/minidev/accessors-smart/2.5.1/accessors-smart-2.5.1.jar:/home/ubuntu/.m2/repository/org/ow2/asm/asm/9.6/asm-9.6.jar:/home/ubuntu/.m2/repository/org/assertj/assertj-core/3.24.2/assertj-core-3.24.2.jar:/home/ubuntu/.m2/repository/org/awaitility/awaitility/4.2.1/awaitility-4.2.1.jar:/home/ubuntu/.m2/repository/org/hamcrest/hamcrest/2.2/hamcrest-2.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter/5.10.2/junit-jupiter-5.10.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.10.2/junit-jupiter-api-5.10.2.jar:/home/ubuntu/.m2/repository/org/opentest4j/opentest4j/1.3.0/opentest4j-1.3.0.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-commons/1.10.2/junit-platform-commons-1.10.2.jar:/home/ubuntu/.m2/repository/org/apiguardian/apiguardian-api/1.1.2/apiguardian-api-1.1.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-params/5.10.2/junit-jupiter-params-5.10.2.jar:/home/ubuntu/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.10.2/junit-jupiter-engine-5.10.2.jar:/home/ubuntu/.m2/repository/org/junit/platform/junit-platform-engine/1.10.2/junit-platform-engine-1.10.2.jar:/home/ubuntu/.m2/repository/org/mockito/mockito-core/5.7.0/mockito-core-5.7.0.jar:/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.13/byte-buddy-agent-1.14.13.jar:/home/ubuntu/.m2/repository/org/objenesis/objenesis/3.3/objenesis-3.3.jar:/home/ubuntu/.m2/repository/org/mockito/mockito-junit-jupiter/5.7.0/mockito-junit-jupiter-5.7.0.jar:/home/ubuntu/.m2/repository/org/skyscreamer/jsonassert/1.5.1/jsonassert-1.5.1.jar:/home/ubuntu/.m2/repository/com/vaadin/external/google/android-json/0.0.20131108.vaadin1/android-json-0.0.20131108.vaadin1.jar:/home/ubuntu/.m2/repository/org/springframework/spring-core/6.1.6/spring-core-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-jcl/6.1.6/spring-jcl-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/spring-test/6.1.6/spring-test-6.1.6.jar:/home/ubuntu/.m2/repository/org/xmlunit/xmlunit-core/2.9.1/xmlunit-core-2.9.1.jar:/home/ubuntu/.m2/repository/org/springframework/batch/spring-batch-test/5.1.1/spring-batch-test-5.1.1.jar:/home/ubuntu/.m2/repository/org/springframework/spring-jdbc/6.1.6/spring-jdbc-6.1.6.jar:/home/ubuntu/.m2/repository/org/springframework/security/spring-security-test/6.2.4/spring-security-test-6.2.4.jar:/home/ubuntu/.m2/repository/org/springframework/security/spring-security-core/6.2.4/spring-security-core-6.2.4.jar:/home/ubuntu/.m2/repository/org/springframework/security/spring-security-crypto/6.2.4/spring-security-crypto-6.2.4.jar:"/>
+    <property name="sun.cpu.endian" value="little"/>
+    <property name="user.home" value="/home/ubuntu"/>
+    <property name="user.language" value="en"/>
+    <property name="java.specification.vendor" value="Oracle Corporation"/>
+    <property name="java.version.date" value="2026-01-20"/>
+    <property name="java.home" value="/usr/lib/jvm/java-21-openjdk-amd64"/>
+    <property name="file.separator" value="/"/>
+    <property name="basedir" value="/home/ubuntu/COBOL-Legacy-Benchmark-Suite/java-migration"/>
+    <property name="java.vm.compressedOopsMode" value="Zero based"/>
+    <property name="line.separator" value="&#10;"/>
+    <property name="java.specification.name" value="Java Platform API Specification"/>
+    <property name="java.vm.specification.vendor" value="Oracle Corporation"/>
+    <property name="FILE_LOG_CHARSET" value="UTF-8"/>
+    <property name="java.awt.headless" value="true"/>
+    <property name="surefire.real.class.path" value="/home/ubuntu/COBOL-Legacy-Benchmark-Suite/java-migration/target/surefire/surefirebooter-20260504142100376_3.jar"/>
+    <property name="sun.management.compiler" value="HotSpot 64-Bit Tiered Compilers"/>
+    <property name="java.runtime.version" value="21.0.10+7-Ubuntu-122.04"/>
+    <property name="user.name" value="ubuntu"/>
+    <property name="stdout.encoding" value="UTF-8"/>
+    <property name="path.separator" value=":"/>
+    <property name="os.version" value="5.15.200"/>
+    <property name="java.runtime.name" value="OpenJDK Runtime Environment"/>
+    <property name="file.encoding" value="UTF-8"/>
+    <property name="java.vm.name" value="OpenJDK 64-Bit Server VM"/>
+    <property name="localRepository" value="/home/ubuntu/.m2/repository"/>
+    <property name="java.vendor.url.bug" value="https://bugs.launchpad.net/ubuntu/+source/openjdk-21"/>
+    <property name="java.io.tmpdir" value="/tmp"/>
+    <property name="com.zaxxer.hikari.pool_number" value="1"/>
+    <property name="java.version" value="21.0.10"/>
+    <property name="user.dir" value="/home/ubuntu/COBOL-Legacy-Benchmark-Suite/java-migration"/>
+    <property name="os.arch" value="amd64"/>
+    <property name="java.vm.specification.name" value="Java Virtual Machine Specification"/>
+    <property name="PID" value="7016"/>
+    <property name="CONSOLE_LOG_CHARSET" value="UTF-8"/>
+    <property name="native.encoding" value="UTF-8"/>
+    <property name="java.library.path" value="/usr/java/packages/lib:/usr/lib/x86_64-linux-gnu/jni:/lib/x86_64-linux-gnu:/usr/lib/x86_64-linux-gnu:/usr/lib/jni:/lib:/usr/lib"/>
+    <property name="stderr.encoding" value="UTF-8"/>
+    <property name="java.vm.info" value="mixed mode, sharing"/>
+    <property name="java.vendor" value="Ubuntu"/>
+    <property name="java.vm.version" value="21.0.10+7-Ubuntu-122.04"/>
+    <property name="sun.io.unicode.encoding" value="UnicodeLittle"/>
+    <property name="java.class.version" value="65.0"/>
+    <property name="LOGGED_APPLICATION_NAME" value="[portfolio-management] "/>
+  </properties>
+  <testcase name="testUpdatePortfolio" classname="com.portfolio.service.PortfolioServiceTest" time="0.781">
+    <system-out><![CDATA[14:21:01.233 [main] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils -- Could not detect default configuration classes for test class [com.portfolio.service.PortfolioServiceTest]: PortfolioServiceTest does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+14:21:01.355 [main] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper -- Found @SpringBootConfiguration com.portfolio.PortfolioApplication for test class com.portfolio.service.PortfolioServiceTest
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::                (v3.2.5)
+
+2026-05-04T14:21:01.774Z  INFO 7016 --- [portfolio-management] [           main] c.p.service.PortfolioServiceTest         : Starting PortfolioServiceTest using Java 21.0.10 with PID 7016 (started by ubuntu in /home/ubuntu/COBOL-Legacy-Benchmark-Suite/java-migration)
+2026-05-04T14:21:01.775Z DEBUG 7016 --- [portfolio-management] [           main] c.p.service.PortfolioServiceTest         : Running with Spring Boot v3.2.5, Spring v6.1.6
+2026-05-04T14:21:01.776Z  INFO 7016 --- [portfolio-management] [           main] c.p.service.PortfolioServiceTest         : The following 1 profile is active: "test"
+2026-05-04T14:21:03.058Z  INFO 7016 --- [portfolio-management] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-05-04T14:21:03.146Z  INFO 7016 --- [portfolio-management] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 80 ms. Found 8 JPA repository interfaces.
+2026-05-04T14:21:03.765Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.jdbc.DataSourceConfiguration$Hikari' of type [org.springframework.boot.autoconfigure.jdbc.DataSourceConfiguration$Hikari] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:03.779Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration' of type [org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:03.789Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'stringOrNumberMigrationVersionConverter' of type [org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration$StringOrNumberToMigrationVersionConverter] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:03.810Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'spring.datasource-org.springframework.boot.autoconfigure.jdbc.DataSourceProperties' of type [org.springframework.boot.autoconfigure.jdbc.DataSourceProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:03.823Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration$PooledDataSourceConfiguration' of type [org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration$PooledDataSourceConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:03.828Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'jdbcConnectionDetails' of type [org.springframework.boot.autoconfigure.jdbc.PropertiesJdbcConnectionDetails] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:03.873Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'dataSource' of type [com.zaxxer.hikari.HikariDataSource] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:03.929Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'spring.jpa-org.springframework.boot.autoconfigure.orm.jpa.JpaProperties' of type [org.springframework.boot.autoconfigure.orm.jpa.JpaProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:03.940Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'spring.jpa.hibernate-org.springframework.boot.autoconfigure.orm.jpa.HibernateProperties' of type [org.springframework.boot.autoconfigure.orm.jpa.HibernateProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:03.953Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.jdbc.metadata.DataSourcePoolMetadataProvidersConfiguration$HikariPoolDataSourceMetadataProviderConfiguration' of type [org.springframework.boot.autoconfigure.jdbc.metadata.DataSourcePoolMetadataProvidersConfiguration$HikariPoolDataSourceMetadataProviderConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:03.956Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'hikariPoolDataSourceMetadataProvider' of type [org.springframework.boot.autoconfigure.jdbc.metadata.DataSourcePoolMetadataProvidersConfiguration$HikariPoolDataSourceMetadataProviderConfiguration$$Lambda/0x00007fae704edd00] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:03.966Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration' of type [org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:03.982Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.transaction.TransactionManagerCustomizationAutoConfiguration' of type [org.springframework.boot.autoconfigure.transaction.TransactionManagerCustomizationAutoConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:03.993Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'transactionExecutionListeners' of type [org.springframework.boot.autoconfigure.transaction.ExecutionListenersTransactionManagerCustomizer] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:04.011Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'spring.transaction-org.springframework.boot.autoconfigure.transaction.TransactionProperties' of type [org.springframework.boot.autoconfigure.transaction.TransactionProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:04.016Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'platformTransactionManagerCustomizers' of type [org.springframework.boot.autoconfigure.transaction.TransactionManagerCustomizers] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:04.076Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'spring.flyway-org.springframework.boot.autoconfigure.flyway.FlywayProperties' of type [org.springframework.boot.autoconfigure.flyway.FlywayProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:04.107Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration$FlywayConfiguration' of type [org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration$FlywayConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:04.161Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'flywayConnectionDetails' of type [org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration$PropertiesFlywayConnectionDetails] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:04.175Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'resourceProviderCustomizer' of type [org.springframework.boot.autoconfigure.flyway.ResourceProviderCustomizer] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:04.195Z  INFO 7016 --- [portfolio-management] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-05-04T14:21:04.514Z  INFO 7016 --- [portfolio-management] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:testdb user=SA
+2026-05-04T14:21:04.524Z  INFO 7016 --- [portfolio-management] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-05-04T14:21:04.584Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'postgresqlFlywayConfigurationCustomizer' of type [org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration$PostgresqlFlywayConfigurationCustomizer] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:04.601Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'flyway' of type [org.flywaydb.core.Flyway] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:04.613Z  INFO 7016 --- [portfolio-management] [           main] o.f.c.internal.license.VersionPrinter    : Flyway Community Edition 9.22.3 by Redgate
+2026-05-04T14:21:04.614Z  INFO 7016 --- [portfolio-management] [           main] o.f.c.internal.license.VersionPrinter    : See release notes here: https://rd.gt/416ObMi
+2026-05-04T14:21:04.614Z  INFO 7016 --- [portfolio-management] [           main] o.f.c.internal.license.VersionPrinter    : 
+2026-05-04T14:21:04.680Z  INFO 7016 --- [portfolio-management] [           main] org.flywaydb.core.FlywayExecutor         : Database: jdbc:h2:mem:testdb (H2 2.2)
+2026-05-04T14:21:04.695Z  WARN 7016 --- [portfolio-management] [           main] o.f.c.internal.database.base.Database    : Flyway upgrade recommended: H2 2.2.224 is newer than this version of Flyway and support has not been tested. The latest supported version of H2 is 2.2.220.
+2026-05-04T14:21:04.719Z  INFO 7016 --- [portfolio-management] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Schema history table "PUBLIC"."flyway_schema_history" does not exist yet
+2026-05-04T14:21:04.722Z  INFO 7016 --- [portfolio-management] [           main] o.f.core.internal.command.DbValidate     : Successfully validated 6 migrations (execution time 00:00.016s)
+2026-05-04T14:21:04.733Z  INFO 7016 --- [portfolio-management] [           main] o.f.c.i.s.JdbcTableSchemaHistory         : Creating Schema History table "PUBLIC"."flyway_schema_history" ...
+2026-05-04T14:21:04.770Z  INFO 7016 --- [portfolio-management] [           main] o.f.core.internal.command.DbMigrate      : Current version of schema "PUBLIC": << Empty Schema >>
+2026-05-04T14:21:04.779Z  INFO 7016 --- [portfolio-management] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "1 - create portfolio master"
+2026-05-04T14:21:04.797Z  INFO 7016 --- [portfolio-management] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "2 - create investment positions"
+2026-05-04T14:21:04.811Z  INFO 7016 --- [portfolio-management] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "3 - create transaction history"
+2026-05-04T14:21:04.821Z  INFO 7016 --- [portfolio-management] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "4 - create errlog"
+2026-05-04T14:21:04.832Z  INFO 7016 --- [portfolio-management] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "5 - create poshist"
+2026-05-04T14:21:04.847Z  INFO 7016 --- [portfolio-management] [           main] o.f.core.internal.command.DbMigrate      : Migrating schema "PUBLIC" to version "6 - create indexes views"
+2026-05-04T14:21:04.889Z  INFO 7016 --- [portfolio-management] [           main] o.f.core.internal.command.DbMigrate      : Successfully applied 6 migrations to schema "PUBLIC", now at version v6 (execution time 00:00.061s)
+2026-05-04T14:21:04.890Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'flywayInitializer' of type [org.springframework.boot.autoconfigure.flyway.FlywayMigrationInitializer] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:04.893Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.sql.init.DataSourceInitializationConfiguration' of type [org.springframework.boot.autoconfigure.sql.init.DataSourceInitializationConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:04.911Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'spring.sql.init-org.springframework.boot.autoconfigure.sql.init.SqlInitializationProperties' of type [org.springframework.boot.autoconfigure.sql.init.SqlInitializationProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:04.918Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'dataSourceScriptDatabaseInitializer' of type [org.springframework.boot.autoconfigure.sql.init.SqlDataSourceScriptDatabaseInitializer] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:04.922Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration$DataSourceInitializerConfiguration' of type [org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration$DataSourceInitializerConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:04.933Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'spring.batch-org.springframework.boot.autoconfigure.batch.BatchProperties' of type [org.springframework.boot.autoconfigure.batch.BatchProperties] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:04.986Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'batchDataSourceInitializer' of type [org.springframework.boot.autoconfigure.batch.BatchDataSourceScriptDatabaseInitializer] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:04.998Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'jpaVendorAdapter' of type [org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:05.005Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'entityManagerFactoryBuilder' of type [org.springframework.boot.orm.jpa.EntityManagerFactoryBuilder] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:05.018Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'persistenceManagedTypes' of type [org.springframework.orm.jpa.persistenceunit.SimplePersistenceManagedTypes] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:05.065Z  INFO 7016 --- [portfolio-management] [           main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2026-05-04T14:21:05.126Z  INFO 7016 --- [portfolio-management] [           main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.4.4.Final
+2026-05-04T14:21:05.175Z  INFO 7016 --- [portfolio-management] [           main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2026-05-04T14:21:05.397Z  INFO 7016 --- [portfolio-management] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-05-04T14:21:05.444Z  WARN 7016 --- [portfolio-management] [           main] org.hibernate.orm.deprecation            : HHH90000025: H2Dialect does not need to be specified explicitly using 'hibernate.dialect' (remove the property setting and it will be selected by default)
+2026-05-04T14:21:06.502Z  INFO 7016 --- [portfolio-management] [           main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2026-05-04T14:21:06.527Z  INFO 7016 --- [portfolio-management] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-05-04T14:21:06.530Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'entityManagerFactory' of type [org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:06.540Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'entityManagerFactory' of type [jdk.proxy2.$Proxy144] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:06.556Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'transactionManager' of type [org.springframework.orm.jpa.JpaTransactionManager] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). Is this bean getting eagerly injected into a currently created BeanPostProcessor [jobRegistryBeanPostProcessor]? Check the corresponding BeanPostProcessor declaration and its dependencies.
+2026-05-04T14:21:06.574Z  WARN 7016 --- [portfolio-management] [           main] trationDelegate$BeanPostProcessorChecker : Bean 'org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration$SpringBootBatchConfiguration' of type [org.springframework.boot.autoconfigure.batch.BatchAutoConfiguration$SpringBootBatchConfiguration] is not eligible for getting processed by all BeanPostProcessors (for example: not eligible for auto-proxying). The currently created BeanPostProcessor [jobRegistryBeanPostProcessor] is declared through a non-static factory method on that class; consider declaring it as static instead.
+2026-05-04T14:21:07.209Z  INFO 7016 --- [portfolio-management] [           main] o.s.d.j.r.query.QueryEnhancerFactory     : Hibernate is in classpath; If applicable, HQL parser will be used.
+Hibernate: 
+    select
+        al1_0.id,
+        al1_0.account_no,
+        al1_0.action,
+        al1_0.after_image,
+        al1_0.audit_timestamp,
+        al1_0.audit_type,
+        al1_0.before_image,
+        al1_0.message,
+        al1_0.portfolio_id,
+        al1_0.program,
+        al1_0.status,
+        al1_0.system_id,
+        al1_0.terminal,
+        al1_0.user_id 
+    from
+        audit_log al1_0
+Hibernate: 
+    select
+        t1_0.transaction_id,
+        t1_0.amount,
+        t1_0.currency_code,
+        t1_0.filler,
+        t1_0.investment_id,
+        t1_0.portfolio_id,
+        t1_0.price,
+        t1_0.process_date,
+        t1_0.process_user,
+        t1_0.quantity,
+        t1_0.sequence_no,
+        t1_0.status,
+        t1_0.transaction_date,
+        t1_0.transaction_time,
+        t1_0.transaction_type 
+    from
+        transaction_history t1_0 
+    where
+        t1_0.status=?
+Hibernate: 
+    select
+        p1_0.investment_id,
+        p1_0.portfolio_id,
+        p1_0.position_date,
+        p1_0.cost_basis,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.market_value,
+        p1_0.quantity,
+        p1_0.status 
+    from
+        investment_positions p1_0
+2026-05-04T14:21:08.302Z  WARN 7016 --- [portfolio-management] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-05-04T14:21:08.973Z  INFO 7016 --- [portfolio-management] [           main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 3 endpoint(s) beneath base path '/actuator'
+2026-05-04T14:21:09.072Z  INFO 7016 --- [portfolio-management] [           main] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.session.DisableEncodeUrlFilter@7cff8996, org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@4ea0ec5e, org.springframework.security.web.context.SecurityContextHolderFilter@4d760ddb, org.springframework.security.web.header.HeaderWriterFilter@7be1b23d, org.springframework.web.filter.CorsFilter@25dee62, org.springframework.security.web.csrf.CsrfFilter@234635cc, org.springframework.security.web.authentication.logout.LogoutFilter@7e58471, org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter@378c2cb4, org.springframework.security.web.authentication.ui.DefaultLoginPageGeneratingFilter@510fb1d8, org.springframework.security.web.authentication.ui.DefaultLogoutPageGeneratingFilter@18182680, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@332cf8ba, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@1500c6e7, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@18abaf2c, org.springframework.security.web.access.ExceptionTranslationFilter@492bbebe, org.springframework.security.web.access.intercept.AuthorizationFilter@2653b95f]
+2026-05-04T14:21:09.715Z  INFO 7016 --- [portfolio-management] [           main] o.s.b.a.h2.H2ConsoleAutoConfiguration    : H2 console available at '/h2-console'. Database available at 'jdbc:h2:mem:testdb'
+2026-05-04T14:21:09.804Z  INFO 7016 --- [portfolio-management] [           main] c.p.service.PortfolioServiceTest         : Started PortfolioServiceTest in 8.338 seconds (process running for 9.365)
+Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+Hibernate: 
+    insert 
+    into
+        portfolio_master
+        (account_type, branch_id, cash_balance, client_id, client_name, client_type, close_date, currency_code, filler, last_maint_date, last_maint_user, last_trans_date, open_date, portfolio_name, risk_level, status, total_value, portfolio_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        audit_log
+        (account_no, action, after_image, audit_timestamp, audit_type, before_image, message, portfolio_id, program, status, system_id, terminal, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-04T14:21:10.625Z DEBUG 7016 --- [portfolio-management] [           main] c.portfolio.service.common.AuditService  : Audit logged: TRAN CREATE SUCC for portfolio UPDT0001
+2026-05-04T14:21:10.626Z  INFO 7016 --- [portfolio-management] [           main] c.p.service.portfolio.PortfolioService   : Portfolio created: UPDT0001
+Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+Hibernate: 
+    insert 
+    into
+        audit_log
+        (account_no, action, after_image, audit_timestamp, audit_type, before_image, message, portfolio_id, program, status, system_id, terminal, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-04T14:21:10.640Z DEBUG 7016 --- [portfolio-management] [           main] c.portfolio.service.common.AuditService  : Audit logged: TRAN UPDATE SUCC for portfolio UPDT0001
+2026-05-04T14:21:10.640Z  INFO 7016 --- [portfolio-management] [           main] c.p.service.portfolio.PortfolioService   : Portfolio updated: UPDT0001
+Hibernate: 
+    update
+        portfolio_master 
+    set
+        account_type=?,
+        branch_id=?,
+        cash_balance=?,
+        client_id=?,
+        client_name=?,
+        client_type=?,
+        close_date=?,
+        currency_code=?,
+        filler=?,
+        last_maint_date=?,
+        last_maint_user=?,
+        last_trans_date=?,
+        open_date=?,
+        portfolio_name=?,
+        risk_level=?,
+        status=?,
+        total_value=? 
+    where
+        portfolio_id=?
+]]></system-out>
+    <system-err><![CDATA[WARNING: A Java agent has been loaded dynamically (/home/ubuntu/.m2/repository/net/bytebuddy/byte-buddy-agent/1.14.13/byte-buddy-agent-1.14.13.jar)
+WARNING: If a serviceability tool is in use, please run with -XX:+EnableDynamicAgentLoading to hide this warning
+WARNING: If a serviceability tool is not in use, please run with -Djdk.instrument.traceUsage for more information
+WARNING: Dynamic loading of agents will be disallowed by default in a future release
+]]></system-err>
+  </testcase>
+  <testcase name="testCreatePortfolio" classname="com.portfolio.service.PortfolioServiceTest" time="0.024">
+    <system-out><![CDATA[Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0
+Hibernate: 
+    delete 
+    from
+        portfolio_master 
+    where
+        portfolio_id=?
+Hibernate: 
+    select
+        count(*) 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+Hibernate: 
+    insert 
+    into
+        portfolio_master
+        (account_type, branch_id, cash_balance, client_id, client_name, client_type, close_date, currency_code, filler, last_maint_date, last_maint_user, last_trans_date, open_date, portfolio_name, risk_level, status, total_value, portfolio_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        audit_log
+        (account_no, action, after_image, audit_timestamp, audit_type, before_image, message, portfolio_id, program, status, system_id, terminal, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-04T14:21:10.730Z DEBUG 7016 --- [portfolio-management] [           main] c.portfolio.service.common.AuditService  : Audit logged: TRAN CREATE SUCC for portfolio CREA0001
+2026-05-04T14:21:10.730Z  INFO 7016 --- [portfolio-management] [           main] c.p.service.portfolio.PortfolioService   : Portfolio created: CREA0001
+]]></system-out>
+  </testcase>
+  <testcase name="testUpdateNonExistentPortfolio" classname="com.portfolio.service.PortfolioServiceTest" time="0.021">
+    <system-out><![CDATA[Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0
+Hibernate: 
+    delete 
+    from
+        portfolio_master 
+    where
+        portfolio_id=?
+Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+]]></system-out>
+  </testcase>
+  <testcase name="testBigDecimalPreservation" classname="com.portfolio.service.PortfolioServiceTest" time="0.029">
+    <system-out><![CDATA[Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+Hibernate: 
+    insert 
+    into
+        portfolio_master
+        (account_type, branch_id, cash_balance, client_id, client_name, client_type, close_date, currency_code, filler, last_maint_date, last_maint_user, last_trans_date, open_date, portfolio_name, risk_level, status, total_value, portfolio_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        audit_log
+        (account_no, action, after_image, audit_timestamp, audit_type, before_image, message, portfolio_id, program, status, system_id, terminal, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-04T14:21:10.775Z DEBUG 7016 --- [portfolio-management] [           main] c.portfolio.service.common.AuditService  : Audit logged: TRAN CREATE SUCC for portfolio PREC0001
+2026-05-04T14:21:10.775Z  INFO 7016 --- [portfolio-management] [           main] c.p.service.portfolio.PortfolioService   : Portfolio created: PREC0001
+Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+]]></system-out>
+  </testcase>
+  <testcase name="testValidationRejectsInvalidClientType" classname="com.portfolio.service.PortfolioServiceTest" time="0.016">
+    <system-out><![CDATA[Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0
+Hibernate: 
+    delete 
+    from
+        portfolio_master 
+    where
+        portfolio_id=?
+]]></system-out>
+  </testcase>
+  <testcase name="testDeletePortfolio" classname="com.portfolio.service.PortfolioServiceTest" time="0.044">
+    <system-out><![CDATA[Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+Hibernate: 
+    insert 
+    into
+        portfolio_master
+        (account_type, branch_id, cash_balance, client_id, client_name, client_type, close_date, currency_code, filler, last_maint_date, last_maint_user, last_trans_date, open_date, portfolio_name, risk_level, status, total_value, portfolio_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        audit_log
+        (account_no, action, after_image, audit_timestamp, audit_type, before_image, message, portfolio_id, program, status, system_id, terminal, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-04T14:21:10.825Z DEBUG 7016 --- [portfolio-management] [           main] c.portfolio.service.common.AuditService  : Audit logged: TRAN CREATE SUCC for portfolio DEL00001
+2026-05-04T14:21:10.825Z  INFO 7016 --- [portfolio-management] [           main] c.p.service.portfolio.PortfolioService   : Portfolio created: DEL00001
+Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+Hibernate: 
+    insert 
+    into
+        audit_log
+        (account_no, action, after_image, audit_timestamp, audit_type, before_image, message, portfolio_id, program, status, system_id, terminal, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-04T14:21:10.833Z DEBUG 7016 --- [portfolio-management] [           main] c.portfolio.service.common.AuditService  : Audit logged: TRAN DELETE SUCC for portfolio DEL00001
+2026-05-04T14:21:10.834Z  INFO 7016 --- [portfolio-management] [           main] c.p.service.portfolio.PortfolioService   : Portfolio soft-deleted: DEL00001
+Hibernate: 
+    update
+        portfolio_master 
+    set
+        account_type=?,
+        branch_id=?,
+        cash_balance=?,
+        client_id=?,
+        client_name=?,
+        client_type=?,
+        close_date=?,
+        currency_code=?,
+        filler=?,
+        last_maint_date=?,
+        last_maint_user=?,
+        last_trans_date=?,
+        open_date=?,
+        portfolio_name=?,
+        risk_level=?,
+        status=?,
+        total_value=? 
+    where
+        portfolio_id=?
+Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+]]></system-out>
+  </testcase>
+  <testcase name="testCreateDuplicatePortfolio" classname="com.portfolio.service.PortfolioServiceTest" time="0.046">
+    <system-out><![CDATA[Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0
+Hibernate: 
+    delete 
+    from
+        portfolio_master 
+    where
+        portfolio_id=?
+Hibernate: 
+    select
+        count(*) 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+Hibernate: 
+    insert 
+    into
+        portfolio_master
+        (account_type, branch_id, cash_balance, client_id, client_name, client_type, close_date, currency_code, filler, last_maint_date, last_maint_user, last_trans_date, open_date, portfolio_name, risk_level, status, total_value, portfolio_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        audit_log
+        (account_no, action, after_image, audit_timestamp, audit_type, before_image, message, portfolio_id, program, status, system_id, terminal, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-04T14:21:10.880Z DEBUG 7016 --- [portfolio-management] [           main] c.portfolio.service.common.AuditService  : Audit logged: TRAN CREATE SUCC for portfolio DUP00001
+2026-05-04T14:21:10.880Z  INFO 7016 --- [portfolio-management] [           main] c.p.service.portfolio.PortfolioService   : Portfolio created: DUP00001
+Hibernate: 
+    select
+        count(*) 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+]]></system-out>
+  </testcase>
+  <testcase name="testGetPortfolioNotFound" classname="com.portfolio.service.PortfolioServiceTest" time="0.025">
+    <system-out><![CDATA[Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0
+Hibernate: 
+    delete 
+    from
+        portfolio_master 
+    where
+        portfolio_id=?
+Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+]]></system-out>
+  </testcase>
+  <testcase name="testGetPortfolio" classname="com.portfolio.service.PortfolioServiceTest" time="0.024">
+    <system-out><![CDATA[Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0
+Hibernate: 
+    select
+        count(*) 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+Hibernate: 
+    insert 
+    into
+        portfolio_master
+        (account_type, branch_id, cash_balance, client_id, client_name, client_type, close_date, currency_code, filler, last_maint_date, last_maint_user, last_trans_date, open_date, portfolio_name, risk_level, status, total_value, portfolio_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        audit_log
+        (account_no, action, after_image, audit_timestamp, audit_type, before_image, message, portfolio_id, program, status, system_id, terminal, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-04T14:21:10.939Z DEBUG 7016 --- [portfolio-management] [           main] c.portfolio.service.common.AuditService  : Audit logged: TRAN CREATE SUCC for portfolio READ0001
+2026-05-04T14:21:10.939Z  INFO 7016 --- [portfolio-management] [           main] c.p.service.portfolio.PortfolioService   : Portfolio created: READ0001
+Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+]]></system-out>
+  </testcase>
+  <testcase name="testGetActivePortfolios" classname="com.portfolio.service.PortfolioServiceTest" time="0.055">
+    <system-out><![CDATA[Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0
+Hibernate: 
+    delete 
+    from
+        portfolio_master 
+    where
+        portfolio_id=?
+Hibernate: 
+    select
+        count(*) 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+Hibernate: 
+    insert 
+    into
+        portfolio_master
+        (account_type, branch_id, cash_balance, client_id, client_name, client_type, close_date, currency_code, filler, last_maint_date, last_maint_user, last_trans_date, open_date, portfolio_name, risk_level, status, total_value, portfolio_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        audit_log
+        (account_no, action, after_image, audit_timestamp, audit_type, before_image, message, portfolio_id, program, status, system_id, terminal, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-04T14:21:10.968Z DEBUG 7016 --- [portfolio-management] [           main] c.portfolio.service.common.AuditService  : Audit logged: TRAN CREATE SUCC for portfolio ACT00001
+2026-05-04T14:21:10.969Z  INFO 7016 --- [portfolio-management] [           main] c.p.service.portfolio.PortfolioService   : Portfolio created: ACT00001
+Hibernate: 
+    select
+        count(*) 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.portfolio_id=?
+Hibernate: 
+    insert 
+    into
+        portfolio_master
+        (account_type, branch_id, cash_balance, client_id, client_name, client_type, close_date, currency_code, filler, last_maint_date, last_maint_user, last_trans_date, open_date, portfolio_name, risk_level, status, total_value, portfolio_id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    insert 
+    into
+        audit_log
+        (account_no, action, after_image, audit_timestamp, audit_type, before_image, message, portfolio_id, program, status, system_id, terminal, user_id, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, default)
+2026-05-04T14:21:10.977Z DEBUG 7016 --- [portfolio-management] [           main] c.portfolio.service.common.AuditService  : Audit logged: TRAN CREATE SUCC for portfolio ACT00002
+2026-05-04T14:21:10.979Z  INFO 7016 --- [portfolio-management] [           main] c.p.service.portfolio.PortfolioService   : Portfolio created: ACT00002
+Hibernate: 
+    select
+        p1_0.portfolio_id,
+        p1_0.account_type,
+        p1_0.branch_id,
+        p1_0.cash_balance,
+        p1_0.client_id,
+        p1_0.client_name,
+        p1_0.client_type,
+        p1_0.close_date,
+        p1_0.currency_code,
+        p1_0.filler,
+        p1_0.last_maint_date,
+        p1_0.last_maint_user,
+        p1_0.last_trans_date,
+        p1_0.open_date,
+        p1_0.portfolio_name,
+        p1_0.risk_level,
+        p1_0.status,
+        p1_0.total_value 
+    from
+        portfolio_master p1_0 
+    where
+        p1_0.status='A' 
+        and (
+            p1_0.close_date is null 
+            or p1_0.close_date>current_date
+        )
+]]></system-out>
+  </testcase>
+</testsuite>

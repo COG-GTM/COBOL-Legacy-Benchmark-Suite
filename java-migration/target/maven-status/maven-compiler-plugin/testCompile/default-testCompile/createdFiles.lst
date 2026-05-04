@@ -1,0 +1,5 @@
+com/portfolio/service/PortfolioServiceTest.class
+com/portfolio/TestValidationSuite.class
+com/portfolio/batch/HistoryLoadJobTest.class
+com/portfolio/TestDataGenerator.class
+com/portfolio/web/InquiryControllerTest.class

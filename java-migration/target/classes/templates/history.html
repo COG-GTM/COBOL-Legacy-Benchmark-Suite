@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Transaction History</title>
+    <style>
+        body { font-family: 'Courier New', monospace; background: #000; color: #0f0; padding: 20px; }
+        h1 { color: #0ff; }
+        h2 { color: #0ff; border-bottom: 1px solid #0ff; padding-bottom: 5px; }
+        table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+        th, td { padding: 8px 12px; text-align: left; border: 1px solid #0f0; }
+        th { background: #003; color: #0ff; }
+        a { color: #ff0; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        .nav { margin-top: 20px; }
+        .nav a { margin-right: 20px; padding: 5px 10px; border: 1px solid #0f0; }
+        .paging { margin-top: 15px; }
+    </style>
+</head>
+<body>
+<!-- HISMAP - Transaction History (replaces BMS map HISMAP from INQSET.bms, 10 rows) -->
+<h1>TRANSACTION HISTORY INQUIRY</h1>
+
+<div th:if="${portfolio != null}">
+    <p>Account: <span th:text="${portfolio.portfolioId}"></span> |
+       Client: <span th:text="${portfolio.clientName}"></span></p>
+</div>
+
+<h2>Transaction History</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Date</th>
+            <th>Time</th>
+            <th>Type</th>
+            <th>Investment</th>
+            <th>Quantity</th>
+            <th>Price</th>
+            <th>Amount</th>
+            <th>Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr th:each="txn : ${transactions.content}">
+            <td th:text="${txn.transactionDate}"></td>
+            <td th:text="${txn.transactionTime}"></td>
+            <td th:text="${txn.transactionType}"></td>
+            <td th:text="${txn.investmentId}"></td>
+            <td th:text="${#numbers.formatDecimal(txn.quantity, 1, 4)}"></td>
+            <td th:text="${#numbers.formatDecimal(txn.price, 1, 4)}"></td>
+            <td th:text="${#numbers.formatDecimal(txn.amount, 1, 2)}"></td>
+            <td th:text="${txn.status}"></td>
+        </tr>
+        <tr th:if="${transactions.empty}">
+            <td colspan="8">No transaction history found.</td>
+        </tr>
+    </tbody>
+</table>
+
+<!-- PF7=Previous, PF8=Next -> pagination controls -->
+<div class="paging">
+    <a th:if="${currentPage > 0}"
+       th:href="@{/portfolio/{id}/history(id=${accountNo}, page=${currentPage - 1}, size=10)}">
+        PF7=Previous
+    </a>
+    <span>Page <span th:text="${currentPage + 1}"></span> of <span th:text="${totalPages}"></span></span>
+    <a th:if="${currentPage + 1 < totalPages}"
+       th:href="@{/portfolio/{id}/history(id=${accountNo}, page=${currentPage + 1}, size=10)}">
+        PF8=Next
+    </a>
+</div>
+
+<div class="nav">
+    <a th:href="@{/menu}">PF3=Menu</a>
+    <a th:href="@{/portfolio/{id}/positions(id=${accountNo})}">View Positions</a>
+</div>
+</body>
+</html>
