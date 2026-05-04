@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Investment Portfolio Management System</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="brand">Investment Portfolio Management System</a>
+        <ul class="nav-links">
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/inquiry/portfolio}">Portfolio Inquiry</a></li>
+            <li><a th:href="@{/inquiry/history}">History Inquiry</a></li>
+            <li><a th:href="@{/batch}">Batch Jobs</a></li>
+            <li><a th:href="@{/admin/monitor}">System Monitor</a></li>
+            <li><a th:href="@{/h2-console}">H2 Console</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title">Main Menu</h1>
+
+        <div class="menu-grid">
+            <a th:href="@{/inquiry/portfolio}" class="menu-item">
+                <h3>1. Portfolio Position Inquiry</h3>
+                <p>Search and display current portfolio positions, cost basis, market value, and gain/loss analysis.</p>
+            </a>
+            <a th:href="@{/inquiry/history}" class="menu-item">
+                <h3>2. Transaction History Inquiry</h3>
+                <p>Search and display transaction history including buys, sells, transfers, and fees.</p>
+            </a>
+            <a th:href="@{/batch}" class="menu-item">
+                <h3>3. Batch Job Management</h3>
+                <p>Trigger and monitor daily batch processing: validation, position updates, history load, and reports.</p>
+            </a>
+            <a th:href="@{/admin/monitor}" class="menu-item">
+                <h3>4. System Monitor</h3>
+                <p>View system health, JVM metrics, database statistics, and error summaries.</p>
+            </a>
+            <a th:href="@{/h2-console}" class="menu-item" target="_blank">
+                <h3>5. H2 Database Console</h3>
+                <p>Direct SQL access to the in-memory H2 database. JDBC URL: jdbc:h2:mem:portfoliodb</p>
+            </a>
+            <a th:href="@{/admin/validate}" class="menu-item">
+                <h3>6. Data Validation</h3>
+                <p>Run data integrity checks across all tables and report any issues found.</p>
+            </a>
+        </div>
+
+        <h2 style="margin-top: 2rem; color: var(--primary);">Database Statistics</h2>
+        <div class="grid grid-4" style="margin-top: 1rem;">
+            <div class="card stat-card" th:each="entry : ${tableCounts}">
+                <div class="stat-value" th:text="${entry.value}">0</div>
+                <div class="stat-label" th:text="${entry.key}">Table</div>
+            </div>
+        </div>
+
+        <h2 style="margin-top: 1.5rem; color: var(--primary);">Transaction Summary</h2>
+        <div class="grid grid-4" style="margin-top: 1rem;">
+            <div class="card stat-card" th:each="entry : ${transactionStats}">
+                <div class="stat-value" th:text="${entry.value}">0</div>
+                <div class="stat-label" th:text="${entry.key}">Status</div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        Investment Portfolio Management System &mdash; Migrated from COBOL/CICS/DB2 to Java Spring Boot
+    </footer>
+</body>
+</html>

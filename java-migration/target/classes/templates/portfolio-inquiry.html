@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Position Inquiry</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="brand">Investment Portfolio Management System</a>
+        <ul class="nav-links">
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/inquiry/portfolio}">Portfolio Inquiry</a></li>
+            <li><a th:href="@{/inquiry/history}">History Inquiry</a></li>
+            <li><a th:href="@{/batch}">Batch Jobs</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title">Portfolio Position Inquiry</h1>
+
+        <div class="card">
+            <h3>Search Portfolio</h3>
+            <form th:action="@{/inquiry/portfolio/search}" method="get" class="form-inline">
+                <div class="form-group">
+                    <label for="portfolioId">Portfolio ID</label>
+                    <input type="text" id="portfolioId" name="portfolioId" placeholder="e.g. PORT0001" maxlength="8">
+                </div>
+                <div class="form-group">
+                    <label for="clientId">or Client ID</label>
+                    <input type="text" id="clientId" name="clientId" placeholder="e.g. CLT0000001" maxlength="10">
+                </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+        <div th:if="${portfolio}" class="card">
+            <h3>Portfolio Details</h3>
+            <div class="grid grid-2">
+                <div>
+                    <div class="detail-row">
+                        <span class="label">Portfolio ID:</span>
+                        <span class="value" th:text="${portfolio.portfolioId}"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Name:</span>
+                        <span class="value" th:text="${portfolio.portfolioName}"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Client:</span>
+                        <span class="value" th:text="${portfolio.clientName}"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Client ID:</span>
+                        <span class="value" th:text="${portfolio.clientId}"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Account No:</span>
+                        <span class="value" th:text="${portfolio.accountNo}"></span>
+                    </div>
+                </div>
+                <div>
+                    <div class="detail-row">
+                        <span class="label">Status:</span>
+                        <span class="badge" th:classappend="${portfolio.status == 'A' ? 'badge-active' : (portfolio.status == 'C' ? 'badge-closed' : 'badge-suspended')}"
+                              th:text="${portfolio.status == 'A' ? 'Active' : (portfolio.status == 'C' ? 'Closed' : 'Suspended')}"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Currency:</span>
+                        <span class="value" th:text="${portfolio.currencyCode}"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Total Value:</span>
+                        <span class="value" th:text="${#numbers.formatDecimal(portfolio.totalValue, 1, 'COMMA', 2, 'POINT')}"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Cash Balance:</span>
+                        <span class="value" th:text="${#numbers.formatDecimal(portfolio.cashBalance, 1, 'COMMA', 2, 'POINT')}"></span>
+                    </div>
+                    <div class="detail-row">
+                        <span class="label">Open Date:</span>
+                        <span class="value" th:text="${portfolio.openDate}"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${analysis}" class="card">
+            <h3>Return Analysis</h3>
+            <div class="grid grid-3">
+                <div class="stat-card">
+                    <div class="stat-value" th:text="${#numbers.formatDecimal(analysis['totalCostBasis'], 1, 'COMMA', 2, 'POINT')}">0</div>
+                    <div class="stat-label">Total Cost Basis</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" th:text="${#numbers.formatDecimal(analysis['totalMarketValue'], 1, 'COMMA', 2, 'POINT')}">0</div>
+                    <div class="stat-label">Total Market Value</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value"
+                         th:classappend="${analysis['totalGainLoss'].signum() >= 0 ? 'positive' : 'negative'}"
+                         th:text="${#numbers.formatDecimal(analysis['totalGainLoss'], 1, 'COMMA', 2, 'POINT')}">0</div>
+                    <div class="stat-label">Total Gain/Loss (<span th:text="${#numbers.formatDecimal(analysis['returnPercentage'], 1, 2)}"></span>%)</div>
+                </div>
+            </div>
+        </div>
+
+        <div th:if="${positions != null and !positions.isEmpty()}" class="card">
+            <h3>Current Positions</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Investment ID</th>
+                        <th>Date</th>
+                        <th>Quantity</th>
+                        <th>Cost Basis</th>
+                        <th>Market Value</th>
+                        <th>Gain/Loss</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="pos : ${positions}">
+                        <td th:text="${pos.investmentId}"></td>
+                        <td th:text="${pos.positionDate}"></td>
+                        <td th:text="${#numbers.formatDecimal(pos.quantity, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:text="${'$' + #numbers.formatDecimal(pos.costBasis, 1, 'COMMA', 2, 'POINT')}"></td>
+                        <td th:text="${'$' + #numbers.formatDecimal(pos.marketValue, 1, 'COMMA', 2, 'POINT')}"></td>
+                        <td th:classappend="${pos.gainLoss.signum() >= 0 ? 'positive' : 'negative'}"
+                            th:text="${'$' + #numbers.formatDecimal(pos.gainLoss, 1, 'COMMA', 2, 'POINT')}"></td>
+                        <td>
+                            <span class="badge" th:classappend="${pos.status == 'A' ? 'badge-active' : 'badge-closed'}"
+                                  th:text="${pos.status == 'A' ? 'Active' : 'Closed'}"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${portfolios != null and !portfolios.isEmpty() and portfolio == null}" class="card">
+            <h3>All Portfolios</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Portfolio ID</th>
+                        <th>Name</th>
+                        <th>Client</th>
+                        <th>Total Value</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="p : ${portfolios}">
+                        <td th:text="${p.portfolioId}"></td>
+                        <td th:text="${p.portfolioName}"></td>
+                        <td th:text="${p.clientName}"></td>
+                        <td th:text="${'$' + #numbers.formatDecimal(p.totalValue, 1, 'COMMA', 2, 'POINT')}"></td>
+                        <td>
+                            <span class="badge" th:classappend="${p.status == 'A' ? 'badge-active' : (p.status == 'C' ? 'badge-closed' : 'badge-suspended')}"
+                                  th:text="${p.status == 'A' ? 'Active' : (p.status == 'C' ? 'Closed' : 'Suspended')}"></span>
+                        </td>
+                        <td>
+                            <a th:href="@{/inquiry/portfolio/search(portfolioId=${p.portfolioId})}" class="btn btn-primary" style="padding: 0.3rem 0.8rem; font-size: 0.85rem;">View</a>
+                            <a th:href="@{/inquiry/history/search(portfolioId=${p.portfolioId})}" class="btn btn-success" style="padding: 0.3rem 0.8rem; font-size: 0.85rem;">History</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        Investment Portfolio Management System &mdash; Translated from INQPORT.cbl / POSMAP (BMS)
+    </footer>
+</body>
+</html>
