@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Error</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="brand">Investment Portfolio Management System</a>
+        <ul class="nav-links">
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/inquiry/portfolio}">Portfolio Inquiry</a></li>
+            <li><a th:href="@{/inquiry/history}">History Inquiry</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title">Error</h1>
+
+        <div class="card">
+            <div class="alert alert-danger">
+                <h3 th:text="${errorType != null ? errorType : 'Error'}">Error</h3>
+                <p th:text="${errorMessage != null ? errorMessage : 'An unexpected error occurred.'}"></p>
+            </div>
+            <a th:href="@{/}" class="btn btn-primary">Return to Main Menu</a>
+        </div>
+    </div>
+
+    <footer>
+        Investment Portfolio Management System &mdash; Translated from ERRHNDL.cbl
+    </footer>
+</body>
+</html>

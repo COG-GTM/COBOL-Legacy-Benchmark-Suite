@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transaction History Inquiry</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="brand">Investment Portfolio Management System</a>
+        <ul class="nav-links">
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/inquiry/portfolio}">Portfolio Inquiry</a></li>
+            <li><a th:href="@{/inquiry/history}">History Inquiry</a></li>
+            <li><a th:href="@{/batch}">Batch Jobs</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title">Transaction History Inquiry</h1>
+
+        <div class="card">
+            <h3>Search Transaction History</h3>
+            <form th:action="@{/inquiry/history/search}" method="get" class="form-inline">
+                <div class="form-group">
+                    <label for="portfolioId">Portfolio ID</label>
+                    <input type="text" id="portfolioId" name="portfolioId" placeholder="e.g. PORT0001" maxlength="8" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+
+        <div th:if="${infoMessage}" class="alert alert-info" th:text="${infoMessage}"></div>
+
+        <div th:if="${portfolio}" class="card">
+            <h3>Portfolio: <span th:text="${portfolio.portfolioId}"></span> - <span th:text="${portfolio.portfolioName}"></span></h3>
+            <div class="detail-row">
+                <span class="label">Client:</span>
+                <span class="value" th:text="${portfolio.clientName}"></span>
+            </div>
+            <div class="detail-row">
+                <span class="label">Status:</span>
+                <span class="badge" th:classappend="${portfolio.status == 'A' ? 'badge-active' : 'badge-closed'}"
+                      th:text="${portfolio.status == 'A' ? 'Active' : 'Closed'}"></span>
+            </div>
+        </div>
+
+        <div th:if="${transactions != null and !transactions.isEmpty()}" class="card">
+            <h3>Transaction History (<span th:text="${transactions.size()}"></span> records)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Time</th>
+                        <th>Type</th>
+                        <th>Investment</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                        <th>Amount</th>
+                        <th>Currency</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="t : ${transactions}">
+                        <td th:text="${t.transactionDate}"></td>
+                        <td th:text="${t.transactionTime}"></td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${t.transactionType == 'BU' ? 'badge-active' : (t.transactionType == 'SL' ? 'badge-closed' : 'badge-pending')}"
+                                  th:text="${t.transactionTypeDisplay}"></span>
+                        </td>
+                        <td th:text="${t.investmentId}"></td>
+                        <td th:text="${#numbers.formatDecimal(t.quantity, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:text="${'$' + #numbers.formatDecimal(t.price, 1, 'COMMA', 4, 'POINT')}"></td>
+                        <td th:text="${'$' + #numbers.formatDecimal(t.amount, 1, 'COMMA', 2, 'POINT')}"></td>
+                        <td th:text="${t.currencyCode}"></td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${t.status == 'D' ? 'badge-active' : (t.status == 'F' ? 'badge-closed' : 'badge-pending')}"
+                                  th:text="${t.status == 'D' ? 'Done' : (t.status == 'F' ? 'Failed' : (t.status == 'P' ? 'Pending' : 'Reversed'))}"></span>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div th:if="${portfolios != null and !portfolios.isEmpty() and transactions == null}" class="card">
+            <h3>Available Portfolios</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Portfolio ID</th>
+                        <th>Name</th>
+                        <th>Client</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="p : ${portfolios}">
+                        <td th:text="${p.portfolioId}"></td>
+                        <td th:text="${p.portfolioName}"></td>
+                        <td th:text="${p.clientName}"></td>
+                        <td>
+                            <span class="badge" th:classappend="${p.status == 'A' ? 'badge-active' : 'badge-closed'}"
+                                  th:text="${p.status == 'A' ? 'Active' : 'Closed'}"></span>
+                        </td>
+                        <td>
+                            <a th:href="@{/inquiry/history/search(portfolioId=${p.portfolioId})}" class="btn btn-primary" style="padding: 0.3rem 0.8rem; font-size: 0.85rem;">View History</a>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <footer>
+        Investment Portfolio Management System &mdash; Translated from INQHIST.cbl / HISMAP (BMS)
+    </footer>
+</body>
+</html>

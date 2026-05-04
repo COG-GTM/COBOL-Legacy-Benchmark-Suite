@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System Monitor</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="brand">Investment Portfolio Management System</a>
+        <ul class="nav-links">
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/inquiry/portfolio}">Portfolio Inquiry</a></li>
+            <li><a th:href="@{/inquiry/history}">History Inquiry</a></li>
+            <li><a th:href="@{/batch}">Batch Jobs</a></li>
+            <li><a th:href="@{/admin/monitor}">System Monitor</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title">System Monitor</h1>
+
+        <div class="grid grid-2">
+            <div class="card">
+                <h3>JVM Information</h3>
+                <div class="detail-row">
+                    <span class="label">Uptime:</span>
+                    <span class="value" th:text="${systemStatus['uptime']}"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">JVM:</span>
+                    <span class="value" th:text="${systemStatus['jvmName']}"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Version:</span>
+                    <span class="value" th:text="${systemStatus['jvmVersion']}"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Processors:</span>
+                    <span class="value" th:text="${systemStatus['availableProcessors']}"></span>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>Memory Usage</h3>
+                <div class="detail-row">
+                    <span class="label">Heap Used:</span>
+                    <span class="value" th:text="${systemStatus['heapUsedMB'] + ' MB'}"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Heap Max:</span>
+                    <span class="value" th:text="${systemStatus['heapMaxMB'] + ' MB'}"></span>
+                </div>
+                <div class="detail-row">
+                    <span class="label">Usage:</span>
+                    <span class="value" th:text="${systemStatus['heapUsagePercent'] + '%'}"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Database Table Counts</h3>
+            <div class="grid grid-4">
+                <div class="stat-card" th:each="entry : ${systemStatus['tableCounts']}">
+                    <div class="stat-value" th:text="${entry.value}">0</div>
+                    <div class="stat-label" th:text="${entry.key}">Table</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3>Transaction Statistics</h3>
+            <div class="grid grid-4">
+                <div class="stat-card" th:each="entry : ${systemStatus['transactionStats']}">
+                    <div class="stat-value" th:text="${entry.value}">0</div>
+                    <div class="stat-label" th:text="${entry.key}">Status</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer>
+        Investment Portfolio Management System &mdash; Translated from UTLMON00.cbl
+    </footer>
+</body>
+</html>

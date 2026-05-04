@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Batch Job Management</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+</head>
+<body>
+    <nav class="navbar">
+        <a href="/" class="brand">Investment Portfolio Management System</a>
+        <ul class="nav-links">
+            <li><a th:href="@{/}">Home</a></li>
+            <li><a th:href="@{/inquiry/portfolio}">Portfolio Inquiry</a></li>
+            <li><a th:href="@{/inquiry/history}">History Inquiry</a></li>
+            <li><a th:href="@{/batch}">Batch Jobs</a></li>
+            <li><a th:href="@{/logout}">Logout</a></li>
+        </ul>
+    </nav>
+
+    <div class="container">
+        <h1 class="page-title">Batch Job Management</h1>
+
+        <div th:if="${successMessage}" class="alert alert-success" th:text="${successMessage}"></div>
+        <div th:if="${errorMessage}" class="alert alert-danger" th:text="${errorMessage}"></div>
+
+        <div class="card">
+            <h3>Batch Job Controls</h3>
+            <p style="margin-bottom: 1rem;">Trigger the daily batch processing sequence: Transaction Validation &rarr; Position Update &rarr; History Load &rarr; Report Generation</p>
+            <form th:action="@{/batch/run-daily}" method="post" style="display: inline;">
+                <button type="submit" class="btn btn-success">Run Daily Batch Job</button>
+            </form>
+            <p style="margin-top: 0.5rem; font-size: 0.85rem; color: #7f8c8d;">
+                Translated from JCL: BCHCTL00 &rarr; TRNVAL00 &rarr; POSUPD00 &rarr; HISTLD00 &rarr; Reports
+            </p>
+        </div>
+
+        <div class="card">
+            <h3>Recent Batch Jobs</h3>
+            <table th:if="${recentJobs != null and !recentJobs.isEmpty()}">
+                <thead>
+                    <tr>
+                        <th>Job Name</th>
+                        <th>Process Date</th>
+                        <th>Status</th>
+                        <th>Program</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>RC</th>
+                        <th>Read</th>
+                        <th>Processed</th>
+                        <th>Errors</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="job : ${recentJobs}">
+                        <td th:text="${job.jobName}"></td>
+                        <td th:text="${job.processDate}"></td>
+                        <td>
+                            <span class="badge"
+                                  th:classappend="${job.status == 'D' ? 'badge-active' : (job.status == 'E' ? 'badge-closed' : (job.status == 'A' ? 'badge-pending' : 'badge-suspended'))}"
+                                  th:text="${job.status == 'D' ? 'Done' : (job.status == 'E' ? 'Error' : (job.status == 'A' ? 'Active' : 'Ready'))}"></span>
+                        </td>
+                        <td th:text="${job.programName}"></td>
+                        <td th:text="${job.startTime != null ? #temporals.format(job.startTime, 'HH:mm:ss') : '-'}"></td>
+                        <td th:text="${job.endTime != null ? #temporals.format(job.endTime, 'HH:mm:ss') : '-'}"></td>
+                        <td th:text="${job.returnCode}"></td>
+                        <td th:text="${job.recordsRead}"></td>
+                        <td th:text="${job.recordsProcessed}"></td>
+                        <td th:text="${job.recordsError}"></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p th:if="${recentJobs == null or recentJobs.isEmpty()}" style="color: #7f8c8d;">No batch jobs have been run yet.</p>
+        </div>
+    </div>
+
+    <footer>
+        Investment Portfolio Management System &mdash; Translated from BCHCTL00.cbl / JCL batch definitions
+    </footer>
+</body>
+</html>
