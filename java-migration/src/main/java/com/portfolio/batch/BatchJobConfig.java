@@ -158,12 +158,18 @@ public class BatchJobConfig {
     private ItemReader<TransactionRecord> pendingTransactionReader() {
         return new ItemReader<>() {
             private Iterator<TransactionRecord> iterator;
+            private boolean initialized = false;
             @Override
             public TransactionRecord read() {
-                if (iterator == null) {
+                if (!initialized) {
                     iterator = transactionRepository.findByStatus("P").iterator();
+                    initialized = true;
                 }
-                return iterator.hasNext() ? iterator.next() : null;
+                if (iterator.hasNext()) {
+                    return iterator.next();
+                }
+                initialized = false;
+                return null;
             }
         };
     }
@@ -201,12 +207,18 @@ public class BatchJobConfig {
     private ItemReader<TransactionRecord> completedTransactionReader() {
         return new ItemReader<>() {
             private Iterator<TransactionRecord> iterator;
+            private boolean initialized = false;
             @Override
             public TransactionRecord read() {
-                if (iterator == null) {
+                if (!initialized) {
                     iterator = transactionRepository.findByStatus("D").iterator();
+                    initialized = true;
                 }
-                return iterator.hasNext() ? iterator.next() : null;
+                if (iterator.hasNext()) {
+                    return iterator.next();
+                }
+                initialized = false;
+                return null;
             }
         };
     }
@@ -214,19 +226,27 @@ public class BatchJobConfig {
     private ItemReader<TransactionRecord> completedTransactionReaderForHistory() {
         return new ItemReader<>() {
             private Iterator<TransactionRecord> iterator;
+            private boolean initialized = false;
             @Override
             public TransactionRecord read() {
-                if (iterator == null) {
-                    iterator = transactionRepository.findByStatus("D").iterator();
+                if (!initialized) {
+                    iterator = transactionRepository.findByStatus("U").iterator();
+                    initialized = true;
                 }
-                return iterator.hasNext() ? iterator.next() : null;
+                if (iterator.hasNext()) {
+                    return iterator.next();
+                }
+                initialized = false;
+                return null;
             }
         };
     }
 
     private ItemProcessor<TransactionRecord, PositionRecord> positionUpdateProcessor() {
-        Map<String, PositionRecord> chunkPositionCache = new HashMap<>();
-        return transaction -> {
+        return new ItemProcessor<>() {
+            private final Map<String, PositionRecord> chunkPositionCache = new HashMap<>();
+            @Override
+            public PositionRecord process(TransactionRecord transaction) {
             String cacheKey = transaction.getPortfolioId() + "|" + transaction.getInvestmentId();
             PositionRecord position = chunkPositionCache.get(cacheKey);
 
@@ -271,7 +291,10 @@ public class BatchJobConfig {
             position.setLastMaintDate(LocalDateTime.now());
             position.setLastMaintUser("BATCH");
             chunkPositionCache.put(cacheKey, position);
+            transaction.setStatus("U");
+            transactionRepository.save(transaction);
             return position;
+        }
         };
     }
 
@@ -311,6 +334,10 @@ public class BatchJobConfig {
         return chunk -> {
             for (HistoryRecord h : chunk.getItems()) {
                 historyRepository.save(h);
+            }
+            for (TransactionRecord t : transactionRepository.findByStatus("U")) {
+                t.setStatus("C");
+                transactionRepository.save(t);
             }
         };
     }
