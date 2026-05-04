@@ -225,12 +225,18 @@ public class BatchJobConfig {
     }
 
     private ItemProcessor<TransactionRecord, PositionRecord> positionUpdateProcessor() {
+        Map<String, PositionRecord> chunkPositionCache = new HashMap<>();
         return transaction -> {
-            List<PositionRecord> existing = positionRepository.findByPortfolioId(transaction.getPortfolioId());
-            PositionRecord position = existing.stream()
-                    .filter(p -> transaction.getInvestmentId().equals(p.getInvestmentId()))
-                    .findFirst()
-                    .orElse(null);
+            String cacheKey = transaction.getPortfolioId() + "|" + transaction.getInvestmentId();
+            PositionRecord position = chunkPositionCache.get(cacheKey);
+
+            if (position == null) {
+                List<PositionRecord> existing = positionRepository.findByPortfolioId(transaction.getPortfolioId());
+                position = existing.stream()
+                        .filter(p -> transaction.getInvestmentId().equals(p.getInvestmentId()))
+                        .findFirst()
+                        .orElse(null);
+            }
 
             if (position == null) {
                 position = new PositionRecord();
@@ -248,10 +254,12 @@ public class BatchJobConfig {
                 case "BU":
                     position.setQuantity(position.getQuantity().add(transaction.getQuantity()));
                     position.setCostBasis(position.getCostBasis().add(transaction.getAmount()));
+                    position.setMarketValue(position.getQuantity().multiply(transaction.getPrice()));
                     break;
                 case "SL":
                     position.setQuantity(position.getQuantity().subtract(transaction.getQuantity()));
                     position.setCostBasis(position.getCostBasis().subtract(transaction.getAmount()));
+                    position.setMarketValue(position.getQuantity().multiply(transaction.getPrice()));
                     break;
                 case "FE":
                     position.setCostBasis(position.getCostBasis().add(transaction.getAmount()));
@@ -259,17 +267,22 @@ public class BatchJobConfig {
                 default:
                     break;
             }
-            position.setMarketValue(position.getQuantity().multiply(transaction.getPrice()));
             position.setPositionDate(LocalDate.now());
             position.setLastMaintDate(LocalDateTime.now());
             position.setLastMaintUser("BATCH");
+            chunkPositionCache.put(cacheKey, position);
             return position;
         };
     }
 
     private ItemWriter<PositionRecord> positionWriter() {
         return chunk -> {
+            Map<String, PositionRecord> deduped = new LinkedHashMap<>();
             for (PositionRecord p : chunk.getItems()) {
+                String key = p.getPortfolioId() + "|" + p.getInvestmentId();
+                deduped.put(key, p);
+            }
+            for (PositionRecord p : deduped.values()) {
                 positionRepository.save(p);
             }
         };

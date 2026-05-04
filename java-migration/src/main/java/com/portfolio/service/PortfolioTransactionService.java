@@ -69,7 +69,11 @@ public class PortfolioTransactionService {
         transaction.setStatus("D");
 
         if (transaction.getAmount() == null || transaction.getAmount().compareTo(BigDecimal.ZERO) == 0) {
-            transaction.setAmount(transaction.getQuantity().multiply(transaction.getPrice()));
+            if (transaction.getPrice() != null) {
+                transaction.setAmount(transaction.getQuantity().multiply(transaction.getPrice()));
+            } else {
+                transaction.setAmount(BigDecimal.ZERO);
+            }
         }
 
         updatePosition(transaction);
