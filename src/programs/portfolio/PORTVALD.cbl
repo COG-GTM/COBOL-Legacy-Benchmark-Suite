@@ -89,10 +89,10 @@
       *----------------------------------------------------------------*
       * Investment type must be valid value
       *----------------------------------------------------------------*
-           IF LS-INPUT-VALUE NOT = 'STK'
-              AND NOT = 'BND'
-              AND NOT = 'MMF'
-              AND NOT = 'ETF'
+           IF LS-INPUT-VALUE NOT = VAL-INV-TYPE-STOCK
+              AND NOT = VAL-INV-TYPE-BOND
+              AND NOT = VAL-INV-TYPE-MMF
+              AND NOT = VAL-INV-TYPE-ETF
                MOVE VAL-INVALID-TYPE TO LS-RETURN-CODE
                MOVE VAL-ERR-TYPE TO LS-ERROR-MSG
                EXIT PARAGRAPH

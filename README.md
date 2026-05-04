@@ -140,6 +140,19 @@ Comprehensive documentation is provided to facilitate understanding and translat
 - **Fine-Tuning LLMs**: Use the project to enhance the capabilities of LLM translation tools in handling complex legacy codebases.
 - **Community Contribution**: Encourage collaboration within the COBOL modernization community to improve and expand the benchmark.
 
+## Investment Type Validation
+
+The portfolio validation subsystem (`PORTVALD`) enforces strict investment type checking against a centralized set of constants defined in the `PORTVAL` copybook. The following investment types are currently supported:
+
+| Code  | Constant Name         | Description            |
+|-------|-----------------------|------------------------|
+| `STK` | `VAL-INV-TYPE-STOCK`  | Stocks / Equities      |
+| `BND` | `VAL-INV-TYPE-BOND`   | Bonds / Fixed Income   |
+| `MMF` | `VAL-INV-TYPE-MMF`    | Money Market Funds     |
+| `ETF` | `VAL-INV-TYPE-ETF`    | Exchange-Traded Funds  |
+
+These constants are maintained in `src/copybook/common/PORTVAL.cpy` under the `VAL-INVESTMENT-TYPES` record group. To add a new investment type, append a new `05`-level entry to this group and update the validation logic in `src/programs/portfolio/PORTVALD.cbl` accordingly.
+
 ## License
 
 [Appropriate License]
