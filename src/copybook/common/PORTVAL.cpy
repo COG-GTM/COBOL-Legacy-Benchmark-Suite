@@ -37,6 +37,15 @@
            05  VAL-ID-PREFIX      PIC X(4)      VALUE 'PORT'.
            
       *----------------------------------------------------------------*
+      * Valid Investment Types (add new types here)
+      *----------------------------------------------------------------*
+       01  VAL-INVESTMENT-TYPES.
+           05  VAL-INV-TYPE-STOCK    PIC X(3) VALUE 'STK'.
+           05  VAL-INV-TYPE-BOND     PIC X(3) VALUE 'BND'.
+           05  VAL-INV-TYPE-MMF      PIC X(3) VALUE 'MMF'.
+           05  VAL-INV-TYPE-ETF      PIC X(3) VALUE 'ETF'.
+           
+      *----------------------------------------------------------------*
       * Validation Working Storage
       *----------------------------------------------------------------*
        01  VAL-WORK-AREAS.
