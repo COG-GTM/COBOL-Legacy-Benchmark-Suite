@@ -1,0 +1,4 @@
+com/coggtm/portfolio/service/ValidationServiceTest.class
+com/coggtm/portfolio/domain/PortfolioTest.class
+com/coggtm/portfolio/PortfolioApplicationTests.class
+com/coggtm/portfolio/repository/PortfolioRepositoryTest.class

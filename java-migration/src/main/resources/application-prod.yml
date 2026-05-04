@@ -1,0 +1,14 @@
+spring:
+  datasource:
+    url: jdbc:db2://${DB2_HOST:localhost}:${DB2_PORT:50000}/${DB2_DATABASE:PORTDB}
+    driver-class-name: com.ibm.db2.jcc.DB2Driver
+    username: ${DB2_USERNAME}
+    password: ${DB2_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.DB2Dialect
+  flyway:
+    enabled: true
