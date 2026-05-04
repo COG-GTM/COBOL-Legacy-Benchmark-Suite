@@ -251,7 +251,7 @@ public class BatchJobConfig {
             PositionRecord position = chunkPositionCache.get(cacheKey);
 
             if (position == null) {
-                List<PositionRecord> existing = positionRepository.findByPortfolioId(transaction.getPortfolioId());
+                List<PositionRecord> existing = positionRepository.findByPortfolioIdAndPositionDate(transaction.getPortfolioId(), LocalDate.now());
                 position = existing.stream()
                         .filter(p -> transaction.getInvestmentId().equals(p.getInvestmentId()))
                         .findFirst()
@@ -326,6 +326,8 @@ public class BatchJobConfig {
                     transaction.getAmount()));
             history.setProcessDate(LocalDateTime.now());
             history.setProcessUser("BATCH");
+            transaction.setStatus("C");
+            transactionRepository.save(transaction);
             return history;
         };
     }
@@ -334,10 +336,6 @@ public class BatchJobConfig {
         return chunk -> {
             for (HistoryRecord h : chunk.getItems()) {
                 historyRepository.save(h);
-            }
-            for (TransactionRecord t : transactionRepository.findByStatus("U")) {
-                t.setStatus("C");
-                transactionRepository.save(t);
             }
         };
     }

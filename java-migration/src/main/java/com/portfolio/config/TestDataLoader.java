@@ -109,7 +109,7 @@ public class TestDataLoader implements CommandLineRunner {
                 t.setPrice(price);
                 t.setAmount(qty.multiply(price).setScale(2, RoundingMode.HALF_UP));
                 t.setCurrencyCode("USD");
-                t.setStatus("D");
+                t.setStatus("C");
                 t.setProcessDate(LocalDateTime.now().minusDays(j));
                 t.setProcessUser("TSTGEN00");
                 transactionRepository.save(t);
