@@ -116,6 +116,8 @@ Comprehensive documentation is provided to facilitate understanding and translat
 
 - [System Architecture Document (SAD)](documentation/technical/system-architecture.md)
 - [Data Dictionary](documentation/technical/data-dictionary.md)
+- [Dependency Graph & System Overview](documentation/dependency-graph.md)
+- [Program Reference Guide](documentation/technical/program-reference.md)
 - [Operations Guide](documentation/operations/README.md)
 - [Test Data Specifications](documentation/operations/test-data-specs.md)
 
