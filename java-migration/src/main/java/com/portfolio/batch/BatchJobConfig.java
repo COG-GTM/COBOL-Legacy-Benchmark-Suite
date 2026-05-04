@@ -226,15 +226,41 @@ public class BatchJobConfig {
 
     private ItemProcessor<TransactionRecord, PositionRecord> positionUpdateProcessor() {
         return transaction -> {
-            PositionRecord position = new PositionRecord();
-            position.setPortfolioId(transaction.getPortfolioId());
-            position.setInvestmentId(transaction.getInvestmentId());
+            List<PositionRecord> existing = positionRepository.findByPortfolioId(transaction.getPortfolioId());
+            PositionRecord position = existing.stream()
+                    .filter(p -> transaction.getInvestmentId().equals(p.getInvestmentId()))
+                    .findFirst()
+                    .orElse(null);
+
+            if (position == null) {
+                position = new PositionRecord();
+                position.setPortfolioId(transaction.getPortfolioId());
+                position.setInvestmentId(transaction.getInvestmentId());
+                position.setPositionDate(LocalDate.now());
+                position.setQuantity(BigDecimal.ZERO);
+                position.setCostBasis(BigDecimal.ZERO);
+                position.setMarketValue(BigDecimal.ZERO);
+                position.setCurrencyCode(transaction.getCurrencyCode());
+                position.setStatus(CommonConstants.STATUS_ACTIVE);
+            }
+
+            switch (transaction.getTransactionType()) {
+                case "BU":
+                    position.setQuantity(position.getQuantity().add(transaction.getQuantity()));
+                    position.setCostBasis(position.getCostBasis().add(transaction.getAmount()));
+                    break;
+                case "SL":
+                    position.setQuantity(position.getQuantity().subtract(transaction.getQuantity()));
+                    position.setCostBasis(position.getCostBasis().subtract(transaction.getAmount()));
+                    break;
+                case "FE":
+                    position.setCostBasis(position.getCostBasis().add(transaction.getAmount()));
+                    break;
+                default:
+                    break;
+            }
+            position.setMarketValue(position.getQuantity().multiply(transaction.getPrice()));
             position.setPositionDate(LocalDate.now());
-            position.setQuantity(transaction.getQuantity());
-            position.setCostBasis(transaction.getAmount());
-            position.setMarketValue(transaction.getQuantity().multiply(transaction.getPrice()));
-            position.setCurrencyCode(transaction.getCurrencyCode());
-            position.setStatus(CommonConstants.STATUS_ACTIVE);
             position.setLastMaintDate(LocalDateTime.now());
             position.setLastMaintUser("BATCH");
             return position;

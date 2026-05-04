@@ -68,7 +68,7 @@ public class BatchJobController {
                     "batchStatus", execution.getStatus().toString()
             );
         } catch (Exception e) {
-            return Map.of("status", "error", "message", e.getMessage());
+            return Map.of("status", "error", "message", e.getMessage() != null ? e.getMessage() : e.getClass().getName());
         }
     }
 }

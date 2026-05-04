@@ -53,13 +53,15 @@ public final class PortfolioValidation {
                 || !VALID_TYPES.contains(transaction.getTransactionType())) {
             errors.add("Invalid Transaction Type: " + transaction.getTransactionType());
         }
-        if (transaction.getQuantity() != null
-                && transaction.getQuantity().compareTo(BigDecimal.ZERO) <= 0) {
+        if (transaction.getQuantity() == null) {
+            errors.add("Quantity is required");
+        } else if (transaction.getQuantity().compareTo(BigDecimal.ZERO) <= 0) {
             errors.add("Quantity must be greater than zero");
         }
         if (!"TR".equals(transaction.getTransactionType())) {
-            if (transaction.getPrice() != null
-                    && transaction.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
+            if (transaction.getPrice() == null) {
+                errors.add("Price is required");
+            } else if (transaction.getPrice().compareTo(BigDecimal.ZERO) <= 0) {
                 errors.add("Price must be greater than zero");
             }
             if (transaction.getAmount() != null

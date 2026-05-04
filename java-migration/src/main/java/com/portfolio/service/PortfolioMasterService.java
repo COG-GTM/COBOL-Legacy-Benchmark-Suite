@@ -145,7 +145,7 @@ public class PortfolioMasterService {
         HistoryRecord history = new HistoryRecord();
         history.setPortfolioId(portfolioId);
         history.setHistoryDate(LocalDate.now().toString().replace("-", "").substring(0, 8));
-        history.setHistoryTime(LocalDateTime.now().toLocalTime().toString().replace(":", "").substring(0, 6));
+        history.setHistoryTime(LocalDateTime.now().toLocalTime().format(java.time.format.DateTimeFormatter.ofPattern("HHmmss")));
         history.setRecordType(recordType);
         history.setActionCode(actionCode);
         history.setBeforeImage(beforeImage != null ? beforeImage.substring(0, Math.min(beforeImage.length(), 400)) : null);
