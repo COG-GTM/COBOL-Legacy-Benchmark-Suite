@@ -121,8 +121,8 @@ public class PortfolioValidator {
         }
 
         String type = request.transactionType();
-        if (!type.equals("BU") && !type.equals("SL") &&
-                !type.equals("TR") && !type.equals("FE")) {
+        if (type == null || (!type.equals("BU") && !type.equals("SL") &&
+                !type.equals("TR") && !type.equals("FE"))) {
             throw new PortfolioValidationException("Invalid Transaction Type: " + type, 3);
         }
 

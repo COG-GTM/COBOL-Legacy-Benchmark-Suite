@@ -1,5 +1,6 @@
 package com.portfolio.portmstr.batch.listener;
 
+import com.portfolio.portmstr.batch.PortfolioBatchProcessor;
 import com.portfolio.portmstr.batch.checkpoint.CheckpointService;
 import com.portfolio.portmstr.service.ErrorLoggingService;
 import org.slf4j.Logger;
@@ -25,16 +26,20 @@ public class BatchJobListener implements JobExecutionListener {
 
     private final CheckpointService checkpointService;
     private final ErrorLoggingService errorLoggingService;
+    private final PortfolioBatchProcessor batchProcessor;
 
     public BatchJobListener(CheckpointService checkpointService,
-                            ErrorLoggingService errorLoggingService) {
+                            ErrorLoggingService errorLoggingService,
+                            PortfolioBatchProcessor batchProcessor) {
         this.checkpointService = checkpointService;
         this.errorLoggingService = errorLoggingService;
+        this.batchProcessor = batchProcessor;
     }
 
     @Override
     public void beforeJob(JobExecution jobExecution) {
         log.info("Starting batch job: {}", jobExecution.getJobInstance().getJobName());
+        batchProcessor.resetCounters();
         checkpointService.initializeCheckpoint(PROGRAM_ID);
     }
 

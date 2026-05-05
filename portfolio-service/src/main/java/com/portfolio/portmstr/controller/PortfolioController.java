@@ -113,6 +113,11 @@ public class PortfolioController {
             @Parameter(description = "Portfolio ID")
             @PathVariable String portfolioId,
             @Valid @RequestBody TransactionRequest request) {
+        if (!portfolioId.equals(request.portfolioId())) {
+            throw new com.portfolio.portmstr.exception.PortfolioValidationException(
+                    "Path portfolioId '" + portfolioId +
+                    "' does not match request body portfolioId '" + request.portfolioId() + "'", 1);
+        }
         TransactionHistory result = transactionService.processTransaction(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(result);
     }

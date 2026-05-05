@@ -25,10 +25,10 @@ public class PositionHistory {
     @Column(name = "ID")
     private Long id;
 
-    @Column(name = "ACCOUNT_NO", length = 8, nullable = false)
+    @Column(name = "ACCOUNT_NO", length = 10, nullable = false)
     private String accountNo;
 
-    @Column(name = "PORTFOLIO_ID", length = 10, nullable = false)
+    @Column(name = "PORTFOLIO_ID", length = 8, nullable = false)
     private String portfolioId;
 
     @Column(name = "TRANS_DATE", nullable = false)
