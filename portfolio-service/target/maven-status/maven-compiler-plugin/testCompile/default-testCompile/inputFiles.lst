@@ -1,0 +1,6 @@
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/portfolio-service/src/test/java/com/portfolio/portmstr/batch/CheckpointServiceTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/portfolio-service/src/test/java/com/portfolio/portmstr/controller/PortfolioControllerTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/portfolio-service/src/test/java/com/portfolio/portmstr/service/AuditServiceTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/portfolio-service/src/test/java/com/portfolio/portmstr/service/PortfolioMasterServiceTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/portfolio-service/src/test/java/com/portfolio/portmstr/service/TransactionProcessingServiceTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/portfolio-service/src/test/java/com/portfolio/portmstr/validation/PortfolioValidatorTest.java
