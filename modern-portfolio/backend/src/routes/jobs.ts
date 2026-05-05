@@ -144,10 +144,13 @@ async function processTransactions(jobId: string, userId: string): Promise<void>
 
   for (const txn of pendingTransactions) {
     try {
-      // Optimistic concurrency: only process if still PENDING
+      // Optimistic concurrency: claim this transaction atomically
+      // Uses updateMany with status='PENDING' as a lock — if count is 0,
+      // another process already claimed it. Goes directly to DONE (no
+      // intermediate PROCESSING status needed since it's not in the enum).
       const claimed = await prisma.transaction.updateMany({
         where: { id: txn.id, status: 'PENDING' },
-        data: { status: 'PROCESSING' },
+        data: { status: 'DONE', processedAt: new Date(), processUser: userId.substring(0, 8) },
       });
       if (claimed.count === 0) {
         continue;
@@ -229,12 +232,6 @@ async function processTransactions(jobId: string, userId: string): Promise<void>
           programId: 'HISTLD00',
           userId: userId.substring(0, 8),
         },
-      });
-
-      // Mark transaction as done
-      await prisma.transaction.update({
-        where: { id: txn.id },
-        data: { status: 'DONE', processedAt: new Date(), processUser: userId.substring(0, 8) },
       });
 
       processed++;
