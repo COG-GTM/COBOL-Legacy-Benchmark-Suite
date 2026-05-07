@@ -91,28 +91,17 @@
            EXIT.
            
        P400-LOG-RETURN-CODE.
-           MOVE FUNCTION CURRENT-DATE TO WS-CURRENT-TIME.
-           
            EXEC SQL
-                INSERT INTO RTNCODES
-                (TIMESTAMP,
-                 PROGRAM_ID,
-                 RETURN_CODE,
-                 HIGHEST_CODE,
-                 STATUS_CODE,
-                 MESSAGE_TEXT)
-                VALUES
-                (:WS-CURRENT-TIME,
-                 :RC-PROGRAM-ID,
+                CALL SP_LOG_RETURN_CODE
+                (:RC-PROGRAM-ID,
                  :RC-CURRENT-CODE,
                  :RC-HIGHEST-CODE,
                  :RC-STATUS,
-                 :RC-MESSAGE)
+                 :RC-MESSAGE,
+                 :RC-RESPONSE-CODE)
            END-EXEC.
            
-           IF SQLCODE = 0
-              MOVE 0 TO RC-RESPONSE-CODE
-           ELSE
+           IF SQLCODE NOT = 0
               MOVE 8 TO RC-RESPONSE-CODE
            END-IF.
        P400-EXIT.
