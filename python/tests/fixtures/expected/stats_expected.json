@@ -1,0 +1,24 @@
+{
+  "small": {
+    "records_read": 10,
+    "records_written": 10,
+    "error_count": 0,
+    "commits_issued": 1,
+    "return_code": 0
+  },
+  "medium": {
+    "records_read": 1000,
+    "records_written": 1000,
+    "error_count": 0,
+    "commit_threshold": 250,
+    "commits_issued": 5,
+    "return_code": 0
+  },
+  "edge": {
+    "records_read": 4,
+    "records_written": 4,
+    "error_count": 0,
+    "commits_issued": 1,
+    "return_code": 0
+  }
+}
