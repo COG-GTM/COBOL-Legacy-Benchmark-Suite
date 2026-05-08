@@ -5,6 +5,7 @@ from app.models.error import ErrorLog
 from app.models.portfolio import PortfolioMaster
 from app.models.position import InvestmentPosition
 from app.models.transaction import TransactionHistory
+from app.models.user import User
 
 __all__ = [
     "Base",
@@ -14,4 +15,5 @@ __all__ = [
     "AuditLog",
     "ErrorLog",
     "BatchControl",
+    "User",
 ]

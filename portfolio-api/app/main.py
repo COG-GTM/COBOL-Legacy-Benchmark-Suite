@@ -6,7 +6,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy import text
 
 from app.database import engine
-from app.routers import admin, inquiries, portfolios, reports, transactions
+from app.routers import admin, auth, inquiries, portfolios, reports, transactions
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +34,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth.router)
 app.include_router(portfolios.router)
 app.include_router(transactions.router)
 app.include_router(inquiries.router)
