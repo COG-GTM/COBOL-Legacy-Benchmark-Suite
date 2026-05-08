@@ -1,0 +1,32 @@
+[project]
+name = "portfolio-api"
+version = "0.1.0"
+description = "Modernized Investment Portfolio Management API"
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn[standard]",
+    "sqlalchemy[asyncio]",
+    "asyncpg",
+    "alembic",
+    "pydantic>=2.0",
+    "python-jose[cryptography]",
+    "passlib[bcrypt]",
+    "celery",
+    "httpx",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest",
+    "pytest-asyncio",
+    "factory-boy",
+    "faker",
+]
+
+[build-system]
+requires = ["setuptools>=68.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["app*"]
