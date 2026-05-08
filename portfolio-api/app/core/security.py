@@ -6,6 +6,7 @@ Replaces COBOL SECMGR credential management:
   - P100-VALIDATE-USER -> token-based authentication
 """
 
+import uuid
 from datetime import datetime, timedelta, timezone
 from typing import Any
 
@@ -52,6 +53,7 @@ def create_access_token(
         "username": username,
         "roles": roles,
         "type": "access",
+        "jti": str(uuid.uuid4()),
         "iat": now,
         "exp": expire,
     }
@@ -79,6 +81,7 @@ def create_refresh_token(
     payload: dict[str, Any] = {
         "sub": user_id,
         "type": "refresh",
+        "jti": str(uuid.uuid4()),
         "iat": now,
         "exp": expire,
     }

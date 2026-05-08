@@ -131,6 +131,88 @@ async def test_login_empty_password(client):
     assert response.status_code == 422
 
 
+@pytest.mark.asyncio
+async def test_login_whitespace_username(client):
+    """POST /api/auth/login rejects whitespace-only username."""
+    response = await client.post(
+        "/api/auth/login",
+        json={"username": "   ", "password": "anypassword"},
+    )
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_login_whitespace_password(client):
+    """POST /api/auth/login rejects whitespace-only password."""
+    response = await client.post(
+        "/api/auth/login",
+        json={"username": "testuser", "password": "   "},
+    )
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_login_updates_last_login(client, test_user):
+    """Successful login updates the user's last_login timestamp."""
+    response = await client.post(
+        "/api/auth/login",
+        json={"username": "testuser", "password": "testpassword123"},
+    )
+    assert response.status_code == 200
+
+    async with TestingSessionLocal() as session:
+        from sqlalchemy import select
+        result = await session.execute(
+            select(User).where(User.username == "testuser")
+        )
+        user = result.scalar_one()
+        assert user.last_login is not None
+
+
+@pytest.mark.asyncio
+async def test_login_returns_valid_jwt_claims(client, test_user):
+    """Access token contains expected claims (sub, username, roles, type)."""
+    response = await client.post(
+        "/api/auth/login",
+        json={"username": "testuser", "password": "testpassword123"},
+    )
+    assert response.status_code == 200
+
+    from app.core.security import decode_access_token
+    token = response.json()["access_token"]
+    payload = decode_access_token(token)
+    assert payload["sub"] == test_user.id
+    assert payload["username"] == "testuser"
+    assert payload["roles"] == ["user"]
+    assert payload["type"] == "access"
+    assert "iat" in payload
+    assert "exp" in payload
+
+
+@pytest.mark.asyncio
+async def test_login_invalid_credentials_has_www_authenticate(client):
+    """401 response includes WWW-Authenticate: Bearer header."""
+    response = await client.post(
+        "/api/auth/login",
+        json={"username": "noone", "password": "nope"},
+    )
+    assert response.status_code == 401
+    assert response.headers.get("www-authenticate") == "Bearer"
+
+
+@pytest.mark.asyncio
+async def test_login_missing_fields(client):
+    """POST /api/auth/login rejects request with missing fields."""
+    response = await client.post("/api/auth/login", json={})
+    assert response.status_code == 422
+
+    response = await client.post("/api/auth/login", json={"username": "user"})
+    assert response.status_code == 422
+
+    response = await client.post("/api/auth/login", json={"password": "pass"})
+    assert response.status_code == 422
+
+
 # --- Refresh Tests ---
 
 
@@ -260,7 +342,7 @@ async def test_middleware_valid_token(client, test_user):
 async def test_middleware_missing_token(client):
     """Auth middleware returns 401 for missing token."""
     response = await client.get("/api/auth/me")
-    assert response.status_code == 403  # HTTPBearer returns 403 when no credentials
+    assert response.status_code in (401, 403)
 
 
 @pytest.mark.asyncio

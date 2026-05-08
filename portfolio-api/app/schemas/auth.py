@@ -22,7 +22,7 @@ class LoginRequest(BaseModel):
     @field_validator("password")
     @classmethod
     def password_not_empty(cls, v: str) -> str:
-        if not v:
+        if not v or not v.strip():
             raise ValueError("Password must not be empty")
         return v
 

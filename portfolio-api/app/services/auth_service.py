@@ -49,12 +49,15 @@ async def authenticate_user(
     user = result.scalar_one_or_none()
 
     if user is None:
+        logger.debug("Authentication failed: credentials invalid")
         return None
 
     if user.status != "active":
+        logger.debug("Authentication failed: account not active")
         return None
 
     if not verify_password(password, user.password_hash):
+        logger.debug("Authentication failed: credentials invalid")
         return None
 
     return user
