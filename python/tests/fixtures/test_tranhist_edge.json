@@ -1,0 +1,62 @@
+[
+  {
+    "account_no": "EDGE0001",
+    "portfolio_id": "EDGEPORT01",
+    "trans_date": "2026-01-15",
+    "trans_time": "00:00:00",
+    "trans_type": "PT",
+    "security_id": "EDGE00000001",
+    "quantity": "0.000",
+    "price": "0.000",
+    "amount": "0.00",
+    "fees": "0.00",
+    "total_amount": "0.00",
+    "cost_basis": "0.00",
+    "gain_loss": "0.00"
+  },
+  {
+    "account_no": "EDGE0002",
+    "portfolio_id": "EDGEPORT02",
+    "trans_date": "2026-01-15",
+    "trans_time": "23:59:59",
+    "trans_type": "PS",
+    "security_id": "EDGE00000002",
+    "quantity": "-1000.500",
+    "price": "50.250",
+    "amount": "-50250.13",
+    "fees": "9.99",
+    "total_amount": "-50260.12",
+    "cost_basis": "51000.00",
+    "gain_loss": "-749.87"
+  },
+  {
+    "account_no": "EDGEACCT",
+    "portfolio_id": "EDGEPORT03",
+    "trans_date": "2026-12-31",
+    "trans_time": "11:59:59",
+    "trans_type": "TR",
+    "security_id": "MAXLEN123456",
+    "quantity": "999999999.999",
+    "price": "999999999.999",
+    "amount": "9999999999.99",
+    "fees": "0.01",
+    "total_amount": "10000000000.00",
+    "cost_basis": "1.00",
+    "gain_loss": "9999999999.00"
+  },
+  {
+    "account_no": "EDGE0004",
+    "portfolio_id": "EDGEPORT04",
+    "trans_date": "2026-06-15",
+    "trans_time": "12:00:00",
+    "trans_type": "PT",
+    "security_id": "EDGE00000004",
+    "quantity": "0.001",
+    "price": "0.001",
+    "amount": "0.01",
+    "fees": "0.01",
+    "total_amount": "0.02",
+    "cost_basis": "0.01",
+    "gain_loss": "0.00"
+  }
+]
