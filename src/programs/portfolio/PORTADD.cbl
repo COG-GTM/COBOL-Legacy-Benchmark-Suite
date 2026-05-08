@@ -1,4 +1,4 @@
-       *================================================================*
+      *================================================================*
       * Program Name: PORTADD
       * Description: Portfolio Addition Program
       *             Creates new portfolio records from input file
@@ -37,7 +37,7 @@
            COPY PORTFLIO.
            
        FD  INPUT-FILE.
-           COPY PORTFLIO.
+       01  INPUT-PORT-RECORD     PIC X(200).
        
        WORKING-STORAGE SECTION.
       *----------------------------------------------------------------*
