@@ -23,7 +23,7 @@
            SELECT PORTFOLIO-FILE
                ASSIGN TO PORTFILE
                ORGANIZATION IS INDEXED
-               ACCESS MODE IS RANDOM
+               ACCESS MODE IS DYNAMIC
                RECORD KEY IS PORT-KEY
                FILE STATUS IS WS-PORT-STATUS.
        
@@ -124,13 +124,29 @@
            END-IF
            
            MOVE TRN-PORTFOLIO-ID TO PORT-ID
-           READ PORTFOLIO-FILE
+           MOVE SPACES TO PORT-ACCOUNT-NO
+           START PORTFOLIO-FILE
+               KEY IS >= PORT-KEY
                INVALID KEY
                    STRING 'Invalid Portfolio ID: '
                           TRN-PORTFOLIO-ID
                      DELIMITED BY SIZE
                      INTO ERR-TEXT
+                   EXIT PARAGRAPH
+           END-START
+           READ PORTFOLIO-FILE NEXT
+               AT END
+                   STRING 'Invalid Portfolio ID: '
+                          TRN-PORTFOLIO-ID
+                     DELIMITED BY SIZE
+                     INTO ERR-TEXT
            END-READ
+           IF PORT-ID NOT = TRN-PORTFOLIO-ID
+               STRING 'Invalid Portfolio ID: '
+                      TRN-PORTFOLIO-ID
+                 DELIMITED BY SIZE
+                 INTO ERR-TEXT
+           END-IF
            .
            
        2120-CHECK-TRANSACTION-TYPE.
@@ -181,12 +197,25 @@
            
        2210-PROCESS-BUY.
            MOVE TRN-PORTFOLIO-ID TO PORT-ID
-           READ PORTFOLIO-FILE
+           MOVE SPACES TO PORT-ACCOUNT-NO
+           START PORTFOLIO-FILE
+               KEY IS >= PORT-KEY
                INVALID KEY
                    MOVE 'Portfolio not found for update' TO ERR-TEXT
                    PERFORM 9000-ERROR-ROUTINE
                    EXIT PARAGRAPH
+           END-START
+           READ PORTFOLIO-FILE NEXT
+               AT END
+                   MOVE 'Portfolio not found for update' TO ERR-TEXT
+                   PERFORM 9000-ERROR-ROUTINE
+                   EXIT PARAGRAPH
            END-READ
+           IF PORT-ID NOT = TRN-PORTFOLIO-ID
+               MOVE 'Portfolio not found for update' TO ERR-TEXT
+               PERFORM 9000-ERROR-ROUTINE
+               EXIT PARAGRAPH
+           END-IF
            
            ADD TRN-AMOUNT TO PORT-TOTAL-VALUE
            SUBTRACT TRN-AMOUNT FROM PORT-CASH-BALANCE
@@ -200,12 +229,25 @@
            
        2220-PROCESS-SELL.
            MOVE TRN-PORTFOLIO-ID TO PORT-ID
-           READ PORTFOLIO-FILE
+           MOVE SPACES TO PORT-ACCOUNT-NO
+           START PORTFOLIO-FILE
+               KEY IS >= PORT-KEY
                INVALID KEY
                    MOVE 'Portfolio not found for update' TO ERR-TEXT
                    PERFORM 9000-ERROR-ROUTINE
                    EXIT PARAGRAPH
+           END-START
+           READ PORTFOLIO-FILE NEXT
+               AT END
+                   MOVE 'Portfolio not found for update' TO ERR-TEXT
+                   PERFORM 9000-ERROR-ROUTINE
+                   EXIT PARAGRAPH
            END-READ
+           IF PORT-ID NOT = TRN-PORTFOLIO-ID
+               MOVE 'Portfolio not found for update' TO ERR-TEXT
+               PERFORM 9000-ERROR-ROUTINE
+               EXIT PARAGRAPH
+           END-IF
            
            IF PORT-TOTAL-VALUE < TRN-AMOUNT
                MOVE 'Insufficient value for sale' TO ERR-TEXT
@@ -230,12 +272,25 @@
            
        2240-PROCESS-FEE.
            MOVE TRN-PORTFOLIO-ID TO PORT-ID
-           READ PORTFOLIO-FILE
+           MOVE SPACES TO PORT-ACCOUNT-NO
+           START PORTFOLIO-FILE
+               KEY IS >= PORT-KEY
                INVALID KEY
                    MOVE 'Portfolio not found' TO ERR-TEXT
                    PERFORM 9000-ERROR-ROUTINE
                    EXIT PARAGRAPH
+           END-START
+           READ PORTFOLIO-FILE NEXT
+               AT END
+                   MOVE 'Portfolio not found' TO ERR-TEXT
+                   PERFORM 9000-ERROR-ROUTINE
+                   EXIT PARAGRAPH
            END-READ
+           IF PORT-ID NOT = TRN-PORTFOLIO-ID
+               MOVE 'Portfolio not found' TO ERR-TEXT
+               PERFORM 9000-ERROR-ROUTINE
+               EXIT PARAGRAPH
+           END-IF
            
            SUBTRACT TRN-AMOUNT FROM PORT-CASH-BALANCE
            
@@ -314,4 +369,4 @@
            MOVE 'PORTTRAN' TO ERR-PROGRAM
            
            CALL 'ERRPROC' USING ERR-MESSAGE
-           .  
+           .    
