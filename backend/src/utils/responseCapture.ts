@@ -11,7 +11,8 @@ export function captureResponseBody(res: Response): () => string | undefined {
 
   res.json = function (body?: unknown): Response {
     try {
-      const serialized = JSON.stringify(body);
+      const redacted = redactSensitiveFields(body);
+      const serialized = JSON.stringify(redacted);
       if (serialized && serialized.length <= MAX_IMAGE_SIZE) {
         capturedBody = serialized;
       } else if (serialized) {

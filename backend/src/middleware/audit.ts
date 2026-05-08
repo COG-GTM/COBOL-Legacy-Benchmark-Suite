@@ -47,12 +47,12 @@ export function createAuditMiddleware(options: AuditMiddlewareOptions) {
     const userId = req.user?.userId ?? 'anonymous';
     const terminal = req.ip ?? req.socket?.remoteAddress ?? 'unknown';
 
-    const portfolioId =
-      (req.params as Record<string, string>).portfolioId ??
-      (req.params as Record<string, string>).id;
-    const accountNo = (req.params as Record<string, string>).accountNo;
-
     onFinished(res, () => {
+      const portfolioId =
+        (req.params as Record<string, string>).portfolioId ??
+        (req.params as Record<string, string>).id;
+      const accountNo = (req.params as Record<string, string>).accountNo;
+
       auditService
         .log({
           method: req.method,
