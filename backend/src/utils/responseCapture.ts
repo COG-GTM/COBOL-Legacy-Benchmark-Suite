@@ -33,7 +33,7 @@ const SENSITIVE_FIELDS = [
   'token',
   'secret',
   'authorization',
-  'creditCard',
+  'creditcard',
   'ssn',
   'pin',
 ];
