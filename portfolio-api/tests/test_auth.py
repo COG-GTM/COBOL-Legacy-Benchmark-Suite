@@ -340,7 +340,7 @@ async def test_middleware_valid_token(client, test_user):
 
 @pytest.mark.asyncio
 async def test_middleware_missing_token(client):
-    """Auth middleware returns 401 for missing token."""
+    """Auth middleware rejects requests without Authorization header."""
     response = await client.get("/api/auth/me")
     assert response.status_code in (401, 403)
 
@@ -371,6 +371,146 @@ async def test_middleware_expired_token(client, test_user):
         headers={"Authorization": f"Bearer {expired_token}"},
     )
     assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_middleware_refresh_token_as_access(client, test_user):
+    """Auth middleware rejects refresh tokens used as access tokens."""
+    login_response = await client.post(
+        "/api/auth/login",
+        json={"username": "testuser", "password": "testpassword123"},
+    )
+    refresh_token = login_response.json()["refresh_token"]
+
+    response = await client.get(
+        "/api/auth/me",
+        headers={"Authorization": f"Bearer {refresh_token}"},
+    )
+    assert response.status_code == 401
+
+
+@pytest.mark.asyncio
+async def test_refresh_inactive_user(client, test_user):
+    """POST /api/auth/refresh rejects token for a user that became inactive."""
+    login_response = await client.post(
+        "/api/auth/login",
+        json={"username": "testuser", "password": "testpassword123"},
+    )
+    refresh_token = login_response.json()["refresh_token"]
+
+    # Suspend the user
+    async with TestingSessionLocal() as session:
+        from sqlalchemy import update
+        await session.execute(
+            update(User).where(User.username == "testuser").values(status="suspended")
+        )
+        await session.commit()
+
+    response = await client.post(
+        "/api/auth/refresh",
+        json={"refresh_token": refresh_token},
+    )
+    assert response.status_code == 401
+
+    # Restore user status for other tests
+    async with TestingSessionLocal() as session:
+        from sqlalchemy import update
+        await session.execute(
+            update(User).where(User.username == "testuser").values(status="active")
+        )
+        await session.commit()
+
+
+@pytest.mark.asyncio
+async def test_refresh_empty_token(client):
+    """POST /api/auth/refresh rejects empty refresh token."""
+    response = await client.post(
+        "/api/auth/refresh",
+        json={"refresh_token": ""},
+    )
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_logout_empty_token(client):
+    """POST /api/auth/logout rejects empty refresh token."""
+    response = await client.post(
+        "/api/auth/logout",
+        json={"refresh_token": ""},
+    )
+    assert response.status_code == 422
+
+
+@pytest.mark.asyncio
+async def test_logout_returns_success_message(client, test_user):
+    """POST /api/auth/logout returns success detail message."""
+    login_response = await client.post(
+        "/api/auth/login",
+        json={"username": "testuser", "password": "testpassword123"},
+    )
+    refresh_token = login_response.json()["refresh_token"]
+
+    response = await client.post(
+        "/api/auth/logout",
+        json={"refresh_token": refresh_token},
+    )
+    assert response.status_code == 200
+    assert response.json()["detail"] == "Successfully logged out"
+
+
+@pytest.mark.asyncio
+async def test_middleware_inactive_user(client, test_user):
+    """Auth middleware rejects tokens for inactive users."""
+    login_response = await client.post(
+        "/api/auth/login",
+        json={"username": "testuser", "password": "testpassword123"},
+    )
+    access_token = login_response.json()["access_token"]
+
+    # Suspend the user after login
+    async with TestingSessionLocal() as session:
+        from sqlalchemy import update
+        await session.execute(
+            update(User).where(User.username == "testuser").values(status="suspended")
+        )
+        await session.commit()
+
+    response = await client.get(
+        "/api/auth/me",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    assert response.status_code == 401
+
+    # Restore user status
+    async with TestingSessionLocal() as session:
+        from sqlalchemy import update
+        await session.execute(
+            update(User).where(User.username == "testuser").values(status="active")
+        )
+        await session.commit()
+
+
+@pytest.mark.asyncio
+async def test_middleware_user_profile_fields(client, test_user):
+    """GET /api/auth/me returns all expected user profile fields."""
+    login_response = await client.post(
+        "/api/auth/login",
+        json={"username": "testuser", "password": "testpassword123"},
+    )
+    access_token = login_response.json()["access_token"]
+
+    response = await client.get(
+        "/api/auth/me",
+        headers={"Authorization": f"Bearer {access_token}"},
+    )
+    assert response.status_code == 200
+    data = response.json()
+    assert data["username"] == "testuser"
+    assert data["roles"] == ["user"]
+    assert data["status"] == "active"
+    assert "id" in data
+    assert "created_at" in data
+    assert "updated_at" in data
 
 
 # --- Password Hashing Tests ---
