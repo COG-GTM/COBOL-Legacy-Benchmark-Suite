@@ -57,7 +57,7 @@
            .
            
        1000-INITIALIZE.
-           ACCEPT WS-FORMATTED-TIME FROM TIME STAMP
+           MOVE FUNCTION CURRENT-DATE TO WS-FORMATTED-TIME
            
            OPEN EXTEND AUDIT-FILE
            IF WS-FILE-STATUS NOT = '00'
@@ -93,4 +93,4 @@
            
        3000-TERMINATE.
            CLOSE AUDIT-FILE
-           . 
+           .  

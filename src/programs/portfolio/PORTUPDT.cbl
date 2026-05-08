@@ -1,4 +1,4 @@
-       *================================================================*
+      *================================================================*
       * Program Name: PORTUPDT
       * Description: Portfolio Update Program
       *             Updates existing portfolio records

@@ -23,8 +23,8 @@
            SELECT PORTFOLIO-FILE
                ASSIGN TO PORTFILE
                ORGANIZATION IS INDEXED
-               ACCESS MODE IS RANDOM
-               RECORD KEY IS PORT-ID
+               ACCESS MODE IS DYNAMIC
+               RECORD KEY IS PORT-KEY
                FILE STATUS IS WS-PORT-STATUS.
        
        DATA DIVISION.
@@ -37,7 +37,7 @@
        FD  PORTFOLIO-FILE
            RECORDING MODE IS F
            BLOCK CONTAINS 0 RECORDS.
-       COPY PORTREC.
+           COPY PORTFLIO.
        
        WORKING-STORAGE SECTION.
            COPY ERRHAND.
@@ -112,6 +112,7 @@
            
            IF ERR-TEXT = SPACES
                ADD 1 TO WS-PROCESS-COUNT
+               PERFORM 2200-UPDATE-POSITIONS
            ELSE
                PERFORM 9000-ERROR-ROUTINE
            END-IF
@@ -124,13 +125,29 @@
            END-IF
            
            MOVE TRN-PORTFOLIO-ID TO PORT-ID
-           READ PORTFOLIO-FILE
+           MOVE SPACES TO PORT-ACCOUNT-NO
+           START PORTFOLIO-FILE
+               KEY IS >= PORT-KEY
                INVALID KEY
                    STRING 'Invalid Portfolio ID: '
                           TRN-PORTFOLIO-ID
                      DELIMITED BY SIZE
                      INTO ERR-TEXT
+                   EXIT PARAGRAPH
+           END-START
+           READ PORTFOLIO-FILE NEXT
+               AT END
+                   STRING 'Invalid Portfolio ID: '
+                          TRN-PORTFOLIO-ID
+                     DELIMITED BY SIZE
+                     INTO ERR-TEXT
            END-READ
+           IF PORT-ID NOT = TRN-PORTFOLIO-ID
+               STRING 'Invalid Portfolio ID: '
+                      TRN-PORTFOLIO-ID
+                 DELIMITED BY SIZE
+                 INTO ERR-TEXT
+           END-IF
            .
            
        2120-CHECK-TRANSACTION-TYPE.
@@ -181,17 +198,30 @@
            
        2210-PROCESS-BUY.
            MOVE TRN-PORTFOLIO-ID TO PORT-ID
-           READ PORTFOLIO-FILE
+           MOVE SPACES TO PORT-ACCOUNT-NO
+           START PORTFOLIO-FILE
+               KEY IS >= PORT-KEY
                INVALID KEY
                    MOVE 'Portfolio not found for update' TO ERR-TEXT
                    PERFORM 9000-ERROR-ROUTINE
                    EXIT PARAGRAPH
+           END-START
+           READ PORTFOLIO-FILE NEXT
+               AT END
+                   MOVE 'Portfolio not found for update' TO ERR-TEXT
+                   PERFORM 9000-ERROR-ROUTINE
+                   EXIT PARAGRAPH
            END-READ
+           IF PORT-ID NOT = TRN-PORTFOLIO-ID
+               MOVE 'Portfolio not found for update' TO ERR-TEXT
+               PERFORM 9000-ERROR-ROUTINE
+               EXIT PARAGRAPH
+           END-IF
            
-           ADD TRN-QUANTITY TO PORT-TOTAL-UNITS
-           ADD TRN-AMOUNT   TO PORT-TOTAL-COST
+           ADD TRN-AMOUNT TO PORT-TOTAL-VALUE
+           SUBTRACT TRN-AMOUNT FROM PORT-CASH-BALANCE
            
-           REWRITE PORTFOLIO-RECORD
+           REWRITE PORT-RECORD
                INVALID KEY
                    MOVE 'Error updating portfolio' TO ERR-TEXT
                    PERFORM 9000-ERROR-ROUTINE
@@ -200,23 +230,36 @@
            
        2220-PROCESS-SELL.
            MOVE TRN-PORTFOLIO-ID TO PORT-ID
-           READ PORTFOLIO-FILE
+           MOVE SPACES TO PORT-ACCOUNT-NO
+           START PORTFOLIO-FILE
+               KEY IS >= PORT-KEY
                INVALID KEY
                    MOVE 'Portfolio not found for update' TO ERR-TEXT
                    PERFORM 9000-ERROR-ROUTINE
                    EXIT PARAGRAPH
+           END-START
+           READ PORTFOLIO-FILE NEXT
+               AT END
+                   MOVE 'Portfolio not found for update' TO ERR-TEXT
+                   PERFORM 9000-ERROR-ROUTINE
+                   EXIT PARAGRAPH
            END-READ
-           
-           IF PORT-TOTAL-UNITS < TRN-QUANTITY
-               MOVE 'Insufficient units for sale' TO ERR-TEXT
+           IF PORT-ID NOT = TRN-PORTFOLIO-ID
+               MOVE 'Portfolio not found for update' TO ERR-TEXT
                PERFORM 9000-ERROR-ROUTINE
                EXIT PARAGRAPH
            END-IF
            
-           SUBTRACT TRN-QUANTITY FROM PORT-TOTAL-UNITS
-           SUBTRACT TRN-AMOUNT   FROM PORT-TOTAL-COST
+           IF PORT-TOTAL-VALUE < TRN-AMOUNT
+               MOVE 'Insufficient value for sale' TO ERR-TEXT
+               PERFORM 9000-ERROR-ROUTINE
+               EXIT PARAGRAPH
+           END-IF
            
-           REWRITE PORTFOLIO-RECORD
+           SUBTRACT TRN-AMOUNT FROM PORT-TOTAL-VALUE
+           ADD TRN-AMOUNT TO PORT-CASH-BALANCE
+           
+           REWRITE PORT-RECORD
                INVALID KEY
                    MOVE 'Error updating portfolio' TO ERR-TEXT
                    PERFORM 9000-ERROR-ROUTINE
@@ -230,16 +273,29 @@
            
        2240-PROCESS-FEE.
            MOVE TRN-PORTFOLIO-ID TO PORT-ID
-           READ PORTFOLIO-FILE
+           MOVE SPACES TO PORT-ACCOUNT-NO
+           START PORTFOLIO-FILE
+               KEY IS >= PORT-KEY
                INVALID KEY
-                   MOVE 'Portfolio not found for fee' TO ERR-TEXT
+                   MOVE 'Portfolio not found' TO ERR-TEXT
+                   PERFORM 9000-ERROR-ROUTINE
+                   EXIT PARAGRAPH
+           END-START
+           READ PORTFOLIO-FILE NEXT
+               AT END
+                   MOVE 'Portfolio not found' TO ERR-TEXT
                    PERFORM 9000-ERROR-ROUTINE
                    EXIT PARAGRAPH
            END-READ
+           IF PORT-ID NOT = TRN-PORTFOLIO-ID
+               MOVE 'Portfolio not found' TO ERR-TEXT
+               PERFORM 9000-ERROR-ROUTINE
+               EXIT PARAGRAPH
+           END-IF
            
-           SUBTRACT TRN-AMOUNT FROM PORT-TOTAL-COST
+           SUBTRACT TRN-AMOUNT FROM PORT-CASH-BALANCE
            
-           REWRITE PORTFOLIO-RECORD
+           REWRITE PORT-RECORD
                INVALID KEY
                    MOVE 'Error updating portfolio' TO ERR-TEXT
                    PERFORM 9000-ERROR-ROUTINE
@@ -251,7 +307,7 @@
            
            MOVE FUNCTION CURRENT-DATE TO AUD-TIMESTAMP
            MOVE 'PORTTRAN'     TO AUD-PROGRAM
-           MOVE FUNCTION USER-ID TO AUD-USER-ID
+           MOVE 'SYSTEM  ' TO AUD-USER-ID
            MOVE 'TRAN'         TO AUD-TYPE
            
            EVALUATE TRN-TYPE
@@ -275,7 +331,7 @@
            MOVE PORT-ACCOUNT-NO  TO AUD-ACCOUNT-NO
            
       *    Store original portfolio state
-           MOVE PORT-RECORD      TO AUD-BEFORE-IMAGE
+           MOVE PORT-RECORD TO AUD-BEFORE-IMAGE
            
       *    Build audit message
            STRING 'Transaction: ' DELIMITED BY SIZE
@@ -314,4 +370,4 @@
            MOVE 'PORTTRAN' TO ERR-PROGRAM
            
            CALL 'ERRPROC' USING ERR-MESSAGE
-           . 
+           .      

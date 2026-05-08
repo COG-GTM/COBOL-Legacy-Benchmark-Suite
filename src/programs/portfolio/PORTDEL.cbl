@@ -1,4 +1,4 @@
-       *================================================================*
+      *================================================================*
       * Program Name: PORTDEL
       * Description: Portfolio Deletion Program
       *             Processes portfolio deletion requests
@@ -166,7 +166,7 @@
            .
            
        2300-WRITE-AUDIT.
-           ACCEPT WS-TIMESTAMP FROM TIME STAMP
+           MOVE FUNCTION CURRENT-DATE TO WS-TIMESTAMP
            
            MOVE WS-TIMESTAMP TO AUD-TIMESTAMP
            MOVE 'DELETE' TO AUD-ACTION
