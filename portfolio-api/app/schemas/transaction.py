@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, time
 from decimal import Decimal
 
 from pydantic import BaseModel, ConfigDict
@@ -23,7 +23,7 @@ class TransactionRead(BaseModel):
     transaction_id: str
     portfolio_id: str
     transaction_date: date
-    transaction_time: str
+    transaction_time: time
     investment_id: str
     transaction_type: str
     quantity: Decimal

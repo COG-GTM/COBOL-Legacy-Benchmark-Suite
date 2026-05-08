@@ -37,9 +37,9 @@ class PortfolioCreate(PortfolioBase):
     @field_validator("portfolio_id")
     @classmethod
     def portfolio_id_format(cls, v: str) -> str:
-        if not re.match(r"^PORT\d{4,5}$", v):
+        if not re.match(r"^PORT\d{4}$", v):
             raise ValueError(
-                "portfolio_id must start with 'PORT' followed by 4-5 digits"
+                "portfolio_id must start with 'PORT' followed by 4 digits"
             )
         return v
 
