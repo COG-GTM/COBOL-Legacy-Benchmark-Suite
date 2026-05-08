@@ -112,6 +112,7 @@
            
            IF ERR-TEXT = SPACES
                ADD 1 TO WS-PROCESS-COUNT
+               PERFORM 2200-UPDATE-POSITIONS
            ELSE
                PERFORM 9000-ERROR-ROUTINE
            END-IF
@@ -369,4 +370,4 @@
            MOVE 'PORTTRAN' TO ERR-PROGRAM
            
            CALL 'ERRPROC' USING ERR-MESSAGE
-           .    
+           .      
