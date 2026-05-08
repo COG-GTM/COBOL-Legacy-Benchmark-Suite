@@ -1,0 +1,116 @@
+import { useCallback, useSyncExternalStore } from 'react'
+import type { AppError, ErrorSeverity } from '@/types/errors'
+import { createAppError } from '@/types/errors'
+
+export interface Toast {
+  id: string
+  error: AppError
+  duration: number
+  createdAt: number
+}
+
+interface ToastOptions {
+  duration?: number
+}
+
+const DEFAULT_DURATIONS: Record<ErrorSeverity, number> = {
+  error: 8000,
+  warning: 5000,
+  info: 3000,
+}
+
+const MAX_TOASTS = 5
+
+let toasts: Toast[] = []
+let listeners: Array<() => void> = []
+let nextId = 0
+
+function emitChange() {
+  for (const listener of listeners) {
+    listener()
+  }
+}
+
+function subscribe(listener: () => void): () => void {
+  listeners = [...listeners, listener]
+  return () => {
+    listeners = listeners.filter((l) => l !== listener)
+  }
+}
+
+function getSnapshot(): Toast[] {
+  return toasts
+}
+
+export function addToast(error: AppError, options?: ToastOptions): string {
+  const id = `toast-${++nextId}`
+  const duration = options?.duration ?? DEFAULT_DURATIONS[error.severity]
+
+  const toast: Toast = {
+    id,
+    error,
+    duration,
+    createdAt: Date.now(),
+  }
+
+  toasts = [...toasts, toast].slice(-MAX_TOASTS)
+  emitChange()
+
+  if (duration > 0) {
+    setTimeout(() => {
+      dismissToast(id)
+    }, duration)
+  }
+
+  return id
+}
+
+export function dismissToast(id: string): void {
+  toasts = toasts.filter((t) => t.id !== id)
+  emitChange()
+}
+
+export function clearAllToasts(): void {
+  toasts = []
+  emitChange()
+}
+
+export function toast(
+  message: string,
+  severity: ErrorSeverity = 'info',
+  options?: ToastOptions,
+): string {
+  const error = createAppError('TOAST', message, severity)
+  return addToast(error, options)
+}
+
+export function useToast() {
+  const currentToasts = useSyncExternalStore(subscribe, getSnapshot, getSnapshot)
+
+  const addErrorToast = useCallback((error: AppError, options?: ToastOptions) => {
+    return addToast(error, options)
+  }, [])
+
+  const showToast = useCallback(
+    (message: string, severity: ErrorSeverity = 'info', options?: ToastOptions) => {
+      return toast(message, severity, options)
+    },
+    [],
+  )
+
+  const dismiss = useCallback((id: string) => {
+    dismissToast(id)
+  }, [])
+
+  const clearAll = useCallback(() => {
+    clearAllToasts()
+  }, [])
+
+  return {
+    toasts: currentToasts,
+    addToast: addErrorToast,
+    toast: showToast,
+    dismiss,
+    clearAll,
+  }
+}
