@@ -1,0 +1,83 @@
+@import "tailwindcss";
+
+@theme {
+  /* Cigna Leaf Design System Colors */
+  --color-action-blue-10: #E6EBFF;
+  --color-action-blue-20: #CCD6FF;
+  --color-action-blue-50: #8099FF;
+  --color-action-blue-100: #0033FF;
+  --color-action-blue-120: #0029CC;
+  --color-action-blue-140: #001F99;
+  --color-action-blue-160: #001466;
+
+  --color-navy-10: #E7E6F2;
+  --color-navy-20: #CFCCE6;
+  --color-navy-60: #7066B3;
+  --color-navy-80: #41339A;
+  --color-navy-100: #110081;
+  --color-navy-140: #0A004D;
+
+  --color-leaf-green-100: #00874D;
+  --color-leaf-green-50: #03CC54;
+  --color-leaf-green-20: #A1F7A1;
+
+  --color-error-red-20: #F1CCCC;
+  --color-error-red-60: #D66666;
+  --color-error-red-100: #BA0000;
+  --color-error-red-180: #250000;
+
+  --color-success-green-20: #DAE6D1;
+  --color-success-green-100: #488319;
+  --color-success-green-120: #3A6914;
+  --color-success-green-180: #0E1A05;
+
+  --color-warning-yellow-20: #FFF5D6;
+  --color-warning-yellow-100: #FFCD34;
+
+  --color-neutral-black: #000000;
+  --color-neutral-180: #0A0A0A;
+  --color-neutral-100: #333333;
+  --color-neutral-80: #5C5C5C;
+  --color-neutral-60: #858585;
+  --color-neutral-50: #999999;
+  --color-neutral-30: #C2C2C2;
+  --color-neutral-20: #D6D6D6;
+  --color-neutral-10: #EBEBEB;
+  --color-neutral-05: #F4F4F4;
+  --color-neutral-white: #FFFFFF;
+
+  /* Spacing scale */
+  --spacing-leaf-2: 0.125rem;
+  --spacing-leaf-4: 0.25rem;
+  --spacing-leaf-6: 0.375rem;
+  --spacing-leaf-8: 0.5rem;
+  --spacing-leaf-12: 0.75rem;
+  --spacing-leaf-16: 1rem;
+  --spacing-leaf-24: 1.5rem;
+  --spacing-leaf-32: 2rem;
+  --spacing-leaf-48: 3rem;
+
+  /* Border radii */
+  --radius-sm: 4px;
+  --radius-default: 8px;
+  --radius-lg: 30px;
+  --radius-pill: 900px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 1px rgba(0, 0, 0, 0.2);
+  --shadow-default: 0 8px 6px 0 rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 12px 0 rgba(0, 0, 0, 0.2);
+}
+
+body {
+  margin: 0;
+  font-family: "Value Sans Pro", system-ui, sans-serif;
+  color: #333333;
+  background: #FFFFFF;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100svh;
+}
