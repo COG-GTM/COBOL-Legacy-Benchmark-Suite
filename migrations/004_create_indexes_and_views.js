@@ -38,7 +38,7 @@ exports.up = async function (knex) {
       SELECT p.*, pm.portfolio_name, pm.client_id
       FROM investment_positions p
       JOIN portfolio_master pm ON p.portfolio_id = pm.portfolio_id
-      WHERE p.position_date = CURRENT_DATE - INTERVAL '1 day'
+      WHERE p.position_date = CURRENT_DATE - 1
   `);
 };
 
