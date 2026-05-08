@@ -36,10 +36,18 @@ export function handleApiError(
 
   switch (status) {
     case 401:
-      config.onUnauthorized?.()
+      if (config.onUnauthorized) {
+        config.onUnauthorized()
+      } else {
+        addToast(error)
+      }
       break
     case 404:
-      config.onNotFound?.()
+      if (config.onNotFound) {
+        config.onNotFound()
+      } else {
+        addToast(error)
+      }
       break
     default:
       if (status >= 400) {
