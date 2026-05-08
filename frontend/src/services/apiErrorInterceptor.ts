@@ -97,7 +97,8 @@ export async function fetchWithErrorHandling(
       if (contentType?.includes('application/json')) {
         body = (await response.json()) as Record<string, unknown>
       } else {
-        body = await response.text()
+        const text = await response.text()
+        body = text || undefined
       }
     } catch {
       // body parsing failed, use default message

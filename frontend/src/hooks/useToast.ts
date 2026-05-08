@@ -24,6 +24,7 @@ const MAX_TOASTS = 5
 let toasts: Toast[] = []
 let listeners: Array<() => void> = []
 let nextId = 0
+const timers = new Map<string, ReturnType<typeof setTimeout>>()
 
 function emitChange() {
   for (const listener of listeners) {
@@ -57,20 +58,29 @@ export function addToast(error: AppError, options?: ToastOptions): string {
   emitChange()
 
   if (duration > 0) {
-    setTimeout(() => {
+    const timerId = setTimeout(() => {
+      timers.delete(id)
       dismissToast(id)
     }, duration)
+    timers.set(id, timerId)
   }
 
   return id
 }
 
 export function dismissToast(id: string): void {
+  const timerId = timers.get(id)
+  if (timerId !== undefined) {
+    clearTimeout(timerId)
+    timers.delete(id)
+  }
   toasts = toasts.filter((t) => t.id !== id)
   emitChange()
 }
 
 export function clearAllToasts(): void {
+  timers.forEach((timerId) => clearTimeout(timerId))
+  timers.clear()
   toasts = []
   emitChange()
 }
