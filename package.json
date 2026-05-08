@@ -1,0 +1,15 @@
+{
+  "name": "cobol-legacy-benchmark-suite",
+  "version": "1.0.0",
+  "description": "PostgreSQL migrations for COBOL Legacy Benchmark Suite modernization",
+  "private": true,
+  "scripts": {
+    "migrate": "knex migrate:latest",
+    "migrate:rollback": "knex migrate:rollback",
+    "migrate:status": "knex migrate:status"
+  },
+  "dependencies": {
+    "knex": "^3.1.0",
+    "pg": "^8.13.0"
+  }
+}
