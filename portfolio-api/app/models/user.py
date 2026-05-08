@@ -18,20 +18,14 @@ from app.models.base import Base
 
 
 class StringArray(TypeDecorator):
-    """Platform-agnostic array type.
+    """Platform-agnostic array type stored as JSON.
 
-    Uses ARRAY(String) on PostgreSQL, JSON on other backends (e.g. SQLite for tests).
+    Uses JSON on all backends for consistency between the migration
+    (which defines the column as sa.JSON) and the ORM model.
     """
 
     impl = JSON
     cache_ok = True
-
-    def load_dialect_impl(self, dialect):
-        if dialect.name == "postgresql":
-            from sqlalchemy.dialects.postgresql import ARRAY
-
-            return dialect.type_descriptor(ARRAY(String))
-        return dialect.type_descriptor(JSON)
 
     def process_bind_param(self, value, dialect):
         if value is None:
