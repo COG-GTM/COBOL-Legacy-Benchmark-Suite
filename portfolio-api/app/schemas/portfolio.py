@@ -1,3 +1,4 @@
+import re
 from datetime import date, datetime
 
 from pydantic import BaseModel, ConfigDict, field_validator
@@ -36,8 +37,6 @@ class PortfolioCreate(PortfolioBase):
     @field_validator("portfolio_id")
     @classmethod
     def portfolio_id_format(cls, v: str) -> str:
-        import re
-
         if not re.match(r"^PORT\d{4,5}$", v):
             raise ValueError(
                 "portfolio_id must start with 'PORT' followed by 4-5 digits"
@@ -68,13 +67,17 @@ class PortfolioUpdate(BaseModel):
         return v
 
 
-class PortfolioRead(PortfolioBase):
+class PortfolioRead(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
     portfolio_id: str
     account_type: str
     branch_id: str
     client_id: str
+    portfolio_name: str
+    currency_code: CurrencyCode
+    risk_level: RiskLevel
+    status: StatusCode
     open_date: date
     close_date: date | None = None
     last_maint_date: datetime
