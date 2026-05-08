@@ -330,14 +330,30 @@ class HistoryLoader:
                 self._error_handler.close()
 
     def _final_commit(self) -> None:
-        """3100-FINAL-COMMIT."""
+        """3100-FINAL-COMMIT.
+
+        On a successful commit we bump ``commits_issued`` and rewrite the
+        BCT checkpoint. If the commit fails we record an error so
+        ``_mark_batch_control_done`` flags the run as ERROR and we leave
+        the checkpoint at the last known-good state.
+        """
         try:
             self._db.commit()
         except SQLAlchemyError as exc:
             LOGGER.error("Final commit failed: %s", exc)
             self._return_code = max(self._return_code, ReturnCode.ERROR)
-        self._update_checkpoint()
+            self.stats.error_count += 1
+            self._error_handler.log_error(
+                program=self.config.program_id,
+                category=ErrorCategory.SYSTEM.value,
+                code="DB03",
+                severity=ErrorSeverity.ERROR,
+                text="Final commit failed",
+                details=str(exc)[:256],
+            )
+            return
         self.stats.commits_issued += 1
+        self._update_checkpoint()
 
     def _mark_batch_control_done(self) -> None:
         if self._batch_control is None:

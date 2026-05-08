@@ -387,6 +387,48 @@ class TestErrorHandling:
         contents = loader_config.errlog_path.read_text()
         assert "test failure" in contents
 
+    def test_final_commit_failure_does_not_overcount_or_checkpoint(
+        self, loader_config, history_records_factory, initial_batch_control
+    ):
+        """3100-FINAL-COMMIT must not bump commits_issued or rewrite the
+        checkpoint when the underlying DB commit raises. The run should be
+        recorded as ERROR in the batch-control file."""
+        loader_config.commit_threshold = 1000  # avoid mid-batch commits
+        records = history_records_factory(3)
+        loader = HistoryLoader(
+            config=loader_config,
+            history_records=records,
+            batch_control=initial_batch_control,
+        )
+        loader.initialize()
+        loader.process_records()
+
+        commits_before = loader.stats.commits_issued
+        # Snapshot the BCT counts written by the last successful checkpoint
+        # (none yet — we haven't crossed the threshold).
+        bct_records_written_before = initial_batch_control.records_written
+
+        # The first commit (3100-FINAL-COMMIT) must raise; the second
+        # call (from DatabaseConnection.disconnect()) succeeds so the
+        # rest of finalize() can run.
+        with patch.object(
+            loader._db,
+            "commit",
+            side_effect=[
+                OperationalError("boom", params=None, orig=Exception("boom")),
+                None,
+            ],
+        ):
+            loader.finalize()
+
+        # commits_issued must NOT have been incremented for the failed commit.
+        assert loader.stats.commits_issued == commits_before
+        # error_count is bumped so _mark_batch_control_done flags ERROR.
+        assert loader.stats.error_count >= 1
+        assert initial_batch_control.status == ProcessStatus.ERROR.value
+        # Checkpoint must not have been advanced past the last good state.
+        assert initial_batch_control.records_written == bct_records_written_before
+
     def test_loader_stops_after_max_errors(self, loader_config, history_records_factory):
         loader_config.max_errors = 3
         records = history_records_factory(20)
