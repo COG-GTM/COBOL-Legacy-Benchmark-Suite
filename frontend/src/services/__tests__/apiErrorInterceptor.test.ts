@@ -153,6 +153,7 @@ describe('apiErrorInterceptor', () => {
         status: 500,
         headers: new Headers({ 'content-type': 'application/json' }),
         json: vi.fn().mockResolvedValue({ message: 'Server error' }),
+        clone() { return { ...this, json: vi.fn().mockResolvedValue({ message: 'Server error' }) } },
       } as unknown as Response
 
       vi.mocked(fetch).mockResolvedValue(mockResponse)
@@ -168,6 +169,7 @@ describe('apiErrorInterceptor', () => {
         status: 400,
         headers: new Headers({ 'content-type': 'application/json' }),
         json: vi.fn().mockResolvedValue({ message: 'JSON error' }),
+        clone() { return { ...this, json: vi.fn().mockResolvedValue({ message: 'JSON error' }) } },
       } as unknown as Response
 
       vi.mocked(fetch).mockResolvedValue(jsonResponse)
@@ -185,6 +187,7 @@ describe('apiErrorInterceptor', () => {
         status: 400,
         headers: new Headers({ 'content-type': 'text/plain' }),
         text: vi.fn().mockResolvedValue('Plain text error'),
+        clone() { return { ...this, text: vi.fn().mockResolvedValue('Plain text error') } },
       } as unknown as Response
 
       vi.mocked(fetch).mockResolvedValue(textResponse)

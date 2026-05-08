@@ -54,7 +54,20 @@ export function addToast(error: AppError, options?: ToastOptions): string {
     createdAt: Date.now(),
   }
 
+  const previous = toasts
   toasts = [...toasts, toast].slice(-MAX_TOASTS)
+
+  const currentIds = new Set(toasts.map((t) => t.id))
+  for (const t of previous) {
+    if (!currentIds.has(t.id)) {
+      const evictedTimer = timers.get(t.id)
+      if (evictedTimer !== undefined) {
+        clearTimeout(evictedTimer)
+        timers.delete(t.id)
+      }
+    }
+  }
+
   emitChange()
 
   if (duration > 0) {

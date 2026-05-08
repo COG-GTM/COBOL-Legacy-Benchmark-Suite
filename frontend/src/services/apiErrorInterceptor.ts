@@ -91,13 +91,14 @@ export async function fetchWithErrorHandling(
   const response = await fetch(input, init)
 
   if (!response.ok) {
+    const clone = response.clone()
     let body: string | Record<string, unknown> | undefined
     try {
-      const contentType = response.headers.get('content-type')
+      const contentType = clone.headers.get('content-type')
       if (contentType?.includes('application/json')) {
-        body = (await response.json()) as Record<string, unknown>
+        body = (await clone.json()) as Record<string, unknown>
       } else {
-        const text = await response.text()
+        const text = await clone.text()
         body = text || undefined
       }
     } catch {
