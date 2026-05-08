@@ -10,9 +10,9 @@ export interface HistoryRecord {
   portfolioId: string;     // HIST-PORTFOLIO-ID (8 chars)
   date: string;            // HIST-DATE (ISO 8601)
   time: string;            // HIST-TIME (HH:MM:SS)
-  seqNo: string;           // HIST-SEQ-NO (6 chars)
+  seqNo: string;           // HIST-SEQ-NO (4 chars)
   recordType: RecordType;  // HIST-REC-TYPE PORT/POS/TRN
-  actionCode: ActionCode;  // HIST-ACTION-CODE ADD/CHG/DEL
+  actionCode: ActionCode;  // HIST-ACTION-CODE ADD/CHANGE/DELETE
   beforeImage: string;     // HIST-BEFORE-IMAGE (400 chars)
   afterImage: string;      // HIST-AFTER-IMAGE (400 chars)
   reasonCode: string;      // HIST-REASON-CODE (4 chars)
