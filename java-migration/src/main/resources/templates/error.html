@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Error</title>
+</head>
+<body>
+<h1>Error</h1>
+<div>
+    <p>Error Code: <span th:text="${errorCode}">Unknown</span></p>
+    <p>Details: <span th:text="${errorMessage}">An error occurred</span></p>
+</div>
+<a href="/inquiry">Back to Menu</a>
+</body>
+</html>

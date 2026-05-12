@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Transaction History</title>
+</head>
+<body>
+<h1>Transaction History</h1>
+<form action="/inquiry/history" method="get">
+    <label for="accountNo">Account Number:</label>
+    <input type="text" id="accountNo" name="accountNo" th:value="${accountNo}" maxlength="8"/>
+    <button type="submit">Search</button>
+</form>
+
+<div th:if="${historyPage}">
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Type</th>
+                <th>Units</th>
+                <th>Price</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="record : ${historyPage.content}">
+                <td th:text="${record.transDate}"/>
+                <td th:text="${record.transType}"/>
+                <td th:text="${record.quantity}"/>
+                <td th:text="${record.price}"/>
+                <td th:text="${record.amount}"/>
+            </tr>
+        </tbody>
+    </table>
+
+    <div>
+        <a th:if="${currentPage > 0}"
+           th:href="@{/inquiry/history(accountNo=${accountNo},page=${currentPage - 1})}">Previous</a>
+        <span th:text="'Page ' + (${currentPage} + 1) + ' of ' + ${historyPage.totalPages}"/>
+        <a th:if="${currentPage < historyPage.totalPages - 1}"
+           th:href="@{/inquiry/history(accountNo=${accountNo},page=${currentPage + 1})}">Next</a>
+    </div>
+</div>
+<a href="/inquiry">Back to Menu</a>
+</body>
+</html>

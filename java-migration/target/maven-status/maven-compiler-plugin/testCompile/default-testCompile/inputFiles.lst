@@ -1,0 +1,7 @@
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/java-migration/src/test/java/com/portfolio/service/PortfolioValidatorTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/java-migration/src/test/java/com/portfolio/integration/ErrorHandlingTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/java-migration/src/test/java/com/portfolio/integration/PortfolioIntegrationTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/java-migration/src/test/java/com/portfolio/service/TransactionProcessingServiceTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/java-migration/src/test/java/com/portfolio/integration/SecurityTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/java-migration/src/test/java/com/portfolio/batch/HistoryLoadJobTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/java-migration/src/test/java/com/portfolio/service/PortfolioServiceTest.java

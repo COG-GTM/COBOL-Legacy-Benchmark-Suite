@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Portfolio Position Inquiry</title>
+</head>
+<body>
+<h1>Portfolio Position Inquiry</h1>
+<div th:if="${portfolio}">
+    <table>
+        <tr><td>Portfolio ID:</td><td th:text="${portfolio.portfolioId}"/></tr>
+        <tr><td>Client ID:</td><td th:text="${portfolio.clientId}"/></tr>
+        <tr><td>Name:</td><td th:text="${portfolio.portfolioName}"/></tr>
+        <tr><td>Status:</td><td th:text="${portfolio.status}"/></tr>
+        <tr><td>Total Value:</td><td th:text="${portfolio.totalValue}"/></tr>
+        <tr><td>Cash Balance:</td><td th:text="${portfolio.cashBalance}"/></tr>
+    </table>
+
+    <h2>Positions</h2>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Investment ID</th>
+                <th>Date</th>
+                <th>Quantity</th>
+                <th>Cost Basis</th>
+                <th>Market Value</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr th:each="pos : ${positions}">
+                <td th:text="${pos.id.investmentId}"/>
+                <td th:text="${pos.id.positionDate}"/>
+                <td th:text="${pos.quantity}"/>
+                <td th:text="${pos.costBasis}"/>
+                <td th:text="${pos.marketValue}"/>
+            </tr>
+        </tbody>
+    </table>
+</div>
+<a href="/inquiry">Back to Menu</a>
+</body>
+</html>
