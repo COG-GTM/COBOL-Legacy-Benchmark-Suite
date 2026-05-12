@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <title>Portfolio Management System</title>
+</head>
+<body>
+<h1>Portfolio Management System</h1>
+<h2>Main Menu</h2>
+<div>
+    <p>Select an option:</p>
+    <ol>
+        <li><a href="/inquiry/portfolio">Portfolio Position Inquiry</a></li>
+        <li><a href="/inquiry/history">Transaction History</a></li>
+        <li><a href="/">Exit</a></li>
+    </ol>
+    <form action="/inquiry/portfolio" method="get">
+        <label for="portfolioId">Portfolio ID:</label>
+        <input type="text" id="portfolioId" name="portfolioId" maxlength="8"/>
+        <button type="submit">Submit</button>
+    </form>
+</div>
+<div th:if="${errorMessage}" style="color: red;">
+    <p th:text="${errorMessage}">Error message</p>
+</div>
+</body>
+</html>

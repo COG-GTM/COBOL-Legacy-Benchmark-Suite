@@ -1,0 +1,7 @@
+com/portfolio/service/PortfolioServiceTest.class
+com/portfolio/service/TransactionProcessingServiceTest.class
+com/portfolio/batch/HistoryLoadJobTest.class
+com/portfolio/integration/SecurityTest.class
+com/portfolio/service/PortfolioValidatorTest.class
+com/portfolio/integration/PortfolioIntegrationTest.class
+com/portfolio/integration/ErrorHandlingTest.class
