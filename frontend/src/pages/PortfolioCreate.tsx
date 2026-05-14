@@ -8,13 +8,18 @@ import type { Portfolio } from '../types';
 
 export default function PortfolioCreate() {
   const navigate = useNavigate();
-  const { addPortfolio } = usePortfolio();
+  const { portfolios, addPortfolio } = usePortfolio();
   const { addToast } = useToast();
   const { formData, errors, updateField, validate } = usePortfolioForm();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!validate()) return;
+
+    if (portfolios.find((p) => p.id === formData.id)) {
+      addToast(`Portfolio ${formData.id} already exists.`, 'error');
+      return;
+    }
 
     const now = new Date();
     const dateStr = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}`;
