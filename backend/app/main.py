@@ -262,7 +262,10 @@ def create_transaction(data: TransactionCreate, db: Session = Depends(get_db)) -
         raise HTTPException(status_code=400, detail="Portfolio is not active")
 
     txn_id = uuid.uuid4().hex
-    amount = round(data.quantity * data.price, 2)
+    if data.amount is not None:
+        amount = round(data.amount, 2)
+    else:
+        amount = round(data.quantity * data.price, 2)
 
     txn = Transaction(
         transaction_id=txn_id,

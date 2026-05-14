@@ -85,7 +85,7 @@ class Transaction(Base):
     __tablename__ = "transactions"
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=True)
-    transaction_id: Mapped[str] = mapped_column(String(20), unique=True, nullable=False)
+    transaction_id: Mapped[str] = mapped_column(String(32), unique=True, nullable=False)
     portfolio_id: Mapped[str] = mapped_column(String(8), ForeignKey("portfolios.portfolio_id"), nullable=False)
     investment_id: Mapped[str] = mapped_column(String(10), nullable=False)
     transaction_date: Mapped[date] = mapped_column(Date, nullable=False)

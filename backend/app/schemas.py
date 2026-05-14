@@ -112,5 +112,6 @@ class TransactionCreate(BaseModel):
     portfolio_id: str = Field(min_length=1, max_length=8)
     investment_id: str = Field(min_length=1, max_length=10)
     transaction_type: str = Field(pattern=r"^(BU|SL|TR|FE)$")
-    quantity: float = Field(gt=0)
-    price: float = Field(gt=0)
+    quantity: float = Field(ge=0)
+    price: float = Field(ge=0)
+    amount: float | None = Field(default=None, ge=0)
