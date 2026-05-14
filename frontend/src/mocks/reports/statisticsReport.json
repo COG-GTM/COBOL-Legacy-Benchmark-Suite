@@ -1,0 +1,20 @@
+[
+  { "date": "2024-09-20", "metric": "Active Portfolios", "value": 6, "unit": "count", "trend": "stable" },
+  { "date": "2024-09-20", "metric": "Total AUM", "value": 14654633.86, "unit": "USD", "trend": "up" },
+  { "date": "2024-09-20", "metric": "Transactions Today", "value": 12, "unit": "count", "trend": "up" },
+  { "date": "2024-09-20", "metric": "Avg Response Time", "value": 0.45, "unit": "seconds", "trend": "down" },
+  { "date": "2024-09-20", "metric": "CICS CPU Usage", "value": 42.5, "unit": "percent", "trend": "stable" },
+  { "date": "2024-09-20", "metric": "DB2 Buffer Hit Ratio", "value": 98.7, "unit": "percent", "trend": "up" },
+  { "date": "2024-09-20", "metric": "VSAM CI Splits", "value": 3, "unit": "count", "trend": "down" },
+  { "date": "2024-09-20", "metric": "Batch Jobs Completed", "value": 8, "unit": "count", "trend": "stable" },
+  { "date": "2024-09-19", "metric": "Active Portfolios", "value": 6, "unit": "count", "trend": "stable" },
+  { "date": "2024-09-19", "metric": "Total AUM", "value": 14598234.50, "unit": "USD", "trend": "up" },
+  { "date": "2024-09-19", "metric": "Transactions Today", "value": 8, "unit": "count", "trend": "down" },
+  { "date": "2024-09-19", "metric": "Avg Response Time", "value": 0.52, "unit": "seconds", "trend": "up" },
+  { "date": "2024-09-19", "metric": "CICS CPU Usage", "value": 38.2, "unit": "percent", "trend": "down" },
+  { "date": "2024-09-19", "metric": "DB2 Buffer Hit Ratio", "value": 98.5, "unit": "percent", "trend": "stable" },
+  { "date": "2024-09-18", "metric": "Active Portfolios", "value": 6, "unit": "count", "trend": "stable" },
+  { "date": "2024-09-18", "metric": "Total AUM", "value": 14512890.25, "unit": "USD", "trend": "down" },
+  { "date": "2024-09-18", "metric": "Transactions Today", "value": 15, "unit": "count", "trend": "up" },
+  { "date": "2024-09-18", "metric": "Avg Response Time", "value": 0.48, "unit": "seconds", "trend": "stable" }
+]
