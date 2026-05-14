@@ -1,0 +1,167 @@
+[
+  {
+    "portfolioId": "PORT0001",
+    "date": "20240920",
+    "investmentId": "FUND001",
+    "fundName": "Vanguard S&P 500 ETF",
+    "quantity": 1500.0000,
+    "costBasis": 450000.00,
+    "marketValue": 525000.00,
+    "currency": "USD",
+    "status": "A"
+  },
+  {
+    "portfolioId": "PORT0001",
+    "date": "20240920",
+    "investmentId": "FUND002",
+    "fundName": "iShares Core Bond ETF",
+    "quantity": 3200.0000,
+    "costBasis": 320000.00,
+    "marketValue": 315680.00,
+    "currency": "USD",
+    "status": "A"
+  },
+  {
+    "portfolioId": "PORT0001",
+    "date": "20240920",
+    "investmentId": "FUND003",
+    "fundName": "Fidelity Growth Fund",
+    "quantity": 800.5000,
+    "costBasis": 680000.00,
+    "marketValue": 745250.75,
+    "currency": "USD",
+    "status": "A"
+  },
+  {
+    "portfolioId": "PORT0001",
+    "date": "20240920",
+    "investmentId": "FUND004",
+    "fundName": "SPDR Gold Shares",
+    "quantity": 250.0000,
+    "costBasis": 420000.00,
+    "marketValue": 448000.00,
+    "currency": "USD",
+    "status": "A"
+  },
+  {
+    "portfolioId": "PORT0002",
+    "date": "20240918",
+    "investmentId": "FUND001",
+    "fundName": "Vanguard S&P 500 ETF",
+    "quantity": 350.0000,
+    "costBasis": 105000.00,
+    "marketValue": 122500.00,
+    "currency": "USD",
+    "status": "A"
+  },
+  {
+    "portfolioId": "PORT0002",
+    "date": "20240918",
+    "investmentId": "FUND005",
+    "fundName": "Schwab International Equity",
+    "quantity": 1200.0000,
+    "costBasis": 240000.00,
+    "marketValue": 228920.30,
+    "currency": "USD",
+    "status": "A"
+  },
+  {
+    "portfolioId": "PORT0003",
+    "date": "20240815",
+    "investmentId": "FUND002",
+    "fundName": "iShares Core Bond ETF",
+    "quantity": 5000.0000,
+    "costBasis": 500000.00,
+    "marketValue": 493567.89,
+    "currency": "USD",
+    "status": "A"
+  },
+  {
+    "portfolioId": "PORT0003",
+    "date": "20240815",
+    "investmentId": "FUND006",
+    "fundName": "T. Rowe Price Blue Chip",
+    "quantity": 600.0000,
+    "costBasis": 420000.00,
+    "marketValue": 452000.00,
+    "currency": "USD",
+    "status": "A"
+  },
+  {
+    "portfolioId": "PORT0006",
+    "date": "20240922",
+    "investmentId": "FUND003",
+    "fundName": "Fidelity Growth Fund",
+    "quantity": 400.0000,
+    "costBasis": 340000.00,
+    "marketValue": 372345.67,
+    "currency": "USD",
+    "status": "A"
+  },
+  {
+    "portfolioId": "PORT0006",
+    "date": "20240922",
+    "investmentId": "FUND007",
+    "fundName": "JPMorgan Emerging Markets",
+    "quantity": 2000.0000,
+    "costBasis": 360000.00,
+    "marketValue": 345000.00,
+    "currency": "USD",
+    "status": "A"
+  },
+  {
+    "portfolioId": "PORT0007",
+    "date": "20240921",
+    "investmentId": "FUND001",
+    "fundName": "Vanguard S&P 500 ETF",
+    "quantity": 200.0000,
+    "costBasis": 60000.00,
+    "marketValue": 70000.00,
+    "currency": "USD",
+    "status": "A"
+  },
+  {
+    "portfolioId": "PORT0007",
+    "date": "20240921",
+    "investmentId": "FUND004",
+    "fundName": "SPDR Gold Shares",
+    "quantity": 100.0000,
+    "costBasis": 168000.00,
+    "marketValue": 175678.90,
+    "currency": "USD",
+    "status": "A"
+  },
+  {
+    "portfolioId": "PORT0008",
+    "date": "20240915",
+    "investmentId": "FUND002",
+    "fundName": "iShares Core Bond ETF",
+    "quantity": 10000.0000,
+    "costBasis": 1000000.00,
+    "marketValue": 987000.00,
+    "currency": "USD",
+    "status": "A"
+  },
+  {
+    "portfolioId": "PORT0008",
+    "date": "20240915",
+    "investmentId": "FUND006",
+    "fundName": "T. Rowe Price Blue Chip",
+    "quantity": 2500.0000,
+    "costBasis": 1750000.00,
+    "marketValue": 1891901.23,
+    "currency": "USD",
+    "status": "A"
+  },
+  {
+    "portfolioId": "PORT0008",
+    "date": "20240915",
+    "investmentId": "FUND003",
+    "fundName": "Fidelity Growth Fund",
+    "quantity": 1500.0000,
+    "costBasis": 1275000.00,
+    "marketValue": 1370000.00,
+    "currency": "USD",
+    "status": "A"
+  }
+]

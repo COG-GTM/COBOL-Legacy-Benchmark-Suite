@@ -1,0 +1,23 @@
+[
+  {
+    "id": "USR00001",
+    "username": "admin",
+    "password": "admin123",
+    "name": "System Administrator",
+    "role": "read-write"
+  },
+  {
+    "id": "USR00002",
+    "username": "analyst",
+    "password": "analyst123",
+    "name": "Portfolio Analyst",
+    "role": "read-only"
+  },
+  {
+    "id": "USR00003",
+    "username": "trader",
+    "password": "trader123",
+    "name": "Senior Trader",
+    "role": "read-write"
+  }
+]

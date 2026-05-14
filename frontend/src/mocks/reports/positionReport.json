@@ -1,0 +1,82 @@
+[
+  {
+    "date": "2024-09-20",
+    "portfolioId": "PORT0001",
+    "investmentId": "FUND001",
+    "fundName": "Vanguard S&P 500 ETF",
+    "quantity": 1500.0,
+    "costBasis": 450000.00,
+    "marketValue": 525000.00,
+    "gainLoss": 75000.00
+  },
+  {
+    "date": "2024-09-20",
+    "portfolioId": "PORT0001",
+    "investmentId": "FUND002",
+    "fundName": "iShares Core Bond ETF",
+    "quantity": 3200.0,
+    "costBasis": 320000.00,
+    "marketValue": 315680.00,
+    "gainLoss": -4320.00
+  },
+  {
+    "date": "2024-09-20",
+    "portfolioId": "PORT0001",
+    "investmentId": "FUND003",
+    "fundName": "Fidelity Growth Fund",
+    "quantity": 800.5,
+    "costBasis": 680000.00,
+    "marketValue": 745250.75,
+    "gainLoss": 65250.75
+  },
+  {
+    "date": "2024-09-19",
+    "portfolioId": "PORT0002",
+    "investmentId": "FUND001",
+    "fundName": "Vanguard S&P 500 ETF",
+    "quantity": 350.0,
+    "costBasis": 105000.00,
+    "marketValue": 121975.00,
+    "gainLoss": 16975.00
+  },
+  {
+    "date": "2024-09-19",
+    "portfolioId": "PORT0003",
+    "investmentId": "FUND002",
+    "fundName": "iShares Core Bond ETF",
+    "quantity": 5000.0,
+    "costBasis": 500000.00,
+    "marketValue": 494500.00,
+    "gainLoss": -5500.00
+  },
+  {
+    "date": "2024-09-18",
+    "portfolioId": "PORT0006",
+    "investmentId": "FUND003",
+    "fundName": "Fidelity Growth Fund",
+    "quantity": 400.0,
+    "costBasis": 340000.00,
+    "marketValue": 370200.00,
+    "gainLoss": 30200.00
+  },
+  {
+    "date": "2024-09-18",
+    "portfolioId": "PORT0008",
+    "investmentId": "FUND006",
+    "fundName": "T. Rowe Price Blue Chip",
+    "quantity": 2500.0,
+    "costBasis": 1750000.00,
+    "marketValue": 1887500.00,
+    "gainLoss": 137500.00
+  },
+  {
+    "date": "2024-09-17",
+    "portfolioId": "PORT0007",
+    "investmentId": "FUND001",
+    "fundName": "Vanguard S&P 500 ETF",
+    "quantity": 200.0,
+    "costBasis": 60000.00,
+    "marketValue": 69800.00,
+    "gainLoss": 9800.00
+  }
+]
