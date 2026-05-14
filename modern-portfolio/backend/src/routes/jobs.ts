@@ -144,96 +144,108 @@ async function processTransactions(jobId: string, userId: string): Promise<void>
 
   for (const txn of pendingTransactions) {
     try {
-      // Optimistic concurrency: claim this transaction atomically
-      // Uses updateMany with status='PENDING' as a lock — if count is 0,
-      // another process already claimed it. Goes directly to DONE (no
-      // intermediate PROCESSING status needed since it's not in the enum).
-      const claimed = await prisma.transaction.updateMany({
-        where: { id: txn.id, status: 'PENDING' },
-        data: { status: 'DONE', processedAt: new Date(), processUser: userId.substring(0, 8) },
-      });
-      if (claimed.count === 0) {
-        continue;
-      }
-
-      // Step 2: Update positions (POSUPD00)
       job.progress = 10 + Math.floor((processed / pendingTransactions.length) * 70);
 
-      const positionDate = txn.transactionDate;
-      const existingPosition = await prisma.position.findFirst({
-        where: {
-          portfolioId: txn.portfolioId,
-          investmentId: txn.investmentId,
-          status: 'ACTIVE',
-        },
-      });
+      // Wrap all three steps in a database transaction for atomicity.
+      // If any step fails, all changes (claim, position update, history)
+      // are rolled back together, preventing inconsistent state.
+      const wasClaimed = await prisma.$transaction(async (tx) => {
+        // Step 1: Claim transaction atomically (optimistic concurrency)
+        const claimed = await tx.transaction.updateMany({
+          where: { id: txn.id, status: 'PENDING' },
+          data: { status: 'DONE', processedAt: new Date(), processUser: userId.substring(0, 8) },
+        });
+        if (claimed.count === 0) {
+          return false;
+        }
 
-      if (txn.type === 'BUY' || txn.type === 'SELL') {
-        const qtyChange = txn.type === 'BUY' ? Number(txn.quantity) : -Number(txn.quantity);
-        const existingQty = existingPosition ? Number(existingPosition.quantity) : 0;
-        const existingCost = existingPosition ? Number(existingPosition.costBasis) : 0;
-        const avgCostPerUnit = existingQty > 0 ? existingCost / existingQty : 0;
-        const newQty = existingQty + qtyChange;
-        const costDeducted = txn.type === 'SELL' ? avgCostPerUnit * Number(txn.quantity) : 0;
-        const newCostBasis = txn.type === 'BUY'
-          ? existingCost + Number(txn.amount)
-          : existingCost - costDeducted;
-
-        await prisma.position.upsert({
-          where: existingPosition
-            ? { id: existingPosition.id }
-            : { portfolioId_investmentId_positionDate: { portfolioId: txn.portfolioId, investmentId: txn.investmentId, positionDate } },
-          update: { quantity: newQty, costBasis: newCostBasis, marketValue: newQty * Number(txn.price), lastUser: userId.substring(0, 8) },
-          create: {
+        // Step 2: Update positions (POSUPD00)
+        const positionDate = txn.transactionDate;
+        const existingPosition = await tx.position.findFirst({
+          where: {
             portfolioId: txn.portfolioId,
             investmentId: txn.investmentId,
-            positionDate,
-            quantity: newQty,
-            costBasis: newCostBasis,
-            marketValue: newQty * Number(txn.price),
-            lastUser: userId.substring(0, 8),
+            status: 'ACTIVE',
           },
         });
-      }
 
-      // Step 3: Load history (HISTLD00)
-      await prisma.positionHistory.create({
-        data: {
-          accountNo: txn.portfolio.accountNo.substring(0, 8),
-          portfolioId: txn.portfolioId,
-          transDate: txn.transactionDate,
-          transTime: txn.transactionTime,
-          transType: txn.type === 'BUY' ? 'BU' : txn.type === 'SELL' ? 'SL' : txn.type === 'TRANSFER' ? 'TR' : 'FE',
-          securityId: txn.investmentId,
-          quantity: txn.quantity,
-          price: txn.price,
-          amount: txn.amount,
-          fees: 0,
-          totalAmount: txn.amount,
-          costBasis: (() => {
-            if (!existingPosition) return txn.amount;
-            if (txn.type === 'SELL') {
+        if (txn.type === 'BUY' || txn.type === 'SELL') {
+          const qtyChange = txn.type === 'BUY' ? Number(txn.quantity) : -Number(txn.quantity);
+          const existingQty = existingPosition ? Number(existingPosition.quantity) : 0;
+          const existingCost = existingPosition ? Number(existingPosition.costBasis) : 0;
+
+          if (txn.type === 'SELL' && existingQty < Number(txn.quantity)) {
+            throw new Error(`Insufficient holdings: have ${existingQty}, selling ${Number(txn.quantity)}`);
+          }
+
+          const avgCostPerUnit = existingQty > 0 ? existingCost / existingQty : 0;
+          const newQty = existingQty + qtyChange;
+          const costDeducted = txn.type === 'SELL' ? avgCostPerUnit * Number(txn.quantity) : 0;
+          const newCostBasis = txn.type === 'BUY'
+            ? existingCost + Number(txn.amount)
+            : existingCost - costDeducted;
+
+          await tx.position.upsert({
+            where: existingPosition
+              ? { id: existingPosition.id }
+              : { portfolioId_investmentId_positionDate: { portfolioId: txn.portfolioId, investmentId: txn.investmentId, positionDate } },
+            update: { quantity: newQty, costBasis: newCostBasis, marketValue: newQty * Number(txn.price), lastUser: userId.substring(0, 8) },
+            create: {
+              portfolioId: txn.portfolioId,
+              investmentId: txn.investmentId,
+              positionDate,
+              quantity: newQty,
+              costBasis: newCostBasis,
+              marketValue: newQty * Number(txn.price),
+              lastUser: userId.substring(0, 8),
+            },
+          });
+        }
+
+        // Step 3: Load history (HISTLD00)
+        await tx.positionHistory.create({
+          data: {
+            accountNo: txn.portfolio.accountNo.substring(0, 8),
+            portfolioId: txn.portfolioId,
+            transDate: txn.transactionDate,
+            transTime: txn.transactionTime,
+            transType: txn.type === 'BUY' ? 'BU' : txn.type === 'SELL' ? 'SL' : txn.type === 'TRANSFER' ? 'TR' : 'FE',
+            securityId: txn.investmentId,
+            quantity: txn.quantity,
+            price: txn.price,
+            amount: txn.amount,
+            fees: 0,
+            totalAmount: txn.amount,
+            costBasis: (() => {
+              if (!existingPosition) return txn.amount;
+              if (txn.type === 'SELL') {
+                const avg = Number(existingPosition.quantity) > 0
+                  ? Number(existingPosition.costBasis) / Number(existingPosition.quantity)
+                  : 0;
+                return avg * Number(txn.quantity);
+              }
+              return txn.amount;
+            })(),
+            gainLoss: (() => {
+              if (txn.type !== 'SELL' || !existingPosition) return 0;
               const avg = Number(existingPosition.quantity) > 0
                 ? Number(existingPosition.costBasis) / Number(existingPosition.quantity)
                 : 0;
-              return avg * Number(txn.quantity);
-            }
-            return txn.amount;
-          })(),
-          gainLoss: (() => {
-            if (txn.type !== 'SELL' || !existingPosition) return 0;
-            const avg = Number(existingPosition.quantity) > 0
-              ? Number(existingPosition.costBasis) / Number(existingPosition.quantity)
-              : 0;
-            const proportionalCost = avg * Number(txn.quantity);
-            return Number(txn.amount) - proportionalCost;
-          })(),
-          processDate: new Date(),
-          programId: 'HISTLD00',
-          userId: userId.substring(0, 8),
-        },
+              const proportionalCost = avg * Number(txn.quantity);
+              return Number(txn.amount) - proportionalCost;
+            })(),
+            processDate: new Date(),
+            programId: 'HISTLD00',
+            userId: userId.substring(0, 8),
+          },
+        });
+
+        return true;
       });
 
+      if (!wasClaimed) {
+        continue;
+      }
       processed++;
     } catch {
       await prisma.transaction.update({
