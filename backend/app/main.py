@@ -10,6 +10,7 @@ Replaces:
   - RPTPOS00 / RPTAUD00 / RPTSTA00 (reporting)
 """
 
+import uuid
 from datetime import date, datetime
 from pathlib import Path
 
@@ -17,7 +18,6 @@ from fastapi import Depends, FastAPI, HTTPException, Query
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 
 from .database import Base, engine, get_db
@@ -261,9 +261,7 @@ def create_transaction(data: TransactionCreate, db: Session = Depends(get_db)) -
     if portfolio.status != "A":
         raise HTTPException(status_code=400, detail="Portfolio is not active")
 
-    now = datetime.utcnow()
-    seq = db.query(Transaction).count() + 1
-    txn_id = now.strftime("%Y%m%d%H%M%S") + f"{seq:06d}"
+    txn_id = uuid.uuid4().hex
     amount = round(data.quantity * data.price, 2)
 
     txn = Transaction(
@@ -277,7 +275,7 @@ def create_transaction(data: TransactionCreate, db: Session = Depends(get_db)) -
         amount=amount,
         currency_code="USD",
         status="D",
-        process_date=now,
+        process_date=datetime.utcnow(),
         process_user="WEBUSER",
     )
     db.add(txn)
@@ -371,7 +369,7 @@ if FRONTEND_DIR.exists():
 
     @app.get("/{full_path:path}")
     def serve_spa(full_path: str) -> FileResponse:
-        file_path = FRONTEND_DIR / full_path
-        if file_path.exists() and file_path.is_file():
+        file_path = (FRONTEND_DIR / full_path).resolve()
+        if file_path.is_relative_to(FRONTEND_DIR) and file_path.is_file():
             return FileResponse(str(file_path))
         return FileResponse(str(FRONTEND_DIR / "index.html"))
