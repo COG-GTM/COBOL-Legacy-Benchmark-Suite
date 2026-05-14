@@ -1,0 +1,215 @@
+// Prisma Schema for Investment Portfolio Management System
+// Modernized from DB2/VSAM definitions in the COBOL Legacy Benchmark Suite
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================
+// PORTFOLIO MASTER (from PORTFOLIO_MASTER + PORTFLIO copybook)
+// ============================================================
+model Portfolio {
+  id            String   @id @default(cuid())
+  portfolioId   String   @unique @map("portfolio_id") @db.VarChar(9)
+  accountNo     String   @map("account_no") @db.VarChar(10)
+  clientName    String   @map("client_name") @db.VarChar(50)
+  clientType    ClientType @map("client_type")
+  status        PortfolioStatus @default(ACTIVE)
+  totalValue    Decimal  @default(0) @map("total_value") @db.Decimal(18, 2)
+  cashBalance   Decimal  @default(0) @map("cash_balance") @db.Decimal(18, 2)
+  currencyCode  String   @default("USD") @map("currency_code") @db.VarChar(3)
+  riskLevel     String   @default("M") @map("risk_level") @db.VarChar(1)
+  branchId      String   @default("01") @map("branch_id") @db.VarChar(2)
+  openDate      DateTime @default(now()) @map("open_date")
+  closeDate     DateTime? @map("close_date")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  lastUser      String   @default("SYSTEM") @map("last_user") @db.VarChar(8)
+
+  positions     Position[]
+  transactions  Transaction[]
+  auditLogs     AuditLog[]
+  positionHistory PositionHistory[]
+
+  @@index([accountNo])
+  @@index([clientType, status])
+  @@map("portfolios")
+}
+
+// ============================================================
+// INVESTMENT POSITIONS (from INVESTMENT_POSITIONS + POSREC)
+// ============================================================
+model Position {
+  id            String   @id @default(cuid())
+  portfolioId   String   @map("portfolio_id")
+  investmentId  String   @map("investment_id") @db.VarChar(10)
+  positionDate  DateTime @map("position_date")
+  quantity      Decimal  @map("quantity") @db.Decimal(18, 4)
+  costBasis     Decimal  @map("cost_basis") @db.Decimal(18, 2)
+  marketValue   Decimal  @map("market_value") @db.Decimal(18, 2)
+  currency      String   @default("USD") @db.VarChar(3)
+  status        PositionStatus @default(ACTIVE)
+  updatedAt     DateTime @updatedAt @map("updated_at")
+  lastUser      String   @default("SYSTEM") @map("last_user") @db.VarChar(8)
+
+  portfolio     Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@unique([portfolioId, investmentId, positionDate])
+  @@index([positionDate, portfolioId])
+  @@map("positions")
+}
+
+// ============================================================
+// TRANSACTION HISTORY (from TRANSACTION_HISTORY + TRNREC)
+// ============================================================
+model Transaction {
+  id                String   @id @default(cuid())
+  transactionId     String   @unique @map("transaction_id") @db.VarChar(20)
+  portfolioId       String   @map("portfolio_id")
+  transactionDate   DateTime @map("transaction_date")
+  transactionTime   String   @map("transaction_time") @db.VarChar(8)
+  investmentId      String   @map("investment_id") @db.VarChar(10)
+  type              TransactionType
+  quantity          Decimal  @db.Decimal(18, 4)
+  price             Decimal  @db.Decimal(18, 4)
+  amount            Decimal  @db.Decimal(18, 2)
+  currency          String   @default("USD") @db.VarChar(3)
+  status            TransactionStatus @default(PENDING)
+  processedAt       DateTime? @map("processed_at")
+  processUser       String   @default("SYSTEM") @map("process_user") @db.VarChar(8)
+  createdAt         DateTime @default(now()) @map("created_at")
+
+  portfolio         Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@index([portfolioId, transactionDate])
+  @@index([transactionDate, portfolioId])
+  @@map("transactions")
+}
+
+// ============================================================
+// POSITION HISTORY (from POSHIST table)
+// ============================================================
+model PositionHistory {
+  id            String   @id @default(cuid())
+  accountNo     String   @map("account_no") @db.VarChar(8)
+  portfolioId   String   @map("portfolio_id")
+  transDate     DateTime @map("trans_date")
+  transTime     String   @map("trans_time") @db.VarChar(8)
+  transType     String   @map("trans_type") @db.VarChar(2)
+  securityId    String   @map("security_id") @db.VarChar(12)
+  quantity      Decimal  @db.Decimal(15, 3)
+  price         Decimal  @db.Decimal(15, 3)
+  amount        Decimal  @db.Decimal(15, 2)
+  fees          Decimal  @default(0) @db.Decimal(15, 2)
+  totalAmount   Decimal  @map("total_amount") @db.Decimal(15, 2)
+  costBasis     Decimal  @map("cost_basis") @db.Decimal(15, 2)
+  gainLoss      Decimal  @map("gain_loss") @db.Decimal(15, 2)
+  processDate   DateTime @map("process_date")
+  programId     String   @map("program_id") @db.VarChar(8)
+  userId        String   @map("user_id") @db.VarChar(8)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  portfolio     Portfolio @relation(fields: [portfolioId], references: [id], onDelete: Cascade)
+
+  @@index([securityId, transDate])
+  @@index([processDate, programId])
+  @@map("position_history")
+}
+
+// ============================================================
+// AUDIT LOG (from HISTREC + AUDITLOG copybooks + ERRLOG)
+// ============================================================
+model AuditLog {
+  id            String   @id @default(cuid())
+  portfolioId   String?  @map("portfolio_id")
+  recordType    RecordType @map("record_type")
+  action        AuditAction
+  beforeImage   Json?    @map("before_image")
+  afterImage    Json?    @map("after_image")
+  reasonCode    String?  @map("reason_code") @db.VarChar(4)
+  userId        String   @map("user_id") @db.VarChar(8)
+  programId     String?  @map("program_id") @db.VarChar(8)
+  message       String?  @db.VarChar(500)
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  portfolio     Portfolio? @relation(fields: [portfolioId], references: [id], onDelete: SetNull)
+
+  @@index([portfolioId])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
+
+// ============================================================
+// USERS (replacing SECMGR)
+// ============================================================
+model User {
+  id            String   @id @default(cuid())
+  username      String   @unique @db.VarChar(30)
+  email         String   @unique @db.VarChar(100)
+  passwordHash  String   @map("password_hash")
+  role          UserRole @default(READ)
+  isActive      Boolean  @default(true) @map("is_active")
+  lastLogin     DateTime? @map("last_login")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
+
+  @@map("users")
+}
+
+// ============================================================
+// ENUMS
+// ============================================================
+enum ClientType {
+  INDIVIDUAL  @map("I")
+  CORPORATE   @map("C")
+  TRUST       @map("T")
+}
+
+enum PortfolioStatus {
+  ACTIVE      @map("A")
+  CLOSED      @map("C")
+  SUSPENDED   @map("S")
+}
+
+enum PositionStatus {
+  ACTIVE      @map("A")
+  CLOSED      @map("C")
+  PENDING     @map("P")
+}
+
+enum TransactionType {
+  BUY         @map("BU")
+  SELL        @map("SL")
+  TRANSFER    @map("TR")
+  FEE         @map("FE")
+}
+
+enum TransactionStatus {
+  PENDING     @map("P")
+  DONE        @map("D")
+  FAILED      @map("F")
+  REVERSED    @map("R")
+}
+
+enum RecordType {
+  PORTFOLIO   @map("PT")
+  POSITION    @map("PS")
+  TRANSACTION @map("TR")
+}
+
+enum AuditAction {
+  ADD         @map("A")
+  CHANGE      @map("C")
+  DELETE      @map("D")
+}
+
+enum UserRole {
+  READ
+  UPDATE
+  ADMIN
+}
