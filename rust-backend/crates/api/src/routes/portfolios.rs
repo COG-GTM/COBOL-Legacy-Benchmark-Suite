@@ -61,6 +61,9 @@ pub struct PortfolioResponse {
     pub total_value: Decimal,
     pub cash_balance: Decimal,
     pub create_date: Option<NaiveDate>,
+    pub last_maint: Option<NaiveDate>,
+    pub last_user: String,
+    pub last_trans: Option<NaiveDate>,
 }
 
 impl From<&PortfolioRecord> for PortfolioResponse {
@@ -74,6 +77,9 @@ impl From<&PortfolioRecord> for PortfolioResponse {
             total_value: r.total_value,
             cash_balance: r.cash_balance,
             create_date: r.create_date,
+            last_maint: r.last_maintenance_date,
+            last_user: r.last_user.clone(),
+            last_trans: r.last_transaction_date,
         }
     }
 }
@@ -137,26 +143,37 @@ impl From<&PositionRecord> for PositionResponse {
 #[serde(rename_all = "camelCase")]
 pub struct TransactionResponse {
     pub date: Option<NaiveDate>,
+    pub time: Option<chrono::NaiveTime>,
     pub portfolio_id: String,
+    pub sequence_no: String,
     pub investment_id: String,
+    #[serde(rename = "type")]
     pub transaction_type: domain::TransactionType,
     pub quantity: Decimal,
     pub price: Decimal,
     pub amount: Decimal,
+    pub currency: String,
     pub status: TransactionStatus,
+    pub process_date: Option<chrono::NaiveDateTime>,
+    pub process_user: String,
 }
 
 impl From<&TransactionRecord> for TransactionResponse {
     fn from(r: &TransactionRecord) -> Self {
         Self {
             date: r.date,
+            time: r.time,
             portfolio_id: r.portfolio_id.clone(),
+            sequence_no: r.sequence_no.clone(),
             investment_id: r.investment_id.clone(),
             transaction_type: r.transaction_type,
             quantity: r.quantity,
             price: r.price,
             amount: r.amount,
+            currency: r.currency.clone(),
             status: r.status,
+            process_date: r.process_date,
+            process_user: r.process_user.clone(),
         }
     }
 }

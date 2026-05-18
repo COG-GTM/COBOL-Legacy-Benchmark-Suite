@@ -15,7 +15,7 @@ rust-version = "1.75"
 
 [workspace.dependencies]
 # Domain / serialization
-rust_decimal = { version = "1", features = ["serde-with-str"] }
+rust_decimal = { version = "1", features = ["serde-with-float"] }
 chrono = { version = "0.4", features = ["serde"] }
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
