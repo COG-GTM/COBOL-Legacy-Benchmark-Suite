@@ -22,13 +22,13 @@ export interface Portfolio {
   accountNo: string;     // PORT-ACCOUNT-NO  PIC X(10)
   clientName: string;    // PORT-CLIENT-NAME PIC X(30)
   clientType: ClientType; // PORT-CLIENT-TYPE PIC X(1)
-  createDate: string;    // PORT-CREATE-DATE (ISO 8601)
-  lastMaint: string;     // PORT-LAST-MAINT  (ISO 8601)
+  createDate: string | null;    // PORT-CREATE-DATE (ISO 8601)
+  lastMaint: string | null;     // PORT-LAST-MAINT  (ISO 8601)
   status: PortfolioStatus; // PORT-STATUS    PIC X(1)
   totalValue: number;    // PORT-TOTAL-VALUE  S9(13)V99
   cashBalance: number;   // PORT-CASH-BALANCE S9(13)V99
   lastUser: string;      // PORT-LAST-USER   PIC X(8)
-  lastTrans: string;     // PORT-LAST-TRANS  (ISO 8601)
+  lastTrans: string | null;     // PORT-LAST-TRANS  (ISO 8601)
 }
 
 // ---------------------------------------------------------------------------

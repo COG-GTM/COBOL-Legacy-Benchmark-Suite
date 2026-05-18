@@ -59,8 +59,8 @@ export default function PortfolioDetail({ portfolioId }: PortfolioDetailProps) {
         <InfoCard label="Status" value={portfolioStatusLabel(portfolio.status)} />
         <InfoCard label="Total Value" value={formatCurrency(portfolio.totalValue)} />
         <InfoCard label="Cash Balance" value={formatCurrency(portfolio.cashBalance)} />
-        <InfoCard label="Created" value={portfolio.createDate} />
-        <InfoCard label="Last Maintenance" value={portfolio.lastMaint} />
+        <InfoCard label="Created" value={portfolio.createDate ?? "N/A"} />
+        <InfoCard label="Last Maintenance" value={portfolio.lastMaint ?? "N/A"} />
       </div>
 
       {/* Positions Section */}

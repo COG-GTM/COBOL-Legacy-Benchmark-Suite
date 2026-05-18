@@ -33,11 +33,14 @@ pub fn spec() -> Value {
                         "id":           { "type": "string" },
                         "accountNo":    { "type": "string" },
                         "clientName":   { "type": "string" },
-                        "clientType":   { "type": "string", "enum": ["individual", "corporate", "trust"] },
-                        "status":       { "type": "string", "enum": ["active", "closed", "suspended"] },
-                        "totalValue":   { "type": "string", "description": "Decimal as string" },
-                        "cashBalance":  { "type": "string", "description": "Decimal as string" },
-                        "createDate":   { "type": "string", "format": "date", "nullable": true }
+                        "clientType":   { "type": "string", "enum": ["I", "C", "T"] },
+                        "status":       { "type": "string", "enum": ["A", "C", "S"] },
+                        "totalValue":   { "type": "number", "description": "Decimal value" },
+                        "cashBalance":  { "type": "number", "description": "Decimal value" },
+                        "createDate":   { "type": "string", "format": "date", "nullable": true },
+                        "lastMaint":    { "type": "string", "format": "date", "nullable": true },
+                        "lastUser":     { "type": "string" },
+                        "lastTrans":    { "type": "string", "format": "date", "nullable": true }
                     }
                 },
                 "CreatePortfolio": {
@@ -46,17 +49,17 @@ pub fn spec() -> Value {
                     "properties": {
                         "accountNo":   { "type": "string", "maxLength": 10 },
                         "clientName":  { "type": "string", "maxLength": 30 },
-                        "clientType":  { "type": "string", "enum": ["individual", "corporate", "trust"] },
-                        "cashBalance": { "type": "string", "default": "0" }
+                        "clientType":  { "type": "string", "enum": ["I", "C", "T"] },
+                        "cashBalance": { "type": "number", "default": 0 }
                     }
                 },
                 "UpdatePortfolio": {
                     "type": "object",
                     "properties": {
                         "clientName":  { "type": "string" },
-                        "clientType":  { "type": "string", "enum": ["individual", "corporate", "trust"] },
-                        "status":      { "type": "string", "enum": ["active", "closed", "suspended"] },
-                        "cashBalance": { "type": "string" }
+                        "clientType":  { "type": "string", "enum": ["I", "C", "T"] },
+                        "status":      { "type": "string", "enum": ["A", "C", "S"] },
+                        "cashBalance": { "type": "number" }
                     }
                 },
                 "Position": {
@@ -64,12 +67,12 @@ pub fn spec() -> Value {
                     "properties": {
                         "portfolioId":        { "type": "string" },
                         "investmentId":       { "type": "string" },
-                        "quantity":           { "type": "string" },
-                        "costBasis":          { "type": "string" },
-                        "marketValue":        { "type": "string" },
+                        "quantity":           { "type": "number" },
+                        "costBasis":          { "type": "number" },
+                        "marketValue":        { "type": "number" },
                         "currency":           { "type": "string" },
-                        "status":             { "type": "string" },
-                        "unrealizedGainLoss": { "type": "string" }
+                        "status":             { "type": "string", "enum": ["A", "C", "P"] },
+                        "unrealizedGainLoss": { "type": "number" }
                     }
                 },
                 "Transaction": {
@@ -78,11 +81,16 @@ pub fn spec() -> Value {
                         "date":            { "type": "string", "format": "date", "nullable": true },
                         "portfolioId":     { "type": "string" },
                         "investmentId":    { "type": "string" },
-                        "transactionType": { "type": "string", "enum": ["buy", "sell", "transfer", "fee"] },
-                        "quantity":        { "type": "string" },
-                        "price":           { "type": "string" },
-                        "amount":          { "type": "string" },
-                        "status":          { "type": "string" }
+                        "type":            { "type": "string", "enum": ["BU", "SL", "TR", "FE"] },
+                        "quantity":        { "type": "number" },
+                        "price":           { "type": "number" },
+                        "amount":          { "type": "number" },
+                        "currency":        { "type": "string" },
+                        "status":          { "type": "string", "enum": ["P", "D", "F", "R"] },
+                        "sequenceNo":      { "type": "string" },
+                        "time":            { "type": "string", "format": "time", "nullable": true },
+                        "processDate":     { "type": "string", "format": "date-time", "nullable": true },
+                        "processUser":     { "type": "string" }
                     }
                 },
                 "Error": {
