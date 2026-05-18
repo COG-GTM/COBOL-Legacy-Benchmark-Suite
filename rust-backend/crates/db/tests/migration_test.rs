@@ -1,11 +1,11 @@
 //! Integration tests for 001_initial_schema.sql
 //!
-//! Spins up a PostgreSQL container via testcontainers, applies the migration,
-//! then validates table structure, constraint enforcement, and sample inserts.
+//! When `DATABASE_URL` is set (CI), connects to the pre-provisioned database
+//! where migrations have already been applied by the CI pipeline.
+//! Otherwise, spins up a PostgreSQL container via testcontainers and applies
+//! the migration SQL directly.
 
 use sqlx::{postgres::PgPoolOptions, Executor, PgPool, Row};
-use testcontainers::runners::AsyncRunner;
-use testcontainers_modules::postgres::Postgres;
 
 const MIGRATION_SQL: &str = include_str!("../../../migrations/001_initial_schema.sql");
 
@@ -21,28 +21,50 @@ const EXPECTED_TABLES: &[&str] = &[
     "return_codes",
 ];
 
-async fn setup_pool() -> (PgPool, testcontainers::ContainerAsync<Postgres>) {
-    let container = Postgres::default().start().await.unwrap();
-    let host_port = container.get_host_port_ipv4(5432).await.unwrap();
-    let connection_string = format!("postgres://postgres:postgres@127.0.0.1:{host_port}/postgres");
+/// Holds either a testcontainers handle (local) or nothing (CI).
+/// The container is kept alive for the duration of the test.
+enum TestDb {
+    #[allow(dead_code)]
+    Container(Box<testcontainers::ContainerAsync<testcontainers_modules::postgres::Postgres>>),
+    Ci,
+}
 
-    let pool = PgPoolOptions::new()
-        .max_connections(5)
-        .connect(&connection_string)
-        .await
-        .unwrap();
+async fn setup_pool() -> (PgPool, TestDb) {
+    if let Ok(url) = std::env::var("DATABASE_URL") {
+        // CI mode — database and migrations already provisioned
+        let pool = PgPoolOptions::new()
+            .max_connections(5)
+            .connect(&url)
+            .await
+            .expect("DATABASE_URL set but connection failed");
+        (pool, TestDb::Ci)
+    } else {
+        // Local mode — spin up a container
+        use testcontainers::runners::AsyncRunner;
+        use testcontainers_modules::postgres::Postgres;
 
-    // Apply migration
-    pool.execute(MIGRATION_SQL).await.unwrap();
+        let container = Postgres::default().start().await.unwrap();
+        let host_port = container.get_host_port_ipv4(5432).await.unwrap();
+        let connection_string =
+            format!("postgres://postgres:postgres@127.0.0.1:{host_port}/postgres");
 
-    (pool, container)
+        let pool = PgPoolOptions::new()
+            .max_connections(5)
+            .connect(&connection_string)
+            .await
+            .unwrap();
+
+        pool.execute(MIGRATION_SQL).await.unwrap();
+
+        (pool, TestDb::Container(Box::new(container)))
+    }
 }
 
 // ── Table existence ─────────────────────────────────────────────────────
 
 #[tokio::test]
 async fn tables_exist_with_correct_columns() {
-    let (pool, _container) = setup_pool().await;
+    let (pool, _db) = setup_pool().await;
 
     for table in EXPECTED_TABLES {
         let row = sqlx::query(
@@ -104,7 +126,10 @@ async fn tables_exist_with_correct_columns() {
 
 #[tokio::test]
 async fn insert_sample_data_and_fk_enforcement() {
-    let (pool, _container) = setup_pool().await;
+    let (pool, _db) = setup_pool().await;
+
+    // Clean up from any previous test run (CI shares a single database)
+    cleanup_tables(&pool).await;
 
     // Insert a portfolio
     let port_id: uuid::Uuid = sqlx::query_scalar(
@@ -167,7 +192,10 @@ async fn insert_sample_data_and_fk_enforcement() {
 
 #[tokio::test]
 async fn check_constraints_reject_invalid_values() {
-    let (pool, _container) = setup_pool().await;
+    let (pool, _db) = setup_pool().await;
+
+    // Clean up from any previous test run
+    cleanup_tables(&pool).await;
 
     // Invalid portfolio status (must be A/C/S)
     let result = sqlx::query(
@@ -264,7 +292,10 @@ async fn check_constraints_reject_invalid_values() {
 
 #[tokio::test]
 async fn insert_into_all_remaining_tables() {
-    let (pool, _container) = setup_pool().await;
+    let (pool, _db) = setup_pool().await;
+
+    // Clean up from any previous test run
+    cleanup_tables(&pool).await;
 
     // transaction_history
     sqlx::query(
@@ -343,4 +374,21 @@ async fn get_columns(pool: &PgPool, table: &str) -> Vec<String> {
     .fetch_all(pool)
     .await
     .unwrap()
+}
+
+async fn cleanup_tables(pool: &PgPool) {
+    // Delete in FK-safe order
+    for table in &[
+        "return_codes",
+        "audit_trail",
+        "error_log",
+        "batch_control",
+        "transaction_history",
+        "transactions",
+        "positions",
+        "portfolios",
+    ] {
+        let q = format!("DELETE FROM {table}");
+        let _ = pool.execute(q.as_str()).await;
+    }
 }
