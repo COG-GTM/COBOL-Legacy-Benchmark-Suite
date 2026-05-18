@@ -1,0 +1,90 @@
+[
+  {
+    "accountNo": "100000001",
+    "fundId": "VTSAX",
+    "cusip": "922908363",
+    "shareBalance": 1250.500,
+    "avgCost": 95.2300,
+    "costBasis": 119050.65,
+    "lastDate": "20260415",
+    "lastTrans": "202604150001",
+    "status": "A"
+  },
+  {
+    "accountNo": "100000001",
+    "fundId": "VBTLX",
+    "cusip": "921937835",
+    "shareBalance": 3200.000,
+    "avgCost": 10.4500,
+    "costBasis": 33440.00,
+    "lastDate": "20260410",
+    "lastTrans": "202604100001",
+    "status": "A"
+  },
+  {
+    "accountNo": "100000001",
+    "fundId": "VFIAX",
+    "cusip": "922908728",
+    "shareBalance": 500.250,
+    "avgCost": 420.1500,
+    "costBasis": 210135.11,
+    "lastDate": "20260412",
+    "lastTrans": "202604120001",
+    "status": "A"
+  },
+  {
+    "accountNo": "200000002",
+    "fundId": "VTSAX",
+    "cusip": "922908363",
+    "shareBalance": 800.000,
+    "avgCost": 92.5000,
+    "costBasis": 74000.00,
+    "lastDate": "20260401",
+    "lastTrans": "202604010001",
+    "status": "A"
+  },
+  {
+    "accountNo": "200000002",
+    "fundId": "VWUSX",
+    "cusip": "922908504",
+    "shareBalance": 0.000,
+    "avgCost": 55.7500,
+    "costBasis": 0.00,
+    "lastDate": "20260320",
+    "lastTrans": "202603200001",
+    "status": "C"
+  },
+  {
+    "accountNo": "300000003",
+    "fundId": "VFIAX",
+    "cusip": "922908728",
+    "shareBalance": 150.750,
+    "avgCost": 418.2000,
+    "costBasis": 63048.65,
+    "lastDate": "20260505",
+    "lastTrans": "202605050001",
+    "status": "A"
+  },
+  {
+    "accountNo": "300000003",
+    "fundId": "VBTLX",
+    "cusip": "921937835",
+    "shareBalance": 5000.000,
+    "avgCost": 10.2000,
+    "costBasis": 51000.00,
+    "lastDate": "20260505",
+    "lastTrans": "202605050002",
+    "status": "A"
+  },
+  {
+    "accountNo": "400000004",
+    "fundId": "VTSAX",
+    "cusip": "922908363",
+    "shareBalance": 2500.000,
+    "avgCost": 97.0000,
+    "costBasis": 242500.00,
+    "lastDate": "20260510",
+    "lastTrans": "202605100001",
+    "status": "A"
+  }
+]
