@@ -281,28 +281,32 @@ async fn update_portfolio(
     require_role(&user.claims, Role::User)?;
 
     let mut store = state.store.write();
-    let record = store
+    let existing = store
         .portfolios
-        .get_mut(&id)
+        .get(&id)
         .ok_or_else(|| ApiError::NotFound(format!("portfolio {id}")))?;
 
+    let mut updated = existing.clone();
     if let Some(name) = body.client_name {
-        record.client_name = name;
+        updated.client_name = name;
     }
     if let Some(ct) = body.client_type {
-        record.client_type = ct;
+        updated.client_type = ct;
     }
     if let Some(st) = body.status {
-        record.status = st;
+        updated.status = st;
     }
     if let Some(cb) = body.cash_balance {
-        record.cash_balance = cb;
+        updated.cash_balance = cb;
     }
-    record.last_maintenance_date = Some(chrono::Utc::now().date_naive());
-    record.last_user = user.claims.sub.clone();
-    record.validate()?;
+    updated.last_maintenance_date = Some(chrono::Utc::now().date_naive());
+    updated.last_user = user.claims.sub.clone();
+    updated.validate()?;
 
-    Ok(Json(PortfolioResponse::from(&*record)))
+    let resp = PortfolioResponse::from(&updated);
+    store.portfolios.insert(id, updated);
+
+    Ok(Json(resp))
 }
 
 /// DELETE /api/portfolios/:id
