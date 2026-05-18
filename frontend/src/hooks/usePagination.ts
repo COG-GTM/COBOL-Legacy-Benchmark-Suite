@@ -23,10 +23,11 @@ export function usePagination<T>(
   options: UsePaginationOptions = {}
 ): UsePaginationResult<T> {
   const { initialPage = 1, initialPageSize = 10 } = options;
-  const [currentPage, setCurrentPage] = useState(initialPage);
+  const [rawPage, setRawPage] = useState(initialPage);
   const [pageSize, setPageSizeState] = useState(initialPageSize);
 
   const totalPages = Math.max(1, Math.ceil(data.length / pageSize));
+  const currentPage = Math.min(rawPage, totalPages);
 
   const paginatedData = useMemo(() => {
     const start = (currentPage - 1) * pageSize;
@@ -37,20 +38,20 @@ export function usePagination<T>(
   const endIndex = Math.min(startIndex + pageSize, data.length);
 
   const goToPage = (page: number) => {
-    setCurrentPage(Math.max(1, Math.min(page, totalPages)));
+    setRawPage(Math.max(1, Math.min(page, totalPages)));
   };
 
   const nextPage = () => {
-    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+    if (currentPage < totalPages) setRawPage(currentPage + 1);
   };
 
   const prevPage = () => {
-    if (currentPage > 1) setCurrentPage(currentPage - 1);
+    if (currentPage > 1) setRawPage(currentPage - 1);
   };
 
   const setPageSize = (size: number) => {
     setPageSizeState(size);
-    setCurrentPage(1);
+    setRawPage(1);
   };
 
   return {

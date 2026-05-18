@@ -31,7 +31,7 @@ export function DataTable<T extends Record<string, unknown>>({
 }: DataTableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<SortDirection>(null);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [rawPage, setRawPage] = useState(1);
   const [filter, setFilter] = useState('');
 
   const filteredData = useMemo(() => {
@@ -61,6 +61,7 @@ export function DataTable<T extends Record<string, unknown>>({
   }, [filteredData, sortKey, sortDir]);
 
   const totalPages = Math.max(1, Math.ceil(sortedData.length / pageSize));
+  const currentPage = Math.min(rawPage, totalPages);
   const paginatedData = sortedData.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
   const handleSort = (key: string) => {
@@ -72,7 +73,7 @@ export function DataTable<T extends Record<string, unknown>>({
       setSortKey(key);
       setSortDir('asc');
     }
-    setCurrentPage(1);
+    setRawPage(1);
   };
 
   const SortIcon = ({ colKey }: { colKey: string }) => {
@@ -88,7 +89,7 @@ export function DataTable<T extends Record<string, unknown>>({
           type="text"
           placeholder="Filter..."
           value={filter}
-          onChange={(e) => { setFilter(e.target.value); setCurrentPage(1); }}
+          onChange={(e) => { setFilter(e.target.value); setRawPage(1); }}
           className="w-full max-w-xs px-3 py-1.5 text-sm border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary-light/50"
         />
       </div>
@@ -150,7 +151,7 @@ export function DataTable<T extends Record<string, unknown>>({
           </span>
           <div className="flex items-center gap-2">
             <button
-              onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+              onClick={() => setRawPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
               className="p-1 rounded hover:bg-surface-dark disabled:opacity-30"
             >
@@ -160,7 +161,7 @@ export function DataTable<T extends Record<string, unknown>>({
               Page {currentPage} of {totalPages}
             </span>
             <button
-              onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))}
+              onClick={() => setRawPage(Math.min(totalPages, currentPage + 1))}
               disabled={currentPage === totalPages}
               className="p-1 rounded hover:bg-surface-dark disabled:opacity-30"
             >
