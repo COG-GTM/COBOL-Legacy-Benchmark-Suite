@@ -36,6 +36,6 @@ export function formatDate(dateStr: string): string {
 
 export function formatTime(timeStr: string): string {
   if (!timeStr || timeStr.length < 6) return timeStr;
-  const padded = timeStr.padStart(8, '0');
+  const padded = timeStr.padEnd(8, '0');
   return `${padded.substring(0, 2)}:${padded.substring(2, 4)}:${padded.substring(4, 6)}`;
 }
