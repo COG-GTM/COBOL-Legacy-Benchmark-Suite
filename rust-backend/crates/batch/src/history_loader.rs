@@ -295,7 +295,7 @@ impl HistoryLoader {
             if self.checkpoint.status == CheckpointStatus::Restarted
                 && !self.checkpoint.last_key.is_empty()
             {
-                let key = format!("{}:{}", input.account_no, input.portfolio_id);
+                let key = Self::record_key(input);
                 if key <= self.checkpoint.last_key {
                     continue;
                 }
@@ -331,7 +331,7 @@ impl HistoryLoader {
             }
 
             // Error threshold (mirrors WS-ERROR-COUNT > 100 guard)
-            if self.stats.error_count as u32 > self.checkpoint.max_errors {
+            if self.stats.error_count > u64::from(self.checkpoint.max_errors) {
                 return Err(HistoryLoadError::MaxErrorsExceeded {
                     max: self.checkpoint.max_errors,
                 });
@@ -372,8 +372,7 @@ impl HistoryLoader {
     fn do_commit(&mut self, last_record: &HistoryInputRecord) {
         self.commit_count = 0;
         self.stats.commits += 1;
-        self.checkpoint.last_key =
-            format!("{}:{}", last_record.account_no, last_record.portfolio_id);
+        self.checkpoint.last_key = Self::record_key(last_record);
         self.checkpoint.last_time = Some(Utc::now().naive_utc());
         self.checkpoint.phase = CheckpointPhase::Update;
         info!(
@@ -382,6 +381,16 @@ impl HistoryLoader {
             "checkpoint committed"
         );
         self.checkpoint.phase = CheckpointPhase::Read;
+    }
+
+    /// Build a composite key that uniquely identifies a record's position
+    /// in the input stream. Includes date, time, and security to avoid
+    /// collisions when multiple transactions share the same account/portfolio.
+    fn record_key(rec: &HistoryInputRecord) -> String {
+        format!(
+            "{}:{}:{}:{}:{}",
+            rec.account_no, rec.portfolio_id, rec.trans_date, rec.trans_time, rec.security_id
+        )
     }
 
     /// 3100-FINAL-COMMIT
@@ -484,7 +493,7 @@ mod tests {
         let ckpt = Checkpoint {
             records_read: 5,
             records_written: 5,
-            last_key: "ACC0004:PF0001".into(),
+            last_key: "ACC0004:PF0001:2024-01-15:10:30:00:AAPL000001".into(),
             ..Checkpoint::default()
         };
 
