@@ -6,6 +6,7 @@ pub mod history;
 pub mod portfolio;
 pub mod position;
 pub mod transaction;
+pub mod validation;
 
 pub use audit::*;
 pub use common::*;
@@ -15,3 +16,4 @@ pub use history::*;
 pub use portfolio::*;
 pub use position::*;
 pub use transaction::*;
+pub use validation::*;
