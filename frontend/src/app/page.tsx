@@ -20,13 +20,11 @@ export default function DashboardPage() {
         />
         <DashboardCard
           title="Positions"
-          description="Track holdings across portfolios"
-          href="/portfolios"
+          description="Track holdings within a portfolio (open a portfolio to view)"
         />
         <DashboardCard
           title="Transactions"
-          description="Review transaction history"
-          href="/portfolios"
+          description="Review transaction history within a portfolio (open a portfolio to view)"
         />
       </div>
     </div>
@@ -40,19 +38,39 @@ function DashboardCard({
 }: {
   title: string;
   description: string;
-  href: string;
+  href?: string;
 }) {
-  return (
-    <Link
-      href={href}
-      className="block rounded-lg border border-zinc-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-zinc-700 dark:bg-zinc-800"
-    >
+  const className =
+    "block rounded-lg border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-700 dark:bg-zinc-800";
+
+  const body = (
+    <>
       <h2 className="text-lg font-semibold text-zinc-900 dark:text-zinc-100">
         {title}
       </h2>
       <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
         {description}
       </p>
-    </Link>
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link
+        href={href}
+        className={`${className} transition-shadow hover:shadow-md`}
+      >
+        {body}
+      </Link>
+    );
+  }
+
+  return (
+    <div
+      className={`${className} cursor-not-allowed opacity-60`}
+      aria-disabled="true"
+    >
+      {body}
+    </div>
   );
 }
