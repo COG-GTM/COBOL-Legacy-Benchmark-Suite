@@ -4,8 +4,11 @@
 //! where migrations have already been applied by the CI pipeline.
 //! Otherwise, spins up a PostgreSQL container via testcontainers and applies
 //! the migration SQL directly.
+//!
+//! Data-mutating tests use a transaction that is rolled back at the end,
+//! providing full isolation when tests run concurrently against a shared DB.
 
-use sqlx::{postgres::PgPoolOptions, Executor, PgPool, Row};
+use sqlx::{postgres::PgPoolOptions, Connection, Executor, PgConnection, PgPool, Row};
 
 const MIGRATION_SQL: &str = include_str!("../../../migrations/001_initial_schema.sql");
 
@@ -29,35 +32,50 @@ enum TestDb {
     Ci,
 }
 
-async fn setup_pool() -> (PgPool, TestDb) {
+async fn connection_string() -> (String, TestDb) {
     if let Ok(url) = std::env::var("DATABASE_URL") {
-        // CI mode — database and migrations already provisioned
-        let pool = PgPoolOptions::new()
-            .max_connections(5)
-            .connect(&url)
-            .await
-            .expect("DATABASE_URL set but connection failed");
-        (pool, TestDb::Ci)
+        (url, TestDb::Ci)
     } else {
-        // Local mode — spin up a container
         use testcontainers::runners::AsyncRunner;
         use testcontainers_modules::postgres::Postgres;
 
         let container = Postgres::default().start().await.unwrap();
         let host_port = container.get_host_port_ipv4(5432).await.unwrap();
-        let connection_string =
-            format!("postgres://postgres:postgres@127.0.0.1:{host_port}/postgres");
-
-        let pool = PgPoolOptions::new()
-            .max_connections(5)
-            .connect(&connection_string)
-            .await
-            .unwrap();
-
-        pool.execute(MIGRATION_SQL).await.unwrap();
-
-        (pool, TestDb::Container(Box::new(container)))
+        let url = format!("postgres://postgres:postgres@127.0.0.1:{host_port}/postgres");
+        (url, TestDb::Container(Box::new(container)))
     }
+}
+
+async fn setup_pool() -> (PgPool, TestDb) {
+    let (url, db) = connection_string().await;
+    let pool = PgPoolOptions::new()
+        .max_connections(5)
+        .connect(&url)
+        .await
+        .expect("failed to connect to database");
+
+    if matches!(db, TestDb::Container(_)) {
+        pool.execute(MIGRATION_SQL).await.unwrap();
+    }
+
+    (pool, db)
+}
+
+/// Acquire a raw connection inside a transaction for data-isolation tests.
+/// The caller must NOT commit — dropping the connection rolls back.
+async fn setup_tx() -> (PgConnection, TestDb) {
+    let (url, db) = connection_string().await;
+    let mut conn = PgConnection::connect(&url)
+        .await
+        .expect("failed to connect to database");
+
+    if matches!(db, TestDb::Container(_)) {
+        conn.execute(MIGRATION_SQL).await.unwrap();
+    }
+
+    // Begin a transaction; it will roll back when `conn` is dropped
+    conn.execute("BEGIN").await.unwrap();
+    (conn, db)
 }
 
 // ── Table existence ─────────────────────────────────────────────────────
@@ -126,10 +144,7 @@ async fn tables_exist_with_correct_columns() {
 
 #[tokio::test]
 async fn insert_sample_data_and_fk_enforcement() {
-    let (pool, _db) = setup_pool().await;
-
-    // Clean up from any previous test run (CI shares a single database)
-    cleanup_tables(&pool).await;
+    let (mut conn, _db) = setup_tx().await;
 
     // Insert a portfolio
     let port_id: uuid::Uuid = sqlx::query_scalar(
@@ -142,7 +157,7 @@ async fn insert_sample_data_and_fk_enforcement() {
                  'A', 'SYSTEM') \
          RETURNING id",
     )
-    .fetch_one(&pool)
+    .fetch_one(&mut conn)
     .await
     .unwrap();
 
@@ -155,7 +170,7 @@ async fn insert_sample_data_and_fk_enforcement() {
                  5000.00, 5200.00, 'USD', 'A', 'SYSTEM')",
     )
     .bind(port_id)
-    .execute(&pool)
+    .execute(&mut conn)
     .await
     .unwrap();
 
@@ -170,7 +185,7 @@ async fn insert_sample_data_and_fk_enforcement() {
                  'USD', 'D', 'SYSTEM')",
     )
     .bind(port_id)
-    .execute(&pool)
+    .execute(&mut conn)
     .await
     .unwrap();
 
@@ -183,21 +198,24 @@ async fn insert_sample_data_and_fk_enforcement() {
          VALUES ($1, 'INV9999999', CURRENT_DATE, 1.0, 1.0, 1.0, 'USD', 'A', 'SYSTEM')",
     )
     .bind(bad_id)
-    .execute(&pool)
+    .execute(&mut conn)
     .await;
     assert!(result.is_err(), "FK violation should be rejected");
+
+    // Transaction rolls back when `conn` is dropped — no cleanup needed
 }
 
 // ── CHECK constraints ───────────────────────────────────────────────────
 
 #[tokio::test]
 async fn check_constraints_reject_invalid_values() {
-    let (pool, _db) = setup_pool().await;
+    let (mut conn, _db) = setup_tx().await;
 
-    // Clean up from any previous test run
-    cleanup_tables(&pool).await;
+    // Each invalid insert is wrapped in a SAVEPOINT so that the
+    // PostgreSQL "aborted transaction" state doesn't block subsequent queries.
 
     // Invalid portfolio status (must be A/C/S)
+    conn.execute("SAVEPOINT sp1").await.unwrap();
     let result = sqlx::query(
         "INSERT INTO portfolios \
              (portfolio_id, account_number, account_type, branch_id, \
@@ -207,12 +225,13 @@ async fn check_constraints_reject_invalid_values() {
                  'CLIENT9999', 'Bad Portfolio', 'USD', 'H', \
                  'X', 'SYSTEM')",
     )
-    .execute(&pool)
+    .execute(&mut conn)
     .await;
     assert!(
         result.is_err(),
         "status 'X' should violate chk_portfolios_status"
     );
+    conn.execute("ROLLBACK TO sp1").await.unwrap();
 
     // Invalid transaction type (must be BU/SL/TR/FE)
     // First, insert a valid portfolio
@@ -226,10 +245,11 @@ async fn check_constraints_reject_invalid_values() {
                  'A', 'SYSTEM') \
          RETURNING id",
     )
-    .fetch_one(&pool)
+    .fetch_one(&mut conn)
     .await
     .unwrap();
 
+    conn.execute("SAVEPOINT sp2").await.unwrap();
     let result = sqlx::query(
         "INSERT INTO transactions \
              (transaction_id, portfolio_id, transaction_date, transaction_time, \
@@ -240,62 +260,66 @@ async fn check_constraints_reject_invalid_values() {
                  'USD', 'P', 'SYSTEM')",
     )
     .bind(port_id)
-    .execute(&pool)
+    .execute(&mut conn)
     .await;
     assert!(
         result.is_err(),
         "transaction_type 'ZZ' should violate chk_transactions_type"
     );
+    conn.execute("ROLLBACK TO sp2").await.unwrap();
 
     // Invalid error_log severity (must be 1..4)
+    conn.execute("SAVEPOINT sp3").await.unwrap();
     let result = sqlx::query(
         "INSERT INTO error_log \
              (program_id, error_type, error_severity, error_code, \
               error_message, user_id) \
          VALUES ('TESTPROG', 'S', 9, 'ERR00001', 'test', 'SYSTEM')",
     )
-    .execute(&pool)
+    .execute(&mut conn)
     .await;
     assert!(
         result.is_err(),
         "error_severity 9 should violate chk_error_log_severity"
     );
+    conn.execute("ROLLBACK TO sp3").await.unwrap();
 
     // Invalid audit action (must be CREATE/UPDATE/DELETE/INQUIRE/LOGIN/LOGOUT/STARTUP/SHUTDOWN)
+    conn.execute("SAVEPOINT sp4").await.unwrap();
     let result = sqlx::query(
         "INSERT INTO audit_trail \
              (user_id, action, entity_type, entity_id) \
          VALUES ('SYSTEM', 'INVALID', 'portfolio', 'P1')",
     )
-    .execute(&pool)
+    .execute(&mut conn)
     .await;
     assert!(
         result.is_err(),
         "action 'INVALID' should violate chk_audit_action"
     );
+    conn.execute("ROLLBACK TO sp4").await.unwrap();
 
     // Invalid return_codes status (must be S/W/E/F)
+    conn.execute("SAVEPOINT sp5").await.unwrap();
     let result = sqlx::query(
         "INSERT INTO return_codes \
              (program_id, return_code, highest_code, status_code) \
          VALUES ('TESTPROG', 0, 0, 'Z')",
     )
-    .execute(&pool)
+    .execute(&mut conn)
     .await;
     assert!(
         result.is_err(),
         "status_code 'Z' should violate chk_return_codes_status"
     );
+    conn.execute("ROLLBACK TO sp5").await.unwrap();
 }
 
 // ── Remaining tables insert smoke test ──────────────────────────────────
 
 #[tokio::test]
 async fn insert_into_all_remaining_tables() {
-    let (pool, _db) = setup_pool().await;
-
-    // Clean up from any previous test run
-    cleanup_tables(&pool).await;
+    let (mut conn, _db) = setup_tx().await;
 
     // transaction_history
     sqlx::query(
@@ -309,7 +333,7 @@ async fn insert_into_all_remaining_tables() {
                  10.00, 5260.00, 5250.00, 0.00, \
                  '2024-01-15', '10:31:00', 'HISTLD00', 'BATCH')",
     )
-    .execute(&pool)
+    .execute(&mut conn)
     .await
     .unwrap();
 
@@ -321,7 +345,7 @@ async fn insert_into_all_remaining_tables() {
          VALUES ('TRNVAL00', 'D', 'STEP010', 'TRNVAL00', \
                  '2024-01-15', 1, 15000)",
     )
-    .execute(&pool)
+    .execute(&mut conn)
     .await
     .unwrap();
 
@@ -334,7 +358,7 @@ async fn insert_into_all_remaining_tables() {
                  'Position recalculation required', 'BATCH', \
                  'Portfolio PORT0001 needs revaluation')",
     )
-    .execute(&pool)
+    .execute(&mut conn)
     .await
     .unwrap();
 
@@ -347,7 +371,7 @@ async fn insert_into_all_remaining_tables() {
                  '{\"status\": \"S\"}'::jsonb, '{\"status\": \"A\"}'::jsonb, \
                  'TRAN', 'SUCC')",
     )
-    .execute(&pool)
+    .execute(&mut conn)
     .await
     .unwrap();
 
@@ -357,7 +381,7 @@ async fn insert_into_all_remaining_tables() {
              (program_id, return_code, highest_code, status_code, message_text) \
          VALUES ('TRNVAL00', 0, 4, 'W', 'Completed with warnings')",
     )
-    .execute(&pool)
+    .execute(&mut conn)
     .await
     .unwrap();
 }
@@ -374,21 +398,4 @@ async fn get_columns(pool: &PgPool, table: &str) -> Vec<String> {
     .fetch_all(pool)
     .await
     .unwrap()
-}
-
-async fn cleanup_tables(pool: &PgPool) {
-    // Delete in FK-safe order
-    for table in &[
-        "return_codes",
-        "audit_trail",
-        "error_log",
-        "batch_control",
-        "transaction_history",
-        "transactions",
-        "positions",
-        "portfolios",
-    ] {
-        let q = format!("DELETE FROM {table}");
-        let _ = pool.execute(q.as_str()).await;
-    }
 }
