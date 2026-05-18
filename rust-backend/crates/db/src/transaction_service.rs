@@ -733,6 +733,7 @@ impl TransactionService {
         currency_code: &str,
         user: &str,
     ) -> Result<PositionRow, TransactionError> {
+        // First try to find an active position (any date).
         let existing = sqlx::query_as::<_, PositionRow>(
             r#"
             SELECT * FROM positions
@@ -750,31 +751,43 @@ impl TransactionService {
         .await
         .map_err(|e| map_sqlx_error(&e))?;
 
-        match existing {
-            Some(row) => Ok(row),
-            None => {
-                let row = sqlx::query_as::<_, PositionRow>(
-                    r#"
-                    INSERT INTO positions (
-                        portfolio_id, investment_id, position_date,
-                        quantity, cost_basis, market_value,
-                        currency_code, status, last_maint_user
-                    )
-                    VALUES ($1, $2, CURRENT_DATE, 0, 0, 0, $3, 'A', $4)
-                    RETURNING *
-                    "#,
-                )
-                .bind(portfolio_id)
-                .bind(investment_id)
-                .bind(currency_code)
-                .bind(user)
-                .fetch_one(tx.as_mut())
-                .await
-                .map_err(|e| map_sqlx_error(&e))?;
-
-                Ok(row)
-            }
+        if let Some(row) = existing {
+            return Ok(row);
         }
+
+        // No active position. Use INSERT ... ON CONFLICT to handle the case
+        // where a closed position already occupies today's
+        // (portfolio_id, investment_id, position_date) slot — reactivate it
+        // instead of failing with a unique-constraint violation.
+        let row = sqlx::query_as::<_, PositionRow>(
+            r#"
+            INSERT INTO positions (
+                portfolio_id, investment_id, position_date,
+                quantity, cost_basis, market_value,
+                currency_code, status, last_maint_user
+            )
+            VALUES ($1, $2, CURRENT_DATE, 0, 0, 0, $3, 'A', $4)
+            ON CONFLICT (portfolio_id, investment_id, position_date)
+            DO UPDATE SET
+                status          = 'A',
+                quantity        = 0,
+                cost_basis      = 0,
+                market_value    = 0,
+                last_maint_user = $4,
+                last_maint_date = now(),
+                updated_at      = now()
+            RETURNING *
+            "#,
+        )
+        .bind(portfolio_id)
+        .bind(investment_id)
+        .bind(currency_code)
+        .bind(user)
+        .fetch_one(tx.as_mut())
+        .await
+        .map_err(|e| map_sqlx_error(&e))?;
+
+        Ok(row)
     }
 
     /// Find an active position — returns error if none exists (for sells and fees).
@@ -1417,5 +1430,87 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(fee_action, "UPDATE");
+    }
+
+    #[tokio::test]
+    async fn buy_after_full_sell_same_day_reactivates_position() {
+        let (pool, _container) = setup_pool().await;
+        let svc = TransactionService::new(pool.clone());
+
+        let port_id = insert_portfolio(&pool, "RS001").await;
+
+        // Buy 100 units.
+        let buy = buy_request(port_id, "RS001");
+        let _buy_result = svc.process(&buy).await.unwrap();
+
+        // Sell all 100 units — position closes (status='C').
+        let mut sell = sell_request(port_id, "RS001");
+        sell.quantity = dec!(100);
+        sell.amount = dec!(15000.00);
+        let sell_result = svc.process(&sell).await.unwrap();
+
+        let closed = sqlx::query_as::<_, PositionRow>("SELECT * FROM positions WHERE id = $1")
+            .bind(sell_result.position_id)
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(closed.status, "C");
+
+        // Buy again on the same day — should NOT fail with unique constraint
+        // violation. The closed position should be reactivated.
+        let buy2 = buy_request(port_id, "RS001");
+        let result = svc.process(&buy2).await.unwrap();
+
+        let pos = sqlx::query_as::<_, PositionRow>("SELECT * FROM positions WHERE id = $1")
+            .bind(result.position_id)
+            .fetch_one(&pool)
+            .await
+            .unwrap();
+        assert_eq!(pos.status, "A");
+        assert_eq!(pos.quantity, dec!(100));
+        assert_eq!(pos.cost_basis, dec!(15000.00));
+    }
+
+    #[tokio::test]
+    async fn transfer_after_close_same_day_reactivates_dest_position() {
+        let (pool, _container) = setup_pool().await;
+        let svc = TransactionService::new(pool.clone());
+
+        let src_id = insert_portfolio(&pool, "RD01S").await;
+        let dst_id = insert_portfolio(&pool, "RD01D").await;
+
+        // Create position in destination, then close it via full sell.
+        let mut buy_dst = buy_request(dst_id, "RD01D");
+        buy_dst.quantity = dec!(10);
+        buy_dst.amount = dec!(1500);
+        svc.process(&buy_dst).await.unwrap();
+
+        let mut sell_dst = sell_request(dst_id, "RD01D");
+        sell_dst.quantity = dec!(10);
+        sell_dst.amount = dec!(1500);
+        svc.process(&sell_dst).await.unwrap();
+
+        // Create source position.
+        let _src_pos = insert_position(&pool, src_id, "AAPL", dec!(100), dec!(15000)).await;
+
+        // Transfer to destination — should reactivate the closed position.
+        let req = transfer_request(src_id, "RD01S", dst_id, "RD01D");
+        let result = svc.process(&req).await.unwrap();
+        assert!(result.transaction_id != Uuid::nil());
+
+        // Verify destination position is active with transferred units.
+        let dst_pos = sqlx::query_as::<_, PositionRow>(
+            r#"
+            SELECT * FROM positions
+            WHERE portfolio_id = $1
+              AND investment_id = 'AAPL'
+              AND status = 'A'
+            "#,
+        )
+        .bind(dst_id)
+        .fetch_one(&pool)
+        .await
+        .unwrap();
+        assert_eq!(dst_pos.quantity, dec!(30));
     }
 }
