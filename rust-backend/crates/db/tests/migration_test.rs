@@ -24,8 +24,7 @@ const EXPECTED_TABLES: &[&str] = &[
 async fn setup_pool() -> (PgPool, testcontainers::ContainerAsync<Postgres>) {
     let container = Postgres::default().start().await.unwrap();
     let host_port = container.get_host_port_ipv4(5432).await.unwrap();
-    let connection_string =
-        format!("postgres://postgres:postgres@127.0.0.1:{host_port}/postgres");
+    let connection_string = format!("postgres://postgres:postgres@127.0.0.1:{host_port}/postgres");
 
     let pool = PgPoolOptions::new()
         .max_connections(5)
@@ -182,7 +181,10 @@ async fn check_constraints_reject_invalid_values() {
     )
     .execute(&pool)
     .await;
-    assert!(result.is_err(), "status 'X' should violate chk_portfolios_status");
+    assert!(
+        result.is_err(),
+        "status 'X' should violate chk_portfolios_status"
+    );
 
     // Invalid transaction type (must be BU/SL/TR/FE)
     // First, insert a valid portfolio
