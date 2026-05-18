@@ -23,6 +23,7 @@ clap.workspace = true
 tokio.workspace = true
 sqlx.workspace = true
 uuid.workspace = true
+csv = "1"
 
 [dev-dependencies]
 rust_decimal_macros = "1"
