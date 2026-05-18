@@ -1,0 +1,33 @@
+[package]
+name = "batch"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "batch-cli"
+path = "src/main.rs"
+
+[dependencies]
+domain = { path = "../domain" }
+db = { path = "../db" }
+common = { path = "../common" }
+chrono.workspace = true
+rust_decimal.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+clap.workspace = true
+tokio.workspace = true
+sqlx.workspace = true
+uuid.workspace = true
+csv = "1"
+
+[dev-dependencies]
+rust_decimal_macros = "1"
+testcontainers.workspace = true
+testcontainers-modules.workspace = true
+proptest.workspace = true
+tokio-test.workspace = true

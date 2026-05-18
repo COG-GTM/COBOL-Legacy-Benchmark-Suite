@@ -1,0 +1,35 @@
+[package]
+name = "api"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[[bin]]
+name = "portfolio-api"
+path = "src/main.rs"
+
+[dependencies]
+domain = { path = "../domain" }
+db = { path = "../db" }
+common = { path = "../common" }
+axum.workspace = true
+chrono.workspace = true
+rust_decimal.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+tokio.workspace = true
+tower.workspace = true
+tower-http.workspace = true
+sqlx.workspace = true
+uuid.workspace = true
+jsonwebtoken.workspace = true
+parking_lot = "0.12"
+
+[dev-dependencies]
+testcontainers.workspace = true
+testcontainers-modules.workspace = true
+tokio-test.workspace = true
+rust_decimal_macros = "1"
