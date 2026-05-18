@@ -4,3 +4,4 @@ pub mod process_sequencer;
 pub mod reports;
 pub mod testdata;
 pub mod testval;
+pub mod utilities;
