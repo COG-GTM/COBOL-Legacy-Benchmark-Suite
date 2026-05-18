@@ -65,12 +65,12 @@ export default function PortfolioDetail({ portfolioId }: PortfolioDetailProps) {
 
       {/* Positions Section */}
       <ErrorBoundary>
-        <PositionInquiry portfolioId={portfolioId} />
+        <PositionInquiry key={portfolioId} portfolioId={portfolioId} />
       </ErrorBoundary>
 
       {/* Transactions Section */}
       <ErrorBoundary>
-        <TransactionHistory portfolioId={portfolioId} />
+        <TransactionHistory key={portfolioId} portfolioId={portfolioId} />
       </ErrorBoundary>
     </div>
   );
