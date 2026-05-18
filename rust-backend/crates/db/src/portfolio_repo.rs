@@ -378,8 +378,8 @@ mod tests {
             currency_code: "USD".into(),
             risk_level: "M".into(),
             status: "A".into(),
-            total_value: Decimal::new(100_000_00, 2),
-            cash_balance: Decimal::new(10_000_00, 2),
+            total_value: Decimal::new(10_000_000, 2),
+            cash_balance: Decimal::new(1_000_000, 2),
             open_date: NaiveDate::from_ymd_opt(2024, 1, 15).unwrap(),
             last_maint_user: "TESTUSER".into(),
         }
@@ -396,7 +396,7 @@ mod tests {
         let created = repo.create(&sample_new_portfolio("001")).await.unwrap();
         assert_eq!(created.portfolio_id, "PT001");
         assert_eq!(created.status, "A");
-        assert_eq!(created.total_value, Decimal::new(100_000_00, 2));
+        assert_eq!(created.total_value, Decimal::new(10_000_000, 2));
 
         // READ (PORTREAD — keyed)
         let found = repo.find_by_id(created.id).await.unwrap();
@@ -406,14 +406,14 @@ mod tests {
         // UPDATE (PORTUPDT)
         let update = UpdatePortfolio {
             client_name: Some("Updated Client".into()),
-            total_value: Some(Decimal::new(200_000_00, 2)),
+            total_value: Some(Decimal::new(20_000_000, 2)),
             last_maint_user: "UPDTUSER".into(),
             expected_version: found.updated_at,
             ..Default::default()
         };
         let updated = repo.update(found.id, &update).await.unwrap();
         assert_eq!(updated.client_name, Some("Updated Client".into()));
-        assert_eq!(updated.total_value, Decimal::new(200_000_00, 2));
+        assert_eq!(updated.total_value, Decimal::new(20_000_000, 2));
         assert_eq!(updated.last_maint_user, "UPDTUSER");
 
         // DELETE (PORTDEL — soft)
