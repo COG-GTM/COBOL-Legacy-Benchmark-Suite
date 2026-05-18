@@ -200,7 +200,14 @@ async fn list_portfolios(
     let mut items: Vec<&PortfolioRecord> = store.portfolios.values().collect();
 
     if let Some(ref status_filter) = params.status {
-        items.retain(|p| p.status.code().eq_ignore_ascii_case(status_filter));
+        items.retain(|p| {
+            let api_name = serde_json::to_value(p.status)
+                .ok()
+                .and_then(|v| v.as_str().map(String::from));
+            api_name
+                .as_deref()
+                .is_some_and(|name| name.eq_ignore_ascii_case(status_filter))
+        });
     }
 
     let total = items.len();
@@ -229,8 +236,17 @@ async fn create_portfolio(
     require_role(&user.claims, Role::User)?;
 
     let now = chrono::Utc::now().date_naive();
+
+    let mut store = state.store.write();
+    let id = loop {
+        let candidate = Uuid::new_v4().to_string();
+        if !store.portfolios.contains_key(&candidate) {
+            break candidate;
+        }
+    };
+
     let record = PortfolioRecord {
-        id: Uuid::new_v4().to_string()[..8].to_string(),
+        id: id.clone(),
         account_no: body.account_no,
         client_name: body.client_name,
         client_type: body.client_type,
@@ -245,11 +261,7 @@ async fn create_portfolio(
     record.validate()?;
 
     let resp = PortfolioResponse::from(&record);
-    state
-        .store
-        .write()
-        .portfolios
-        .insert(record.id.clone(), record);
+    store.portfolios.insert(id, record);
 
     Ok((StatusCode::CREATED, Json(resp)))
 }
