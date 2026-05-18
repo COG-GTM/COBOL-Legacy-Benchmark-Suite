@@ -35,6 +35,7 @@ export interface DashboardSummary {
   totalPortfolios: number;
   totalValue: number;
   recentTransactions: Transaction[];
+  isPartialValue: boolean;
 }
 
 // ---------------------------------------------------------------------------
@@ -99,6 +100,62 @@ export async function getPortfolio(id: string): Promise<Portfolio | null> {
   } catch {
     return null;
   }
+}
+
+// ---------------------------------------------------------------------------
+// Throwing variants for use with React Query (errors propagate to useQuery)
+// ---------------------------------------------------------------------------
+
+export function fetchPortfolios(
+  params?: ListParams,
+): Promise<PaginatedResponse<Portfolio>> {
+  return request<PaginatedResponse<Portfolio>>(
+    `/portfolios${buildQuery(params)}`,
+  );
+}
+
+export function fetchPortfolio(id: string): Promise<Portfolio> {
+  return request<Portfolio>(`/portfolios/${encodeURIComponent(id)}`);
+}
+
+export function fetchPositions(
+  portfolioId: string,
+  params?: ListParams,
+): Promise<PaginatedResponse<Position>> {
+  return request<PaginatedResponse<Position>>(
+    `/portfolios/${encodeURIComponent(portfolioId)}/positions${buildQuery(params)}`,
+  );
+}
+
+export function fetchTransactions(
+  portfolioId: string,
+  params?: ListParams,
+): Promise<PaginatedResponse<Transaction>> {
+  return request<PaginatedResponse<Transaction>>(
+    `/portfolios/${encodeURIComponent(portfolioId)}/transactions${buildQuery(params)}`,
+  );
+}
+
+export async function fetchDashboardSummary(): Promise<DashboardSummary> {
+  const portfolioResp = await fetchPortfolios({ limit: 100 });
+  const totalValue = portfolioResp.data.reduce(
+    (sum, p) => sum + p.totalValue,
+    0,
+  );
+
+  let recentTransactions: Transaction[] = [];
+  if (portfolioResp.data.length > 0) {
+    const firstPortfolio = portfolioResp.data[0];
+    const txResp = await fetchTransactions(firstPortfolio.id, { limit: 5 });
+    recentTransactions = txResp.data;
+  }
+
+  return {
+    totalPortfolios: portfolioResp.total,
+    totalValue,
+    recentTransactions,
+    isPartialValue: portfolioResp.total > portfolioResp.data.length,
+  };
 }
 
 export async function createPortfolio(
@@ -173,27 +230,4 @@ export async function getTransactions(
   }
 }
 
-// ---------------------------------------------------------------------------
-// Dashboard summary — aggregates portfolio + transaction data
-// ---------------------------------------------------------------------------
 
-export async function getDashboardSummary(): Promise<DashboardSummary> {
-  const portfolioResp = await getPortfolios({ limit: 100 });
-  const totalValue = portfolioResp.data.reduce(
-    (sum, p) => sum + p.totalValue,
-    0,
-  );
-
-  let recentTransactions: Transaction[] = [];
-  if (portfolioResp.data.length > 0) {
-    const firstPortfolio = portfolioResp.data[0];
-    const txResp = await getTransactions(firstPortfolio.id, { limit: 5 });
-    recentTransactions = txResp.data;
-  }
-
-  return {
-    totalPortfolios: portfolioResp.total,
-    totalValue,
-    recentTransactions,
-  };
-}

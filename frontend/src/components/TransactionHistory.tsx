@@ -2,7 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getTransactions, type PaginatedResponse } from "@/lib/api";
+import { fetchTransactions, type PaginatedResponse } from "@/lib/api";
 import type { Transaction, TransactionType, TransactionStatus } from "@/types/domain";
 import { transactionTypeLabel, transactionStatusLabel } from "@/types/domain";
 
@@ -39,7 +39,7 @@ export default function TransactionHistory({ portfolioId }: TransactionHistoryPr
   const { data, isLoading, error } = useQuery<PaginatedResponse<Transaction>>({
     queryKey: ["transactions", portfolioId, page],
     queryFn: () =>
-      getTransactions(portfolioId, { limit: pageSize, offset: page * pageSize }),
+      fetchTransactions(portfolioId, { limit: pageSize, offset: page * pageSize }),
     enabled: !!portfolioId,
   });
 

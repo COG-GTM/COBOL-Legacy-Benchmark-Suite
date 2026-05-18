@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getPositions, type PaginatedResponse } from "@/lib/api";
+import { fetchPositions, type PaginatedResponse } from "@/lib/api";
 import type { Position } from "@/types/domain";
 
 function formatCurrency(value: number): string {
@@ -37,7 +37,7 @@ export default function PositionInquiry({ portfolioId }: PositionInquiryProps) {
 
   const { data, isLoading, error } = useQuery<PaginatedResponse<Position>>({
     queryKey: ["positions", portfolioId, page],
-    queryFn: () => getPositions(portfolioId, { limit: pageSize, offset: page * pageSize }),
+    queryFn: () => fetchPositions(portfolioId, { limit: pageSize, offset: page * pageSize }),
     enabled: !!portfolioId,
   });
 

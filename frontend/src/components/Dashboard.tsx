@@ -2,7 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { getDashboardSummary } from "@/lib/api";
+import { fetchDashboardSummary } from "@/lib/api";
 import { transactionTypeLabel } from "@/types/domain";
 
 function formatCurrency(value: number): string {
@@ -16,7 +16,7 @@ function formatCurrency(value: number): string {
 export default function Dashboard() {
   const { data: summary, isLoading, error } = useQuery({
     queryKey: ["dashboardSummary"],
-    queryFn: getDashboardSummary,
+    queryFn: fetchDashboardSummary,
   });
 
   if (isLoading) {
@@ -70,7 +70,7 @@ export default function Dashboard() {
           href="/portfolios"
         />
         <SummaryCard
-          title="Total Market Value"
+          title={summary?.isPartialValue ? "Market Value (partial)" : "Total Market Value"}
           value={formatCurrency(totalValue)}
         />
         <SummaryCard

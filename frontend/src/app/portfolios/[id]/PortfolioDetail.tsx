@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { getPortfolio } from "@/lib/api";
+import { fetchPortfolio } from "@/lib/api";
 import { portfolioStatusLabel, clientTypeLabel } from "@/types/domain";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import PositionInquiry from "@/components/PositionInquiry";
@@ -22,7 +22,7 @@ interface PortfolioDetailProps {
 export default function PortfolioDetail({ portfolioId }: PortfolioDetailProps) {
   const { data: portfolio, isLoading, error } = useQuery({
     queryKey: ["portfolio", portfolioId],
-    queryFn: () => getPortfolio(portfolioId),
+    queryFn: () => fetchPortfolio(portfolioId),
     enabled: !!portfolioId,
   });
 
@@ -35,14 +35,18 @@ export default function PortfolioDetail({ portfolioId }: PortfolioDetailProps) {
     );
   }
 
-  if (error || !portfolio) {
+  if (error) {
     return (
       <div className="rounded-lg border border-red-200 bg-red-50 p-4 dark:border-red-800 dark:bg-red-950">
         <p className="text-sm text-red-700 dark:text-red-300">
-          {error ? "Failed to load portfolio." : "Portfolio not found."}
+          Failed to load portfolio.
         </p>
       </div>
     );
+  }
+
+  if (!portfolio) {
+    return null;
   }
 
   return (
