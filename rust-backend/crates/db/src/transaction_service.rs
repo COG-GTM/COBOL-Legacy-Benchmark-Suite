@@ -769,13 +769,13 @@ impl TransactionService {
             VALUES ($1, $2, CURRENT_DATE, 0, 0, 0, $3, 'A', $4)
             ON CONFLICT (portfolio_id, investment_id, position_date)
             DO UPDATE SET
-                status          = 'A',
-                quantity        = 0,
-                cost_basis      = 0,
-                market_value    = 0,
-                last_maint_user = $4,
-                last_maint_date = now(),
-                updated_at      = now()
+                status          = CASE WHEN positions.status = 'C' THEN 'A' ELSE positions.status END,
+                quantity        = CASE WHEN positions.status = 'C' THEN 0 ELSE positions.quantity END,
+                cost_basis      = CASE WHEN positions.status = 'C' THEN 0 ELSE positions.cost_basis END,
+                market_value    = CASE WHEN positions.status = 'C' THEN 0 ELSE positions.market_value END,
+                last_maint_user = CASE WHEN positions.status = 'C' THEN $4 ELSE positions.last_maint_user END,
+                last_maint_date = CASE WHEN positions.status = 'C' THEN now() ELSE positions.last_maint_date END,
+                updated_at      = CASE WHEN positions.status = 'C' THEN now() ELSE positions.updated_at END
             RETURNING *
             "#,
         )
