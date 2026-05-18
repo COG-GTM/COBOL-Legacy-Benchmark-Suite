@@ -52,9 +52,14 @@ impl AppState {
     }
 
     /// Generate the next COBOL-compatible portfolio ID (PORT0001..PORT9999).
-    pub fn next_portfolio_id(&self) -> String {
+    ///
+    /// Returns `None` when the 9 999-entry ID space is exhausted.
+    pub fn next_portfolio_id(&self) -> Option<String> {
         let seq = self.seq.fetch_add(1, Ordering::Relaxed);
-        format!("PORT{:04}", seq % 10_000)
+        if seq >= 10_000 {
+            return None;
+        }
+        Some(format!("PORT{:04}", seq))
     }
 }
 

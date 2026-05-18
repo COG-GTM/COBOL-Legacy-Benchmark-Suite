@@ -234,7 +234,9 @@ async fn create_portfolio(
     require_role(&user.claims, Role::User)?;
 
     let now = chrono::Utc::now().date_naive();
-    let id = state.next_portfolio_id();
+    let id = state
+        .next_portfolio_id()
+        .ok_or_else(|| ApiError::Conflict("portfolio ID space exhausted".into()))?;
 
     let record = PortfolioRecord {
         id: id.clone(),
@@ -252,7 +254,11 @@ async fn create_portfolio(
     record.validate()?;
 
     let resp = PortfolioResponse::from(&record);
-    state.store.write().portfolios.insert(id, record);
+    let mut store = state.store.write();
+    if store.portfolios.contains_key(&id) {
+        return Err(ApiError::Conflict(format!("portfolio {id} already exists")));
+    }
+    store.portfolios.insert(id, record);
 
     Ok((StatusCode::CREATED, Json(resp)))
 }
