@@ -300,7 +300,10 @@ impl MaintenanceRunner {
         req: &MaintenanceRequest,
     ) -> Result<MaintenanceResult, MaintenanceError> {
         let retention = req.retention_days.unwrap_or(90);
-        let cutoff = Utc::now().date_naive() - chrono::Duration::days(retention as i64);
+        let retention_i64 = i64::try_from(retention).map_err(|_| {
+            MaintenanceError::InvalidFunction(format!("retention_days too large: {retention}"))
+        })?;
+        let cutoff = Utc::now().date_naive() - chrono::Duration::days(retention_i64);
         let table = &req.table_name;
 
         info!(table, %cutoff, retention, "cleaning up old records");
