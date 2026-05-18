@@ -88,9 +88,9 @@ CREATE TABLE positions (
     -- DB2: QUANTITY DECIMAL(18,4) / POS-QUANTITY PIC S9(11)V9(4)
     quantity          DECIMAL(18,4) NOT NULL,
     -- DB2: COST_BASIS DECIMAL(18,2) / POS-COST-BASIS PIC S9(13)V9(2)
-    cost_basis        DECIMAL(15,2) NOT NULL,
+    cost_basis        DECIMAL(18,2) NOT NULL,
     -- DB2: MARKET_VALUE DECIMAL(18,2) / POS-MARKET-VALUE PIC S9(13)V9(2)
-    market_value      DECIMAL(15,2) NOT NULL,
+    market_value      DECIMAL(18,2) NOT NULL,
     -- DB2: CURRENCY_CODE CHAR(3) / POS-CURRENCY PIC X(3)
     currency_code     VARCHAR(3)    NOT NULL,
     -- POS-STATUS PIC X(1) — level-88: A/C/P
@@ -137,7 +137,7 @@ CREATE TABLE transactions (
     -- DB2: PRICE DECIMAL(18,4) / TRN-PRICE PIC S9(11)V9(4)
     price               DECIMAL(18,4) NOT NULL,
     -- DB2: AMOUNT DECIMAL(18,2) / TRN-AMOUNT PIC S9(13)V9(2)
-    amount              DECIMAL(15,2) NOT NULL,
+    amount              DECIMAL(18,2) NOT NULL,
     -- DB2: CURRENCY_CODE CHAR(3) / TRN-CURRENCY PIC X(3)
     currency_code       VARCHAR(3)    NOT NULL,
     -- DB2: STATUS CHAR(1) — level-88: P/D/F/R
