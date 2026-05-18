@@ -4,12 +4,10 @@
 //! builds application state, and starts the Axum HTTP server.
 
 use std::net::SocketAddr;
-use std::sync::Arc;
 
-use parking_lot::RwLock;
 use tracing_subscriber::EnvFilter;
 
-use api::app::{build_router, AppState, InMemoryStore};
+use api::app::{build_router, AppState};
 use api::middleware::auth::JwtConfig;
 
 #[tokio::main]
@@ -32,10 +30,7 @@ async fn main() {
         jwt = jwt.with_issuer(iss);
     }
 
-    let state = AppState {
-        jwt,
-        store: Arc::new(RwLock::new(InMemoryStore::default())),
-    };
+    let state = AppState::new(jwt);
 
     let app = build_router(state);
     let addr = SocketAddr::from(([0, 0, 0, 0], port));

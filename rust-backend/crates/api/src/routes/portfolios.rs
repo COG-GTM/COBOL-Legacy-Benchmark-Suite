@@ -14,14 +14,12 @@ use axum::http::StatusCode;
 use axum::routing::get;
 use axum::{Json, Router};
 use chrono::NaiveDate;
-use rust_decimal::Decimal;
-use serde::{Deserialize, Serialize};
-use uuid::Uuid;
-
 use domain::{
     ClientType, PortfolioRecord, PortfolioStatus, PositionRecord, PositionStatus,
     TransactionRecord, TransactionStatus,
 };
+use rust_decimal::Decimal;
+use serde::{Deserialize, Serialize};
 
 use crate::app::AppState;
 use crate::error::ApiError;
@@ -236,14 +234,7 @@ async fn create_portfolio(
     require_role(&user.claims, Role::User)?;
 
     let now = chrono::Utc::now().date_naive();
-
-    let mut store = state.store.write();
-    let id = loop {
-        let candidate = Uuid::new_v4().to_string();
-        if !store.portfolios.contains_key(&candidate) {
-            break candidate;
-        }
-    };
+    let id = state.next_portfolio_id();
 
     let record = PortfolioRecord {
         id: id.clone(),
@@ -261,7 +252,7 @@ async fn create_portfolio(
     record.validate()?;
 
     let resp = PortfolioResponse::from(&record);
-    store.portfolios.insert(id, record);
+    state.store.write().portfolios.insert(id, record);
 
     Ok((StatusCode::CREATED, Json(resp)))
 }

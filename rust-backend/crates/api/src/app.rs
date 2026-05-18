@@ -3,6 +3,7 @@
 //! Assembles the Axum router tree and shared application state.
 
 use std::collections::HashMap;
+use std::sync::atomic::{AtomicU32, Ordering};
 
 use axum::{Json, Router};
 use parking_lot::RwLock;
@@ -24,6 +25,7 @@ use crate::routes;
 pub struct AppState {
     pub jwt: JwtConfig,
     pub store: std::sync::Arc<RwLock<InMemoryStore>>,
+    seq: std::sync::Arc<AtomicU32>,
 }
 
 impl AsRef<JwtConfig> for AppState {
@@ -38,6 +40,22 @@ pub struct InMemoryStore {
     pub portfolios: HashMap<String, PortfolioRecord>,
     pub positions: Vec<PositionRecord>,
     pub transactions: Vec<TransactionRecord>,
+}
+
+impl AppState {
+    pub fn new(jwt: JwtConfig) -> Self {
+        Self {
+            jwt,
+            store: std::sync::Arc::new(RwLock::new(InMemoryStore::default())),
+            seq: std::sync::Arc::new(AtomicU32::new(1)),
+        }
+    }
+
+    /// Generate the next COBOL-compatible portfolio ID (PORT0001..PORT9999).
+    pub fn next_portfolio_id(&self) -> String {
+        let seq = self.seq.fetch_add(1, Ordering::Relaxed);
+        format!("PORT{:04}", seq % 10_000)
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -80,10 +98,7 @@ mod tests {
     use tower::ServiceExt;
 
     fn test_state() -> AppState {
-        AppState {
-            jwt: JwtConfig::new("test-secret"),
-            store: std::sync::Arc::new(RwLock::new(InMemoryStore::default())),
-        }
+        AppState::new(JwtConfig::new("test-secret"))
     }
 
     #[tokio::test]
