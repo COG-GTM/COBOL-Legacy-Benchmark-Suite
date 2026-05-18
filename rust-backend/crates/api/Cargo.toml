@@ -4,6 +4,10 @@ version.workspace = true
 edition.workspace = true
 rust-version.workspace = true
 
+[[bin]]
+name = "portfolio-api"
+path = "src/main.rs"
+
 [dependencies]
 domain = { path = "../domain" }
 db = { path = "../db" }
@@ -22,8 +26,10 @@ tower-http.workspace = true
 sqlx.workspace = true
 uuid.workspace = true
 jsonwebtoken.workspace = true
+parking_lot = "0.12"
 
 [dev-dependencies]
 testcontainers.workspace = true
 testcontainers-modules.workspace = true
 tokio-test.workspace = true
+rust_decimal_macros = "1"
