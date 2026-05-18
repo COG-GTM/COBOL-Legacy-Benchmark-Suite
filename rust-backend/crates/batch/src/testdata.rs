@@ -208,8 +208,8 @@ impl TestDataGenerator {
     /// Generate `count` portfolio records with associated positions
     /// (mirrors 2200-GEN-PORTFOLIO / 2210-GEN-PORT-DATA).
     fn gen_portfolios(&mut self, count: u32, data: &mut GeneratedData) {
-        for i in 0..count {
-            let port = self.gen_one_portfolio(i);
+        for _i in 0..count {
+            let port = self.gen_one_portfolio(data.portfolios.len() as u32);
             let port_id = port.id.clone();
 
             // Generate 1-5 positions per portfolio.
@@ -242,7 +242,8 @@ impl TestDataGenerator {
 
         let total_value = self.rng.next_decimal(10_000_000);
         let cash_pct = self.rng.next_bounded(30) + 1; // 1-30 %
-        let cash_balance = (total_value * Decimal::new(cash_pct as i64, 0)) / Decimal::new(100, 0);
+        let cash_balance =
+            ((total_value * Decimal::new(cash_pct as i64, 0)) / Decimal::new(100, 0)).round_dp(2);
 
         PortfolioRecord {
             id,
@@ -274,8 +275,9 @@ impl TestDataGenerator {
         let quantity = self.rng.next_decimal4(100_000);
         let cost_basis = self.rng.next_decimal(5_000_000);
         let gain_pct = self.rng.next_bounded(40) as i64 - 10; // -10% to +29%
-        let market_value =
-            cost_basis + (cost_basis * Decimal::new(gain_pct, 0)) / Decimal::new(100, 0);
+        let market_value = (cost_basis
+            + (cost_basis * Decimal::new(gain_pct, 0)) / Decimal::new(100, 0))
+        .round_dp(2);
 
         let maint_dt = pos_date.map(|d| {
             let offset = self.rng.next_bounded(180) as i64;
@@ -306,12 +308,16 @@ impl TestDataGenerator {
     }
 
     /// Generate `count` transaction records (mirrors 2300-GEN-TRANSACTION / 2310).
+    ///
+    /// When no portfolios exist yet, stub portfolios are created so that
+    /// referential integrity holds for transaction-only generation runs.
     fn gen_transactions(&mut self, count: u32, data: &mut GeneratedData) {
-        // Pick portfolio IDs from already-generated portfolios, or synthesize.
+        // If no portfolios exist and we actually need some, create stubs.
+        if count > 0 && data.portfolios.is_empty() {
+            self.gen_portfolios(10, data);
+        }
         for i in 0..count {
-            let port_id = if data.portfolios.is_empty() {
-                format!("PT{:06}", self.rng.next_bounded(1000) + 1)
-            } else {
+            let port_id = {
                 let idx = self.rng.next_bounded(data.portfolios.len() as u64) as usize;
                 data.portfolios[idx].id.clone()
             };
@@ -331,9 +337,14 @@ impl TestDataGenerator {
                 self.rng.next_bounded(60) as u32,
             );
 
-            let quantity = self.rng.next_decimal4(10_000);
-            let price = self.rng.next_decimal4(10_000);
-            let amount = quantity * price;
+            let quantity = self.rng.next_decimal(10_000);
+            let price = self.rng.next_decimal(10_000);
+            let tt = TRANSACTION_TYPES[tt_idx];
+            let amount = if tt == TransactionType::Fee {
+                self.rng.next_decimal(10_000)
+            } else {
+                quantity * price
+            };
 
             let process_dt = trn_date.map(|d| {
                 NaiveDateTime::new(
@@ -353,7 +364,7 @@ impl TestDataGenerator {
                 portfolio_id: port_id,
                 sequence_no: format!("{:06}", i + 1),
                 investment_id: INVESTMENT_IDS[inv_idx].to_string(),
-                transaction_type: TRANSACTION_TYPES[tt_idx],
+                transaction_type: tt,
                 quantity,
                 price,
                 amount,

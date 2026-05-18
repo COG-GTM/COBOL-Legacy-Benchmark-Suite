@@ -281,9 +281,12 @@ impl TestDataValidator {
         checks: &mut Vec<CheckResult>,
         seq: &mut u32,
     ) {
-        // Check 1: transaction amount should equal quantity × price.
+        // Check 1: transaction amount should equal quantity × price (skip fees).
         let mut amount_mismatches: Vec<String> = Vec::new();
         for trn in &data.transactions {
+            if trn.transaction_type == domain::common::TransactionType::Fee {
+                continue;
+            }
             let expected = trn.quantity * trn.price;
             if trn.amount != expected {
                 amount_mismatches.push(format!(
