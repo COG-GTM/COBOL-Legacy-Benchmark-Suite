@@ -352,10 +352,15 @@ mod tests {
     use super::*;
     use sqlx::PgPool;
     use testcontainers::runners::AsyncRunner;
+    use testcontainers::ImageExt;
     use testcontainers_modules::postgres::Postgres;
 
     async fn setup_pool() -> (PgPool, testcontainers::ContainerAsync<Postgres>) {
-        let container = Postgres::default().start().await.unwrap();
+        let container = Postgres::default()
+            .with_tag("16-alpine")
+            .start()
+            .await
+            .unwrap();
         let port = container.get_host_port_ipv4(5432).await.unwrap();
         let url = format!("postgres://postgres:postgres@127.0.0.1:{port}/postgres");
 
