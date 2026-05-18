@@ -1,1 +1,3 @@
-// Database layer — will be populated by Wave 2 (Child 4) and Wave 3 (Child 7)
+pub mod pool;
+
+pub use pool::{map_sqlx_error, DatabasePool, DbError, PoolConfig, PoolStats, StatsSnapshot};
