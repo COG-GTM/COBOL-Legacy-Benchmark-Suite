@@ -168,7 +168,7 @@ pub struct MaintenanceRequest {
     pub function: MaintenanceFunction,
     pub table_name: String,
     pub cutoff_date: Option<NaiveDate>,
-    pub retention_days: Option<i64>,
+    pub retention_days: Option<u64>,
 }
 
 /// Executes database maintenance functions.
@@ -300,7 +300,7 @@ impl MaintenanceRunner {
         req: &MaintenanceRequest,
     ) -> Result<MaintenanceResult, MaintenanceError> {
         let retention = req.retention_days.unwrap_or(90);
-        let cutoff = Utc::now().date_naive() - chrono::Duration::days(retention);
+        let cutoff = Utc::now().date_naive() - chrono::Duration::days(retention as i64);
         let table = &req.table_name;
 
         info!(table, %cutoff, retention, "cleaning up old records");

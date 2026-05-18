@@ -77,7 +77,7 @@ enum Command {
 
         /// Retention days for cleanup.
         #[arg(long)]
-        retention_days: Option<i64>,
+        retention_days: Option<u64>,
 
         /// Database URL.
         #[arg(long, env = "DATABASE_URL")]
@@ -254,7 +254,7 @@ async fn run_maintain(
     function: &str,
     table: &str,
     cutoff_date: Option<&str>,
-    retention_days: Option<i64>,
+    retention_days: Option<u64>,
     database_url: &str,
 ) {
     let func = MaintenanceFunction::from_code(function)
