@@ -135,11 +135,27 @@ pub enum MaintenanceError {
     #[error("invalid function: {0}")]
     InvalidFunction(String),
 
+    #[error("invalid table name: {0}")]
+    InvalidTableName(String),
+
     #[error("database error: {0}")]
     Db(#[from] sqlx::Error),
 
     #[error("maintenance aborted — error count exceeded limit (>{0})")]
     ErrorLimitExceeded(u64),
+}
+
+/// Validate that a table name contains only safe SQL identifier characters.
+fn validate_table_name(name: &str) -> Result<&str, MaintenanceError> {
+    if !name.is_empty()
+        && name
+            .chars()
+            .all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '.')
+    {
+        Ok(name)
+    } else {
+        Err(MaintenanceError::InvalidTableName(name.to_string()))
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -188,6 +204,8 @@ impl MaintenanceRunner {
         let mut report = MaintenanceReport::default();
 
         for req in requests {
+            validate_table_name(&req.table_name)?;
+
             let result = match req.function {
                 MaintenanceFunction::Archive => self.archive(pool, req).await,
                 MaintenanceFunction::Cleanup => self.cleanup(pool, req).await,
@@ -242,13 +260,23 @@ impl MaintenanceRunner {
 
         info!(table, %cutoff, "archiving records");
 
+        let mut tx = pool.begin().await?;
+
         let insert_sql =
             format!("INSERT INTO {archive_table} SELECT * FROM {table} WHERE created_at < $1");
-        let insert_result = sqlx::query(&insert_sql).bind(cutoff).execute(pool).await?;
+        let insert_result = sqlx::query(&insert_sql)
+            .bind(cutoff)
+            .execute(&mut *tx)
+            .await?;
         let archived = insert_result.rows_affected();
 
         let delete_sql = format!("DELETE FROM {table} WHERE created_at < $1");
-        sqlx::query(&delete_sql).bind(cutoff).execute(pool).await?;
+        sqlx::query(&delete_sql)
+            .bind(cutoff)
+            .execute(&mut *tx)
+            .await?;
+
+        tx.commit().await?;
 
         info!(table, archived, "archive complete");
 
@@ -478,5 +506,20 @@ mod tests {
         assert!(output.contains("Maintenance Report"));
         assert!(output.contains("test_table"));
         assert!(output.contains("ARCHIVE"));
+    }
+
+    #[test]
+    fn validate_table_name_accepts_valid() {
+        assert!(validate_table_name("transactions").is_ok());
+        assert!(validate_table_name("public.positions").is_ok());
+        assert!(validate_table_name("my_table_123").is_ok());
+    }
+
+    #[test]
+    fn validate_table_name_rejects_injection() {
+        assert!(validate_table_name("users; DROP TABLE users; --").is_err());
+        assert!(validate_table_name("").is_err());
+        assert!(validate_table_name("table name").is_err());
+        assert!(validate_table_name("table'name").is_err());
     }
 }

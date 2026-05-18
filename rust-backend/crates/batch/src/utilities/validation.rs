@@ -256,6 +256,10 @@ impl DataValidator {
     ) -> Result<(), ValidationError> {
         info!("checking data integrity (orphan records)");
 
+        let position_count = self.count_table(pool, "positions").await?;
+        let transaction_count = self.count_table(pool, "transactions").await?;
+        report.totals.records_read += position_count + transaction_count;
+
         let orphan_positions = self.find_orphan_positions(pool).await?;
         for key in &orphan_positions {
             report.findings.push(ValidationFinding {
@@ -275,9 +279,6 @@ impl DataValidator {
                 description: "transaction references non-existent position".to_string(),
             });
         }
-
-        let checked = orphan_positions.len() + orphan_transactions.len();
-        report.totals.records_read += checked as u64;
 
         if orphan_positions.is_empty() && orphan_transactions.is_empty() {
             info!("integrity check passed — no orphans found");
@@ -301,6 +302,9 @@ impl DataValidator {
     ) -> Result<(), ValidationError> {
         info!("checking cross-references");
 
+        let join_count = self.count_xref_records(pool).await?;
+        report.totals.records_read += join_count;
+
         let mismatches = self.find_xref_mismatches(pool).await?;
         for (key, desc) in &mismatches {
             report.findings.push(ValidationFinding {
@@ -311,7 +315,6 @@ impl DataValidator {
             });
         }
 
-        report.totals.records_read += mismatches.len() as u64;
         Ok(())
     }
 
@@ -324,6 +327,9 @@ impl DataValidator {
     ) -> Result<(), ValidationError> {
         info!("checking data formats");
 
+        let txn_count = self.count_table(pool, "transactions").await?;
+        report.totals.records_read += txn_count;
+
         let bad_dates = self.find_invalid_dates(pool).await?;
         for (key, desc) in &bad_dates {
             report.findings.push(ValidationFinding {
@@ -334,7 +340,6 @@ impl DataValidator {
             });
         }
 
-        report.totals.records_read += bad_dates.len() as u64;
         Ok(())
     }
 
@@ -346,6 +351,9 @@ impl DataValidator {
         report: &mut ValidationReport,
     ) -> Result<(), ValidationError> {
         info!("checking balance reconciliation");
+
+        let pos_count = self.count_table(pool, "positions").await?;
+        report.totals.records_read += pos_count;
 
         let mismatches = self.find_balance_mismatches(pool).await?;
         for (key, position_amt, txn_sum) in &mismatches {
@@ -359,11 +367,34 @@ impl DataValidator {
             report.totals.control_total += txn_sum;
         }
 
-        report.totals.records_read += mismatches.len() as u64;
         Ok(())
     }
 
     // -- helper queries (gracefully handle missing tables) --
+
+    async fn count_table(&self, pool: &PgPool, table: &str) -> Result<u64, ValidationError> {
+        let result: Result<(i64,), _> =
+            sqlx::query_as(&format!("SELECT count(*)::bigint FROM {table}"))
+                .fetch_one(pool)
+                .await;
+        match result {
+            Ok((n,)) => Ok(n as u64),
+            Err(_) => Ok(0),
+        }
+    }
+
+    async fn count_xref_records(&self, pool: &PgPool) -> Result<u64, ValidationError> {
+        let result: Result<(i64,), _> = sqlx::query_as(
+            "SELECT count(*)::bigint FROM positions p \
+             JOIN transactions t ON t.position_id = p.id",
+        )
+        .fetch_one(pool)
+        .await;
+        match result {
+            Ok((n,)) => Ok(n as u64),
+            Err(_) => Ok(0),
+        }
+    }
 
     async fn find_orphan_positions(&self, pool: &PgPool) -> Result<Vec<String>, ValidationError> {
         let result: Result<Vec<(String,)>, _> = sqlx::query_as(
