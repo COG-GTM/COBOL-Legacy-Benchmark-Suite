@@ -30,15 +30,25 @@ pub struct AuditFilter {
 
 impl AuditFilter {
     /// Returns `true` if the record passes every non-`None` criterion.
+    ///
+    /// Records with unparseable timestamps are excluded when a date filter
+    /// is active.
     pub fn matches(&self, rec: &AuditRecord) -> bool {
-        if let (Some(start), Ok(ts_date)) = (&self.start_date, parse_date_prefix(&rec.timestamp)) {
-            if ts_date < *start {
-                return false;
+        if self.start_date.is_some() || self.end_date.is_some() {
+            let ts_date = parse_date_prefix(&rec.timestamp);
+            if let Some(ref start) = self.start_date {
+                match ts_date {
+                    Ok(d) if d < *start => return false,
+                    Err(_) => return false,
+                    _ => {}
+                }
             }
-        }
-        if let (Some(end), Ok(ts_date)) = (&self.end_date, parse_date_prefix(&rec.timestamp)) {
-            if ts_date > *end {
-                return false;
+            if let Some(ref end) = self.end_date {
+                match ts_date {
+                    Ok(d) if d > *end => return false,
+                    Err(_) => return false,
+                    _ => {}
+                }
             }
         }
         if let Some(ref uid) = self.user_id {
@@ -483,5 +493,32 @@ mod tests {
         let desc = build_filter_description(&f);
         assert!(desc.contains("from 2024-01-01"));
         assert!(desc.contains("user=ADMIN"));
+    }
+
+    #[test]
+    fn unparseable_timestamp_excluded_by_date_filter() {
+        let bad_record = AuditRecord {
+            timestamp: "INVALID".into(),
+            system_id: "SYS1".into(),
+            user_id: "USER01".into(),
+            program: "TEST".into(),
+            terminal: String::new(),
+            audit_type: AuditType::Transaction,
+            action: AuditAction::Create,
+            status: AuditStatus::Success,
+            portfolio_id: String::new(),
+            account_no: String::new(),
+            before_image: String::new(),
+            after_image: String::new(),
+            message: "bad ts".into(),
+        };
+        let filter = AuditFilter {
+            start_date: Some(NaiveDate::from_ymd_opt(2024, 1, 1).unwrap()),
+            ..Default::default()
+        };
+        assert!(!filter.matches(&bad_record));
+
+        // Without date filter the record passes
+        assert!(AuditFilter::default().matches(&bad_record));
     }
 }
