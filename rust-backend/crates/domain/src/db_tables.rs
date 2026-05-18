@@ -66,10 +66,10 @@ impl PositionHistory {
         let mut errors = ValidationErrors::new();
 
         check_non_empty(&mut errors, "account_no", &self.account_no);
-        check_max_len(&mut errors, "account_no", &self.account_no, 8);
+        check_max_len(&mut errors, "account_no", &self.account_no, 10);
 
         check_non_empty(&mut errors, "portfolio_id", &self.portfolio_id);
-        check_max_len(&mut errors, "portfolio_id", &self.portfolio_id, 10);
+        check_max_len(&mut errors, "portfolio_id", &self.portfolio_id, 8);
 
         check_max_len(&mut errors, "transaction_date", &self.transaction_date, 10);
         check_max_len(&mut errors, "transaction_time", &self.transaction_time, 8);
@@ -241,8 +241,8 @@ mod tests {
     #[test]
     fn position_history_serde_roundtrip() {
         let ph = PositionHistory {
-            account_no: "ACCT0001".into(),
-            portfolio_id: "PORT000001".into(),
+            account_no: "ACCT000001".into(),
+            portfolio_id: "PORT0001".into(),
             transaction_date: "2024-06-15".into(),
             transaction_time: "14:30:00".into(),
             transaction_type: "BU".into(),
@@ -283,8 +283,8 @@ mod tests {
     #[test]
     fn position_history_validation_pass() {
         let ph = PositionHistory {
-            account_no: "ACCT0001".into(),
-            portfolio_id: "PORT000001".into(),
+            account_no: "ACCT000001".into(),
+            portfolio_id: "PORT0001".into(),
             security_id: "AAPL00000001".into(),
             ..PositionHistory::default()
         };

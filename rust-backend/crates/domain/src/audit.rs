@@ -71,7 +71,7 @@ impl AuditAction {
     }
 
     pub fn from_code(code: &str) -> Option<Self> {
-        match code.trim() {
+        match code {
             "CREATE" => Some(Self::Create),
             "UPDATE" => Some(Self::Update),
             "DELETE" => Some(Self::Delete),
@@ -242,7 +242,7 @@ mod tests {
     fn audit_action_codes() {
         assert_eq!(AuditAction::Create.code(), "CREATE");
         assert_eq!(AuditAction::Shutdown.code(), "SHUTDOWN");
-        assert_eq!(AuditAction::from_code("LOGIN   "), Some(AuditAction::Login));
+        assert_eq!(AuditAction::from_code("LOGIN"), Some(AuditAction::Login));
         assert_eq!(AuditAction::from_code("NOPE"), None);
     }
 
