@@ -337,9 +337,13 @@ impl TestDataGenerator {
                 self.rng.next_bounded(60) as u32,
             );
 
-            let quantity = self.rng.next_decimal(10_000);
-            let price = self.rng.next_decimal(10_000);
             let tt = TRANSACTION_TYPES[tt_idx];
+            let mut quantity = self.rng.next_decimal(10_000);
+            // Non-fee transactions require non-zero quantity per domain rules.
+            if tt != TransactionType::Fee && quantity == Decimal::ZERO {
+                quantity = Decimal::new(1, 2); // 0.01
+            }
+            let price = self.rng.next_decimal(10_000);
             let amount = if tt == TransactionType::Fee {
                 self.rng.next_decimal(10_000)
             } else {
