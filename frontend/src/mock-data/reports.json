@@ -1,0 +1,115 @@
+{
+  "positionReport": [
+    {
+      "accountNo": "100000001",
+      "fundId": "VTSAX",
+      "fundName": "Vanguard Total Stock Market Index",
+      "shares": 1250.500,
+      "costBasis": 119050.65,
+      "marketValue": 125050.00,
+      "gainLoss": 5999.35,
+      "gainLossPercent": 5.04
+    },
+    {
+      "accountNo": "100000001",
+      "fundId": "VBTLX",
+      "fundName": "Vanguard Total Bond Market Index",
+      "shares": 3200.000,
+      "costBasis": 33440.00,
+      "marketValue": 33600.00,
+      "gainLoss": 160.00,
+      "gainLossPercent": 0.48
+    },
+    {
+      "accountNo": "100000001",
+      "fundId": "VFIAX",
+      "fundName": "Vanguard 500 Index Fund",
+      "shares": 500.250,
+      "costBasis": 210135.11,
+      "marketValue": 212106.15,
+      "gainLoss": 1971.04,
+      "gainLossPercent": 0.94
+    },
+    {
+      "accountNo": "200000002",
+      "fundId": "VTSAX",
+      "fundName": "Vanguard Total Stock Market Index",
+      "shares": 800.000,
+      "costBasis": 74000.00,
+      "marketValue": 78400.00,
+      "gainLoss": 4400.00,
+      "gainLossPercent": 5.95
+    }
+  ],
+  "auditReport": [
+    {
+      "timestamp": "2026-05-18T09:30:00Z",
+      "userId": "ADMIN01",
+      "program": "PORTMSTR",
+      "action": "UPDATE",
+      "status": "SUCCESS",
+      "portfolioId": "PORT00001",
+      "details": "Portfolio name updated"
+    },
+    {
+      "timestamp": "2026-05-18T08:15:00Z",
+      "userId": "USER02",
+      "program": "INQPORT",
+      "action": "INQUIRY",
+      "status": "SUCCESS",
+      "portfolioId": "PORT00002",
+      "details": "Position inquiry for account 200000002"
+    },
+    {
+      "timestamp": "2026-05-17T16:45:00Z",
+      "userId": "ADMIN01",
+      "program": "PORTMSTR",
+      "action": "CREATE",
+      "status": "SUCCESS",
+      "portfolioId": "PORT00004",
+      "details": "New portfolio created"
+    },
+    {
+      "timestamp": "2026-05-17T14:20:00Z",
+      "userId": "USER03",
+      "program": "INQHIST",
+      "action": "INQUIRY",
+      "status": "SUCCESS",
+      "portfolioId": "PORT00003",
+      "details": "History inquiry for account 300000003"
+    },
+    {
+      "timestamp": "2026-05-17T10:00:00Z",
+      "userId": "BATCH",
+      "program": "TRNVAL00",
+      "action": "VALIDATE",
+      "status": "WARNING",
+      "portfolioId": "",
+      "details": "1 duplicate transaction detected"
+    }
+  ],
+  "statisticsReport": {
+    "systemMetrics": {
+      "totalTransactionsToday": 1523,
+      "avgResponseTimeMs": 45,
+      "peakResponseTimeMs": 320,
+      "errorRate": 0.2,
+      "uptime": 99.97
+    },
+    "batchMetrics": {
+      "avgBatchDurationMin": 120,
+      "totalRecordsProcessed": 45230,
+      "totalErrorsThisWeek": 19,
+      "successRate": 95.8
+    },
+    "dailyVolumes": [
+      { "date": "2026-05-12", "transactions": 1102 },
+      { "date": "2026-05-13", "transactions": 1345 },
+      { "date": "2026-05-14", "transactions": 1198 },
+      { "date": "2026-05-15", "transactions": 1456 },
+      { "date": "2026-05-16", "transactions": 200 },
+      { "date": "2026-05-17", "transactions": 1245 },
+      { "date": "2026-05-18", "transactions": 1523 }
+    ]
+  }
+}

@@ -1,0 +1,122 @@
+[
+  {
+    "processDate": "20260518",
+    "processId": "TRNVAL00",
+    "status": "C",
+    "startTime": "18000000",
+    "endTime": "18120000",
+    "recordCount": 1523,
+    "errorCount": 3,
+    "lastPos": 1523,
+    "returnCode": "0004",
+    "message": "Completed with 3 warnings"
+  },
+  {
+    "processDate": "20260518",
+    "processId": "POSUPD00",
+    "status": "C",
+    "startTime": "18150000",
+    "endTime": "18450000",
+    "recordCount": 1520,
+    "errorCount": 0,
+    "lastPos": 1520,
+    "returnCode": "0000",
+    "message": "Successful completion"
+  },
+  {
+    "processDate": "20260518",
+    "processId": "HISTLD00",
+    "status": "P",
+    "startTime": "19000000",
+    "endTime": "",
+    "recordCount": 850,
+    "errorCount": 0,
+    "lastPos": 850,
+    "returnCode": "0000",
+    "message": "Processing in progress"
+  },
+  {
+    "processDate": "20260518",
+    "processId": "RPTGEN00",
+    "status": "W",
+    "startTime": "",
+    "endTime": "",
+    "recordCount": 0,
+    "errorCount": 0,
+    "lastPos": 0,
+    "returnCode": "0000",
+    "message": "Waiting for POSUPD00"
+  },
+  {
+    "processDate": "20260517",
+    "processId": "TRNVAL00",
+    "status": "C",
+    "startTime": "18000000",
+    "endTime": "18100000",
+    "recordCount": 1245,
+    "errorCount": 1,
+    "lastPos": 1245,
+    "returnCode": "0004",
+    "message": "Completed with 1 warning"
+  },
+  {
+    "processDate": "20260517",
+    "processId": "POSUPD00",
+    "status": "C",
+    "startTime": "18150000",
+    "endTime": "18400000",
+    "recordCount": 1244,
+    "errorCount": 0,
+    "lastPos": 1244,
+    "returnCode": "0000",
+    "message": "Successful completion"
+  },
+  {
+    "processDate": "20260517",
+    "processId": "HISTLD00",
+    "status": "C",
+    "startTime": "19000000",
+    "endTime": "19250000",
+    "recordCount": 1244,
+    "errorCount": 0,
+    "lastPos": 1244,
+    "returnCode": "0000",
+    "message": "Successful completion"
+  },
+  {
+    "processDate": "20260517",
+    "processId": "RPTGEN00",
+    "status": "C",
+    "startTime": "19300000",
+    "endTime": "19500000",
+    "recordCount": 4,
+    "errorCount": 0,
+    "lastPos": 4,
+    "returnCode": "0000",
+    "message": "4 reports generated"
+  },
+  {
+    "processDate": "20260516",
+    "processId": "TRNVAL00",
+    "status": "E",
+    "startTime": "18000000",
+    "endTime": "18050000",
+    "recordCount": 200,
+    "errorCount": 15,
+    "lastPos": 200,
+    "returnCode": "0008",
+    "message": "Excessive errors - processing halted"
+  },
+  {
+    "processDate": "20260516",
+    "processId": "POSUPD00",
+    "status": "W",
+    "startTime": "",
+    "endTime": "",
+    "recordCount": 0,
+    "errorCount": 0,
+    "lastPos": 0,
+    "returnCode": "0000",
+    "message": "Blocked by TRNVAL00 failure"
+  }
+]

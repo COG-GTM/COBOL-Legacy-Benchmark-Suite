@@ -1,0 +1,44 @@
+[
+  {
+    "portfolioId": "PORT00001",
+    "name": "Growth Investment Portfolio",
+    "status": "A",
+    "createDate": "20250101",
+    "totalValue": 362625.76
+  },
+  {
+    "portfolioId": "PORT00002",
+    "name": "Conservative Bond Portfolio",
+    "status": "A",
+    "createDate": "20250215",
+    "totalValue": 74000.00
+  },
+  {
+    "portfolioId": "PORT00003",
+    "name": "Balanced Retirement Fund",
+    "status": "A",
+    "createDate": "20250301",
+    "totalValue": 114048.65
+  },
+  {
+    "portfolioId": "PORT00004",
+    "name": "Aggressive Growth Fund",
+    "status": "A",
+    "createDate": "20250415",
+    "totalValue": 242500.00
+  },
+  {
+    "portfolioId": "PORT00005",
+    "name": "Legacy Fixed Income",
+    "status": "I",
+    "createDate": "20240601",
+    "totalValue": 0.00
+  },
+  {
+    "portfolioId": "PORT00006",
+    "name": "Closed Equity Fund",
+    "status": "C",
+    "createDate": "20240101",
+    "totalValue": 0.00
+  }
+]
