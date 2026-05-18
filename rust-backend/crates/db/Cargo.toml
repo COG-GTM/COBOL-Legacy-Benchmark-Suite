@@ -17,6 +17,7 @@ tokio.workspace = true
 uuid.workspace = true
 
 [dev-dependencies]
+rust_decimal_macros = "1"
 testcontainers.workspace = true
 testcontainers-modules.workspace = true
 tokio-test.workspace = true
