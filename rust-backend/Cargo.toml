@@ -37,7 +37,7 @@ uuid = { version = "1", features = ["v4", "serde"] }
 jsonwebtoken = "9"
 
 # CLI
-clap = { version = "4", features = ["derive"] }
+clap = { version = "4", features = ["derive", "env"] }
 
 # Testing
 testcontainers = "0.23"

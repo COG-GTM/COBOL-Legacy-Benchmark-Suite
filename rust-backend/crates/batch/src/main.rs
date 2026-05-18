@@ -1,7 +1,7 @@
 //! Batch processing CLI.
 //!
-//! Provides sub-commands for the three batch-processing pipelines ported
-//! from COBOL: batch control, history loading, and process sequencing.
+//! Provides sub-commands for the batch-processing pipelines and utility
+//! programs ported from COBOL.
 
 use chrono::NaiveDate;
 use clap::{Parser, Subcommand};
@@ -10,6 +10,9 @@ use tracing_subscriber::EnvFilter;
 use batch::batch_control::{BatchControlRecord, BatchController, Prerequisite};
 use batch::history_loader::{HistoryLoader, LoadOutcome};
 use batch::process_sequencer::{ProcessDefinition, ProcessSequencer, SequenceType};
+use batch::utilities::maintenance::{MaintenanceFunction, MaintenanceRequest, MaintenanceRunner};
+use batch::utilities::monitoring::{PrometheusExporter, SystemMonitor};
+use batch::utilities::validation::{DataValidator, ValidationRequest, ValidationType};
 
 // ---------------------------------------------------------------------------
 // CLI definition
@@ -56,6 +59,51 @@ enum Command {
         /// Process date (YYYY-MM-DD).
         #[arg(long, default_value = "2024-01-15")]
         date: String,
+    },
+
+    /// Run database maintenance (UTLMNT00).
+    Maintain {
+        /// Maintenance function: ARCHIVE, CLEANUP, REORG, ANALYZE.
+        #[arg(long)]
+        function: String,
+
+        /// Target table name.
+        #[arg(long)]
+        table: String,
+
+        /// Cutoff date for archive/cleanup (YYYY-MM-DD).
+        #[arg(long)]
+        cutoff_date: Option<String>,
+
+        /// Retention days for cleanup.
+        #[arg(long)]
+        retention_days: Option<i64>,
+
+        /// Database URL.
+        #[arg(long, env = "DATABASE_URL")]
+        database_url: String,
+    },
+
+    /// Run system monitoring (UTLMON00).
+    Monitor {
+        /// Output format: text or prometheus.
+        #[arg(long, default_value = "text")]
+        format: String,
+
+        /// Database URL.
+        #[arg(long, env = "DATABASE_URL")]
+        database_url: String,
+    },
+
+    /// Run data validation checks (UTLVAL00).
+    Validate {
+        /// Validation types to run (comma-separated): INTEGRITY, XREF, FORMAT, BALANCE.
+        #[arg(long, default_value = "INTEGRITY,XREF,FORMAT,BALANCE")]
+        checks: String,
+
+        /// Database URL.
+        #[arg(long, env = "DATABASE_URL")]
+        database_url: String,
     },
 }
 
@@ -202,11 +250,104 @@ fn run_sequence(seq_type_str: &str, date_str: &str) {
     println!("Completion: {status}  RC={rc}");
 }
 
+async fn run_maintain(
+    function: &str,
+    table: &str,
+    cutoff_date: Option<&str>,
+    retention_days: Option<i64>,
+    database_url: &str,
+) {
+    let func = MaintenanceFunction::from_code(function)
+        .unwrap_or_else(|| panic!("unknown maintenance function: {function}"));
+
+    let cutoff = cutoff_date.map(|d| {
+        NaiveDate::parse_from_str(d, "%Y-%m-%d").expect("invalid cutoff date (expected YYYY-MM-DD)")
+    });
+
+    let pool = sqlx::postgres::PgPoolOptions::new()
+        .max_connections(5)
+        .connect(database_url)
+        .await
+        .expect("failed to connect to database");
+
+    let request = MaintenanceRequest {
+        function: func,
+        table_name: table.to_string(),
+        cutoff_date: cutoff,
+        retention_days,
+    };
+
+    let runner = MaintenanceRunner::new();
+    match runner.run(&pool, &[request]).await {
+        Ok(report) => {
+            println!("{report}");
+            std::process::exit(report.return_code());
+        }
+        Err(e) => {
+            eprintln!("ERROR: {e}");
+            std::process::exit(12);
+        }
+    }
+}
+
+async fn run_monitor(format: &str, database_url: &str) {
+    let pool = sqlx::postgres::PgPoolOptions::new()
+        .max_connections(5)
+        .connect(database_url)
+        .await
+        .expect("failed to connect to database");
+
+    let monitor = SystemMonitor::new();
+    match monitor.check(&pool).await {
+        Ok(report) => match format {
+            "prometheus" => print!("{}", PrometheusExporter::render(&report)),
+            _ => println!("{report}"),
+        },
+        Err(e) => {
+            eprintln!("ERROR: {e}");
+            std::process::exit(12);
+        }
+    }
+}
+
+async fn run_validate(checks: &str, database_url: &str) {
+    let pool = sqlx::postgres::PgPoolOptions::new()
+        .max_connections(5)
+        .connect(database_url)
+        .await
+        .expect("failed to connect to database");
+
+    let requests: Vec<ValidationRequest> = checks
+        .split(',')
+        .map(|s| {
+            let vt = ValidationType::from_code(s.trim())
+                .unwrap_or_else(|| panic!("unknown validation type: {s}"));
+            ValidationRequest {
+                validation_type: vt,
+                table_name: None,
+            }
+        })
+        .collect();
+
+    let validator = DataValidator::new();
+    match validator.run(&pool, &requests).await {
+        Ok(report) => {
+            println!("{report}");
+            std::process::exit(report.return_code());
+        }
+        Err(e) => {
+            eprintln!("ERROR: {e}");
+            std::process::exit(12);
+        }
+    }
+}
+
 // ---------------------------------------------------------------------------
 // Entry point
 // ---------------------------------------------------------------------------
 
-fn main() {
+#[tokio::main]
+async fn main() {
     tracing_subscriber::fmt()
         .with_env_filter(EnvFilter::from_default_env())
         .init();
@@ -217,5 +358,33 @@ fn main() {
         Command::RunBatch { date, job } => run_batch(date, job),
         Command::LoadHistory { count, commit_freq } => load_history(*count, *commit_freq),
         Command::RunSequence { seq_type, date } => run_sequence(seq_type, date),
+        Command::Maintain {
+            function,
+            table,
+            cutoff_date,
+            retention_days,
+            database_url,
+        } => {
+            run_maintain(
+                function,
+                table,
+                cutoff_date.as_deref(),
+                *retention_days,
+                database_url,
+            )
+            .await;
+        }
+        Command::Monitor {
+            format,
+            database_url,
+        } => {
+            run_monitor(format, database_url).await;
+        }
+        Command::Validate {
+            checks,
+            database_url,
+        } => {
+            run_validate(checks, database_url).await;
+        }
     }
 }

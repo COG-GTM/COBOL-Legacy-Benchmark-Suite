@@ -3,3 +3,4 @@ pub mod history_loader;
 pub mod process_sequencer;
 pub mod testdata;
 pub mod testval;
+pub mod utilities;
