@@ -80,8 +80,9 @@ export default function TransactionHistory({ portfolioId }: TransactionHistoryPr
     return result;
   }, [data?.data, typeFilter, statusFilter, sortField, sortDir]);
 
-  const total = hasClientFilter ? filteredAndSorted.length : (data?.total ?? 0);
-  const totalPages = Math.ceil(total / pageSize);
+  const serverTotal = data?.total ?? 0;
+  const displayedCount = hasClientFilter ? filteredAndSorted.length : serverTotal;
+  const totalPages = Math.ceil(serverTotal / pageSize);
 
   function handleSort(field: SortField) {
     if (sortField === field) {
@@ -104,8 +105,8 @@ export default function TransactionHistory({ portfolioId }: TransactionHistoryPr
           Transaction History
         </h2>
         <span className="text-sm text-zinc-500 dark:text-zinc-400">
-          {total} transaction{total !== 1 ? "s" : ""}
-          {hasClientFilter ? " (filtered)" : ""}
+          {displayedCount} transaction{displayedCount !== 1 ? "s" : ""}
+          {hasClientFilter ? ` of ${serverTotal} (filtered)` : ""}
         </span>
       </div>
 

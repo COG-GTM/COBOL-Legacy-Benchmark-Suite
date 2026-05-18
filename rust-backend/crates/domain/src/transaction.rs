@@ -15,11 +15,14 @@ use crate::error::{check_max_len, check_non_empty, ValidationErrors};
 
 /// Transaction processing status: P=Pending, D=Done, F=Failed, R=Reversed.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub enum TransactionStatus {
+    #[serde(rename = "P")]
     Pending,
+    #[serde(rename = "D")]
     Done,
+    #[serde(rename = "F")]
     Failed,
+    #[serde(rename = "R")]
     Reversed,
 }
 

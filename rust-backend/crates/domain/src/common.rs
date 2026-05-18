@@ -94,11 +94,14 @@ impl StatusCode {
 
 /// Transaction type codes: BU=Buy, SL=Sell, TR=Transfer, FE=Fee.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub enum TransactionType {
+    #[serde(rename = "BU")]
     Buy,
+    #[serde(rename = "SL")]
     Sell,
+    #[serde(rename = "TR")]
     Transfer,
+    #[serde(rename = "FE")]
     Fee,
 }
 

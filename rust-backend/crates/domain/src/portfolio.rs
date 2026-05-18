@@ -14,10 +14,12 @@ use crate::error::{check_max_len, check_non_empty, ValidationErrors};
 
 /// Portfolio client type: I=Individual, C=Corporate, T=Trust.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub enum ClientType {
+    #[serde(rename = "I")]
     Individual,
+    #[serde(rename = "C")]
     Corporate,
+    #[serde(rename = "T")]
     Trust,
 }
 
@@ -46,10 +48,12 @@ impl ClientType {
 
 /// Portfolio lifecycle status: A=Active, C=Closed, S=Suspended.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub enum PortfolioStatus {
+    #[serde(rename = "A")]
     Active,
+    #[serde(rename = "C")]
     Closed,
+    #[serde(rename = "S")]
     Suspended,
 }
 

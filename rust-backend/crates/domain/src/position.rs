@@ -14,10 +14,12 @@ use crate::error::{check_max_len, check_non_empty, ValidationErrors};
 
 /// Position lifecycle status: A=Active, C=Closed, P=Pending.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
-#[serde(rename_all = "camelCase")]
 pub enum PositionStatus {
+    #[serde(rename = "A")]
     Active,
+    #[serde(rename = "C")]
     Closed,
+    #[serde(rename = "P")]
     Pending,
 }
 
