@@ -1,1 +1,5 @@
-// API layer — will be populated by Wave 3 (Child 9)
+pub mod app;
+pub mod error;
+pub mod middleware;
+pub mod openapi;
+pub mod routes;
