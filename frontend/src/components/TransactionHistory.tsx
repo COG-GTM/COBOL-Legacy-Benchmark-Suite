@@ -43,8 +43,7 @@ export default function TransactionHistory({ portfolioId }: TransactionHistoryPr
     enabled: !!portfolioId,
   });
 
-  const total = data?.total ?? 0;
-  const totalPages = Math.ceil(total / pageSize);
+  const hasClientFilter = typeFilter !== "" || statusFilter !== "";
 
   const filteredAndSorted = useMemo(() => {
     let result = [...(data?.data ?? [])];
@@ -81,6 +80,9 @@ export default function TransactionHistory({ portfolioId }: TransactionHistoryPr
     return result;
   }, [data?.data, typeFilter, statusFilter, sortField, sortDir]);
 
+  const total = hasClientFilter ? filteredAndSorted.length : (data?.total ?? 0);
+  const totalPages = Math.ceil(total / pageSize);
+
   function handleSort(field: SortField) {
     if (sortField === field) {
       setSortDir((d) => (d === "asc" ? "desc" : "asc"));
@@ -103,6 +105,7 @@ export default function TransactionHistory({ portfolioId }: TransactionHistoryPr
         </h2>
         <span className="text-sm text-zinc-500 dark:text-zinc-400">
           {total} transaction{total !== 1 ? "s" : ""}
+          {hasClientFilter ? " (filtered)" : ""}
         </span>
       </div>
 
@@ -118,7 +121,7 @@ export default function TransactionHistory({ portfolioId }: TransactionHistoryPr
           <select
             id="txn-type-filter"
             value={typeFilter}
-            onChange={(e) => setTypeFilter(e.target.value as TransactionType | "")}
+            onChange={(e) => { setTypeFilter(e.target.value as TransactionType | ""); setPage(0); }}
             className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
           >
             <option value="">All Types</option>
@@ -139,7 +142,7 @@ export default function TransactionHistory({ portfolioId }: TransactionHistoryPr
           <select
             id="txn-status-filter"
             value={statusFilter}
-            onChange={(e) => setStatusFilter(e.target.value as TransactionStatus | "")}
+            onChange={(e) => { setStatusFilter(e.target.value as TransactionStatus | ""); setPage(0); }}
             className="rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-900 focus:border-blue-500 focus:outline-none dark:border-zinc-600 dark:bg-zinc-800 dark:text-zinc-100"
           >
             <option value="">All Statuses</option>

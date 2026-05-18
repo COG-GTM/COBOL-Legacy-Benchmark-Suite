@@ -55,11 +55,19 @@ impl AppState {
     ///
     /// Returns `None` when the 9 999-entry ID space is exhausted.
     pub fn next_portfolio_id(&self) -> Option<String> {
-        let seq = self.seq.fetch_add(1, Ordering::Relaxed);
-        if seq >= 10_000 {
-            return None;
+        loop {
+            let current = self.seq.load(Ordering::Relaxed);
+            if current >= 10_000 {
+                return None;
+            }
+            if self
+                .seq
+                .compare_exchange(current, current + 1, Ordering::Relaxed, Ordering::Relaxed)
+                .is_ok()
+            {
+                return Some(format!("PORT{:04}", current));
+            }
         }
-        Some(format!("PORT{:04}", seq))
     }
 }
 
