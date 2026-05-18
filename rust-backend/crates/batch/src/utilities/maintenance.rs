@@ -299,11 +299,21 @@ impl MaintenanceRunner {
         pool: &PgPool,
         req: &MaintenanceRequest,
     ) -> Result<MaintenanceResult, MaintenanceError> {
-        let retention = req.retention_days.unwrap_or(90);
-        let cutoff = Utc::now().date_naive() - chrono::Duration::days(retention as i64);
+        let cutoff = match req.cutoff_date {
+            Some(d) => d,
+            None => {
+                let retention = req.retention_days.unwrap_or(90);
+                let retention_i64 = i64::try_from(retention).map_err(|_| {
+                    MaintenanceError::InvalidFunction(format!(
+                        "retention_days too large: {retention}"
+                    ))
+                })?;
+                Utc::now().date_naive() - chrono::Duration::days(retention_i64)
+            }
+        };
         let table = &req.table_name;
 
-        info!(table, %cutoff, retention, "cleaning up old records");
+        info!(table, %cutoff, "cleaning up old records");
 
         let sql = format!("DELETE FROM {table} WHERE created_at < $1");
         let result = sqlx::query(&sql).bind(cutoff).execute(pool).await?;
