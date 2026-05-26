@@ -8,18 +8,18 @@ import type {
 } from './types';
 
 export const portfolios: Portfolio[] = [
-  { id: 'PORT0001', name: 'Growth Equity Fund', createDate: '2024-01-15', status: 'A', totalValue: 2450000.00 },
-  { id: 'PORT0002', name: 'Blue Chip Dividend Portfolio', createDate: '2024-02-01', status: 'A', totalValue: 5120000.00 },
-  { id: 'PORT0003', name: 'Fixed Income Treasury', createDate: '2024-02-20', status: 'A', totalValue: 3800000.00 },
-  { id: 'PORT0004', name: 'International Emerging Markets', createDate: '2024-03-10', status: 'A', totalValue: 1875000.00 },
-  { id: 'PORT0005', name: 'Technology Sector Fund', createDate: '2024-03-22', status: 'A', totalValue: 4200000.00 },
-  { id: 'PORT0006', name: 'Healthcare Innovation Fund', createDate: '2024-04-05', status: 'A', totalValue: 2950000.00 },
-  { id: 'PORT0007', name: 'Real Estate Investment Trust', createDate: '2024-04-18', status: 'I', totalValue: 1620000.00 },
-  { id: 'PORT0008', name: 'Balanced Growth & Income', createDate: '2024-05-01', status: 'A', totalValue: 6750000.00 },
-  { id: 'PORT0009', name: 'Small Cap Value Fund', createDate: '2024-05-15', status: 'A', totalValue: 980000.00 },
-  { id: 'PORT0010', name: 'Municipal Bond Portfolio', createDate: '2024-06-01', status: 'C', totalValue: 0.00 },
-  { id: 'PORT0011', name: 'ESG Sustainable Growth', createDate: '2024-06-12', status: 'A', totalValue: 3150000.00 },
-  { id: 'PORT0012', name: 'Retirement Income Fund', createDate: '2024-07-01', status: 'A', totalValue: 8200000.00 },
+  { id: 'PORT0001', name: 'Growth Equity Fund', accountNo: '100000001', clientType: 'I', cashBalance: 125000.00, createDate: '2024-01-15', status: 'A', totalValue: 2450000.00, lastUser: 'ADMIN01', lastTransDate: '2024-08-15' },
+  { id: 'PORT0002', name: 'Blue Chip Dividend Portfolio', accountNo: '100000002', clientType: 'C', cashBalance: 250000.00, createDate: '2024-02-01', status: 'A', totalValue: 5120000.00, lastUser: 'ADMIN01', lastTransDate: '2024-08-14' },
+  { id: 'PORT0003', name: 'Fixed Income Treasury', accountNo: '100000003', clientType: 'T', cashBalance: 180000.00, createDate: '2024-02-20', status: 'A', totalValue: 3800000.00, lastUser: 'ADMIN02', lastTransDate: '2024-08-15' },
+  { id: 'PORT0004', name: 'International Emerging Markets', accountNo: '100000004', clientType: 'I', cashBalance: 95000.00, createDate: '2024-03-10', status: 'A', totalValue: 1875000.00, lastUser: 'ADMIN01', lastTransDate: '2024-08-13' },
+  { id: 'PORT0005', name: 'Technology Sector Fund', accountNo: '100000005', clientType: 'C', cashBalance: 310000.00, createDate: '2024-03-22', status: 'A', totalValue: 4200000.00, lastUser: 'ADMIN02', lastTransDate: '2024-08-15' },
+  { id: 'PORT0006', name: 'Healthcare Innovation Fund', accountNo: '100000006', clientType: 'I', cashBalance: 175000.00, createDate: '2024-04-05', status: 'A', totalValue: 2950000.00, lastUser: 'ADMIN01', lastTransDate: '2024-08-15' },
+  { id: 'PORT0007', name: 'Real Estate Investment Trust', accountNo: '100000007', clientType: 'T', cashBalance: 50000.00, createDate: '2024-04-18', status: 'I', totalValue: 1620000.00, lastUser: 'ADMIN02', lastTransDate: '2024-08-13' },
+  { id: 'PORT0008', name: 'Balanced Growth & Income', accountNo: '100000008', clientType: 'C', cashBalance: 420000.00, createDate: '2024-05-01', status: 'A', totalValue: 6750000.00, lastUser: 'ADMIN01', lastTransDate: '2024-08-11' },
+  { id: 'PORT0009', name: 'Small Cap Value Fund', accountNo: '100000009', clientType: 'I', cashBalance: 45000.00, createDate: '2024-05-15', status: 'A', totalValue: 980000.00, lastUser: 'ADMIN02', lastTransDate: '2024-08-09' },
+  { id: 'PORT0010', name: 'Municipal Bond Portfolio', accountNo: '100000010', clientType: 'I', cashBalance: 0.00, createDate: '2024-06-01', status: 'C', totalValue: 0.00, lastUser: 'ADMIN01', lastTransDate: '2024-07-20' },
+  { id: 'PORT0011', name: 'ESG Sustainable Growth', accountNo: '100000011', clientType: 'C', cashBalance: 200000.00, createDate: '2024-06-12', status: 'A', totalValue: 3150000.00, lastUser: 'ADMIN01', lastTransDate: '2024-08-15' },
+  { id: 'PORT0012', name: 'Retirement Income Fund', accountNo: '100000012', clientType: 'T', cashBalance: 550000.00, createDate: '2024-07-01', status: 'A', totalValue: 8200000.00, lastUser: 'ADMIN02', lastTransDate: '2024-08-14' },
 ];
 
 export const positions: Position[] = [

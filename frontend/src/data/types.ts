@@ -1,9 +1,14 @@
 export interface Portfolio {
   id: string;
   name: string;
+  accountNo: string;
+  clientType: 'I' | 'C' | 'T';
+  cashBalance: number;
   createDate: string;
   status: 'A' | 'I' | 'C';
   totalValue: number;
+  lastUser?: string;
+  lastTransDate?: string;
 }
 
 export interface Position {
