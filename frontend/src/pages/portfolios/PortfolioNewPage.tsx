@@ -37,8 +37,8 @@ export function PortfolioNewPage() {
 
     if (!accountNo) {
       newErrors.accountNo = 'Account number is required';
-    } else if (!/^\d{10}$/.test(accountNo)) {
-      newErrors.accountNo = 'Account number must be exactly 10 digits';
+    } else if (!/^\d{9}$/.test(accountNo)) {
+      newErrors.accountNo = 'Account number must be exactly 9 digits';
     }
 
     if (!clientType) {
@@ -125,14 +125,14 @@ export function PortfolioNewPage() {
               type="text"
               value={accountNo}
               onChange={(e) => {
-                const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                const val = e.target.value.replace(/\D/g, '').slice(0, 9);
                 setAccountNo(val);
               }}
               className={`w-full px-3 py-2 text-sm border rounded-lg bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 font-mono ${
                 errors.accountNo ? 'border-red-300' : 'border-slate-300'
               }`}
-              placeholder="10-digit numeric account number"
-              maxLength={10}
+              placeholder="9-digit numeric account number"
+              maxLength={9}
             />
             {errors.accountNo && <p className="mt-1 text-sm text-red-600">{errors.accountNo}</p>}
           </div>

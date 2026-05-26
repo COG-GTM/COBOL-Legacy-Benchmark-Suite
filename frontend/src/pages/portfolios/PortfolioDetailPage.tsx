@@ -10,7 +10,8 @@ import { EmptyState } from '@/components/ui/EmptyState';
 import { portfolios, positions } from '@/data/mockData';
 import type { Position } from '@/data/types';
 
-type PositionRecord = Position & Record<string, unknown>;
+type PositionWithMarketValue = Position & { marketValue: number };
+type PositionRecord = PositionWithMarketValue & Record<string, unknown>;
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(value);
@@ -33,7 +34,9 @@ export function PortfolioDetailPage() {
 
   const portfolioPositions = useMemo(() => {
     if (!portfolio) return [];
-    return positions.filter((p) => p.accountNo === portfolio.accountNo);
+    return positions
+      .filter((p) => p.accountNo === portfolio.accountNo)
+      .map((p) => ({ ...p, marketValue: p.shareBalance * p.avgCost }));
   }, [portfolio]);
 
   if (!portfolio) {
@@ -87,7 +90,7 @@ export function PortfolioDetailPage() {
       sortable: true,
       className: 'text-right',
       render: (row) => (
-        <span className="font-medium">{formatCurrency(row.shareBalance * row.avgCost)}</span>
+        <span className="font-medium">{formatCurrency(row.marketValue)}</span>
       ),
     },
     { key: 'lastDate', header: 'Last Date', sortable: true },
