@@ -39,6 +39,8 @@ export function PortfolioNewPage() {
       newErrors.accountNo = 'Account number is required';
     } else if (!/^\d{9}$/.test(accountNo)) {
       newErrors.accountNo = 'Account number must be exactly 9 digits';
+    } else if (portfolios.some((p) => p.accountNo === accountNo)) {
+      newErrors.accountNo = 'This account number is already in use';
     }
 
     if (!clientType) {
