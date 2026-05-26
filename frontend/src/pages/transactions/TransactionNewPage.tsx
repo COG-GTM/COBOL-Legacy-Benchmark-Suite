@@ -147,6 +147,8 @@ export function TransactionNewPage() {
         if (!isNaN(qty) && qty > currentPosition.shareBalance) {
           errs.shareQty = `Cannot exceed current position balance (${formatQuantity(currentPosition.shareBalance)})`;
         }
+      } else if (form.transType === 'SL' && !currentPosition) {
+        errs.shareQty = 'Cannot sell without an existing position';
       }
     }
 

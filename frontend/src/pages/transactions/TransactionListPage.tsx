@@ -360,8 +360,8 @@ function TransactionRow({
                 </p>
               </div>
               <div>
-                <p className="text-slate-500 text-xs font-medium uppercase">Timestamp</p>
-                <p className="text-slate-900 mt-0.5">{txn.transDate} 18:00:00</p>
+                <p className="text-slate-500 text-xs font-medium uppercase">Transaction Date</p>
+                <p className="text-slate-900 mt-0.5">{txn.transDate}</p>
               </div>
             </div>
           </td>
