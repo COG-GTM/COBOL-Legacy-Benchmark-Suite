@@ -62,4 +62,15 @@ export interface ErrorEntry {
   action: string;
   timestamp: string;
   program: string;
+  accountNo?: string;
+}
+
+export interface CheckpointData {
+  processDate: string;
+  processId: string;
+  lastTransId: string;
+  lastAccount: string;
+  lastFund: string;
+  recordsProcessed: number;
+  timestamp: string;
 }

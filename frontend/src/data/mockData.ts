@@ -5,6 +5,7 @@ import type {
   BatchJob,
   AuditEntry,
   ErrorEntry,
+  CheckpointData,
 } from './types';
 
 export const portfolios: Portfolio[] = [
@@ -102,14 +103,43 @@ export const transactions: Transaction[] = [
 ];
 
 export const batchJobs: BatchJob[] = [
+  // 2024-08-15 — current day (mixed statuses for pipeline demo)
   { processDate: '2024-08-15', processId: 'TRNVAL00', status: 'C', startTime: '18:00:00', endTime: '18:15:32', recordCount: 1250, errorCount: 3, returnCode: '0004', message: 'Transaction validation completed with warnings' },
   { processDate: '2024-08-15', processId: 'POSUPD00', status: 'C', startTime: '18:16:00', endTime: '18:28:45', recordCount: 1247, errorCount: 0, returnCode: '0000', message: 'Position updates completed successfully' },
-  { processDate: '2024-08-15', processId: 'HISTLD00', status: 'C', startTime: '18:30:00', endTime: '18:42:18', recordCount: 1247, errorCount: 0, returnCode: '0000', message: 'History load to DB2 completed successfully' },
-  { processDate: '2024-08-15', processId: 'RPTPOS00', status: 'C', startTime: '18:45:00', endTime: '18:52:10', recordCount: 850, errorCount: 0, returnCode: '0000', message: 'Position report generated successfully' },
-  { processDate: '2024-08-15', processId: 'RPTAUD00', status: 'C', startTime: '18:53:00', endTime: '18:58:22', recordCount: 2400, errorCount: 0, returnCode: '0000', message: 'Audit report generated successfully' },
-  { processDate: '2024-08-15', processId: 'RPTSTA00', status: 'P', startTime: '19:00:00', endTime: '', recordCount: 0, errorCount: 0, returnCode: '', message: 'Statistics report generation in progress' },
-  { processDate: '2024-08-15', processId: 'UTLMNT00', status: 'W', startTime: '', endTime: '', recordCount: 0, errorCount: 0, returnCode: '', message: 'File maintenance waiting for prerequisite jobs' },
-  { processDate: '2024-08-15', processId: 'UTLMON00', status: 'W', startTime: '', endTime: '', recordCount: 0, errorCount: 0, returnCode: '', message: 'System monitoring waiting for prerequisite jobs' },
+  { processDate: '2024-08-15', processId: 'HISTLD00', status: 'P', startTime: '18:30:00', endTime: '', recordCount: 620, errorCount: 0, returnCode: '', message: 'History load in progress — 620 of 1247 records transferred' },
+  { processDate: '2024-08-15', processId: 'RPTGEN00', status: 'W', startTime: '', endTime: '', recordCount: 0, errorCount: 0, returnCode: '', message: 'Report generation waiting for history load' },
+  // 2024-08-14 — all completed
+  { processDate: '2024-08-14', processId: 'TRNVAL00', status: 'C', startTime: '18:00:00', endTime: '18:12:45', recordCount: 980, errorCount: 0, returnCode: '0000', message: 'Transaction validation completed successfully' },
+  { processDate: '2024-08-14', processId: 'POSUPD00', status: 'C', startTime: '18:13:00', endTime: '18:24:30', recordCount: 980, errorCount: 0, returnCode: '0000', message: 'Position updates completed successfully' },
+  { processDate: '2024-08-14', processId: 'HISTLD00', status: 'C', startTime: '18:25:00', endTime: '18:38:10', recordCount: 980, errorCount: 0, returnCode: '0000', message: 'History load to DB2 completed successfully' },
+  { processDate: '2024-08-14', processId: 'RPTGEN00', status: 'C', startTime: '18:40:00', endTime: '18:55:22', recordCount: 780, errorCount: 0, returnCode: '0000', message: 'All reports generated successfully' },
+  // 2024-08-13 — had an error in POSUPD00
+  { processDate: '2024-08-13', processId: 'TRNVAL00', status: 'C', startTime: '18:00:00', endTime: '18:14:20', recordCount: 1100, errorCount: 5, returnCode: '0004', message: 'Transaction validation completed with warnings' },
+  { processDate: '2024-08-13', processId: 'POSUPD00', status: 'E', startTime: '18:15:00', endTime: '18:22:05', recordCount: 430, errorCount: 12, returnCode: '0012', message: 'VSAM I/O error — batch aborted at checkpoint' },
+  { processDate: '2024-08-13', processId: 'HISTLD00', status: 'W', startTime: '', endTime: '', recordCount: 0, errorCount: 0, returnCode: '', message: 'Skipped — prerequisite POSUPD00 failed' },
+  { processDate: '2024-08-13', processId: 'RPTGEN00', status: 'W', startTime: '', endTime: '', recordCount: 0, errorCount: 0, returnCode: '', message: 'Skipped — prerequisite HISTLD00 not run' },
+  // 2024-08-12 — clean run
+  { processDate: '2024-08-12', processId: 'TRNVAL00', status: 'C', startTime: '18:00:00', endTime: '18:10:15', recordCount: 870, errorCount: 0, returnCode: '0000', message: 'Transaction validation completed successfully' },
+  { processDate: '2024-08-12', processId: 'POSUPD00', status: 'C', startTime: '18:11:00', endTime: '18:20:42', recordCount: 870, errorCount: 0, returnCode: '0000', message: 'Position updates completed successfully' },
+  { processDate: '2024-08-12', processId: 'HISTLD00', status: 'C', startTime: '18:21:00', endTime: '18:32:55', recordCount: 870, errorCount: 0, returnCode: '0000', message: 'History load to DB2 completed successfully' },
+  { processDate: '2024-08-12', processId: 'RPTGEN00', status: 'C', startTime: '18:34:00', endTime: '18:48:30', recordCount: 650, errorCount: 0, returnCode: '0000', message: 'All reports generated successfully' },
+  // 2024-08-11 — warning return code
+  { processDate: '2024-08-11', processId: 'TRNVAL00', status: 'C', startTime: '18:00:00', endTime: '18:18:05', recordCount: 1420, errorCount: 8, returnCode: '0008', message: 'Transaction validation completed with errors rejected' },
+  { processDate: '2024-08-11', processId: 'POSUPD00', status: 'C', startTime: '18:19:00', endTime: '18:35:10', recordCount: 1412, errorCount: 0, returnCode: '0000', message: 'Position updates completed successfully' },
+  { processDate: '2024-08-11', processId: 'HISTLD00', status: 'C', startTime: '18:36:00', endTime: '18:50:20', recordCount: 1412, errorCount: 0, returnCode: '0000', message: 'History load to DB2 completed successfully' },
+  { processDate: '2024-08-11', processId: 'RPTGEN00', status: 'C', startTime: '18:52:00', endTime: '19:10:45', recordCount: 920, errorCount: 0, returnCode: '0000', message: 'All reports generated successfully' },
+];
+
+export const checkpointData: CheckpointData[] = [
+  { processDate: '2024-08-15', processId: 'TRNVAL00', lastTransId: 'TXN001250', lastAccount: '100000010', lastFund: 'RETINC', recordsProcessed: 1250, timestamp: '2024-08-15 18:15:30' },
+  { processDate: '2024-08-15', processId: 'POSUPD00', lastTransId: 'TXN001247', lastAccount: '100000009', lastFund: 'EMERGE', recordsProcessed: 1247, timestamp: '2024-08-15 18:28:40' },
+  { processDate: '2024-08-15', processId: 'HISTLD00', lastTransId: 'TXN000620', lastAccount: '100000005', lastFund: 'SMCAPV', recordsProcessed: 620, timestamp: '2024-08-15 18:38:00' },
+  { processDate: '2024-08-14', processId: 'TRNVAL00', lastTransId: 'TXN000980', lastAccount: '100000008', lastFund: 'FIXINC', recordsProcessed: 980, timestamp: '2024-08-14 18:12:40' },
+  { processDate: '2024-08-14', processId: 'POSUPD00', lastTransId: 'TXN000980', lastAccount: '100000008', lastFund: 'FIXINC', recordsProcessed: 980, timestamp: '2024-08-14 18:24:25' },
+  { processDate: '2024-08-14', processId: 'HISTLD00', lastTransId: 'TXN000980', lastAccount: '100000008', lastFund: 'FIXINC', recordsProcessed: 980, timestamp: '2024-08-14 18:38:05' },
+  { processDate: '2024-08-14', processId: 'RPTGEN00', lastTransId: '', lastAccount: '', lastFund: '', recordsProcessed: 780, timestamp: '2024-08-14 18:55:18' },
+  { processDate: '2024-08-13', processId: 'TRNVAL00', lastTransId: 'TXN001100', lastAccount: '100000009', lastFund: 'HLTHIF', recordsProcessed: 1100, timestamp: '2024-08-13 18:14:15' },
+  { processDate: '2024-08-13', processId: 'POSUPD00', lastTransId: 'TXN000430', lastAccount: '100000004', lastFund: 'REITPF', recordsProcessed: 430, timestamp: '2024-08-13 18:22:00' },
 ];
 
 export const auditEntries: AuditEntry[] = [
@@ -132,16 +162,36 @@ export const auditEntries: AuditEntry[] = [
 ];
 
 export const errorEntries: ErrorEntry[] = [
-  { code: 'E001', description: 'Invalid account number format', severity: 'Error', action: 'Verify account number is 9 digits', timestamp: '2024-08-15 18:02:15', program: 'TRNVAL00' },
-  { code: 'E002', description: 'Fund ID not found in master file', severity: 'Error', action: 'Check fund ID exists in VSAM master', timestamp: '2024-08-15 18:02:30', program: 'TRNVAL00' },
-  { code: 'E003', description: 'Insufficient share balance for sale', severity: 'Error', action: 'Verify available shares before sell transaction', timestamp: '2024-08-15 18:03:45', program: 'TRNVAL00' },
-  { code: 'W001', description: 'Transaction amount exceeds daily limit', severity: 'Warning', action: 'Review transaction for manual approval', timestamp: '2024-08-15 18:04:10', program: 'TRNVAL00' },
-  { code: 'W002', description: 'Duplicate transaction reference detected', severity: 'Warning', action: 'Verify transaction is not a duplicate entry', timestamp: '2024-08-15 18:05:55', program: 'TRNVAL00' },
-  { code: 'E001', description: 'Invalid account number format', severity: 'Error', action: 'Verify account number is 9 digits', timestamp: '2024-08-15 18:08:22', program: 'POSUPD00' },
-  { code: 'E004', description: 'VSAM file I/O error on master update', severity: 'Error', action: 'Check VSAM file status and retry operation', timestamp: '2024-08-15 18:12:30', program: 'POSUPD00' },
-  { code: 'W001', description: 'Transaction amount exceeds daily limit', severity: 'Warning', action: 'Review transaction for manual approval', timestamp: '2024-08-15 18:14:00', program: 'POSUPD00' },
-  { code: 'E002', description: 'Fund ID not found in master file', severity: 'Error', action: 'Check fund ID exists in VSAM master', timestamp: '2024-08-15 18:32:10', program: 'HISTLD00' },
-  { code: 'E003', description: 'Insufficient share balance for sale', severity: 'Error', action: 'Verify available shares before sell transaction', timestamp: '2024-08-15 18:35:45', program: 'HISTLD00' },
-  { code: 'W002', description: 'Duplicate transaction reference detected', severity: 'Warning', action: 'Verify transaction is not a duplicate entry', timestamp: '2024-08-15 18:38:20', program: 'HISTLD00' },
-  { code: 'E004', description: 'VSAM file I/O error on master update', severity: 'Error', action: 'Check VSAM file status and retry operation', timestamp: '2024-08-15 18:45:30', program: 'RPTPOS00' },
+  // 2024-08-15
+  { code: 'E001', description: 'Invalid account number format', severity: 'Error', action: 'Verify account number is 9 digits', timestamp: '2024-08-15 18:02:15', program: 'TRNVAL00', accountNo: '10000000X' },
+  { code: 'E002', description: 'Fund ID not found in master file', severity: 'Error', action: 'Check fund ID exists in VSAM master', timestamp: '2024-08-15 18:02:30', program: 'TRNVAL00', accountNo: '100000004' },
+  { code: 'E003', description: 'Invalid transaction type', severity: 'Error', action: 'Reject transaction and log', timestamp: '2024-08-15 18:03:45', program: 'TRNVAL00', accountNo: '100000007' },
+  { code: 'W001', description: 'Zero dollar transaction detected', severity: 'Warning', action: 'Process transaction and log for review', timestamp: '2024-08-15 18:04:10', program: 'TRNVAL00', accountNo: '100000003' },
+  { code: 'W002', description: 'Duplicate transaction ID detected', severity: 'Warning', action: 'Log duplicate and skip processing', timestamp: '2024-08-15 18:05:55', program: 'TRNVAL00', accountNo: '100000006' },
+  { code: 'E001', description: 'Invalid account number format', severity: 'Error', action: 'Verify account number is 9 digits', timestamp: '2024-08-15 18:18:22', program: 'POSUPD00', accountNo: '10000000X' },
+  { code: 'E004', description: 'Insufficient position balance for sale', severity: 'Error', action: 'Reject sell — insufficient shares', timestamp: '2024-08-15 18:22:30', program: 'POSUPD00', accountNo: '100000008' },
+  { code: 'W001', description: 'Zero dollar transaction detected', severity: 'Warning', action: 'Process transaction and log for review', timestamp: '2024-08-15 18:24:00', program: 'POSUPD00', accountNo: '100000005' },
+  // 2024-08-14
+  { code: 'W002', description: 'Duplicate transaction ID detected', severity: 'Warning', action: 'Log duplicate and skip processing', timestamp: '2024-08-14 18:05:10', program: 'TRNVAL00', accountNo: '100000002' },
+  { code: 'W001', description: 'Zero dollar transaction detected', severity: 'Warning', action: 'Process transaction and log for review', timestamp: '2024-08-14 18:08:30', program: 'TRNVAL00', accountNo: '100000009' },
+  // 2024-08-13
+  { code: 'E001', description: 'Invalid account number format', severity: 'Error', action: 'Verify account number is 9 digits', timestamp: '2024-08-13 18:01:45', program: 'TRNVAL00', accountNo: '1000000AB' },
+  { code: 'E002', description: 'Fund ID not found in master file', severity: 'Error', action: 'Check fund ID exists in VSAM master', timestamp: '2024-08-13 18:03:10', program: 'TRNVAL00', accountNo: '100000003' },
+  { code: 'E003', description: 'Invalid transaction type', severity: 'Error', action: 'Reject transaction and log', timestamp: '2024-08-13 18:04:55', program: 'TRNVAL00', accountNo: '100000001' },
+  { code: 'E004', description: 'Insufficient position balance for sale', severity: 'Error', action: 'Reject sell — insufficient shares', timestamp: '2024-08-13 18:06:20', program: 'TRNVAL00', accountNo: '100000005' },
+  { code: 'W002', description: 'Duplicate transaction ID detected', severity: 'Warning', action: 'Log duplicate and skip processing', timestamp: '2024-08-13 18:08:40', program: 'TRNVAL00', accountNo: '100000007' },
+  { code: 'E004', description: 'Insufficient position balance for sale', severity: 'Error', action: 'Reject sell — insufficient shares', timestamp: '2024-08-13 18:16:10', program: 'POSUPD00', accountNo: '100000004' },
+  { code: 'E002', description: 'Fund ID not found in master file', severity: 'Error', action: 'Check fund ID exists in VSAM master', timestamp: '2024-08-13 18:17:55', program: 'POSUPD00', accountNo: '100000006' },
+  { code: 'E001', description: 'Invalid account number format', severity: 'Error', action: 'Verify account number is 9 digits', timestamp: '2024-08-13 18:19:30', program: 'POSUPD00', accountNo: '1000000AB' },
+  // 2024-08-12
+  { code: 'W001', description: 'Zero dollar transaction detected', severity: 'Warning', action: 'Process transaction and log for review', timestamp: '2024-08-12 18:03:15', program: 'TRNVAL00', accountNo: '100000010' },
+  // 2024-08-11
+  { code: 'E001', description: 'Invalid account number format', severity: 'Error', action: 'Verify account number is 9 digits', timestamp: '2024-08-11 18:02:00', program: 'TRNVAL00', accountNo: '10000XXXX' },
+  { code: 'E003', description: 'Invalid transaction type', severity: 'Error', action: 'Reject transaction and log', timestamp: '2024-08-11 18:04:30', program: 'TRNVAL00', accountNo: '100000002' },
+  { code: 'E002', description: 'Fund ID not found in master file', severity: 'Error', action: 'Check fund ID exists in VSAM master', timestamp: '2024-08-11 18:06:15', program: 'TRNVAL00', accountNo: '100000008' },
+  { code: 'W002', description: 'Duplicate transaction ID detected', severity: 'Warning', action: 'Log duplicate and skip processing', timestamp: '2024-08-11 18:08:45', program: 'TRNVAL00', accountNo: '100000001' },
+  { code: 'E004', description: 'Insufficient position balance for sale', severity: 'Error', action: 'Reject sell — insufficient shares', timestamp: '2024-08-11 18:10:20', program: 'TRNVAL00', accountNo: '100000003' },
+  { code: 'E001', description: 'Invalid account number format', severity: 'Error', action: 'Verify account number is 9 digits', timestamp: '2024-08-11 18:12:55', program: 'TRNVAL00', accountNo: '10000XXXX' },
+  { code: 'W001', description: 'Zero dollar transaction detected', severity: 'Warning', action: 'Process transaction and log for review', timestamp: '2024-08-11 18:15:10', program: 'TRNVAL00', accountNo: '100000006' },
+  { code: 'E003', description: 'Invalid transaction type', severity: 'Error', action: 'Reject transaction and log', timestamp: '2024-08-11 18:17:40', program: 'TRNVAL00', accountNo: '100000009' },
 ];
