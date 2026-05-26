@@ -12,6 +12,7 @@ export interface Position {
   cusip: string;
   shareBalance: number;
   avgCost: number;
+  currentPrice: number;
   costBasis: number;
   lastDate: string;
   lastTrans: string;
