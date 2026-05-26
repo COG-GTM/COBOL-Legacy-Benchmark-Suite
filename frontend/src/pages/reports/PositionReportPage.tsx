@@ -23,7 +23,7 @@ interface GroupedPositions {
 }
 
 function getMarketValue(pos: Position): number {
-  return pos.shareBalance * pos.avgCost;
+  return pos.shareBalance * pos.currentPrice;
 }
 
 function getGainLoss(pos: Position): number {
