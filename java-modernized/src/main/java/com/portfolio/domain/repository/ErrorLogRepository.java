@@ -13,8 +13,9 @@ import java.util.List;
 @Repository
 public interface ErrorLogRepository extends JpaRepository<ErrorLog, ErrorLogId> {
 
-    @Query("SELECT e FROM ErrorLog e WHERE e.processDate = :processDate AND e.errorSeverity >= :severity")
-    List<ErrorLog> findByProcessDateAndErrorSeverityGreaterThanEqual(
+    @Query(value = "SELECT * FROM error_log WHERE process_date = :processDate AND error_severity >= :severity",
+            nativeQuery = true)
+    List<ErrorLog> findByProcessDateAndMinSeverity(
             @Param("processDate") LocalDate processDate,
             @Param("severity") int severity);
 
