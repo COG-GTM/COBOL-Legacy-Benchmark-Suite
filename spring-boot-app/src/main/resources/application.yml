@@ -1,0 +1,77 @@
+spring:
+  application:
+    name: clbs-portfolio-manager
+
+  datasource:
+    url: jdbc:h2:mem:clbsdb;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: true
+        generate_statistics: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: 8080
+
+# Report configuration
+report:
+  output-directory: ./reports
+  date-format: yyyy-MM-dd
+  retention-days: 90
+
+# Monitoring thresholds
+monitoring:
+  thresholds:
+    batch-job-duration-warning-ms: 300000
+    batch-job-duration-critical-ms: 600000
+    error-rate-warning: 5.0
+    error-rate-critical: 10.0
+    db-query-duration-warning-ms: 1000
+    db-query-duration-critical-ms: 5000
+
+# Maintenance configuration
+maintenance:
+  archive:
+    retention-days: 365
+  cleanup:
+    checkpoint-retention-days: 30
+    error-log-retention-days: 90
+
+# Actuator endpoints
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,metrics,prometheus,info
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: clbs-portfolio-manager
