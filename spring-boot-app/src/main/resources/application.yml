@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: clbs-portfolio
+  profiles:
+    active: dev
+  jpa:
+    open-in-view: false
+  batch:
+    jdbc:
+      initialize-schema: always
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+logging:
+  level:
+    com.clbs.portfolio: INFO
+    org.springframework.batch: INFO
+    org.springframework.data: INFO
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics

@@ -1,0 +1,6 @@
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/spring-boot-app/src/test/java/com/clbs/portfolio/repository/RepositoryTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/spring-boot-app/src/test/java/com/clbs/portfolio/batch/control/ProcessSequenceManagerTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/spring-boot-app/src/test/java/com/clbs/portfolio/batch/control/BatchControlProcessorTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/spring-boot-app/src/test/java/com/clbs/portfolio/common/EnumTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/spring-boot-app/src/test/java/com/clbs/portfolio/model/EntityMappingTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/spring-boot-app/src/test/java/com/clbs/portfolio/PortfolioApplicationTests.java
