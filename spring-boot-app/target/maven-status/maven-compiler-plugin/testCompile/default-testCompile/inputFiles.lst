@@ -1,0 +1,9 @@
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/spring-boot-app/src/test/java/com/clbs/portfolio/service/maintenance/MaintenanceServiceTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/spring-boot-app/src/test/java/com/clbs/portfolio/service/report/SystemStatsReportServiceTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/spring-boot-app/src/test/java/com/clbs/portfolio/service/report/AuditReportServiceTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/spring-boot-app/src/test/java/com/clbs/portfolio/controller/UtilityControllerTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/spring-boot-app/src/test/java/com/clbs/portfolio/batch/BatchConfigTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/spring-boot-app/src/test/java/com/clbs/portfolio/controller/ReportControllerTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/spring-boot-app/src/test/java/com/clbs/portfolio/service/monitoring/MonitoringServiceTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/spring-boot-app/src/test/java/com/clbs/portfolio/service/validation/DataValidationServiceTest.java
+/home/ubuntu/repos/COBOL-Legacy-Benchmark-Suite/spring-boot-app/src/test/java/com/clbs/portfolio/service/report/PositionReportServiceTest.java
