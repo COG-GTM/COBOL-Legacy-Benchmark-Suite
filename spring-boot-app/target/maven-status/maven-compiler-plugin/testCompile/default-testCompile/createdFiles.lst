@@ -1,0 +1,6 @@
+com/clbs/portfolio/batch/control/ProcessSequenceManagerTest.class
+com/clbs/portfolio/PortfolioApplicationTests.class
+com/clbs/portfolio/batch/control/BatchControlProcessorTest.class
+com/clbs/portfolio/repository/RepositoryTest.class
+com/clbs/portfolio/model/EntityMappingTest.class
+com/clbs/portfolio/common/EnumTest.class
