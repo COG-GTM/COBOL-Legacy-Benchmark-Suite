@@ -58,6 +58,18 @@ const router = createBrowserRouter([
         path: 'reports/statistics',
         lazy: () => import('./pages/reports/StatisticsReportPage'),
       },
+      {
+        path: 'system/jobs',
+        lazy: () => import('./pages/system/BatchJobStatusPage'),
+      },
+      {
+        path: 'system/monitor',
+        lazy: () => import('./pages/system/SystemMonitorPage'),
+      },
+      {
+        path: 'system/maintenance',
+        lazy: () => import('./pages/system/MaintenanceStatusPage'),
+      },
     ],
   },
 ]);

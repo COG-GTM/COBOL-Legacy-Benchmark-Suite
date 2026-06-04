@@ -1,0 +1,108 @@
+{
+  "tasks": [
+    {
+      "id": "MNT001",
+      "function": "ARCHIVE",
+      "fileName": "HIST.TRANS.ARCHIVE",
+      "status": "COMPLETE",
+      "lastRun": "2024-03-15T02:00:00Z",
+      "nextScheduled": "2024-03-16T02:00:00Z",
+      "recordsProcessed": 15420,
+      "recordsWritten": 15420,
+      "errors": 0,
+      "durationSeconds": 342
+    },
+    {
+      "id": "MNT002",
+      "function": "CLEANUP",
+      "fileName": "TEMP.WORK.FILES",
+      "status": "COMPLETE",
+      "lastRun": "2024-03-15T02:10:00Z",
+      "nextScheduled": "2024-03-16T02:10:00Z",
+      "recordsProcessed": 8934,
+      "recordsWritten": 0,
+      "errors": 0,
+      "durationSeconds": 45
+    },
+    {
+      "id": "MNT003",
+      "function": "REORG",
+      "fileName": "PORTMSTR.VSAM.KSDS",
+      "status": "RUNNING",
+      "lastRun": "2024-03-15T03:00:00Z",
+      "nextScheduled": "2024-03-22T03:00:00Z",
+      "recordsProcessed": 4521,
+      "recordsWritten": 4521,
+      "errors": 0,
+      "durationSeconds": 0
+    },
+    {
+      "id": "MNT004",
+      "function": "REORG",
+      "fileName": "POSITION.VSAM.KSDS",
+      "status": "PENDING",
+      "lastRun": "2024-03-08T03:00:00Z",
+      "nextScheduled": "2024-03-15T03:30:00Z",
+      "recordsProcessed": 0,
+      "recordsWritten": 0,
+      "errors": 0,
+      "durationSeconds": 0
+    },
+    {
+      "id": "MNT005",
+      "function": "ANALYZE",
+      "fileName": "PORTMSTR.VSAM.KSDS",
+      "status": "COMPLETE",
+      "lastRun": "2024-03-14T22:00:00Z",
+      "nextScheduled": "2024-03-15T22:00:00Z",
+      "recordsProcessed": 12,
+      "recordsWritten": 0,
+      "errors": 0,
+      "durationSeconds": 18
+    },
+    {
+      "id": "MNT006",
+      "function": "ARCHIVE",
+      "fileName": "AUDIT.LOG.ARCHIVE",
+      "status": "ERROR",
+      "lastRun": "2024-03-14T02:00:00Z",
+      "nextScheduled": "2024-03-15T02:00:00Z",
+      "recordsProcessed": 8200,
+      "recordsWritten": 8145,
+      "errors": 55,
+      "durationSeconds": 128
+    },
+    {
+      "id": "MNT007",
+      "function": "CLEANUP",
+      "fileName": "SPOOL.OUTPUT.FILES",
+      "status": "COMPLETE",
+      "lastRun": "2024-03-15T01:00:00Z",
+      "nextScheduled": "2024-03-16T01:00:00Z",
+      "recordsProcessed": 342,
+      "recordsWritten": 0,
+      "errors": 0,
+      "durationSeconds": 12
+    },
+    {
+      "id": "MNT008",
+      "function": "ANALYZE",
+      "fileName": "TRANS.HISTORY.DB2",
+      "status": "COMPLETE",
+      "lastRun": "2024-03-14T22:30:00Z",
+      "nextScheduled": "2024-03-15T22:30:00Z",
+      "recordsProcessed": 89453,
+      "recordsWritten": 0,
+      "errors": 0,
+      "durationSeconds": 67
+    }
+  ],
+  "spaceUtilization": [
+    { "fileName": "PORTMSTR.VSAM.KSDS", "allocatedMB": 500, "usedMB": 412, "extents": 3, "ciSize": 4096 },
+    { "fileName": "POSITION.VSAM.KSDS", "allocatedMB": 1000, "usedMB": 756, "extents": 5, "ciSize": 8192 },
+    { "fileName": "HIST.TRANS.ARCHIVE", "allocatedMB": 2000, "usedMB": 1834, "extents": 8, "ciSize": 16384 },
+    { "fileName": "AUDIT.LOG.ARCHIVE", "allocatedMB": 800, "usedMB": 623, "extents": 4, "ciSize": 4096 },
+    { "fileName": "TRANS.HISTORY.DB2", "allocatedMB": 3000, "usedMB": 2145, "extents": 6, "ciSize": 32768 },
+    { "fileName": "TEMP.WORK.FILES", "allocatedMB": 200, "usedMB": 12, "extents": 1, "ciSize": 4096 }
+  ]
+}
