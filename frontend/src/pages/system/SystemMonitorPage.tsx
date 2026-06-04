@@ -47,7 +47,9 @@ const ALERT_LEVEL_MAP: Record<string, { color: string; icon: React.ReactNode }> 
 };
 
 function getGaugeColor(value: number, threshold: number, isInverse = false): string {
-  const ratio = isInverse ? threshold / value : value / threshold;
+  const ratio = isInverse
+    ? (100 - value) / (100 - threshold)
+    : value / threshold;
   if (ratio >= 0.95) return '#ff4d4f';
   if (ratio >= 0.8) return '#faad14';
   return '#52c41a';
