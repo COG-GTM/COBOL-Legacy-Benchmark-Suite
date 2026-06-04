@@ -7,6 +7,7 @@ import {
   SearchOutlined,
   SwapOutlined,
   BarChartOutlined,
+  SettingOutlined,
   LogoutOutlined,
   MenuFoldOutlined,
   MenuUnfoldOutlined,
@@ -63,14 +64,25 @@ const menuItems: MenuItem[] = [
       { key: '/reports/statistics', label: 'System Statistics' },
     ],
   },
+  {
+    key: 'system-sub',
+    icon: <SettingOutlined />,
+    label: 'System Admin',
+    children: [
+      { key: '/system/jobs', label: 'Batch Jobs' },
+      { key: '/system/monitor', label: 'System Monitor' },
+      { key: '/system/maintenance', label: 'File Maintenance' },
+    ],
+  },
 ];
 
-const MENU_KEYS = ['/', '/portfolios', '/portfolios/new', '/positions', '/history', '/transactions/new', '/reports/valuation', '/reports/audit', '/reports/statistics'];
+const MENU_KEYS = ['/', '/portfolios', '/portfolios/new', '/positions', '/history', '/transactions/new', '/reports/valuation', '/reports/audit', '/reports/statistics', '/system/jobs', '/system/monitor', '/system/maintenance'];
 
 function getSelectedKeys(pathname: string): string[] {
   if (MENU_KEYS.includes(pathname)) return [pathname];
   if (pathname.startsWith('/portfolios')) return ['/portfolios'];
   if (pathname.startsWith('/transactions')) return ['/transactions/new'];
+  if (pathname.startsWith('/system')) return [pathname];
   return [pathname];
 }
 
@@ -80,6 +92,7 @@ function getOpenKeys(pathname: string): string[] {
     return ['inquiries-sub'];
   if (pathname.startsWith('/transactions')) return ['transactions-sub'];
   if (pathname.startsWith('/reports')) return ['reports-sub'];
+  if (pathname.startsWith('/system')) return ['system-sub'];
   return [];
 }
 

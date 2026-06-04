@@ -1,0 +1,128 @@
+{
+  "resources": [
+    {
+      "type": "CPU",
+      "metricName": "Utilization",
+      "currentValue": 67.5,
+      "threshold": 85.0,
+      "status": "NORMAL",
+      "unit": "%"
+    },
+    {
+      "type": "CPU",
+      "metricName": "Queue Depth",
+      "currentValue": 3.2,
+      "threshold": 8.0,
+      "status": "NORMAL",
+      "unit": ""
+    },
+    {
+      "type": "MEMORY",
+      "metricName": "Utilization",
+      "currentValue": 78.3,
+      "threshold": 90.0,
+      "status": "NORMAL",
+      "unit": "%"
+    },
+    {
+      "type": "MEMORY",
+      "metricName": "Page Rate",
+      "currentValue": 12.4,
+      "threshold": 50.0,
+      "status": "NORMAL",
+      "unit": "pages/s"
+    },
+    {
+      "type": "DASD",
+      "metricName": "Utilization",
+      "currentValue": 82.1,
+      "threshold": 85.0,
+      "status": "WARNING",
+      "unit": "%"
+    },
+    {
+      "type": "DASD",
+      "metricName": "Response Time",
+      "currentValue": 8.7,
+      "threshold": 15.0,
+      "status": "NORMAL",
+      "unit": "ms"
+    },
+    {
+      "type": "DB2",
+      "metricName": "Buffer Pool Hit Ratio",
+      "currentValue": 96.8,
+      "threshold": 90.0,
+      "status": "NORMAL",
+      "unit": "%"
+    },
+    {
+      "type": "DB2",
+      "metricName": "Lock Waits",
+      "currentValue": 45,
+      "threshold": 100,
+      "status": "NORMAL",
+      "unit": "/min"
+    }
+  ],
+  "alerts": [
+    {
+      "timestamp": "2024-03-15T06:32:14Z",
+      "level": "WARNING",
+      "resource": "DASD",
+      "message": "DASD volume VOL001 utilization approaching threshold (82.1%)"
+    },
+    {
+      "timestamp": "2024-03-15T05:45:00Z",
+      "level": "INFO",
+      "resource": "DB2",
+      "message": "DB2 buffer pool reorganization completed successfully"
+    },
+    {
+      "timestamp": "2024-03-14T22:15:33Z",
+      "level": "CRITICAL",
+      "resource": "CPU",
+      "message": "CPU utilization exceeded threshold (92.3%) during batch window"
+    },
+    {
+      "timestamp": "2024-03-14T18:30:00Z",
+      "level": "WARNING",
+      "resource": "MEMORY",
+      "message": "Extended CSA fragmentation detected, recommend recycling CICS"
+    },
+    {
+      "timestamp": "2024-03-14T12:00:00Z",
+      "level": "INFO",
+      "resource": "DB2",
+      "message": "Scheduled RUNSTATS completed for all tablespaces"
+    },
+    {
+      "timestamp": "2024-03-14T06:20:00Z",
+      "level": "CRITICAL",
+      "resource": "DASD",
+      "message": "VSAM file PORTMSTR detected concurrent access conflict"
+    },
+    {
+      "timestamp": "2024-03-13T23:45:00Z",
+      "level": "INFO",
+      "resource": "CPU",
+      "message": "Batch processing window closed, CPU utilization normalized"
+    },
+    {
+      "timestamp": "2024-03-13T14:22:10Z",
+      "level": "WARNING",
+      "resource": "DB2",
+      "message": "Thread pool approaching maximum capacity (187/200 active threads)"
+    }
+  ],
+  "thresholds": [
+    { "resource": "CPU", "metric": "Utilization", "warnAt": 75, "criticalAt": 85, "unit": "%" },
+    { "resource": "CPU", "metric": "Queue Depth", "warnAt": 5, "criticalAt": 8, "unit": "" },
+    { "resource": "MEMORY", "metric": "Utilization", "warnAt": 80, "criticalAt": 90, "unit": "%" },
+    { "resource": "MEMORY", "metric": "Page Rate", "warnAt": 30, "criticalAt": 50, "unit": "pages/s" },
+    { "resource": "DASD", "metric": "Utilization", "warnAt": 75, "criticalAt": 85, "unit": "%" },
+    { "resource": "DASD", "metric": "Response Time", "warnAt": 10, "criticalAt": 15, "unit": "ms" },
+    { "resource": "DB2", "metric": "Buffer Pool Hit Ratio", "warnAt": 95, "criticalAt": 90, "unit": "%" },
+    { "resource": "DB2", "metric": "Lock Waits", "warnAt": 75, "criticalAt": 100, "unit": "/min" }
+  ]
+}
