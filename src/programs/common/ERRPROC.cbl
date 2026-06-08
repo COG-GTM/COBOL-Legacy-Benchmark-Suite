@@ -54,7 +54,7 @@
            
        1000-INITIALIZE.
            INITIALIZE WS-WORK-AREAS
-           ACCEPT WS-FORMATTED-TIME FROM TIME STAMP
+           ACCEPT WS-FORMATTED-TIME FROM TIME
            
            OPEN EXTEND ERROR-LOG
            IF WS-LOG-STATUS NOT = '00'
@@ -91,7 +91,7 @@
            .
            
        2200-DISPLAY-ERROR.
-           DISPLAY '===================================================='
+           DISPLAY '================================'
            DISPLAY 'ERROR DETECTED: ' ERR-TIMESTAMP
            DISPLAY 'PROGRAM:       ' ERR-PROGRAM
            DISPLAY 'CATEGORY:      ' ERR-CATEGORY
@@ -99,7 +99,7 @@
            DISPLAY 'SEVERITY:      ' ERR-SEVERITY
            DISPLAY 'MESSAGE:       ' ERR-TEXT
            DISPLAY 'DETAILS:       ' ERR-DETAILS
-           DISPLAY '===================================================='
+           DISPLAY '================================'
            .
            
        3000-TERMINATE.

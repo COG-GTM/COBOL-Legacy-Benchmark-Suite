@@ -1,4 +1,4 @@
-       *================================================================*
+      *================================================================*
       * Program Name: PRCSEQ00
       * Description: Process Sequence Manager
       * Version: 1.0
@@ -50,6 +50,7 @@
            05  WS-PROCESS-COUNT      PIC 9(4) COMP.
            05  WS-ACTIVE-COUNT       PIC 9(4) COMP.
            05  WS-ERROR-COUNT        PIC 9(4) COMP.
+           05  WS-SUB               PIC 9(4) COMP.
            
        01  WS-PROCESS-TABLE.
            05  WS-PROC-ENTRY OCCURS 100 TIMES
@@ -268,7 +269,7 @@
            END-READ
            
            MOVE BCT-STAT-ACTIVE TO BCT-STATUS
-           ACCEPT WS-CURRENT-TIME FROM TIME STAMP
+           ACCEPT WS-CURRENT-TIME FROM TIME
            MOVE WS-CURRENT-TIME TO BCT-START-TIME
            
            REWRITE BATCH-CONTROL-RECORD

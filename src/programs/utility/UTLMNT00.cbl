@@ -168,6 +168,39 @@
            PERFORM 2510-COLLECT-STATS
            PERFORM 2520-GENERATE-REPORT.
 
+       2210-OPEN-VSAM.
+           CONTINUE.
+
+       2220-ARCHIVE-RECORDS.
+           CONTINUE.
+
+       2230-CLOSE-VSAM.
+           CONTINUE.
+
+       2310-ANALYZE-SPACE.
+           CONTINUE.
+
+       2320-DELETE-OLD.
+           CONTINUE.
+
+       2330-UPDATE-CATALOG.
+           CONTINUE.
+
+       2410-EXPORT-DATA.
+           CONTINUE.
+
+       2420-DELETE-DEFINE.
+           CONTINUE.
+
+       2430-IMPORT-DATA.
+           CONTINUE.
+
+       2510-COLLECT-STATS.
+           CONTINUE.
+
+       2520-GENERATE-REPORT.
+           CONTINUE.
+
        3000-CLEANUP.
            CLOSE CONTROL-FILE
                 ARCHIVE-FILE

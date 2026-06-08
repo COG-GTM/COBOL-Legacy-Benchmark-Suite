@@ -1,5 +1,5 @@
       ******************************************************************
-      * DB2 Request Area Copybook                                       *
+      * DB2 Request Area Copybook                                       
       ******************************************************************
        01  DB2-REQUEST-AREA.
            05 DB2-REQUEST-TYPE        PIC X.

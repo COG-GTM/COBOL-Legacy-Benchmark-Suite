@@ -1,4 +1,4 @@
-       *================================================================*
+      *================================================================*
       * Program Name: HISTLD00
       * Description: Position History DB2 Load Program
       * Version: 1.0
@@ -18,7 +18,7 @@
                ASSIGN TO TRANHIST
                ORGANIZATION IS INDEXED
                ACCESS MODE IS SEQUENTIAL
-               RECORD KEY IS TH-KEY
+               RECORD KEY IS HIST-KEY
                FILE STATUS IS WS-TH-STATUS.
                
            SELECT BATCH-CONTROL-FILE
@@ -143,19 +143,19 @@
        2200-LOAD-TO-DB2.
            INITIALIZE POSHIST-RECORD
            
-           MOVE TH-ACCOUNT-NO    TO PH-ACCOUNT-NO
-           MOVE TH-PORTFOLIO-ID  TO PH-PORTFOLIO-ID
-           MOVE TH-TRANS-DATE    TO PH-TRANS-DATE
-           MOVE TH-TRANS-TIME    TO PH-TRANS-TIME
-           MOVE TH-TRANS-TYPE    TO PH-TRANS-TYPE
-           MOVE TH-SECURITY-ID   TO PH-SECURITY-ID
-           MOVE TH-QUANTITY      TO PH-QUANTITY
-           MOVE TH-PRICE         TO PH-PRICE
-           MOVE TH-AMOUNT        TO PH-AMOUNT
-           MOVE TH-FEES          TO PH-FEES
-           MOVE TH-TOTAL-AMOUNT  TO PH-TOTAL-AMOUNT
-           MOVE TH-COST-BASIS    TO PH-COST-BASIS
-           MOVE TH-GAIN-LOSS     TO PH-GAIN-LOSS
+           MOVE PH-ACCOUNT-NO    TO PH-ACCOUNT-NO
+           MOVE PH-PORTFOLIO-ID  TO PH-PORTFOLIO-ID
+           MOVE PH-TRANS-DATE    TO PH-TRANS-DATE
+           MOVE PH-TRANS-TIME    TO PH-TRANS-TIME
+           MOVE PH-TRANS-TYPE    TO PH-TRANS-TYPE
+           MOVE PH-SECURITY-ID   TO PH-SECURITY-ID
+           MOVE PH-QUANTITY      TO PH-QUANTITY
+           MOVE PH-PRICE         TO PH-PRICE
+           MOVE PH-AMOUNT        TO PH-AMOUNT
+           MOVE PH-FEES          TO PH-FEES
+           MOVE PH-TOTAL-AMOUNT  TO PH-TOTAL-AMOUNT
+           MOVE PH-COST-BASIS    TO PH-COST-BASIS
+           MOVE PH-GAIN-LOSS     TO PH-GAIN-LOSS
            
            EXEC SQL
                INSERT INTO POSHIST
@@ -189,8 +189,8 @@
            .
            
        2310-UPDATE-CHECKPOINT.
-           MOVE WS-RECORDS-READ TO BCT-RECORDS-READ
-           MOVE WS-RECORDS-WRITTEN TO BCT-RECORDS-WRITTEN
+           MOVE WS-RECORDS-READ TO WS-RECORDS-READ
+           MOVE WS-RECORDS-WRITTEN TO WS-RECORDS-WRITTEN
            
            REWRITE BATCH-CONTROL-RECORD
                INVALID KEY
@@ -231,3 +231,12 @@
                ROLLBACK WORK
            END-EXEC
            .
+
+       CONNECT-TO-DB2.
+           CONTINUE.
+
+       DISCONNECT-FROM-DB2.
+           CONTINUE.
+
+       DB2-ERROR-ROUTINE.
+           CONTINUE.

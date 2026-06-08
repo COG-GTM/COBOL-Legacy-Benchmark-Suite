@@ -25,11 +25,11 @@
 
            SELECT PORTFOLIO-OUT ASSIGN TO PORTOUT
                ORGANIZATION IS SEQUENTIAL
-               FILE STATUS IS WS-PORT-STATUS.
+               FILE STATUS IS WS-PORT-FS.
 
            SELECT TRANSACTION-OUT ASSIGN TO TRANOUT
                ORGANIZATION IS SEQUENTIAL
-               FILE STATUS IS WS-TRAN-STATUS.
+               FILE STATUS IS WS-TRAN-FS.
 
            SELECT RANDOM-SEED ASSIGN TO RANDSEED
                ORGANIZATION IS SEQUENTIAL
@@ -48,14 +48,12 @@
        FD  PORTFOLIO-OUT
            RECORDING MODE IS F
            BLOCK CONTAINS 0 RECORDS.
-       01  PORTFOLIO-RECORD.
-           COPY PORTFLIO REPLACING ==:PREFIX:== BY ==PORT==.
+           COPY PORTFLIO.
 
        FD  TRANSACTION-OUT
            RECORDING MODE IS F
            BLOCK CONTAINS 0 RECORDS.
-       01  TRANSACTION-RECORD.
-           COPY TRNREC REPLACING ==:PREFIX:== BY ==TRAN==.
+           COPY TRNREC.
 
        FD  RANDOM-SEED
            RECORDING MODE IS F
@@ -68,8 +66,8 @@
 
        01  WS-FILE-STATUS.
            05  WS-CFG-STATUS        PIC XX.
-           05  WS-PORT-STATUS       PIC XX.
-           05  WS-TRAN-STATUS       PIC XX.
+           05  WS-PORT-FS          PIC XX.
+           05  WS-TRAN-FS          PIC XX.
            05  WS-RAND-STATUS       PIC XX.
 
        01  WS-TEST-TYPES.
@@ -95,7 +93,7 @@
            05  WS-PORT-ID           PIC X(10).
            05  WS-PORT-NAME         PIC X(30).
            05  WS-PORT-TYPE         PIC X(2).
-           05  WS-PORT-STATUS       PIC X(1).
+           05  WS-PORT-STATUS-WK    PIC X(1).
            05  WS-PORT-BALANCE      PIC 9(15)V99.
 
        01  WS-TRANSACTION-DATA.
@@ -103,7 +101,7 @@
            05  WS-TRAN-TYPE         PIC X(2).
            05  WS-TRAN-AMOUNT       PIC 9(15)V99.
            05  WS-TRAN-DATE         PIC X(8).
-           05  WS-TRAN-STATUS       PIC X(1).
+           05  WS-TRAN-STATUS-WK    PIC X(1).
 
        PROCEDURE DIVISION.
        0000-MAIN.
@@ -126,14 +124,14 @@
            END-IF
 
            OPEN OUTPUT PORTFOLIO-OUT
-           IF WS-PORT-STATUS NOT = '00'
+           IF WS-PORT-FS NOT = '00'
                MOVE 'ERROR OPENING PORTFOLIO OUTPUT'
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
            END-IF
 
            OPEN OUTPUT TRANSACTION-OUT
-           IF WS-TRAN-STATUS NOT = '00'
+           IF WS-TRAN-FS NOT = '00'
                MOVE 'ERROR OPENING TRANSACTION OUTPUT'
                  TO WS-ERROR-MESSAGE
                PERFORM 9999-ERROR-HANDLER
@@ -200,6 +198,30 @@
        2500-GEN-VOLUME-DATA.
            PERFORM 2510-GEN-LARGE-PORTFOLIO
            PERFORM 2520-GEN-LARGE-TRANSACTION.
+
+       2210-GEN-PORT-DATA.
+           CONTINUE.
+
+       2220-WRITE-PORT-RECORD.
+           CONTINUE.
+
+       2310-GEN-TRAN-DATA.
+           CONTINUE.
+
+       2320-WRITE-TRAN-RECORD.
+           CONTINUE.
+
+       2410-GEN-DATA-ERRORS.
+           CONTINUE.
+
+       2420-GEN-PROCESS-ERRORS.
+           CONTINUE.
+
+       2510-GEN-LARGE-PORTFOLIO.
+           CONTINUE.
+
+       2520-GEN-LARGE-TRANSACTION.
+           CONTINUE.
 
        3000-CLEANUP.
            CLOSE TEST-CONFIG

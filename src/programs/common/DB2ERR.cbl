@@ -14,12 +14,9 @@
        
        DATA DIVISION.
        WORKING-STORAGE SECTION.
-           EXEC SQL BEGIN DECLARE SECTION END-EXEC.
-           01  WS-ERRLOG-REC.
-               COPY DBTBLS REPLACING 
-                   ==POSHIST-RECORD== BY ==WS-POSHIST-REC==
-                   ==ERRLOG-RECORD== BY ==WS-ERRLOG-REC==.
-           EXEC SQL END DECLARE SECTION END-EXEC.
+           COPY DBTBLS REPLACING 
+               ==POSHIST-RECORD== BY ==WS-POSHIST-REC==
+               ==ERRLOG-RECORD== BY ==WS-ERRLOG-REC==.
            
            COPY SQLCA.
            COPY DBPROC.
@@ -72,7 +69,7 @@
        1000-LOG-ERROR.
            INITIALIZE WS-ERRLOG-REC
            
-           ACCEPT WS-CURRENT-TIMESTAMP FROM TIME STAMP
+           ACCEPT WS-CURRENT-TIMESTAMP FROM TIME
            
            MOVE WS-CURRENT-TIMESTAMP TO EL-ERROR-TIMESTAMP
            MOVE LS-PROGRAM-ID       TO EL-PROGRAM-ID

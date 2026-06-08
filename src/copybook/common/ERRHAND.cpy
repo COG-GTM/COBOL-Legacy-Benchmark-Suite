@@ -53,4 +53,9 @@
            05  ERR-VSAM-23         PIC X(80) VALUE
                'Record not found'.
            05  ERR-OTHER           PIC X(80) VALUE
-               'Unexpected VSAM error'. 
+               'Unexpected VSAM error'.
+
+      *----------------------------------------------------------------*
+      * Common Error Message Work Area
+      *----------------------------------------------------------------*
+       01  WS-ERROR-MESSAGE          PIC X(80).

@@ -14,17 +14,26 @@
        DATA DIVISION.
        FILE SECTION.
        FD  CHECKPOINT-FILE.
-       COPY CKPRST.
+       01  CHECKPOINT-FILE-RECORD.
+           05  CKR-KEY.
+               10  CKR-PROGRAM-ID      PIC X(8).
+               10  CKR-RUN-DATE        PIC X(8).
+           05  CKR-DATA                PIC X(400).
        
        WORKING-STORAGE SECTION.
        01  WS-FILE-STATUS             PIC X(2).
+       01  WS-ENTRY-POINT             PIC X(4).
+           88  ENTRY-POINT-INIT       VALUE 'INIT'.
+           88  ENTRY-POINT-TAKE       VALUE 'TAKE'.
+           88  ENTRY-POINT-COMMIT     VALUE 'CMIT'.
+           88  ENTRY-POINT-RESTART    VALUE 'RSTR'.
        
        LINKAGE SECTION.
        COPY CKPRST.
        COPY RETHND.
        
        PROCEDURE DIVISION USING CHECKPOINT-CONTROL
-                              RETURN-STATUS.
+                              RETURN-HANDLING.
            
            EVALUATE TRUE
                WHEN ENTRY-POINT-INIT
@@ -41,17 +50,13 @@
            .
       
        PROC-INIT.
-           * Initialize checkpoint processing
-           .
+           CONTINUE.
        
        PROC-TAKE-CHECKPOINT.
-           * Take a checkpoint
-           .
+           CONTINUE.
        
        PROC-COMMIT-CHECKPOINT.
-           * Commit checkpoint
-           .
+           CONTINUE.
        
        PROC-RESTART.
-           * Handle restart processing
-           . 
+           CONTINUE.

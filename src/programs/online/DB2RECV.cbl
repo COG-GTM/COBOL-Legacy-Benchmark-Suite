@@ -1,7 +1,7 @@
        IDENTIFICATION DIVISION.
        PROGRAM-ID. DB2RECV.
       *****************************************************************
-      * DB2 Recovery Manager for Online Programs                        *
+      * DB2 Recovery Manager for Online Programs                        
       * - Handles DB2 connection failures                              *
       * - Implements retry logic                                       *
       * - Manages transaction rollback                                 *
@@ -12,8 +12,7 @@
        
        DATA DIVISION.
        WORKING-STORAGE SECTION.
-       01  WS-DB2-AREA.
-           EXEC SQL INCLUDE SQLCA END-EXEC.
+       COPY SQLCA.
            
        01  WS-RECOVERY-STATS.
            05 WS-RETRY-COUNT        PIC S9(4) COMP VALUE 0.
@@ -21,10 +20,8 @@
            05 WS-RETRY-INTERVAL     PIC S9(8) COMP VALUE 2.
            05 WS-LAST-ERROR         PIC S9(9) COMP VALUE 0.
            
-       01  WS-ERROR-AREA.
-           COPY ERRHND.
+       COPY ERRHND.
            
-       01  WS-DB2-REQUEST.
            COPY DB2REQ.
            
        LINKAGE SECTION.
@@ -37,7 +34,7 @@
            05 RECV-SQLCODE          PIC S9(9) COMP.
            05 RECV-ERROR-INFO.
               10 RECV-PROGRAM       PIC X(8).
-              10 RECV-CURSOR        PIC X(18).
+              10 RECV-CURS-NAME     PIC X(18).
               10 RECV-MESSAGE       PIC X(80).
            05 RECV-STATUS           PIC X.
               88 RECV-SUCCESS            VALUE 'S'.
@@ -83,19 +80,19 @@
            EXIT.
            
        P110-ATTEMPT-RECONNECT.
-           MOVE 'C' TO DB2-REQUEST-TYPE OF WS-DB2-REQUEST.
+           MOVE 'C' TO DB2-REQUEST-TYPE.
            
            EXEC CICS LINK PROGRAM('DB2ONLN')
                      COMMAREA(WS-DB2-REQUEST)
-                     LENGTH(LENGTH OF WS-DB2-REQUEST)
+                     LENGTH(LENGTH)
            END-EXEC.
            
-           IF DB2-RESPONSE-CODE OF WS-DB2-REQUEST = 0
+           IF DB2-RESPONSE-CODE = 0
               SET RECV-SUCCESS TO TRUE
               MOVE 0 TO RECV-RESPONSE-CODE
            ELSE
               SET RECV-RETRY TO TRUE
-              MOVE DB2-SQLCODE OF WS-DB2-REQUEST 
+              MOVE DB2-SQLCODE 
                 TO RECV-SQLCODE
            END-IF.
        P110-EXIT.
@@ -123,15 +120,15 @@
            EXIT.
            
        P300-RECOVER-CURSOR.
-           MOVE SPACES TO WS-ERROR-AREA.
+           MOVE SPACES TO ERROR-HANDLING.
            MOVE RECV-PROGRAM TO ERR-PROGRAM.
-           MOVE RECV-CURSOR TO ERR-PARAGRAPH.
+           MOVE RECV-CURS-NAME TO ERR-PARAGRAPH.
            MOVE RECV-SQLCODE TO ERR-SQLCODE.
            SET ERR-WARNING TO TRUE.
            
            EXEC CICS LINK PROGRAM('ERRHNDL')
-                     COMMAREA(WS-ERROR-AREA)
-                     LENGTH(LENGTH OF WS-ERROR-AREA)
+                     COMMAREA(ERROR-HANDLING)
+                     LENGTH(LENGTH OF ERROR-HANDLING)
            END-EXEC.
            
            IF ERR-CONTINUE

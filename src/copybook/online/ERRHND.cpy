@@ -1,5 +1,5 @@
       ******************************************************************
-      * Online Error Handling Copybook                                  *
+      * Online Error Handling Copybook                                  
       ******************************************************************
        01  ERROR-HANDLING.
            05 ERR-PROGRAM          PIC X(8).

@@ -1,5 +1,5 @@
       ******************************************************************
-      * Online Inquiry Communication Area                               *
+      * Online Inquiry Communication Area                               
       ******************************************************************
        01  INQCOM-AREA.
            05 INQCOM-FUNCTION         PIC X(4).
