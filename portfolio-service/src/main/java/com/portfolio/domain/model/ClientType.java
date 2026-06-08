@@ -24,4 +24,11 @@ public enum ClientType {
         }
         throw new IllegalArgumentException("Unknown client type code: " + code);
     }
+
+    public static boolean isValid(char code) {
+        for (ClientType type : values()) {
+            if (type.code == code) return true;
+        }
+        return false;
+    }
 }

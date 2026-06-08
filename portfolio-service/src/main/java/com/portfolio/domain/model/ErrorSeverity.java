@@ -26,4 +26,11 @@ public enum ErrorSeverity {
         }
         throw new IllegalArgumentException("Unknown error severity code: " + code);
     }
+
+    public static boolean isValid(int code) {
+        for (ErrorSeverity s : values()) {
+            if (s.code == code) return true;
+        }
+        return false;
+    }
 }

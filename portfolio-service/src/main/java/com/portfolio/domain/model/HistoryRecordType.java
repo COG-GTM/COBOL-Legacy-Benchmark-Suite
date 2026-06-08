@@ -24,4 +24,11 @@ public enum HistoryRecordType {
         }
         throw new IllegalArgumentException("Unknown history record type: " + code);
     }
+
+    public static boolean isValid(String code) {
+        for (HistoryRecordType t : values()) {
+            if (t.code.equals(code)) return true;
+        }
+        return false;
+    }
 }

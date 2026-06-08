@@ -24,4 +24,11 @@ public enum HistoryActionCode {
         }
         throw new IllegalArgumentException("Unknown history action code: " + code);
     }
+
+    public static boolean isValid(char code) {
+        for (HistoryActionCode a : values()) {
+            if (a.code == code) return true;
+        }
+        return false;
+    }
 }

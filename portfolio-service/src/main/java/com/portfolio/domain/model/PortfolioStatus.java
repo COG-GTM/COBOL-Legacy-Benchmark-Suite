@@ -24,4 +24,11 @@ public enum PortfolioStatus {
         }
         throw new IllegalArgumentException("Unknown portfolio status code: " + code);
     }
+
+    public static boolean isValid(char code) {
+        for (PortfolioStatus s : values()) {
+            if (s.code == code) return true;
+        }
+        return false;
+    }
 }

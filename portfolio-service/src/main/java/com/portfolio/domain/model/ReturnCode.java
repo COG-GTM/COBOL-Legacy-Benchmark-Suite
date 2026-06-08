@@ -25,4 +25,11 @@ public enum ReturnCode {
         }
         throw new IllegalArgumentException("Unknown return code: " + code);
     }
+
+    public static boolean isValid(char code) {
+        for (ReturnCode rc : values()) {
+            if (rc.code == code) return true;
+        }
+        return false;
+    }
 }
