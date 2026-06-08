@@ -1,5 +1,5 @@
       ******************************************************************
-      * Return Code Management Copybook                                 *
+      * Return Code Management Copybook                                 
       ******************************************************************
        01  RETURN-CODE-AREA.
            05 RC-REQUEST-TYPE        PIC X.

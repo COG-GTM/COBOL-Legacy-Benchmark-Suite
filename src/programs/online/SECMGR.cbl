@@ -1,7 +1,7 @@
        IDENTIFICATION DIVISION.
        PROGRAM-ID. SECMGR.
       *****************************************************************
-      * Security Manager for Online Programs                            *
+      * Security Manager for Online Programs                            
       * - Validates CICS user credentials                              *
       * - Manages DB2 authorization                                    *
       * - Implements access control                                    *
@@ -12,9 +12,10 @@
        
        DATA DIVISION.
        WORKING-STORAGE SECTION.
-       01  WS-DB2-AREA.
-           EXEC SQL INCLUDE SQLCA END-EXEC.
+       COPY SQLCA.
            
+       01  WS-DB2-AREA              PIC S9(9) COMP VALUE 0.
+
        01  WS-SECURITY-AREA.
            05 WS-USER-ID           PIC X(8).
            05 WS-TERMINAL-ID       PIC X(4).
@@ -23,8 +24,7 @@
            05 WS-ACCESS-TYPE       PIC X(8).
            05 WS-TIMESTAMP         PIC X(26).
            
-       01  WS-ERROR-AREA.
-           COPY ERRHND.
+       COPY ERRHND.
            
        LINKAGE SECTION.
        01  SECURITY-REQUEST-AREA.
@@ -59,7 +59,7 @@
                      RESP(SEC-RESPONSE-CODE)
            END-EXEC.
            
-           IF SEC-RESPONSE-CODE = DFHRESP(NORMAL)
+           IF SEC-RESPONSE-CODE = 0
               IF SEC-USER-ID = WS-USER-ID
                  MOVE 0 TO SEC-RESPONSE-CODE
               ELSE

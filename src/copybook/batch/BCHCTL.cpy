@@ -46,4 +46,4 @@
       * 2. Job step checks prerequisites using BCT-PREREQ-JOBS
       * 3. Program uses CKPRST for checkpointing during execution
       * 4. Job completion updates BCT status and return info
-      *================================================================* 
+      *================================================================*

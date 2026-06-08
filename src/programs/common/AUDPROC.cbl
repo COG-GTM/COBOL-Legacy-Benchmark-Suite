@@ -57,7 +57,7 @@
            .
            
        1000-INITIALIZE.
-           ACCEPT WS-FORMATTED-TIME FROM TIME STAMP
+           ACCEPT WS-FORMATTED-TIME FROM TIME
            
            OPEN EXTEND AUDIT-FILE
            IF WS-FILE-STATUS NOT = '00'

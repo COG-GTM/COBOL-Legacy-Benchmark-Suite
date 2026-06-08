@@ -1,7 +1,7 @@
         IDENTIFICATION DIVISION.
        PROGRAM-ID. INQHIST.
       *****************************************************************
-      * Transaction History Inquiry Handler                             *
+      * Transaction History Inquiry Handler                             
       * - Retrieves transaction history from DB2                       *
       * - Formats history data for display                            *
       * - Supports scrolling through history                          *
@@ -11,11 +11,9 @@
        
        DATA DIVISION.
        WORKING-STORAGE SECTION.
-       01  WS-COMMAREA.
-           COPY INQCOM.
+       COPY INQCOM.
            
-       01  WS-DB2-AREA.
-           EXEC SQL INCLUDE SQLCA END-EXEC.
+       COPY SQLCA.
            
        01  WS-HISTORY-TABLE.
            05 WS-HISTORY-ENTRY OCCURS 10 TIMES.
@@ -32,6 +30,8 @@
               88 NO-MORE-ROWS          VALUE 'N'.
            05 WS-ROW-COUNT        PIC S9(4) COMP.
            
+       01  WS-DB2-TOKEN             PIC X(40) VALUE SPACES.
+
        01  WS-DB2-REQUEST.
            05 DB2-REQUEST-TYPE        PIC X.
            05 DB2-RESPONSE-CODE       PIC S9(8) COMP.
@@ -63,8 +63,7 @@
               88 RECV-RETRY             VALUE 'R'.
            
        LINKAGE SECTION.
-       01  DFHCOMMAREA.
-           COPY INQCOM.
+       01  DFHCOMMAREA              PIC X(200).
            
        PROCEDURE DIVISION.
            PERFORM P100-INIT-PROGRAM
@@ -79,7 +78,7 @@
            EXEC CICS RETURN END-EXEC.
            
        P100-INIT-PROGRAM.
-           MOVE DFHCOMMAREA TO WS-COMMAREA.
+           MOVE DFHCOMMAREA TO INQCOM-AREA.
            MOVE ZEROS TO WS-ROW-COUNT.
            SET NO-MORE-ROWS TO TRUE.
            
@@ -115,7 +114,7 @@
                     THRU P150-EXIT
               ELSE
                  MOVE RECV-MESSAGE 
-                   TO INQCOM-ERROR-MSG OF WS-COMMAREA
+                   TO INQCOM-ERROR-MSG OF INQCOM-AREA
                  PERFORM P999-ERROR-ROUTINE
                     THRU P999-EXIT
               END-IF
@@ -187,7 +186,7 @@
            
        P999-ERROR-ROUTINE.
            MOVE SQLCODE 
-             TO INQCOM-RESPONSE-CODE OF WS-COMMAREA.
-           MOVE WS-COMMAREA TO DFHCOMMAREA.
+             TO INQCOM-RESPONSE-CODE OF INQCOM-AREA.
+           MOVE INQCOM-AREA TO DFHCOMMAREA.
        P999-EXIT.
            EXIT.

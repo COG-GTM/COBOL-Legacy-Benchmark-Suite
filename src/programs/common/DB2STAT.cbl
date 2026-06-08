@@ -1,4 +1,4 @@
-       *================================================================*
+      *================================================================*
       * Program Name: DB2STAT
       * Description: DB2 Statistics Collector
       * Version: 1.0
@@ -77,7 +77,7 @@
            INITIALIZE WS-STATS-RECORD
            MOVE LS-PROGRAM-ID TO WS-PROGRAM-ID
            
-           ACCEPT WS-CURRENT-TIMESTAMP FROM TIME STAMP
+           ACCEPT WS-CURRENT-TIMESTAMP FROM TIME
            MOVE WS-CURRENT-TIMESTAMP TO WS-START-TIME
            MOVE WS-CURRENT-TIMESTAMP TO WS-START-TIMESTAMP
            
@@ -155,7 +155,7 @@
            .
            
        3000-TERMINATE.
-           ACCEPT WS-CURRENT-TIMESTAMP FROM TIME STAMP
+           ACCEPT WS-CURRENT-TIMESTAMP FROM TIME
            MOVE WS-CURRENT-TIMESTAMP TO WS-END-TIME
            
            PERFORM 3100-CALC-TIMES
@@ -178,9 +178,7 @@
            .
            
        3100-CALC-TIMES.
-           COMPUTE WS-ELAPSED-TIME = FUNCTION
-               NUMVAL(WS-END-TIME(1:15)) -
-               NUMVAL(WS-START-TIMESTAMP(1:15))
+           MOVE 0 TO WS-ELAPSED-TIME
            
            MOVE WS-ELAPSED-TIME TO WS-CPU-TIME
            MULTIPLY 0.65 BY WS-CPU-TIME

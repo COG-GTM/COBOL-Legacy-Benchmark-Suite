@@ -1,7 +1,7 @@
         IDENTIFICATION DIVISION.
        PROGRAM-ID. DB2ONLN.
       *****************************************************************
-      * Online DB2 Connection Manager                                   *
+      * Online DB2 Connection Manager                                   
       * - Manages DB2 connection pool                                  *
       * - Optimizes connection reuse                                   *
       * - Handles connection errors                                    *
@@ -12,8 +12,7 @@
        
        DATA DIVISION.
        WORKING-STORAGE SECTION.
-       01  WS-DB2-AREA.
-           EXEC SQL INCLUDE SQLCA END-EXEC.
+       COPY SQLCA.
            
        01  WS-POOL-STATS.
            05 WS-TOTAL-CONNECTIONS    PIC S9(8) COMP VALUE 0.
@@ -21,8 +20,7 @@
            05 WS-AVAILABLE-CONNECTIONS PIC S9(8) COMP VALUE 0.
            05 WS-MAX-CONNECTIONS      PIC S9(8) COMP VALUE 100.
            
-       01  WS-ERROR-AREA.
-           COPY ERRHND.
+       COPY ERRHND.
            
        LINKAGE SECTION.
        01  DB2-REQUEST-AREA.

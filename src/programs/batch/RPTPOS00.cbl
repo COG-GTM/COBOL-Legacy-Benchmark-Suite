@@ -3,7 +3,7 @@
        AUTHOR. CLAUDE.
        DATE-WRITTEN. 2024-04-09.
       *****************************************************************
-      * Daily Position Report Generator                                 *
+      * Daily Position Report Generator                                 
       *                                                               *
       * This program generates the daily position report including:    *
       * - Portfolio position summary                                   *
@@ -23,7 +23,7 @@
            SELECT TRANSACTION-HISTORY ASSIGN TO TRANHIST
                ORGANIZATION IS INDEXED
                ACCESS MODE IS SEQUENTIAL
-               RECORD KEY IS TRAN-KEY
+               RECORD KEY IS TRN-KEY
                FILE STATUS IS WS-TRAN-STATUS.
 
            SELECT REPORT-FILE ASSIGN TO RPTFILE
@@ -32,8 +32,15 @@
 
        DATA DIVISION.
        FILE SECTION.
-           COPY POSREC.
-           COPY TRNREC.
+       FD  POSITION-MASTER
+           RECORDING MODE IS F
+           BLOCK CONTAINS 0 RECORDS.
+       COPY POSREC.
+
+       FD  TRANSACTION-HISTORY
+           RECORDING MODE IS F
+           BLOCK CONTAINS 0 RECORDS.
+       COPY TRNREC.
            
        FD  REPORT-FILE
            RECORDING MODE IS F
@@ -62,10 +69,14 @@
                10  WS-REPORT-DATE    PIC X(10).
                10  FILLER            PIC X(107) VALUE SPACES.
 
+       01  WS-FLAGS.
+           05  WS-END-OF-POS          PIC X VALUE 'N'.
+               88  END-OF-POSITIONS   VALUE 'Y'.
+
        01  WS-POSITION-DETAIL.
            05  WS-POS-PORTFOLIO     PIC X(10).
            05  FILLER               PIC X(2) VALUE SPACES.
-           05  WS-POS-DESCRIPTION   PIC X(30).
+           05  WS-POS-PORTFOLIO-ID   PIC X(30).
            05  FILLER               PIC X(2) VALUE SPACES.
            05  WS-POS-QUANTITY      PIC ZZZ,ZZZ,ZZ9.99.
            05  FILLER               PIC X(2) VALUE SPACES.
@@ -132,12 +143,12 @@
 
        2110-FORMAT-POSITION.
            MOVE POS-PORTFOLIO-ID   TO WS-POS-PORTFOLIO
-           MOVE POS-DESCRIPTION    TO WS-POS-DESCRIPTION
+           MOVE POS-PORTFOLIO-ID    TO WS-POS-PORTFOLIO-ID
            MOVE POS-QUANTITY       TO WS-POS-QUANTITY
-           MOVE POS-CURRENT-VALUE  TO WS-POS-VALUE
+           MOVE POS-MARKET-VALUE  TO WS-POS-VALUE
            COMPUTE WS-POS-CHANGE-PCT = 
-               (POS-CURRENT-VALUE - POS-PREVIOUS-VALUE) /
-                POS-PREVIOUS-VALUE * 100
+               (POS-MARKET-VALUE - POS-COST-BASIS) /
+                POS-COST-BASIS * 100
            WRITE REPORT-RECORD FROM WS-POSITION-DETAIL.
 
        2200-PROCESS-TRANSACTIONS.
@@ -148,6 +159,21 @@
            PERFORM 2310-WRITE-TOTALS
            PERFORM 2320-WRITE-EXCEPTIONS
            PERFORM 2330-WRITE-METRICS.
+
+       2210-READ-TRANSACTIONS.
+           CONTINUE.
+
+       2220-SUMMARIZE-ACTIVITY.
+           CONTINUE.
+
+       2310-WRITE-TOTALS.
+           CONTINUE.
+
+       2320-WRITE-EXCEPTIONS.
+           CONTINUE.
+
+       2330-WRITE-METRICS.
+           CONTINUE.
 
        3000-CLEANUP.
            CLOSE POSITION-MASTER

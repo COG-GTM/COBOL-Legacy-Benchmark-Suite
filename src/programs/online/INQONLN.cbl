@@ -1,10 +1,10 @@
        IDENTIFICATION DIVISION.
        PROGRAM-ID. INQONLN.
       *****************************************************************
-      * Portfolio Online Inquiry Main Handler                           *
-      * - Handles CICS portfolio inquiry transactions                   *
-      * - Manages screen interactions                                   *
-      * - Processes portfolio lookups                                   *
+      * Portfolio Online Inquiry Main Handler                           
+      * - Handles CICS portfolio inquiry transactions                   
+      * - Manages screen interactions                                   
+      * - Processes portfolio lookups                                   
       * - Interfaces with DB2 for history                              *
       *****************************************************************
        
@@ -12,8 +12,8 @@
        
        DATA DIVISION.
        WORKING-STORAGE SECTION.
-       01  WS-COMMAREA.
            COPY INQCOM.
+           COPY DFHEIBLK.
            
        01  WS-FLAGS.
            05 WS-END-OF-SESSION       PIC X VALUE 'N'.
@@ -21,7 +21,6 @@
               88 SESSION-TERMINATED         VALUE 'Y'.
            05 WS-RESPONSE-CODE        PIC S9(8) COMP.
            
-       01  WS-ERROR-AREA.
            COPY ERRHND.
            
        01  WS-SECURITY-REQUEST.
@@ -33,8 +32,7 @@
            05 SEC-ERROR-INFO       PIC X(80).
            
        LINKAGE SECTION.
-       01  DFHCOMMAREA.
-           COPY INQCOM.
+       01  DFHCOMMAREA              PIC X(200).
            
        PROCEDURE DIVISION.
            EXEC CICS HANDLE CONDITION
@@ -51,15 +49,15 @@
            END-EXEC.
            
        P100-PROCESS-REQUEST.
-           MOVE LOW-VALUES TO WS-COMMAREA.
+           MOVE LOW-VALUES TO INQCOM-AREA.
            
            EXEC CICS RECEIVE MAP('INQMAP')
                      MAPSET('INQSET')
-                     INTO(WS-COMMAREA)
+                     INTO(INQCOM-AREA)
                      RESP(WS-RESPONSE-CODE)
            END-EXEC.
            
-           EVALUATE WS-COMMAREA-FUNCTION
+           EVALUATE INQCOM-FUNCTION
                WHEN 'MENU'
                     PERFORM P200-DISPLAY-MENU
                        THRU P200-EXIT
@@ -81,7 +79,7 @@
               
            IF SEC-RESPONSE-CODE NOT = 0
               MOVE SEC-ERROR-INFO 
-                TO WS-ERROR-MESSAGE
+                TO ERR-MESSAGE
               PERFORM P900-ERROR-ROUTINE
                  THRU P900-EXIT
               EXEC CICS RETURN END-EXEC
@@ -100,8 +98,8 @@
            
        P300-PORTFOLIO-INQUIRY.
            EXEC CICS LINK PROGRAM('INQPORT')
-                     COMMAREA(WS-COMMAREA)
-                     LENGTH(LENGTH OF WS-COMMAREA)
+                     COMMAREA(INQCOM-AREA)
+                     LENGTH(LENGTH OF INQCOM-AREA)
                      RESP(WS-RESPONSE-CODE)
            END-EXEC.
        P300-EXIT.
@@ -109,8 +107,8 @@
            
        P400-HISTORY-INQUIRY.
            EXEC CICS LINK PROGRAM('INQHIST')
-                     COMMAREA(WS-COMMAREA)
-                     LENGTH(LENGTH OF WS-COMMAREA)
+                     COMMAREA(INQCOM-AREA)
+                     LENGTH(LENGTH OF INQCOM-AREA)
                      RESP(WS-RESPONSE-CODE)
            END-EXEC.
        P400-EXIT.
@@ -132,7 +130,7 @@
               EXEC CICS ABEND ABCODE('IERR') END-EXEC
            END-IF.
            
-           MOVE ERR-MESSAGE TO WS-ERROR-MESSAGE.
+           MOVE ERR-MESSAGE TO ERR-MESSAGE.
        P900-EXIT.
            EXIT.
            

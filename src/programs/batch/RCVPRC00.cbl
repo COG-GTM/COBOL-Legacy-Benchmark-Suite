@@ -1,4 +1,4 @@
-       *================================================================*
+      *================================================================*
       * Program Name: RCVPRC00
       * Description: Process Recovery Handler
       * Version: 1.0
@@ -204,7 +204,7 @@
        2121-RESTART-PROCESS.
            MOVE BCT-STAT-READY TO BCT-STATUS
            ADD 1 TO BCT-RESTART-COUNT
-           ACCEPT WS-CURRENT-TIME FROM TIME STAMP
+           ACCEPT WS-CURRENT-TIME FROM TIME
            MOVE WS-CURRENT-TIME TO BCT-ATTEMPT-TS
            
            REWRITE BATCH-CONTROL-RECORD

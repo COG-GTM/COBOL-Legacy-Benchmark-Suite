@@ -183,7 +183,7 @@
            PERFORM 2200-CHECK-THRESHOLDS
            PERFORM 2300-LOG-STATUS
            PERFORM 2400-GENERATE-ALERTS
-           CALL 'ILBOABN0' USING WS-MINUTE
+           CALL "CBL_OC_NANOSLEEP" USING WS-MINUTE
            PERFORM 1200-INIT-PROCESSING.
 
        2100-COLLECT-METRICS.
@@ -208,6 +208,45 @@
                PERFORM 2410-FORMAT-ALERT
                PERFORM 2420-WRITE-ALERT
            END-IF.
+
+       1310-STORE-CONFIG.
+           CONTINUE.
+
+       2110-GET-CPU-METRICS.
+           CONTINUE.
+
+       2120-GET-MEMORY-METRICS.
+           CONTINUE.
+
+       2130-GET-DASD-METRICS.
+           CONTINUE.
+
+       2140-GET-DB2-METRICS.
+           CONTINUE.
+
+       2210-CHECK-UTILIZATION.
+           CONTINUE.
+
+       2220-CHECK-RESPONSE.
+           CONTINUE.
+
+       2230-CHECK-QUEUES.
+           CONTINUE.
+
+       2240-CHECK-ERRORS.
+           CONTINUE.
+
+       2310-LOG-RESOURCES.
+           CONTINUE.
+
+       2320-LOG-PERFORMANCE.
+           CONTINUE.
+
+       2410-FORMAT-ALERT.
+           CONTINUE.
+
+       2420-WRITE-ALERT.
+           CONTINUE.
 
        3000-CLEANUP.
            CLOSE MONITOR-CONFIG

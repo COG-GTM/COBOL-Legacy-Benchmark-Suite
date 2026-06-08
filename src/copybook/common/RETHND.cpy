@@ -13,7 +13,7 @@
                    88  RC-CRITICAL     VALUE +16.
                10  REASON-CODE         PIC S9(4) COMP.
                10  MODULE-ID           PIC X(8).
-               10  FUNCTION-ID         PIC X(8).
+               10  FUNC-ID             PIC X(8).
            
            05  RETURN-DETAILS.
                10  ERROR-LOCATION.
@@ -58,7 +58,7 @@
       * USAGE EXAMPLE:
       *
       *     MOVE 'PORTMSTR'   TO MODULE-ID
-      *     MOVE 'VALIDATE'   TO FUNCTION-ID
+      *     MOVE 'VALIDATE'   TO FUNC-ID
       *     MOVE 'E001'       TO ERROR-CODE
       *     SET ERR-VALIDATION TO TRUE
       *     SET RC-ERROR      TO TRUE

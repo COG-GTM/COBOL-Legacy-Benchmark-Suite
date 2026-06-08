@@ -1,7 +1,7 @@
         IDENTIFICATION DIVISION.
        PROGRAM-ID. INQPORT.
       *****************************************************************
-      * Portfolio Position Inquiry Handler                              *
+      * Portfolio Position Inquiry Handler                              
       * - Retrieves current portfolio positions                        *
       * - Formats position data for display                            *
       * - Handles VSAM and DB2 access                                  *
@@ -11,14 +11,11 @@
        
        DATA DIVISION.
        WORKING-STORAGE SECTION.
-       01  WS-COMMAREA.
-           COPY INQCOM.
+       COPY INQCOM.
            
-       01  WS-POSITION-RECORD.
            COPY POSREC.
            
-       01  WS-DB2-POSITION.
-           EXEC SQL INCLUDE SQLPOS END-EXEC.
+       01  WS-DB2-POSITION          PIC X(200).
            
        01  WS-FLAGS.
            05 WS-RESPONSE-CODE        PIC S9(8) COMP.
@@ -34,8 +31,7 @@
            05 WS-VALUE-LABEL         PIC X(15) VALUE 'Market Value:'.
            
        LINKAGE SECTION.
-       01  DFHCOMMAREA.
-           COPY INQCOM.
+       01  DFHCOMMAREA              PIC X(200).
            
        PROCEDURE DIVISION.
            PERFORM P100-INIT-PROGRAM
@@ -55,8 +51,8 @@
            EXEC CICS RETURN END-EXEC.
            
        P100-INIT-PROGRAM.
-           MOVE LOW-VALUES TO WS-POSITION-RECORD
-           MOVE DFHCOMMAREA TO WS-COMMAREA.
+           MOVE LOW-VALUES TO POSITION-RECORD
+           MOVE DFHCOMMAREA TO INQCOM-AREA.
            
            EXEC CICS HANDLE CONDITION
                      ERROR(P999-ERROR-ROUTINE)
@@ -66,16 +62,16 @@
            EXIT.
            
        P200-GET-POSITION.
-           MOVE WS-COMMAREA-ACCOUNT-NO 
-             TO POSITION-ACCOUNT OF WS-POSITION-RECORD.
+           MOVE INQCOM-ACCOUNT-NO 
+             TO POS-PORTFOLIO-ID.
              
            EXEC CICS READ FILE('POSFILE')
-                     INTO(WS-POSITION-RECORD)
-                     RIDFLD(POSITION-ACCOUNT OF WS-POSITION-RECORD)
+                     INTO(POSITION-RECORD)
+                     RIDFLD(POS-PORTFOLIO-ID)
                      RESP(WS-RESPONSE-CODE)
            END-EXEC.
            
-           IF WS-RESPONSE-CODE = DFHRESP(NORMAL)
+           IF WS-RESPONSE-CODE = 0
               SET POSITION-EXISTS TO TRUE
            ELSE
               SET NO-POSITION TO TRUE
@@ -86,7 +82,7 @@
        P300-FORMAT-DISPLAY.
            EXEC CICS SEND MAP('POSMAP')
                      MAPSET('INQSET')
-                     FROM(WS-POSITION-RECORD)
+                     FROM(POSITION-RECORD)
                      ERASE
                      RESP(WS-RESPONSE-CODE)
            END-EXEC.
@@ -95,16 +91,16 @@
            
        P900-NOT-FOUND.
            MOVE 'Position not found for account' 
-             TO INQCOM-ERROR-MSG OF WS-COMMAREA.
-           MOVE WS-COMMAREA TO DFHCOMMAREA.
+             TO INQCOM-ERROR-MSG OF INQCOM-AREA.
+           MOVE INQCOM-AREA TO DFHCOMMAREA.
        P900-EXIT.
            EXIT.
            
        P999-ERROR-ROUTINE.
            MOVE 'Error accessing position data' 
-             TO INQCOM-ERROR-MSG OF WS-COMMAREA.
+             TO INQCOM-ERROR-MSG OF INQCOM-AREA.
            MOVE WS-RESPONSE-CODE 
-             TO INQCOM-RESPONSE-CODE OF WS-COMMAREA.
-           MOVE WS-COMMAREA TO DFHCOMMAREA.
+             TO INQCOM-RESPONSE-CODE OF INQCOM-AREA.
+           MOVE INQCOM-AREA TO DFHCOMMAREA.
        P999-EXIT.
            EXIT.

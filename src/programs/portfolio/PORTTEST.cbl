@@ -1,4 +1,4 @@
-  *================================================================*
+      *================================================================*
       * Program Name: PORTTEST
       * Description: Portfolio Test Data Generator
       * Author: [Author name]
@@ -85,7 +85,8 @@
                INTO PORT-ID
            
            MOVE FUNCTION RANDOM(WS-RECORD-COUNT) TO WS-TYPE-SUB
-           COMPUTE PORT-ACCOUNT-NO = WS-RECORD-COUNT + 1000000000
+           STRING WS-RECORD-COUNT DELIMITED BY SIZE
+               INTO PORT-ACCOUNT-NO
            .
            
        2200-GENERATE-CLIENT-INFO.

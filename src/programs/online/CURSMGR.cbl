@@ -1,9 +1,9 @@
        IDENTIFICATION DIVISION.
        PROGRAM-ID. CURSMGR.
       *****************************************************************
-      * Cursor Management for Online Programs                           *
-      * - Manages cursor declarations and lifecycle                     *
-      * - Implements cursor optimization techniques                     *
+      * Cursor Management for Online Programs                           
+      * - Manages cursor declarations and lifecycle                     
+      * - Implements cursor optimization techniques                     
       * - Handles array fetching for performance                       *
       * - Provides cursor status monitoring                            *
       *****************************************************************
@@ -12,8 +12,7 @@
        
        DATA DIVISION.
        WORKING-STORAGE SECTION.
-       01  WS-DB2-AREA.
-           EXEC SQL INCLUDE SQLCA END-EXEC.
+       COPY SQLCA.
            
        01  WS-CURSOR-STATS.
            05 WS-FETCH-COUNT         PIC S9(8) COMP VALUE 0.
@@ -88,4 +87,15 @@
            ELSE
               MOVE SQLCODE TO CURS-RESPONSE-CODE
            END-IF.
-       P200-EXIT
+       P200-EXIT.
+           EXIT.
+
+       P300-FETCH-DATA.
+           CONTINUE.
+       P300-EXIT.
+           EXIT.
+
+       P400-CLOSE-CURSOR.
+           CONTINUE.
+       P400-EXIT.
+           EXIT.

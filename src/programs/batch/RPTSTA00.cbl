@@ -23,7 +23,7 @@
            SELECT BATCH-STATS ASSIGN TO BCHSTATS
                ORGANIZATION IS INDEXED
                ACCESS MODE IS SEQUENTIAL
-               RECORD KEY IS BCH-KEY
+               RECORD KEY IS BCT-KEY
                FILE STATUS IS WS-BCH-STATUS.
 
            SELECT REPORT-FILE ASSIGN TO RPTFILE
@@ -32,8 +32,12 @@
 
        DATA DIVISION.
        FILE SECTION.
-           COPY DB2STAT.
-           COPY BCHCTL.
+       COPY DB2STAT.
+
+       FD  BATCH-STATS
+           RECORDING MODE IS F
+           BLOCK CONTAINS 0 RECORDS.
+       COPY BCHCTL.
            
        FD  REPORT-FILE
            RECORDING MODE IS F
@@ -43,6 +47,12 @@
        WORKING-STORAGE SECTION.
            COPY RTNCODE.
            COPY ERRHAND.
+
+       01  WS-PROCESS-FLAGS.
+           05  WS-DB2-EOF              PIC X VALUE 'N'.
+               88  END-OF-DB2-STATS    VALUE 'Y'.
+           05  WS-BCH-EOF              PIC X VALUE 'N'.
+               88  END-OF-BATCH-STATS  VALUE 'Y'.
 
        01  WS-FILE-STATUS.
            05  WS-DB2-STATUS         PIC XX.
@@ -165,6 +175,12 @@
                END-READ
            END-PERFORM.
 
+       2110-ACCUMULATE-DB2-STATS.
+           CONTINUE.
+
+       2210-ACCUMULATE-BATCH-STATS.
+           CONTINUE.
+
        2300-CALCULATE-METRICS.
            PERFORM 2310-CALC-DB2-METRICS
            PERFORM 2320-CALC-BATCH-METRICS.
@@ -173,6 +189,21 @@
            PERFORM 2410-WRITE-DB2-SECTION
            PERFORM 2420-WRITE-BATCH-SECTION
            PERFORM 2430-WRITE-TREND-ANALYSIS.
+
+       2310-CALC-DB2-METRICS.
+           CONTINUE.
+
+       2320-CALC-BATCH-METRICS.
+           CONTINUE.
+
+       2410-WRITE-DB2-SECTION.
+           CONTINUE.
+
+       2420-WRITE-BATCH-SECTION.
+           CONTINUE.
+
+       2430-WRITE-TREND-ANALYSIS.
+           CONTINUE.
 
        3000-CLEANUP.
            CLOSE DB2-STATS

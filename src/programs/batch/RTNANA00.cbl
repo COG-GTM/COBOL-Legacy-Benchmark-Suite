@@ -1,7 +1,7 @@
        IDENTIFICATION DIVISION.
        PROGRAM-ID. RTNANA00.
       *****************************************************************
-      * Return Code Analysis Utility                                    *
+      * Return Code Analysis Utility                                    
       * - Analyzes return codes across system                          *
       * - Generates trend analysis                                     *
       * - Identifies error patterns                                    *
@@ -28,8 +28,7 @@
        01  WS-FILE-STATUS.
            05 WS-REPORT-STATUS        PIC XX.
            
-       01  WS-DB2-AREA.
-           EXEC SQL INCLUDE SQLCA END-EXEC.
+           COPY SQLCA.
            
        01  WS-CURRENT-DATE-DATA.
            05 WS-CURRENT-DATE.
@@ -42,6 +41,13 @@
               10 WS-CURRENT-SECOND   PIC 9(2).
               10 WS-CURRENT-MS       PIC 9(2).
            
+       01  WS-DTL-NUMERICS.
+           05  WS-DTL-TOTAL-N       PIC S9(7) COMP VALUE 0.
+           05  WS-DTL-SUCCESS-N     PIC S9(7) COMP VALUE 0.
+           05  WS-DTL-WARNING-N     PIC S9(7) COMP VALUE 0.
+           05  WS-DTL-ERROR-N       PIC S9(7) COMP VALUE 0.
+           05  WS-DTL-SEVERE-N      PIC S9(7) COMP VALUE 0.
+
        01  WS-ANALYSIS-AREA.
            05 WS-START-TIME          PIC X(26).
            05 WS-END-TIME            PIC X(26).
@@ -180,11 +186,11 @@
            IF SQLCODE = 0
               WRITE REPORT-RECORD FROM WS-DETAIL-LINE
               
-              ADD WS-DTL-TOTAL TO WS-PROGRAM-COUNT
-              ADD WS-DTL-SUCCESS TO WS-SUCCESS-COUNT
-              ADD WS-DTL-WARNING TO WS-WARNING-COUNT
-              ADD WS-DTL-ERROR TO WS-ERROR-COUNT
-              ADD WS-DTL-SEVERE TO WS-SEVERE-COUNT
+              ADD WS-DTL-TOTAL-N TO WS-PROGRAM-COUNT
+              ADD WS-DTL-SUCCESS-N TO WS-SUCCESS-COUNT
+              ADD WS-DTL-WARNING-N TO WS-WARNING-COUNT
+              ADD WS-DTL-ERROR-N TO WS-ERROR-COUNT
+              ADD WS-DTL-SEVERE-N TO WS-SEVERE-COUNT
            END-IF.
        P220-EXIT.
            EXIT.

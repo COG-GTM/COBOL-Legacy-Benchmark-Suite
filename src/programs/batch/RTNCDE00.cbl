@@ -1,7 +1,7 @@
        IDENTIFICATION DIVISION.
        PROGRAM-ID. RTNCDE00.
       *****************************************************************
-      * Standard Return Code Handler                                    *
+      * Standard Return Code Handler                                    
       * - Manages standardized return codes across system              *
       * - Provides return code analysis and reporting                  *
       * - Integrates with error handling framework                     *
@@ -22,14 +22,12 @@
            05 WS-CURRENT-SECONDS     PIC 9(2).
            05 WS-CURRENT-MILLISEC    PIC 9(2).
            
-       01  WS-DB2-AREA.
-           EXEC SQL INCLUDE SQLCA END-EXEC.
+           COPY SQLCA.
            
        LINKAGE SECTION.
-       01  RC-REQUEST-AREA.
            COPY RTNCODE.
            
-       PROCEDURE DIVISION USING RC-REQUEST-AREA.
+       PROCEDURE DIVISION USING RETURN-CODE-AREA.
            EVALUATE TRUE
                WHEN RC-INITIALIZE
                     PERFORM P100-INIT-RETURN-CODES

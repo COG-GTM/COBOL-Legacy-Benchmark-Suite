@@ -1,4 +1,4 @@
-       *================================================================*
+      *================================================================*
       * Program Name: BCHCTL00
       * Description: Batch Control Processor
       * Version: 1.0
@@ -113,15 +113,35 @@
            MOVE BCT-RC-ERROR TO LS-RETURN-CODE
            CALL 'ERRPROC' USING ERR-MESSAGE
            .
-      *================================================================*
-      * Detailed procedures to be implemented:
-      * 1100-OPEN-FILES
-      * 1200-READ-CONTROL-RECORD
-      * 1300-VALIDATE-PROCESS
-      * 1400-UPDATE-START-STATUS
-      * 2200-CHECK-DEPENDENCIES
-      * 3200-UPDATE-PROCESS-STATUS
-      * 3300-WRITE-CONTROL-RECORD
-      * 4100-UPDATE-COMPLETION
-      * 4200-CLOSE-FILES
-      *================================================================*
+       1100-OPEN-FILES.
+           CONTINUE.
+
+       1200-READ-CONTROL-RECORD.
+           CONTINUE.
+
+       1300-VALIDATE-PROCESS.
+           CONTINUE.
+
+       1400-UPDATE-START-STATUS.
+           CONTINUE.
+
+       2100-READ-CONTROL-RECORD.
+           CONTINUE.
+
+       2200-CHECK-DEPENDENCIES.
+           CONTINUE.
+
+       3100-READ-CONTROL-RECORD.
+           CONTINUE.
+
+       3200-UPDATE-PROCESS-STATUS.
+           CONTINUE.
+
+       3300-WRITE-CONTROL-RECORD.
+           CONTINUE.
+
+       4100-UPDATE-COMPLETION.
+           CONTINUE.
+
+       4200-CLOSE-FILES.
+           CONTINUE.
