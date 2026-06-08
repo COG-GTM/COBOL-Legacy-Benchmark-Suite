@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: portfolio-service
+
+  # H2 for local development — swap for PostgreSQL/DB2 in production
+  datasource:
+    url: jdbc:h2:mem:portfoliodb;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false  # Jobs are triggered explicitly, not on startup
+
+  h2:
+    console:
+      enabled: true
+
+server:
+  port: 8080
+
+springdoc:
+  api-docs:
+    path: /api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+logging:
+  level:
+    com.portfolio: DEBUG
+    org.springframework.batch: INFO
