@@ -1,14 +1,13 @@
 package com.portfolio.domain.model;
 
+import com.portfolio.domain.exception.InsufficientUnitsException;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
+import java.util.Objects;
 
 /**
  * Aggregate root — maps COBOL PORTFLIO.cpy PORT-RECORD.
- * <p>
- * Child sessions will add {@code applyBuy()}, {@code applySell()}, etc.
  */
 @Entity
 @Table(name = "portfolio")
@@ -44,6 +43,12 @@ public class Portfolio {
     @Column(name = "cash_balance", precision = 15, scale = 2)
     private BigDecimal cashBalance;
 
+    @Column(name = "total_units", precision = 15, scale = 4)
+    private BigDecimal totalUnits;
+
+    @Column(name = "total_cost", precision = 15, scale = 2)
+    private BigDecimal totalCost;
+
     @Column(name = "last_user", length = 8)
     private String lastUser;
 
@@ -61,6 +66,8 @@ public class Portfolio {
         this.status = PortfolioStatus.ACTIVE;
         this.totalValue = BigDecimal.ZERO;
         this.cashBalance = BigDecimal.ZERO;
+        this.totalUnits = BigDecimal.ZERO;
+        this.totalCost = BigDecimal.ZERO;
         this.createDate = LocalDate.now();
         this.lastMaintenance = LocalDate.now();
     }
@@ -76,10 +83,12 @@ public class Portfolio {
     public PortfolioStatus getStatus() { return status; }
     public BigDecimal getTotalValue() { return totalValue; }
     public BigDecimal getCashBalance() { return cashBalance; }
+    public BigDecimal getTotalUnits() { return totalUnits; }
+    public BigDecimal getTotalCost() { return totalCost; }
     public String getLastUser() { return lastUser; }
     public LocalDate getLastTransDate() { return lastTransDate; }
 
-    // --- Mutators (to be expanded by child sessions) ---
+    // --- Mutators ---
 
     public void setStatus(PortfolioStatus status) { this.status = status; }
     public void setClientName(String clientName) { this.clientName = clientName; }
@@ -91,5 +100,40 @@ public class Portfolio {
         this.lastMaintenance = LocalDate.now();
         this.lastUser = userId;
         this.lastTransDate = LocalDate.now();
+    }
+
+    // --- Transaction methods (maps COBOL transaction processing) ---
+
+    public void applyBuy(BigDecimal quantity, BigDecimal amount) {
+        this.totalUnits = this.totalUnits.add(quantity);
+        this.totalCost = this.totalCost.add(amount);
+    }
+
+    public void applySell(BigDecimal quantity, BigDecimal amount) {
+        if (this.totalUnits.compareTo(quantity) < 0) {
+            throw new InsufficientUnitsException(quantity, this.totalUnits);
+        }
+        this.totalUnits = this.totalUnits.subtract(quantity);
+        this.totalCost = this.totalCost.subtract(amount);
+    }
+
+    public void applyFee(BigDecimal amount) {
+        this.totalCost = this.totalCost.subtract(amount);
+    }
+
+    public void applyTransfer() {
+        throw new UnsupportedOperationException("Transfer not yet implemented");
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Portfolio that)) return false;
+        return Objects.equals(portfolioId, that.portfolioId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(portfolioId);
     }
 }

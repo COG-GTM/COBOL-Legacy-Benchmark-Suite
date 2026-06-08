@@ -25,4 +25,11 @@ public enum TransactionType {
         }
         throw new IllegalArgumentException("Unknown transaction type code: " + code);
     }
+
+    public static boolean isValid(String code) {
+        for (TransactionType t : values()) {
+            if (t.code.equals(code)) return true;
+        }
+        return false;
+    }
 }

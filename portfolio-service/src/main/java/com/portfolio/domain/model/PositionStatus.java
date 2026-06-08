@@ -24,4 +24,11 @@ public enum PositionStatus {
         }
         throw new IllegalArgumentException("Unknown position status code: " + code);
     }
+
+    public static boolean isValid(char code) {
+        for (PositionStatus s : values()) {
+            if (s.code == code) return true;
+        }
+        return false;
+    }
 }

@@ -22,4 +22,24 @@ public enum AuditAction {
     public String getCode() {
         return code;
     }
+
+    public static AuditAction fromCode(String code) {
+        if (code == null) {
+            throw new IllegalArgumentException("Unknown audit action code: null");
+        }
+        String trimmed = code.trim();
+        for (AuditAction a : values()) {
+            if (a.code.equals(trimmed)) return a;
+        }
+        throw new IllegalArgumentException("Unknown audit action code: " + code);
+    }
+
+    public static boolean isValid(String code) {
+        if (code == null) return false;
+        String trimmed = code.trim();
+        for (AuditAction a : values()) {
+            if (a.code.equals(trimmed)) return true;
+        }
+        return false;
+    }
 }

@@ -25,4 +25,11 @@ public enum TransactionStatus {
         }
         throw new IllegalArgumentException("Unknown transaction status code: " + code);
     }
+
+    public static boolean isValid(char code) {
+        for (TransactionStatus s : values()) {
+            if (s.code == code) return true;
+        }
+        return false;
+    }
 }

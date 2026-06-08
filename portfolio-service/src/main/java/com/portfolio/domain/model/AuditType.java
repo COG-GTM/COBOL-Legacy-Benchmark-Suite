@@ -17,4 +17,18 @@ public enum AuditType {
     public String getCode() {
         return code;
     }
+
+    public static AuditType fromCode(String code) {
+        for (AuditType t : values()) {
+            if (t.code.equals(code)) return t;
+        }
+        throw new IllegalArgumentException("Unknown audit type code: " + code);
+    }
+
+    public static boolean isValid(String code) {
+        for (AuditType t : values()) {
+            if (t.code.equals(code)) return true;
+        }
+        return false;
+    }
 }

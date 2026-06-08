@@ -25,4 +25,11 @@ public enum ErrorCategory {
         }
         throw new IllegalArgumentException("Unknown error category code: " + code);
     }
+
+    public static boolean isValid(String code) {
+        for (ErrorCategory c : values()) {
+            if (c.code.equals(code)) return true;
+        }
+        return false;
+    }
 }
