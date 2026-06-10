@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/StatusBadge';
 import { transactions } from '@/data/mockData';
 import type { Transaction } from '@/data/types';
-import type { Column } from '@/components/ui/DataTable';
+import type { Column, SortDirection } from '@/components/ui/DataTable';
 
 type TransactionRow = Transaction & Record<string, unknown>;
 
@@ -101,9 +101,11 @@ export function TransactionListPage() {
   const [dateFrom, setDateFrom] = useState('');
   const [dateTo, setDateTo] = useState('');
   const [page, setPage] = useState(0);
+  const [sortKey, setSortKey] = useState<string | null>('transDate');
+  const [sortDir, setSortDir] = useState<SortDirection>('desc');
 
   const filtered = useMemo(() => {
-    let result = transactions;
+    let result: Transaction[] = transactions;
 
     if (accountSearch.trim()) {
       const q = accountSearch.trim().toLowerCase();
@@ -117,15 +119,38 @@ export function TransactionListPage() {
       result = result.filter((t) => t.transDate <= dateTo);
     }
 
-    return [...result].sort((a, b) => b.transDate.localeCompare(a.transDate));
+    return [...result];
   }, [accountSearch, dateFrom, dateTo]);
 
-  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const sorted = useMemo(() => {
+    if (!sortKey || !sortDir) return filtered;
+    return [...filtered].sort((a, b) => {
+      const aVal = a[sortKey as keyof Transaction];
+      const bVal = b[sortKey as keyof Transaction];
+      if (aVal == null && bVal == null) return 0;
+      if (aVal == null) return 1;
+      if (bVal == null) return -1;
+      if (typeof aVal === 'number' && typeof bVal === 'number') {
+        return sortDir === 'asc' ? aVal - bVal : bVal - aVal;
+      }
+      const aStr = String(aVal);
+      const bStr = String(bVal);
+      return sortDir === 'asc' ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr);
+    });
+  }, [filtered, sortKey, sortDir]);
+
+  const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages - 1);
-  const pageData = filtered.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
+  const pageData = sorted.slice(safePage * PAGE_SIZE, (safePage + 1) * PAGE_SIZE);
 
   const handlePageChange = (newPage: number) => {
     setPage(Math.max(0, Math.min(newPage, totalPages - 1)));
+  };
+
+  const handleSortChange = (key: string | null, direction: SortDirection) => {
+    setSortKey(key);
+    setSortDir(direction);
+    setPage(0);
   };
 
   const resetFilters = () => {
@@ -184,13 +209,13 @@ export function TransactionListPage() {
       <Card>
         <div className="flex items-center justify-between mb-4">
           <p className="text-sm text-slate-500">
-            {filtered.length === 0
+            {sorted.length === 0
               ? 'No transactions found'
-              : `Showing ${safePage * PAGE_SIZE + 1}–${Math.min((safePage + 1) * PAGE_SIZE, filtered.length)} of ${filtered.length} transactions`}
+              : `Showing ${safePage * PAGE_SIZE + 1}–${Math.min((safePage + 1) * PAGE_SIZE, sorted.length)} of ${sorted.length} transactions`}
           </p>
         </div>
 
-        {filtered.length === 0 ? (
+        {sorted.length === 0 ? (
           <EmptyState
             title="No transactions found"
             message={hasFilters ? 'Try adjusting your search criteria or date range.' : 'There are no transactions to display.'}
@@ -214,6 +239,9 @@ export function TransactionListPage() {
                 data={pageData as TransactionRow[]}
                 keyExtractor={(row) => row.transId}
                 emptyMessage="No transactions found"
+                sortKey={sortKey}
+                sortDirection={sortDir}
+                onSortChange={handleSortChange}
               />
             </div>
 
