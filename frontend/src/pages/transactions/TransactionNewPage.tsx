@@ -72,11 +72,15 @@ export function TransactionNewPage() {
 
   function setField<K extends keyof FormData>(key: K, value: FormData[K]) {
     setForm((prev) => ({ ...prev, [key]: value }));
-    setErrors((prev) => {
-      const next = { ...prev };
-      delete next[key];
-      return next;
-    });
+    if (key === 'transType') {
+      setErrors({});
+    } else {
+      setErrors((prev) => {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      });
+    }
   }
 
   function validate(): FormErrors {
@@ -131,6 +135,7 @@ export function TransactionNewPage() {
       setErrors(errs);
       return;
     }
+    setErrors({});
     setStep(2);
   }
 
