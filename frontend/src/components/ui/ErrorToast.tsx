@@ -40,12 +40,14 @@ function Toast({ error, onDismiss }: { error: AppError; onDismiss: (id: string) 
         </p>
         <p className={`text-sm mt-0.5 ${colors.text}`}>{error.message}</p>
       </div>
-      <button
-        onClick={handleDismiss}
-        className={`shrink-0 p-0.5 rounded hover:bg-black/5 ${colors.text}`}
-      >
-        <X className="w-4 h-4" />
-      </button>
+      {(error.dismissible ?? true) && (
+        <button
+          onClick={handleDismiss}
+          className={`shrink-0 p-0.5 rounded hover:bg-black/5 ${colors.text}`}
+        >
+          <X className="w-4 h-4" />
+        </button>
+      )}
     </div>
   );
 }
