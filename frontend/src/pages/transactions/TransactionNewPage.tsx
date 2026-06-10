@@ -43,6 +43,7 @@ const STEPS = ['Portfolio & Type', 'Amounts', 'Review & Confirm'];
 interface FormErrors {
   portfolioId?: string;
   transType?: string;
+  fundId?: string;
   quantity?: string;
   price?: string;
   amount?: string;
@@ -105,7 +106,7 @@ export function TransactionNewPage() {
   const validateStep2 = (): boolean => {
     const next: FormErrors = {};
     if (!fundId) {
-      next.quantity = 'Fund is required';
+      next.fundId = 'Fund is required';
     }
     if (!isFee) {
       if (!QUANTITY_PATTERN.test(quantity)) {
@@ -321,6 +322,7 @@ export function TransactionNewPage() {
                   </option>
                 ))}
               </select>
+              {errors.fundId && <p className="mt-1 text-sm text-red-600">{errors.fundId}</p>}
               {currentPosition && (
                 <p className="mt-1 text-xs text-slate-500">
                   Current position: {quantityFormat.format(currentPosition.shareBalance)} units,
@@ -381,9 +383,6 @@ export function TransactionNewPage() {
                 className={inputClass}
               />
               {errors.amount && <p className="mt-1 text-sm text-red-600">{errors.amount}</p>}
-              {isFee && errors.quantity && (
-                <p className="mt-1 text-sm text-red-600">{errors.quantity}</p>
-              )}
             </div>
 
             <div className="flex justify-between">
