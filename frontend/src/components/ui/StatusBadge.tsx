@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 type StatusVariant = 'success' | 'error' | 'warning' | 'info' | 'neutral';
 
 interface StatusBadgeProps {
@@ -43,18 +44,20 @@ export function getPortfolioStatusLabel(status: string): string {
 
 export function getTransactionStatusVariant(status: string): StatusVariant {
   switch (status) {
-    case 'C': return 'success';
+    case 'D': return 'success';
     case 'P': return 'warning';
-    case 'E': return 'error';
+    case 'F': return 'error';
+    case 'R': return 'info';
     default: return 'neutral';
   }
 }
 
 export function getTransactionStatusLabel(status: string): string {
   switch (status) {
-    case 'C': return 'Completed';
+    case 'D': return 'Done';
     case 'P': return 'Pending';
-    case 'E': return 'Error';
+    case 'F': return 'Failed';
+    case 'R': return 'Reversed';
     default: return status;
   }
 }
@@ -113,8 +116,9 @@ export function getPositionStatusLabel(status: string): string {
 
 export function getTransTypeLabel(type: string): string {
   switch (type) {
-    case 'BY': return 'Buy';
+    case 'BU': return 'Buy';
     case 'SL': return 'Sell';
+    case 'TR': return 'Transfer';
     case 'FE': return 'Fee';
     default: return type;
   }
