@@ -13,7 +13,8 @@ import {
 import { Card } from '@/components/ui/Card';
 import { StatusBadge, getTransactionStatusVariant, getTransactionStatusLabel, getTransTypeLabel } from '@/components/ui/StatusBadge';
 import { PageHeader } from '@/components/ui/PageHeader';
-import { portfolios, positions, transactions } from '@/data/mockData';
+import { usePortfolios } from '@/context/PortfolioContext';
+import { positions, transactions } from '@/data/mockData';
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
@@ -24,13 +25,15 @@ function formatAmount(value: number): string {
 }
 
 export function DashboardPage() {
+  const { portfolios } = usePortfolios();
+
   const stats = useMemo(() => {
     const totalPortfolios = portfolios.filter((p) => p.status === 'A').length;
     const totalValue = portfolios.filter((p) => p.status === 'A').reduce((sum, p) => sum + p.totalValue, 0);
     const activePositions = positions.filter((p) => p.status === 'A').length;
     const pendingTransactions = transactions.filter((t) => t.status === 'P').length;
     return { totalPortfolios, totalValue, activePositions, pendingTransactions };
-  }, []);
+  }, [portfolios]);
 
   const recentTransactions = useMemo(
     () =>
