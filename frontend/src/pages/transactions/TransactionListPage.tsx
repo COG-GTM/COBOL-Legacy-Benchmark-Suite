@@ -39,6 +39,12 @@ const columns: Column<TransactionRow>[] = [
     sortable: true,
   },
   {
+    key: 'accountNo',
+    header: 'Account',
+    sortable: true,
+    render: (row) => <span className="font-mono">{row.accountNo}</span>,
+  },
+  {
     key: 'transType',
     header: 'Type',
     sortable: true,
@@ -111,7 +117,7 @@ export function TransactionListPage() {
       result = result.filter((t) => t.transDate <= dateTo);
     }
 
-    return result.sort((a, b) => b.transDate.localeCompare(a.transDate));
+    return [...result].sort((a, b) => b.transDate.localeCompare(a.transDate));
   }, [accountSearch, dateFrom, dateTo]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
