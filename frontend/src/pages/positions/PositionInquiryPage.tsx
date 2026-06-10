@@ -11,19 +11,17 @@ import type { Position } from '@/data/types';
 const PAGE_SIZE = 10;
 
 const columns: Column<Position>[] = [
-  { key: 'fundId', header: 'Fund ID', sortable: true },
-  { key: 'cusip', header: 'CUSIP', sortable: true },
+  { key: 'fundId', header: 'Fund ID' },
+  { key: 'cusip', header: 'CUSIP' },
   {
     key: 'shareBalance',
     header: 'Share Balance',
-    sortable: true,
     className: 'text-right',
     render: (row) => row.shareBalance.toLocaleString('en-US', { minimumFractionDigits: 3 }),
   },
   {
     key: 'avgCost',
     header: 'Avg Cost',
-    sortable: true,
     className: 'text-right',
     render: (row) =>
       new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(row.avgCost),
@@ -31,12 +29,11 @@ const columns: Column<Position>[] = [
   {
     key: 'costBasis',
     header: 'Cost Basis',
-    sortable: true,
     className: 'text-right',
     render: (row) =>
       new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(row.costBasis),
   },
-  { key: 'lastDate', header: 'Last Activity', sortable: true },
+  { key: 'lastDate', header: 'Last Activity' },
   {
     key: 'lastTrans',
     header: 'Last Trans',
