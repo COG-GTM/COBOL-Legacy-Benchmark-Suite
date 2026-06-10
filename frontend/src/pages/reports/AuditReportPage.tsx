@@ -146,13 +146,13 @@ export function AuditReportPage() {
       <div className="flex flex-wrap items-end gap-4 mb-6">
         <div>
           <label htmlFor="program-filter" className="block text-sm font-medium text-slate-700 mb-1">Program</label>
-          <select id="program-filter" value={programFilter} onChange={(e) => setProgramFilter(e.target.value)} className={selectClass}>
+          <select id="program-filter" value={programFilter} onChange={(e) => { setProgramFilter(e.target.value); setPage(0); }} className={selectClass}>
             {PROGRAMS.map((p) => <option key={p} value={p}>{p}</option>)}
           </select>
         </div>
         <div>
           <label htmlFor="status-filter" className="block text-sm font-medium text-slate-700 mb-1">Status</label>
-          <select id="status-filter" value={statusFilter} onChange={(e) => setStatusFilter(e.target.value)} className={selectClass}>
+          <select id="status-filter" value={statusFilter} onChange={(e) => { setStatusFilter(e.target.value); setPage(0); }} className={selectClass}>
             <option value="All">All</option>
             <option value="Success">Success</option>
             <option value="Failure">Failure</option>
@@ -160,11 +160,11 @@ export function AuditReportPage() {
         </div>
         <div>
           <label htmlFor="date-from" className="block text-sm font-medium text-slate-700 mb-1">From</label>
-          <input id="date-from" type="date" value={dateFrom} onChange={(e) => setDateFrom(e.target.value)} className={selectClass} />
+          <input id="date-from" type="date" value={dateFrom} onChange={(e) => { setDateFrom(e.target.value); setPage(0); }} className={selectClass} />
         </div>
         <div>
           <label htmlFor="date-to" className="block text-sm font-medium text-slate-700 mb-1">To</label>
-          <input id="date-to" type="date" value={dateTo} onChange={(e) => setDateTo(e.target.value)} className={selectClass} />
+          <input id="date-to" type="date" value={dateTo} onChange={(e) => { setDateTo(e.target.value); setPage(0); }} className={selectClass} />
         </div>
       </div>
 

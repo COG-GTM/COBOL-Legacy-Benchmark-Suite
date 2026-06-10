@@ -13,29 +13,30 @@ type PositionReportRow = Record<string, unknown> & {
   currentValue: number;
   previousValue: number;
   changePercent: number;
+  changeDollar: number;
 };
 
 const positionReportData: PositionReportRow[] = [
-  { portfolioId: 'PORT0001', portfolioName: 'Growth Equity Fund', fundId: 'GRWEQF', currentValue: 712500.00, previousValue: 682500.00, changePercent: 4.40 },
-  { portfolioId: 'PORT0001', portfolioName: 'Growth Equity Fund', fundId: 'BLUCDP', currentValue: 1044750.00, previousValue: 1022125.00, changePercent: 2.21 },
-  { portfolioId: 'PORT0002', portfolioName: 'Blue Chip Dividend Portfolio', fundId: 'FIXINC', currentValue: 2512500.00, previousValue: 2468750.00, changePercent: 1.77 },
-  { portfolioId: 'PORT0002', portfolioName: 'Blue Chip Dividend Portfolio', fundId: 'EMERGE', currentValue: 408000.00, previousValue: 393600.00, changePercent: 3.66 },
-  { portfolioId: 'PORT0003', portfolioName: 'Fixed Income Treasury', fundId: 'TECHSF', currentValue: 1182500.00, previousValue: 1155000.00, changePercent: 2.38 },
-  { portfolioId: 'PORT0003', portfolioName: 'Fixed Income Treasury', fundId: 'HLTHIF', currentValue: 678200.00, previousValue: 692760.00, changePercent: -2.10 },
-  { portfolioId: 'PORT0004', portfolioName: 'International Emerging Markets', fundId: 'REITPF', currentValue: 1026000.00, previousValue: 1000800.00, changePercent: 2.52 },
-  { portfolioId: 'PORT0004', portfolioName: 'International Emerging Markets', fundId: 'BALGIF', currentValue: 2685000.00, previousValue: 2655000.00, changePercent: 1.13 },
-  { portfolioId: 'PORT0005', portfolioName: 'Technology Sector Fund', fundId: 'SMCAPV', currentValue: 638000.00, previousValue: 624800.00, changePercent: 2.11 },
-  { portfolioId: 'PORT0006', portfolioName: 'Healthcare Innovation Fund', fundId: 'ESGSUS', currentValue: 922250.00, previousValue: 900450.00, changePercent: 2.42 },
-  { portfolioId: 'PORT0006', portfolioName: 'Healthcare Innovation Fund', fundId: 'RETINC', currentValue: 4280000.00, previousValue: 4200000.00, changePercent: 1.90 },
-  { portfolioId: 'PORT0007', portfolioName: 'Real Estate Investment Trust', fundId: 'GRWEQF', currentValue: 351000.00, previousValue: 360360.00, changePercent: -2.60 },
-  { portfolioId: 'PORT0007', portfolioName: 'Real Estate Investment Trust', fundId: 'TECHSF', currentValue: 700800.00, previousValue: 689600.00, changePercent: 1.62 },
-  { portfolioId: 'PORT0008', portfolioName: 'Balanced Growth & Income', fundId: 'FIXINC', currentValue: 2010000.00, previousValue: 1982000.00, changePercent: 1.41 },
-  { portfolioId: 'PORT0008', portfolioName: 'Balanced Growth & Income', fundId: 'BALGIF', currentValue: 1327500.00, previousValue: 1308750.00, changePercent: 1.43 },
-  { portfolioId: 'PORT0009', portfolioName: 'Small Cap Value Fund', fundId: 'HLTHIF', currentValue: 836000.00, previousValue: 822800.00, changePercent: 1.60 },
-  { portfolioId: 'PORT0009', portfolioName: 'Small Cap Value Fund', fundId: 'EMERGE', currentValue: 280500.00, previousValue: 284750.00, changePercent: -1.49 },
-  { portfolioId: 'PORT0010', portfolioName: 'Municipal Bond Portfolio', fundId: 'SMCAPV', currentValue: 472000.00, previousValue: 465600.00, changePercent: 1.37 },
-  { portfolioId: 'PORT0010', portfolioName: 'Municipal Bond Portfolio', fundId: 'RETINC', currentValue: 2650000.00, previousValue: 2612500.00, changePercent: 1.44 },
-  { portfolioId: 'PORT0011', portfolioName: 'ESG Sustainable Growth', fundId: 'REITPF', currentValue: 575000.00, previousValue: 563000.00, changePercent: 2.13 },
+  { portfolioId: 'PORT0001', portfolioName: 'Growth Equity Fund', fundId: 'GRWEQF', currentValue: 712500.00, previousValue: 682500.00, changePercent: 4.40, changeDollar: 30000.00 },
+  { portfolioId: 'PORT0001', portfolioName: 'Growth Equity Fund', fundId: 'BLUCDP', currentValue: 1044750.00, previousValue: 1022125.00, changePercent: 2.21, changeDollar: 22625.00 },
+  { portfolioId: 'PORT0002', portfolioName: 'Blue Chip Dividend Portfolio', fundId: 'FIXINC', currentValue: 2512500.00, previousValue: 2468750.00, changePercent: 1.77, changeDollar: 43750.00 },
+  { portfolioId: 'PORT0002', portfolioName: 'Blue Chip Dividend Portfolio', fundId: 'EMERGE', currentValue: 408000.00, previousValue: 393600.00, changePercent: 3.66, changeDollar: 14400.00 },
+  { portfolioId: 'PORT0003', portfolioName: 'Fixed Income Treasury', fundId: 'TECHSF', currentValue: 1182500.00, previousValue: 1155000.00, changePercent: 2.38, changeDollar: 27500.00 },
+  { portfolioId: 'PORT0003', portfolioName: 'Fixed Income Treasury', fundId: 'HLTHIF', currentValue: 678200.00, previousValue: 692760.00, changePercent: -2.10, changeDollar: -14560.00 },
+  { portfolioId: 'PORT0004', portfolioName: 'International Emerging Markets', fundId: 'REITPF', currentValue: 1026000.00, previousValue: 1000800.00, changePercent: 2.52, changeDollar: 25200.00 },
+  { portfolioId: 'PORT0004', portfolioName: 'International Emerging Markets', fundId: 'BALGIF', currentValue: 2685000.00, previousValue: 2655000.00, changePercent: 1.13, changeDollar: 30000.00 },
+  { portfolioId: 'PORT0005', portfolioName: 'Technology Sector Fund', fundId: 'SMCAPV', currentValue: 638000.00, previousValue: 624800.00, changePercent: 2.11, changeDollar: 13200.00 },
+  { portfolioId: 'PORT0006', portfolioName: 'Healthcare Innovation Fund', fundId: 'ESGSUS', currentValue: 922250.00, previousValue: 900450.00, changePercent: 2.42, changeDollar: 21800.00 },
+  { portfolioId: 'PORT0006', portfolioName: 'Healthcare Innovation Fund', fundId: 'RETINC', currentValue: 4280000.00, previousValue: 4200000.00, changePercent: 1.90, changeDollar: 80000.00 },
+  { portfolioId: 'PORT0007', portfolioName: 'Real Estate Investment Trust', fundId: 'GRWEQF', currentValue: 351000.00, previousValue: 360360.00, changePercent: -2.60, changeDollar: -9360.00 },
+  { portfolioId: 'PORT0007', portfolioName: 'Real Estate Investment Trust', fundId: 'TECHSF', currentValue: 700800.00, previousValue: 689600.00, changePercent: 1.62, changeDollar: 11200.00 },
+  { portfolioId: 'PORT0008', portfolioName: 'Balanced Growth & Income', fundId: 'FIXINC', currentValue: 2010000.00, previousValue: 1982000.00, changePercent: 1.41, changeDollar: 28000.00 },
+  { portfolioId: 'PORT0008', portfolioName: 'Balanced Growth & Income', fundId: 'BALGIF', currentValue: 1327500.00, previousValue: 1308750.00, changePercent: 1.43, changeDollar: 18750.00 },
+  { portfolioId: 'PORT0009', portfolioName: 'Small Cap Value Fund', fundId: 'HLTHIF', currentValue: 836000.00, previousValue: 822800.00, changePercent: 1.60, changeDollar: 13200.00 },
+  { portfolioId: 'PORT0009', portfolioName: 'Small Cap Value Fund', fundId: 'EMERGE', currentValue: 280500.00, previousValue: 284750.00, changePercent: -1.49, changeDollar: -4250.00 },
+  { portfolioId: 'PORT0010', portfolioName: 'Municipal Bond Portfolio', fundId: 'SMCAPV', currentValue: 472000.00, previousValue: 465600.00, changePercent: 1.37, changeDollar: 6400.00 },
+  { portfolioId: 'PORT0010', portfolioName: 'Municipal Bond Portfolio', fundId: 'RETINC', currentValue: 2650000.00, previousValue: 2612500.00, changePercent: 1.44, changeDollar: 37500.00 },
+  { portfolioId: 'PORT0011', portfolioName: 'ESG Sustainable Growth', fundId: 'REITPF', currentValue: 575000.00, previousValue: 563000.00, changePercent: 2.13, changeDollar: 12000.00 },
 ];
 
 function formatCurrency(value: number): string {
@@ -51,7 +52,7 @@ function downloadCsv(data: PositionReportRow[], filename: string) {
     r.currentValue.toFixed(2),
     r.previousValue.toFixed(2),
     r.changePercent.toFixed(2),
-    (r.currentValue - r.previousValue).toFixed(2),
+    r.changeDollar.toFixed(2),
   ]);
   const csv = [headers.join(','), ...rows.map((r) => r.join(','))].join('\n');
   const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
@@ -104,14 +105,11 @@ export function PositionReportPage() {
         {r.changePercent >= 0 ? '+' : ''}{r.changePercent.toFixed(2)}%
       </span>
     )},
-    { key: 'changeDollar', header: 'Change ($)', sortable: true, className: 'text-right', render: (r) => {
-      const change = r.currentValue - r.previousValue;
-      return (
-        <span className={`text-right block font-medium ${change >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-          {change >= 0 ? '+' : ''}{formatCurrency(change)}
-        </span>
-      );
-    }},
+    { key: 'changeDollar', header: 'Change ($)', sortable: true, className: 'text-right', render: (r) => (
+      <span className={`text-right block font-medium ${r.changeDollar >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+        {r.changeDollar >= 0 ? '+' : ''}{formatCurrency(r.changeDollar)}
+      </span>
+    )},
   ];
 
   const today = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
@@ -170,19 +168,27 @@ export function PositionReportPage() {
           />
 
           {filteredData.length > 0 && (
-            <div className="border-t-2 border-slate-300 bg-slate-50">
-              <div className="grid grid-cols-6 px-4 py-3 text-sm font-semibold text-slate-900">
-                <div className="col-span-2">Totals ({filteredData.length} positions)</div>
-                <div className="text-right">{formatCurrency(summary.totalCurrent)}</div>
-                <div className="text-right">{formatCurrency(summary.totalPrevious)}</div>
-                <div className={`text-right font-medium ${summary.overallChange >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                  {summary.overallChange >= 0 ? '+' : ''}{summary.overallChange.toFixed(2)}%
-                </div>
-                <div className={`text-right font-medium ${summary.totalCurrent - summary.totalPrevious >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
-                  {summary.totalCurrent - summary.totalPrevious >= 0 ? '+' : ''}{formatCurrency(summary.totalCurrent - summary.totalPrevious)}
-                </div>
-              </div>
-            </div>
+            <table className="min-w-full border-t-2 border-slate-300 bg-slate-50">
+              <tfoot>
+                <tr>
+                  <td colSpan={2} className="px-4 py-3 text-sm font-semibold text-slate-900">
+                    Totals ({filteredData.length} positions)
+                  </td>
+                  <td className="px-4 py-3 text-sm font-semibold text-slate-900 text-right">
+                    {formatCurrency(summary.totalCurrent)}
+                  </td>
+                  <td className="px-4 py-3 text-sm font-semibold text-slate-900 text-right">
+                    {formatCurrency(summary.totalPrevious)}
+                  </td>
+                  <td className={`px-4 py-3 text-sm font-semibold text-right ${summary.overallChange >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                    {summary.overallChange >= 0 ? '+' : ''}{summary.overallChange.toFixed(2)}%
+                  </td>
+                  <td className={`px-4 py-3 text-sm font-semibold text-right ${summary.totalCurrent - summary.totalPrevious >= 0 ? 'text-emerald-600' : 'text-red-600'}`}>
+                    {summary.totalCurrent - summary.totalPrevious >= 0 ? '+' : ''}{formatCurrency(summary.totalCurrent - summary.totalPrevious)}
+                  </td>
+                </tr>
+              </tfoot>
+            </table>
           )}
         </div>
       </Card>
