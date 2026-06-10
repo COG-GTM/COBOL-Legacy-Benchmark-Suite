@@ -1,73 +1,109 @@
-# React + TypeScript + Vite
+# Investment Portfolio Management System — Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Modern React SPA replacing the legacy COBOL/CICS/BMS terminal interface for the Investment Portfolio Management System.
 
-Currently, two official plugins are available:
+## Quick Start
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
-
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+cd frontend
+npm install
+npm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+Open [http://localhost:5173](http://localhost:5173). Login with any username/password (mock auth).
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Tech Stack
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+| Layer | Technology |
+|-------|-----------|
+| Framework | React 19 + TypeScript |
+| Build | Vite 8 |
+| Styling | Tailwind CSS v4 |
+| Routing | React Router v7 |
+| Charts | Recharts |
+| Icons | Lucide React |
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start dev server (port 5173) |
+| `npm run build` | Type-check + production build |
+| `npm run lint` | ESLint check |
+| `npm run preview` | Preview production build |
+
+## Page Map: Legacy Screens → Modern UI
+
+| Legacy Screen (BMS) | Modern Route | Description |
+|---------------------|-------------|-------------|
+| Login (SECMGR) | `/login` | Username/password authentication |
+| MENMAP (Main Menu) | `/` | Dashboard with summary stats |
+| POSMAP (Position Inquiry) | `/positions` | Account position lookup |
+| HISMAP (Transaction History) | `/transactions` | Transaction history with filtering |
+| PORTMSTR (Portfolio Mgmt) | `/portfolios` | Portfolio CRUD operations |
+| PORTTRAN/PORTVALD | `/transactions/new` | Transaction entry form |
+| RPTPOS00 | `/reports/positions` | Position valuation report |
+| RPTAUD00 | `/reports/audit` | Audit trail report |
+| RPTSTA00 | `/reports/statistics` | System statistics report |
+| ERRMAP (Error Display) | `/errors` | Error log + global toast/banner |
+| Batch Monitor | `/batch` | Batch job status |
+
+## Legacy Key Mapping
+
+| CICS Function Key | Modern UI Equivalent |
+|-------------------|---------------------|
+| PF3 (Exit) | Back button / navigation |
+| PF7 (Previous) | Previous page button |
+| PF8 (Next) | Next page button |
+| Enter | Form submit |
+
+## Project Structure
+
 ```
+frontend/
+├── src/
+│   ├── components/
+│   │   ├── layout/        # AppLayout, Header, Sidebar
+│   │   └── ui/            # Reusable: DataTable, Card, StatusBadge, ErrorToast, ErrorBanner
+│   ├── context/           # AuthContext, ErrorContext, PortfolioContext
+│   ├── data/
+│   │   ├── types.ts       # TypeScript interfaces (from COBOL copybooks)
+│   │   └── mockData.ts    # Stub data (no backend yet)
+│   ├── pages/
+│   │   ├── login/         # Authentication
+│   │   ├── dashboard/     # Main dashboard
+│   │   ├── positions/     # Position inquiry
+│   │   ├── portfolios/    # Portfolio CRUD (list, detail, new, edit)
+│   │   ├── transactions/  # Transaction history + entry form
+│   │   ├── reports/       # Position, Audit, Statistics reports
+│   │   ├── batch/         # Batch job monitor
+│   │   └── errors/        # Error log
+│   ├── App.tsx            # Route definitions
+│   └── main.tsx           # Entry point
+├── index.html
+├── package.json
+├── tsconfig.json
+└── vite.config.ts
+```
+
+## Data Layer
+
+All data is **mock/stub** — no real backend yet. Mock data lives in `frontend/src/data/mockData.ts` and models the COBOL VSAM/DB2 record structures:
+
+- **Portfolios**: 12 records (PORT0001–PORT0012)
+- **Positions**: 22 records across 11 accounts
+- **Transactions**: 52 records spanning Jul–Aug 2024
+- **Batch Jobs**: 8 records showing a typical nightly cycle
+- **Audit Entries**: 16 records from batch processing
+- **Error Entries**: 7 records demonstrating validation/system errors
+
+## COBOL Type Mappings
+
+| COBOL Record | TypeScript Interface | Source Copybook |
+|-------------|---------------------|-----------------|
+| PORT-RECORD | `Portfolio` | PORTFLIO.cpy |
+| POSITION-RECORD | `Position` | POSREC.cpy |
+| TRANSACTION-RECORD | `Transaction` | TRNREC.cpy |
+| BATCH-CONTROL | `BatchJob` | — |
+| AUDIT-RECORD | `AuditEntry` | AUDITLOG.cpy |
+| ERR-MESSAGE | `ErrorEntry` / `AppError` | ERRHAND.cpy |
