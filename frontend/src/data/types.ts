@@ -18,16 +18,16 @@ export interface Position {
   status: 'A' | 'C';
 }
 
-export interface Transaction {
+export type Transaction = {
   transId: string;
   accountNo: string;
   fundId: string;
-  transType: 'BY' | 'SL' | 'FE';
+  transType: 'BU' | 'SL' | 'TR' | 'FE';
   transDate: string;
   shareQty: number;
   price: number;
   amount: number;
-  status: 'P' | 'C' | 'E';
+  status: 'P' | 'D' | 'F' | 'R';
   beforeBalance: number;
   afterBalance: number;
 }
