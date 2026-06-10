@@ -14,6 +14,7 @@ import { AuditReportPage } from '@/pages/reports/AuditReportPage';
 import { StatisticsReportPage } from '@/pages/reports/StatisticsReportPage';
 import { BatchMonitorPage } from '@/pages/batch/BatchMonitorPage';
 import { ErrorLogPage } from '@/pages/errors/ErrorLogPage';
+import { PositionInquiryPage } from '@/pages/positions/PositionInquiryPage';
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route element={<AppLayout />}>
             <Route path="/" element={<DashboardPage />} />
+            <Route path="/positions" element={<PositionInquiryPage />} />
             <Route path="/portfolios" element={<PortfolioListPage />} />
             <Route path="/portfolios/new" element={<PortfolioNewPage />} />
             <Route path="/portfolios/:id" element={<PortfolioDetailPage />} />
