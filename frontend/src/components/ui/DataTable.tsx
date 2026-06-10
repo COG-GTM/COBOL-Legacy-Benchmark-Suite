@@ -10,38 +10,62 @@ export interface Column<T> {
   className?: string;
 }
 
+export type SortDirection = 'asc' | 'desc' | null;
+
 interface DataTableProps<T> {
   columns: Column<T>[];
   data: T[];
   keyExtractor: (row: T) => string;
   emptyMessage?: string;
+  sortKey?: string | null;
+  sortDirection?: SortDirection;
+  onSortChange?: (key: string | null, direction: SortDirection) => void;
 }
-
-type SortDirection = 'asc' | 'desc' | null;
 
 export function DataTable<T extends Record<string, unknown>>({
   columns,
   data,
   keyExtractor,
   emptyMessage = 'No data found',
+  sortKey: controlledSortKey,
+  sortDirection: controlledSortDir,
+  onSortChange,
 }: DataTableProps<T>) {
-  const [sortKey, setSortKey] = useState<string | null>(null);
-  const [sortDir, setSortDir] = useState<SortDirection>(null);
+  const isControlled = onSortChange !== undefined;
+
+  const [internalSortKey, setInternalSortKey] = useState<string | null>(null);
+  const [internalSortDir, setInternalSortDir] = useState<SortDirection>(null);
+
+  const sortKey = isControlled ? (controlledSortKey ?? null) : internalSortKey;
+  const sortDir = isControlled ? (controlledSortDir ?? null) : internalSortDir;
 
   const handleSort = (key: string) => {
+    let newKey: string | null;
+    let newDir: SortDirection;
+
     if (sortKey === key) {
-      if (sortDir === 'asc') setSortDir('desc');
-      else if (sortDir === 'desc') {
-        setSortKey(null);
-        setSortDir(null);
+      if (sortDir === 'asc') {
+        newKey = key;
+        newDir = 'desc';
+      } else {
+        newKey = null;
+        newDir = null;
       }
     } else {
-      setSortKey(key);
-      setSortDir('asc');
+      newKey = key;
+      newDir = 'asc';
+    }
+
+    if (isControlled) {
+      onSortChange(newKey, newDir);
+    } else {
+      setInternalSortKey(newKey);
+      setInternalSortDir(newDir);
     }
   };
 
   const sortedData = useMemo(() => {
+    if (isControlled) return data;
     if (!sortKey || !sortDir) return data;
     return [...data].sort((a, b) => {
       const aVal = a[sortKey];
@@ -56,7 +80,7 @@ export function DataTable<T extends Record<string, unknown>>({
       const bStr = String(bVal);
       return sortDir === 'asc' ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr);
     });
-  }, [data, sortKey, sortDir]);
+  }, [data, sortKey, sortDir, isControlled]);
 
   if (data.length === 0) {
     return (
