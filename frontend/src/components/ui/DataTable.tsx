@@ -20,6 +20,7 @@ interface DataTableProps<T> {
   sortKey?: string | null;
   sortDirection?: SortDirection;
   onSortChange?: (key: string | null, direction: SortDirection) => void;
+  footer?: ReactNode;
 }
 
 export function DataTable<T extends Record<string, unknown>>({
@@ -30,6 +31,7 @@ export function DataTable<T extends Record<string, unknown>>({
   sortKey: controlledSortKey,
   sortDirection: controlledSortDir,
   onSortChange,
+  footer,
 }: DataTableProps<T>) {
   const isControlled = onSortChange !== undefined;
 
@@ -132,6 +134,7 @@ export function DataTable<T extends Record<string, unknown>>({
             </tr>
           ))}
         </tbody>
+        {footer}
       </table>
     </div>
   );
