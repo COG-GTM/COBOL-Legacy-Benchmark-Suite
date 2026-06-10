@@ -3,6 +3,7 @@ import { Outlet, Navigate } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Sidebar } from './Sidebar';
 import { Header } from './Header';
+import { ErrorToast } from '@/components/ui/ErrorToast';
 
 export function AppLayout() {
   const { isAuthenticated } = useAuth();
@@ -14,6 +15,7 @@ export function AppLayout() {
 
   return (
     <div className="flex h-screen bg-slate-50">
+      <ErrorToast />
       <Sidebar
         collapsed={sidebarCollapsed}
         onToggle={() => setSidebarCollapsed((prev) => !prev)}

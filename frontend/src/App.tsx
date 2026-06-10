@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { AuthProvider } from '@/context/AuthContext';
+import { ErrorProvider } from '@/context/ErrorContext';
 import { AppLayout } from '@/components/layout/AppLayout';
 import { LoginPage } from '@/pages/login/LoginPage';
 import { DashboardPage } from '@/pages/dashboard/DashboardPage';
@@ -17,8 +18,9 @@ import { ErrorLogPage } from '@/pages/errors/ErrorLogPage';
 
 function App() {
   return (
-    <AuthProvider>
-      <BrowserRouter>
+    <ErrorProvider>
+      <AuthProvider>
+        <BrowserRouter>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route element={<AppLayout />}>
@@ -36,8 +38,9 @@ function App() {
             <Route path="/errors" element={<ErrorLogPage />} />
           </Route>
         </Routes>
-      </BrowserRouter>
-    </AuthProvider>
+        </BrowserRouter>
+      </AuthProvider>
+    </ErrorProvider>
   );
 }
 
