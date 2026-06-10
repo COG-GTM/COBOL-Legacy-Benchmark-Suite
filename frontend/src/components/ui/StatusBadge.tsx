@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 type StatusVariant = 'success' | 'error' | 'warning' | 'info' | 'neutral';
 
 interface StatusBadgeProps {
