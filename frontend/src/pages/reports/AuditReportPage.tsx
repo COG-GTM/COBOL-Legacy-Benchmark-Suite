@@ -78,23 +78,23 @@ export function AuditReportPage() {
   );
 
   const columns: Column<AuditRow>[] = [
-    { key: 'timestamp', header: 'Timestamp', sortable: true, render: (r) => (
+    { key: 'timestamp', header: 'Timestamp', render: (r) => (
       <span className="font-mono text-xs">{r.timestamp}</span>
     )},
-    { key: 'program', header: 'Program', sortable: true, render: (r) => (
+    { key: 'program', header: 'Program', render: (r) => (
       <span className="font-mono text-sm">{r.program}</span>
     )},
-    { key: 'type', header: 'Type', sortable: true },
-    { key: 'action', header: 'Action', sortable: true, render: (r) => (
+    { key: 'type', header: 'Type' },
+    { key: 'action', header: 'Action', render: (r) => (
       <span className="text-xs">{r.action}</span>
     )},
-    { key: 'status', header: 'Status', sortable: true, render: (r) => (
+    { key: 'status', header: 'Status', render: (r) => (
       <StatusBadge label={r.status} variant={getAuditStatusVariant(r.status)} />
     )},
-    { key: 'portfolioId', header: 'Portfolio ID', sortable: true, render: (r) => (
+    { key: 'portfolioId', header: 'Portfolio ID', render: (r) => (
       <span className="font-mono text-sm">{r.portfolioId || '—'}</span>
     )},
-    { key: 'message', header: 'Message', sortable: false, render: (r) => (
+    { key: 'message', header: 'Message', render: (r) => (
       <span className="text-xs text-slate-600 max-w-xs truncate block" title={r.message}>{r.message}</span>
     )},
   ];
