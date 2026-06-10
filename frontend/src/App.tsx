@@ -7,6 +7,7 @@ import { PortfolioListPage } from '@/pages/portfolios/PortfolioListPage';
 import { PortfolioNewPage } from '@/pages/portfolios/PortfolioNewPage';
 import { PortfolioDetailPage } from '@/pages/portfolios/PortfolioDetailPage';
 import { PortfolioEditPage } from '@/pages/portfolios/PortfolioEditPage';
+import { PortfolioLayout } from '@/pages/portfolios/PortfolioContext';
 import { TransactionListPage } from '@/pages/transactions/TransactionListPage';
 import { TransactionNewPage } from '@/pages/transactions/TransactionNewPage';
 import { PositionReportPage } from '@/pages/reports/PositionReportPage';
@@ -23,10 +24,12 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route element={<AppLayout />}>
             <Route path="/" element={<DashboardPage />} />
-            <Route path="/portfolios" element={<PortfolioListPage />} />
-            <Route path="/portfolios/new" element={<PortfolioNewPage />} />
-            <Route path="/portfolios/:id" element={<PortfolioDetailPage />} />
-            <Route path="/portfolios/:id/edit" element={<PortfolioEditPage />} />
+            <Route element={<PortfolioLayout />}>
+              <Route path="/portfolios" element={<PortfolioListPage />} />
+              <Route path="/portfolios/new" element={<PortfolioNewPage />} />
+              <Route path="/portfolios/:id" element={<PortfolioDetailPage />} />
+              <Route path="/portfolios/:id/edit" element={<PortfolioEditPage />} />
+            </Route>
             <Route path="/transactions" element={<TransactionListPage />} />
             <Route path="/transactions/new" element={<TransactionNewPage />} />
             <Route path="/reports/positions" element={<PositionReportPage />} />
