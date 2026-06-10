@@ -15,6 +15,7 @@ interface DataTableProps<T> {
   data: T[];
   keyExtractor: (row: T) => string;
   emptyMessage?: string;
+  footer?: ReactNode;
 }
 
 type SortDirection = 'asc' | 'desc' | null;
@@ -24,6 +25,7 @@ export function DataTable<T extends Record<string, unknown>>({
   data,
   keyExtractor,
   emptyMessage = 'No data found',
+  footer,
 }: DataTableProps<T>) {
   const [sortKey, setSortKey] = useState<string | null>(null);
   const [sortDir, setSortDir] = useState<SortDirection>(null);
@@ -108,6 +110,7 @@ export function DataTable<T extends Record<string, unknown>>({
             </tr>
           ))}
         </tbody>
+        {footer}
       </table>
     </div>
   );

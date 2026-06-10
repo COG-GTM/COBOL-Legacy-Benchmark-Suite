@@ -165,11 +165,8 @@ export function PositionReportPage() {
             data={filteredData}
             keyExtractor={(r) => `${r.portfolioId}-${r.fundId}`}
             emptyMessage="No positions match the selected filter"
-          />
-
-          {filteredData.length > 0 && (
-            <table className="min-w-full border-t-2 border-slate-300 bg-slate-50">
-              <tfoot>
+            footer={filteredData.length > 0 ? (
+              <tfoot className="border-t-2 border-slate-300 bg-slate-50">
                 <tr>
                   <td colSpan={2} className="px-4 py-3 text-sm font-semibold text-slate-900">
                     Totals ({filteredData.length} positions)
@@ -188,8 +185,8 @@ export function PositionReportPage() {
                   </td>
                 </tr>
               </tfoot>
-            </table>
-          )}
+            ) : undefined}
+          />
         </div>
       </Card>
     </div>

@@ -13,6 +13,7 @@ type SystemMetric = Record<string, unknown> & {
   unit: string;
   trend: 'up' | 'down' | 'stable';
   threshold: number;
+  lowerIsBetter?: boolean;
 };
 
 type DailyVolume = {
@@ -22,13 +23,13 @@ type DailyVolume = {
 
 const systemMetrics: SystemMetric[] = [
   { metricName: 'Transactions/Day', value: 1247, unit: 'txn', trend: 'up', threshold: 2000 },
-  { metricName: 'Avg Response Time', value: 145, unit: 'ms', trend: 'down', threshold: 200 },
-  { metricName: 'Error Rate', value: 0.24, unit: '%', trend: 'down', threshold: 1.0 },
-  { metricName: 'CPU Utilization', value: 68, unit: '%', trend: 'up', threshold: 85 },
-  { metricName: 'VSAM I/O Ops', value: 8450, unit: 'ops/hr', trend: 'stable', threshold: 12000 },
-  { metricName: 'DB2 Queries/Hour', value: 3280, unit: 'q/hr', trend: 'up', threshold: 5000 },
-  { metricName: 'Batch Duration', value: 58, unit: 'min', trend: 'down', threshold: 90 },
-  { metricName: 'Active Sessions', value: 24, unit: 'sessions', trend: 'stable', threshold: 50 },
+  { metricName: 'Avg Response Time', value: 145, unit: 'ms', trend: 'down', threshold: 200, lowerIsBetter: true },
+  { metricName: 'Error Rate', value: 0.24, unit: '%', trend: 'down', threshold: 1.0, lowerIsBetter: true },
+  { metricName: 'CPU Utilization', value: 68, unit: '%', trend: 'up', threshold: 85, lowerIsBetter: true },
+  { metricName: 'VSAM I/O Ops', value: 8450, unit: 'ops/hr', trend: 'stable', threshold: 12000, lowerIsBetter: true },
+  { metricName: 'DB2 Queries/Hour', value: 3280, unit: 'q/hr', trend: 'up', threshold: 5000, lowerIsBetter: true },
+  { metricName: 'Batch Duration', value: 58, unit: 'min', trend: 'down', threshold: 90, lowerIsBetter: true },
+  { metricName: 'Active Sessions', value: 24, unit: 'sessions', trend: 'stable', threshold: 50, lowerIsBetter: true },
 ];
 
 function generateDailyVolume(): DailyVolume[] {
@@ -77,14 +78,18 @@ function downloadCsv(data: SystemMetric[], filename: string) {
   URL.revokeObjectURL(url);
 }
 
-function TrendIcon({ trend }: { trend: 'up' | 'down' | 'stable' }) {
+function TrendIcon({ trend, lowerIsBetter }: { trend: 'up' | 'down' | 'stable'; lowerIsBetter?: boolean }) {
+  const isPositive = trend === 'stable'
+    ? null
+    : lowerIsBetter ? trend === 'down' : trend === 'up';
+  const color = isPositive === null ? 'text-slate-400' : isPositive ? 'text-emerald-600' : 'text-red-500';
   switch (trend) {
     case 'up':
-      return <TrendingUp className="w-4 h-4 text-emerald-600" />;
+      return <TrendingUp className={`w-4 h-4 ${color}`} />;
     case 'down':
-      return <TrendingDown className="w-4 h-4 text-red-500" />;
+      return <TrendingDown className={`w-4 h-4 ${color}`} />;
     case 'stable':
-      return <Minus className="w-4 h-4 text-slate-400" />;
+      return <Minus className={`w-4 h-4 ${color}`} />;
   }
 }
 
@@ -101,7 +106,7 @@ export function StatisticsReportPage() {
     { key: 'unit', header: 'Unit', sortable: false },
     { key: 'trend', header: 'Trend', sortable: true, render: (r) => (
       <div className="flex items-center gap-1.5">
-        <TrendIcon trend={r.trend} />
+        <TrendIcon trend={r.trend} lowerIsBetter={r.lowerIsBetter} />
         <span className="text-sm capitalize text-slate-600">{r.trend}</span>
       </div>
     )},
