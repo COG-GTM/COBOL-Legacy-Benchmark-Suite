@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, XCircle } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { DataTable } from '@/components/ui/DataTable';
+import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { StatusBadge, getSeverityVariant } from '@/components/ui/StatusBadge';
 import { errorEntries } from '@/data/mockData';
 import type { ErrorEntry } from '@/data/types';
@@ -14,9 +15,13 @@ const ITEMS_PER_PAGE = 10;
 const programs = Array.from(new Set(errorEntries.map((e) => e.program))).sort();
 
 const columns: Column<ErrorRecord>[] = [
-  { key: 'timestamp', header: 'Timestamp', sortable: true },
+  {
+    key: 'timestamp',
+    header: 'Timestamp',
+    sortable: true,
+    render: (row) => <span className="font-mono text-xs">{row.timestamp}</span>,
+  },
   { key: 'code', header: 'Code', sortable: true, className: 'font-mono' },
-  { key: 'description', header: 'Description', sortable: true },
   {
     key: 'severity',
     header: 'Severity',
@@ -24,13 +29,39 @@ const columns: Column<ErrorRecord>[] = [
     render: (row) => <StatusBadge label={row.severity} variant={getSeverityVariant(row.severity)} />,
   },
   { key: 'program', header: 'Program', sortable: true, className: 'font-mono' },
-  { key: 'action', header: 'Action' },
+  {
+    key: 'paragraph',
+    header: 'Paragraph',
+    render: (row) => <span className="font-mono text-xs">{row.paragraph}</span>,
+  },
+  {
+    key: 'respCode',
+    header: 'RESP',
+    render: (row) => <span className="font-mono text-xs">{row.respCode}</span>,
+  },
+  {
+    key: 'respCode2',
+    header: 'RESP2',
+    render: (row) => <span className="font-mono text-xs">{row.respCode2}</span>,
+  },
+  { key: 'description', header: 'Message', sortable: true },
+  {
+    key: 'action',
+    header: 'Recommended Action',
+    render: (row) => <span className="text-slate-500">{row.action}</span>,
+  },
 ];
 
 export function ErrorLogPage() {
+  const [loading, setLoading] = useState(true);
   const [severityFilter, setSeverityFilter] = useState<'All' | 'Error' | 'Warning'>('All');
   const [programFilter, setProgramFilter] = useState<string>('All');
   const [page, setPage] = useState(1);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setLoading(false), 400);
+    return () => clearTimeout(timer);
+  }, []);
 
   const filtered = useMemo(() => {
     return errorEntries.filter((e) => {
@@ -56,6 +87,15 @@ export function ErrorLogPage() {
 
   const errorCount = errorEntries.filter((e) => e.severity === 'Error').length;
   const warningCount = errorEntries.filter((e) => e.severity === 'Warning').length;
+
+  if (loading) {
+    return (
+      <div>
+        <PageHeader title="Error Log" description="System error and warning messages" />
+        <LoadingSpinner size="lg" message="Loading error log..." />
+      </div>
+    );
+  }
 
   return (
     <div>

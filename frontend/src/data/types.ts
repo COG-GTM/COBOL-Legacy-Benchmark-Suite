@@ -42,6 +42,10 @@ export interface BatchJob {
   errorCount: number;
   returnCode: string;
   message: string;
+  checkpointId: string;
+  checkpointCount: number;
+  restartFlag: 'Y' | 'N';
+  lastCheckpointTime: string;
 }
 
 export interface AuditEntry {
@@ -62,6 +66,9 @@ export interface ErrorEntry {
   action: string;
   timestamp: string;
   program: string;
+  paragraph: string;
+  respCode: string;
+  respCode2: string;
 }
 
 export type ErrorCategory = 'VS' | 'VL' | 'PR' | 'SY';

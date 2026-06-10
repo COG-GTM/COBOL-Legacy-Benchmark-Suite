@@ -101,15 +101,30 @@ export const transactions: Transaction[] = [
   { transId: 'TXN000052', accountNo: '100000008', fundId: 'BALGIF', transType: 'SL', transDate: '2024-07-04', shareQty: 2000.000, price: 86.00, amount: 172000.00, status: 'C', beforeBalance: 16500.000, afterBalance: 14500.000 },
 ];
 
+export const fundPrices: Record<string, number> = {
+  GRWEQF: 47.10,
+  BLUCDP: 122.4,
+  FIXINC: 98.2,
+  EMERGE: 34.6,
+  TECHSF: 219.75,
+  HLTHIF: 77.85,
+  REITPF: 54.9,
+  BALGIF: 89.6,
+  SMCAPV: 30.25,
+  MUNBPF: 42.0,
+  ESGSUS: 64.3,
+  RETINC: 106.8,
+};
+
 export const batchJobs: BatchJob[] = [
-  { processDate: '2024-08-15', processId: 'TRNVAL00', status: 'C', startTime: '18:00:00', endTime: '18:15:32', recordCount: 1250, errorCount: 3, returnCode: '0004', message: 'Transaction validation completed with warnings' },
-  { processDate: '2024-08-15', processId: 'POSUPD00', status: 'C', startTime: '18:16:00', endTime: '18:28:45', recordCount: 1247, errorCount: 0, returnCode: '0000', message: 'Position updates completed successfully' },
-  { processDate: '2024-08-15', processId: 'HISTLD00', status: 'C', startTime: '18:30:00', endTime: '18:42:18', recordCount: 1247, errorCount: 0, returnCode: '0000', message: 'History load to DB2 completed successfully' },
-  { processDate: '2024-08-15', processId: 'RPTPOS00', status: 'C', startTime: '18:45:00', endTime: '18:52:10', recordCount: 850, errorCount: 0, returnCode: '0000', message: 'Position report generated successfully' },
-  { processDate: '2024-08-15', processId: 'RPTAUD00', status: 'C', startTime: '18:53:00', endTime: '18:58:22', recordCount: 2400, errorCount: 0, returnCode: '0000', message: 'Audit report generated successfully' },
-  { processDate: '2024-08-15', processId: 'RPTSTA00', status: 'P', startTime: '19:00:00', endTime: '', recordCount: 0, errorCount: 0, returnCode: '', message: 'Statistics report generation in progress' },
-  { processDate: '2024-08-15', processId: 'UTLMNT00', status: 'W', startTime: '', endTime: '', recordCount: 0, errorCount: 0, returnCode: '', message: 'File maintenance waiting for prerequisite jobs' },
-  { processDate: '2024-08-15', processId: 'UTLMON00', status: 'W', startTime: '', endTime: '', recordCount: 0, errorCount: 0, returnCode: '', message: 'System monitoring waiting for prerequisite jobs' },
+  { processDate: '2024-08-15', processId: 'TRNVAL00', status: 'C', startTime: '18:00:00', endTime: '18:15:32', recordCount: 1250, errorCount: 3, returnCode: '0004', message: 'Transaction validation completed with warnings', checkpointId: 'CKPT-TRNVAL-0125', checkpointCount: 13, restartFlag: 'N', lastCheckpointTime: '18:14:55' },
+  { processDate: '2024-08-15', processId: 'POSUPD00', status: 'C', startTime: '18:16:00', endTime: '18:28:45', recordCount: 1247, errorCount: 0, returnCode: '0000', message: 'Position updates completed successfully', checkpointId: 'CKPT-POSUPD-0125', checkpointCount: 12, restartFlag: 'Y', lastCheckpointTime: '18:28:10' },
+  { processDate: '2024-08-15', processId: 'HISTLD00', status: 'C', startTime: '18:30:00', endTime: '18:42:18', recordCount: 1247, errorCount: 0, returnCode: '0000', message: 'History load to DB2 completed successfully', checkpointId: 'CKPT-HISTLD-0125', checkpointCount: 12, restartFlag: 'N', lastCheckpointTime: '18:41:50' },
+  { processDate: '2024-08-15', processId: 'RPTPOS00', status: 'C', startTime: '18:45:00', endTime: '18:52:10', recordCount: 850, errorCount: 0, returnCode: '0000', message: 'Position report generated successfully', checkpointId: 'CKPT-RPTPOS-0125', checkpointCount: 8, restartFlag: 'N', lastCheckpointTime: '18:51:40' },
+  { processDate: '2024-08-15', processId: 'RPTAUD00', status: 'C', startTime: '18:53:00', endTime: '18:58:22', recordCount: 2400, errorCount: 0, returnCode: '0000', message: 'Audit report generated successfully', checkpointId: 'CKPT-RPTAUD-0125', checkpointCount: 24, restartFlag: 'N', lastCheckpointTime: '18:58:00' },
+  { processDate: '2024-08-15', processId: 'RPTSTA00', status: 'P', startTime: '19:00:00', endTime: '', recordCount: 0, errorCount: 0, returnCode: '', message: 'Statistics report generation in progress', checkpointId: 'CKPT-RPTSTA-0125', checkpointCount: 3, restartFlag: 'N', lastCheckpointTime: '19:06:30' },
+  { processDate: '2024-08-15', processId: 'UTLMNT00', status: 'W', startTime: '', endTime: '', recordCount: 0, errorCount: 0, returnCode: '', message: 'File maintenance waiting for prerequisite jobs', checkpointId: '', checkpointCount: 0, restartFlag: 'N', lastCheckpointTime: '' },
+  { processDate: '2024-08-15', processId: 'UTLMON00', status: 'W', startTime: '', endTime: '', recordCount: 0, errorCount: 0, returnCode: '', message: 'System monitoring waiting for prerequisite jobs', checkpointId: '', checkpointCount: 0, restartFlag: 'N', lastCheckpointTime: '' },
 ];
 
 export const auditEntries: AuditEntry[] = [
@@ -132,16 +147,16 @@ export const auditEntries: AuditEntry[] = [
 ];
 
 export const errorEntries: ErrorEntry[] = [
-  { code: 'E001', description: 'Invalid account number format', severity: 'Error', action: 'Verify account number is 9 digits', timestamp: '2024-08-15 18:02:15', program: 'TRNVAL00' },
-  { code: 'E002', description: 'Fund ID not found in master file', severity: 'Error', action: 'Check fund ID exists in VSAM master', timestamp: '2024-08-15 18:02:30', program: 'TRNVAL00' },
-  { code: 'E003', description: 'Insufficient share balance for sale', severity: 'Error', action: 'Verify available shares before sell transaction', timestamp: '2024-08-15 18:03:45', program: 'TRNVAL00' },
-  { code: 'W001', description: 'Transaction amount exceeds daily limit', severity: 'Warning', action: 'Review transaction for manual approval', timestamp: '2024-08-15 18:04:10', program: 'TRNVAL00' },
-  { code: 'W002', description: 'Duplicate transaction reference detected', severity: 'Warning', action: 'Verify transaction is not a duplicate entry', timestamp: '2024-08-15 18:05:55', program: 'TRNVAL00' },
-  { code: 'E001', description: 'Invalid account number format', severity: 'Error', action: 'Verify account number is 9 digits', timestamp: '2024-08-15 18:08:22', program: 'POSUPD00' },
-  { code: 'E004', description: 'VSAM file I/O error on master update', severity: 'Error', action: 'Check VSAM file status and retry operation', timestamp: '2024-08-15 18:12:30', program: 'POSUPD00' },
-  { code: 'W001', description: 'Transaction amount exceeds daily limit', severity: 'Warning', action: 'Review transaction for manual approval', timestamp: '2024-08-15 18:14:00', program: 'POSUPD00' },
-  { code: 'E002', description: 'Fund ID not found in master file', severity: 'Error', action: 'Check fund ID exists in VSAM master', timestamp: '2024-08-15 18:32:10', program: 'HISTLD00' },
-  { code: 'E003', description: 'Insufficient share balance for sale', severity: 'Error', action: 'Verify available shares before sell transaction', timestamp: '2024-08-15 18:35:45', program: 'HISTLD00' },
-  { code: 'W002', description: 'Duplicate transaction reference detected', severity: 'Warning', action: 'Verify transaction is not a duplicate entry', timestamp: '2024-08-15 18:38:20', program: 'HISTLD00' },
-  { code: 'E004', description: 'VSAM file I/O error on master update', severity: 'Error', action: 'Check VSAM file status and retry operation', timestamp: '2024-08-15 18:45:30', program: 'RPTPOS00' },
+  { code: 'E001', description: 'Invalid account number format', severity: 'Error', action: 'Verify account number is 9 digits', timestamp: '2024-08-15 18:02:15', program: 'TRNVAL00', paragraph: '2100-VALIDATE-ACCOUNT', respCode: '0016', respCode2: '0001' },
+  { code: 'E002', description: 'Fund ID not found in master file', severity: 'Error', action: 'Check fund ID exists in VSAM master', timestamp: '2024-08-15 18:02:30', program: 'TRNVAL00', paragraph: '2200-VALIDATE-FUND', respCode: '0013', respCode2: '0080' },
+  { code: 'E003', description: 'Insufficient share balance for sale', severity: 'Error', action: 'Verify available shares before sell transaction', timestamp: '2024-08-15 18:03:45', program: 'TRNVAL00', paragraph: '2300-VALIDATE-BALANCE', respCode: '0016', respCode2: '0002' },
+  { code: 'W001', description: 'Transaction amount exceeds daily limit', severity: 'Warning', action: 'Review transaction for manual approval', timestamp: '2024-08-15 18:04:10', program: 'TRNVAL00', paragraph: '2400-CHECK-LIMITS', respCode: '0004', respCode2: '0000' },
+  { code: 'W002', description: 'Duplicate transaction reference detected', severity: 'Warning', action: 'Verify transaction is not a duplicate entry', timestamp: '2024-08-15 18:05:55', program: 'TRNVAL00', paragraph: '2500-CHECK-DUPLICATE', respCode: '0004', respCode2: '0000' },
+  { code: 'E001', description: 'Invalid account number format', severity: 'Error', action: 'Verify account number is 9 digits', timestamp: '2024-08-15 18:08:22', program: 'POSUPD00', paragraph: '3100-READ-POSITION', respCode: '0016', respCode2: '0001' },
+  { code: 'E004', description: 'VSAM file I/O error on master update', severity: 'Error', action: 'Check VSAM file status and retry operation', timestamp: '2024-08-15 18:12:30', program: 'POSUPD00', paragraph: '3200-REWRITE-MASTER', respCode: '0023', respCode2: '0120' },
+  { code: 'W001', description: 'Transaction amount exceeds daily limit', severity: 'Warning', action: 'Review transaction for manual approval', timestamp: '2024-08-15 18:14:00', program: 'POSUPD00', paragraph: '3300-CHECK-LIMITS', respCode: '0004', respCode2: '0000' },
+  { code: 'E002', description: 'Fund ID not found in master file', severity: 'Error', action: 'Check fund ID exists in VSAM master', timestamp: '2024-08-15 18:32:10', program: 'HISTLD00', paragraph: '4100-LOOKUP-FUND', respCode: '0013', respCode2: '0080' },
+  { code: 'E003', description: 'Insufficient share balance for sale', severity: 'Error', action: 'Verify available shares before sell transaction', timestamp: '2024-08-15 18:35:45', program: 'HISTLD00', paragraph: '4200-VALIDATE-RECORD', respCode: '0016', respCode2: '0002' },
+  { code: 'W002', description: 'Duplicate transaction reference detected', severity: 'Warning', action: 'Verify transaction is not a duplicate entry', timestamp: '2024-08-15 18:38:20', program: 'HISTLD00', paragraph: '4300-INSERT-DB2', respCode: '0004', respCode2: '-803' },
+  { code: 'E004', description: 'VSAM file I/O error on master update', severity: 'Error', action: 'Check VSAM file status and retry operation', timestamp: '2024-08-15 18:45:30', program: 'RPTPOS00', paragraph: '5100-READ-MASTER', respCode: '0023', respCode2: '0120' },
 ];
