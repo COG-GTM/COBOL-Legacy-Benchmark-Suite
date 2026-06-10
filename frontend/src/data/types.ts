@@ -70,3 +70,18 @@ export interface ErrorEntry {
   respCode: string;
   respCode2: string;
 }
+
+export type ErrorCategory = 'VS' | 'VL' | 'PR' | 'SY';
+export type ErrorSeverity = 'warning' | 'error' | 'severe' | 'critical';
+
+export interface AppError {
+  id: string;
+  code: string;
+  category: ErrorCategory;
+  severity: ErrorSeverity;
+  message: string;
+  details?: string;
+  timestamp: string;
+  program?: string;
+  dismissible?: boolean;
+}

@@ -11,7 +11,8 @@ import { StatusBadge, getTransactionStatusVariant, getTransactionStatusLabel, ge
 import { PageHeader } from '@/components/ui/PageHeader';
 import { LoadingSpinner } from '@/components/ui/LoadingSpinner';
 import { EmptyState } from '@/components/ui/EmptyState';
-import { portfolios, positions, transactions, fundPrices } from '@/data/mockData';
+import { usePortfolios } from '@/context/PortfolioContext';
+import { positions, transactions, fundPrices } from '@/data/mockData';
 
 function formatCurrency(value: number): string {
   return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0, maximumFractionDigits: 0 }).format(value);
@@ -35,6 +36,7 @@ interface AccountGrowth {
 }
 
 export function DashboardPage() {
+  const { portfolios } = usePortfolios();
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -50,7 +52,7 @@ export function DashboardPage() {
     const totalPositions = positions.length;
     const recentTransactionCount = transactions.length;
     return { totalPortfolios, totalMarketValue, totalPositions, recentTransactionCount };
-  }, []);
+  }, [portfolios]);
 
   const accountGrowth = useMemo<AccountGrowth[]>(() => {
     const byAccount = new Map<string, { marketValue: number; costBasis: number }>();

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import {
   LayoutDashboard,
+  Search,
   Briefcase,
   ArrowLeftRight,
   FileText,
@@ -21,6 +22,7 @@ interface NavItem {
 
 const navItems: NavItem[] = [
   { label: 'Dashboard', path: '/', icon: <LayoutDashboard className="w-5 h-5" /> },
+  { label: 'Position Inquiry', path: '/positions', icon: <Search className="w-5 h-5" /> },
   { label: 'Portfolios', path: '/portfolios', icon: <Briefcase className="w-5 h-5" /> },
   { label: 'Transactions', path: '/transactions', icon: <ArrowLeftRight className="w-5 h-5" /> },
   {
