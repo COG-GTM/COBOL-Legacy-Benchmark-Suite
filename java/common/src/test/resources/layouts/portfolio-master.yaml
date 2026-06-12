@@ -1,0 +1,16 @@
+name: PORTFLIO
+recordLength: 148
+keyFields: [PORT-ID]
+fields:
+  - {name: PORT-ID, offset: 0, length: 8, type: CHAR}
+  - {name: PORT-ACCOUNT-NO, offset: 8, length: 10, type: CHAR}
+  - {name: PORT-CLIENT-NAME, offset: 18, length: 30, type: CHAR}
+  - {name: PORT-CLIENT-TYPE, offset: 48, length: 1, type: CHAR}
+  - {name: PORT-CREATE-DATE, offset: 49, length: 8, type: ZONED}
+  - {name: PORT-LAST-MAINT, offset: 57, length: 8, type: ZONED}
+  - {name: PORT-STATUS, offset: 65, length: 1, type: CHAR}
+  - {name: PORT-TOTAL-VALUE, offset: 66, length: 8, type: PACKED, scale: 2}
+  - {name: PORT-CASH-BALANCE, offset: 74, length: 8, type: PACKED, scale: 2}
+  - {name: PORT-LAST-USER, offset: 82, length: 8, type: CHAR}
+  - {name: PORT-LAST-TRANS, offset: 90, length: 8, type: ZONED}
+  - {name: PORT-FILLER, offset: 98, length: 50, type: CHAR}
