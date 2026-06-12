@@ -12,12 +12,17 @@
 
   <artifactId>common</artifactId>
   <name>common</name>
-  <description>Shared data types, copybook record mappings, and utilities</description>
+  <description>Shared data types, copybook record mappings, return codes, and utilities</description>
 
   <dependencies>
     <dependency>
       <groupId>org.springframework.boot</groupId>
       <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
     </dependency>
   </dependencies>
 </project>
