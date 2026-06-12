@@ -110,7 +110,7 @@ identity PK `ERROR_LOG_ID` (no VSAM key; insert-only).
 | ERR-PROGRAM | PIC X(8) | PROGRAM_ID | VARCHAR(8) | String | |
 | ERR-CATEGORY | PIC X(2) | ERROR_CATEGORY | CHAR(2) | String/enum | 'VS' VSAM, 'VL' Validation, 'PR' Processing, 'SY' System (CHECK). |
 | ERR-CODE | PIC X(4) | ERROR_CODE | CHAR(4) | String | |
-| ERR-SEVERITY | PIC S9(4) COMP | ERROR_SEVERITY | SMALLINT | short/Integer | Binary halfword; values 0/4/8/12/16 per ERR-RETURN-CODES. |
+| ERR-SEVERITY | PIC S9(4) COMP | ERROR_SEVERITY | SMALLINT | short/Integer | Binary halfword; values 0/4/8/12/16 per ERR-RETURN-CODES (CHECK). |
 | ERR-TEXT | PIC X(80) | ERROR_TEXT | VARCHAR(80) | String | |
 | ERR-DETAILS | PIC X(256) | ERROR_DETAILS | VARCHAR(256) | String | |
 

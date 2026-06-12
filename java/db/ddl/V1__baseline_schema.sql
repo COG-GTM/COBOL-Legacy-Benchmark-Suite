@@ -137,7 +137,8 @@ CREATE TABLE ERROR_LOG (
     ERROR_CATEGORY    CHAR(2)        NOT NULL
         CONSTRAINT CK_ERR_CATEGORY CHECK (ERROR_CATEGORY IN ('VS','VL','PR','SY')), -- ERR-CATEGORY: VS=VSAM, VL=Validation, PR=Processing, SY=System
     ERROR_CODE        CHAR(4)        NOT NULL,                          -- ERR-CODE
-    ERROR_SEVERITY    SMALLINT       NOT NULL,                          -- ERR-SEVERITY S9(4) COMP (0/4/8/12/16)
+    ERROR_SEVERITY    SMALLINT       NOT NULL
+        CONSTRAINT CK_ERR_SEVERITY CHECK (ERROR_SEVERITY IN (0,4,8,12,16)),     -- ERR-SEVERITY S9(4) COMP per ERR-RETURN-CODES
     ERROR_TEXT        VARCHAR(80),                                      -- ERR-TEXT
     ERROR_DETAILS     VARCHAR(256),                                     -- ERR-DETAILS
     CONSTRAINT PK_ERROR_LOG PRIMARY KEY (ERROR_LOG_ID)
