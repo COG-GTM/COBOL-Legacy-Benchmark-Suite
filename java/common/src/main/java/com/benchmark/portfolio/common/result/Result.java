@@ -25,12 +25,17 @@ public final class Result<T> {
         this.message = message;
     }
 
+    /** Success carrying no payload, for void-like operations. */
+    public static Result<Void> success() {
+        return new Result<>(null, ReturnCode.SUCCESS, null);
+    }
+
     public static <T> Result<T> success(T value) {
-        return new Result<>(value, ReturnCode.SUCCESS, null);
+        return new Result<>(Objects.requireNonNull(value, "value"), ReturnCode.SUCCESS, null);
     }
 
     public static <T> Result<T> success(T value, String message) {
-        return new Result<>(value, ReturnCode.SUCCESS, message);
+        return new Result<>(Objects.requireNonNull(value, "value"), ReturnCode.SUCCESS, message);
     }
 
     public static <T> Result<T> failure(ReturnCode returnCode, String message) {

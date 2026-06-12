@@ -41,6 +41,20 @@ class ResultTest {
     }
 
     @Test
+    void successRejectsNullValue() {
+        assertThrows(NullPointerException.class, () -> Result.success(null));
+        assertThrows(NullPointerException.class, () -> Result.success(null, "msg"));
+    }
+
+    @Test
+    void voidSuccessCarriesNoValue() {
+        Result<Void> result = Result.success();
+        assertTrue(result.isSuccess());
+        assertSame(ReturnCode.SUCCESS, result.getReturnCode());
+        assertEquals(Optional.empty(), result.toOptional());
+    }
+
+    @Test
     void failureRejectsSuccessCode() {
         assertThrows(IllegalArgumentException.class,
             () -> Result.failure(ReturnCode.SUCCESS, "not a failure"));
