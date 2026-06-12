@@ -23,6 +23,8 @@
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <!-- Flyway 10+ splits PostgreSQL support into flyway-database-postgresql -->
+    <flyway.version>10.12.0</flyway.version>
   </properties>
 
   <modules>
@@ -45,8 +47,50 @@
         <artifactId>portfolio</artifactId>
         <version>${project.version}</version>
       </dependency>
+      <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-core</artifactId>
+        <version>${flyway.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-database-postgresql</artifactId>
+        <version>${flyway.version}</version>
+      </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.flywaydb</groupId>
+          <artifactId>flyway-maven-plugin</artifactId>
+          <version>${flyway.version}</version>
+          <configuration>
+            <url>${env.SPRING_DATASOURCE_URL}</url>
+            <user>${env.SPRING_DATASOURCE_USERNAME}</user>
+            <password>${env.SPRING_DATASOURCE_PASSWORD}</password>
+            <locations>
+              <location>classpath:db/migration</location>
+            </locations>
+          </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.flywaydb</groupId>
+              <artifactId>flyway-database-postgresql</artifactId>
+              <version>${flyway.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.postgresql</groupId>
+              <artifactId>postgresql</artifactId>
+              <version>${postgresql.version}</version>
+            </dependency>
+          </dependencies>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
 
   <dependencies>
     <dependency>
