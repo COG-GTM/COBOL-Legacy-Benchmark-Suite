@@ -43,30 +43,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const endSession = useCallback(
     (reason: LogoutReason) => {
       setShowTimeoutWarning(false);
-      setUser((current) => {
-        if (current) {
-          // Mirrors SECMGR audit write for a logout event (AUD-LOGOUT).
-          recordAuditEvent({
-            userId: current.userId,
-            action: 'LOGOUT',
-            status: reason === 'timeout' ? 'WARN' : 'SUCC',
-            message:
-              reason === 'timeout'
-                ? 'Session expired due to inactivity'
-                : 'User logged out',
-            program: SECMGR_PROGRAM,
-          });
-        }
-        return null;
-      });
-      setLastLogoutReason(reason);
-      try {
-        sessionStorage.removeItem(STORAGE_KEY);
-      } catch {
-        // ignore
+      if (user) {
+        // Mirrors SECMGR audit write for a logout event (AUD-LOGOUT).
+        recordAuditEvent({
+          userId: user.userId,
+          action: 'LOGOUT',
+          status: reason === 'timeout' ? 'WARN' : 'SUCC',
+          message:
+            reason === 'timeout'
+              ? 'Session expired due to inactivity'
+              : 'User logged out',
+          program: SECMGR_PROGRAM,
+        });
       }
+      persist(null);
+      setLastLogoutReason(reason);
     },
-    [],
+    [user, persist],
   );
 
   const login = useCallback(
