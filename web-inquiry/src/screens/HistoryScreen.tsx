@@ -26,6 +26,8 @@ export function HistoryScreen() {
   const navigate = useNavigate();
   const { comm, setFunction, setAccountNo, setError, clearError } = useSession();
   const [account, setAccount] = useState(comm.accountNo);
+  /** Account that produced the currently displayed page; paging uses this, not the editable field. */
+  const [loadedAccount, setLoadedAccount] = useState('');
   const [page, setPage] = useState<HistoryPage | null>(null);
   const [localError, setLocalError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -41,6 +43,7 @@ export function HistoryScreen() {
       setBusy(false);
       if (result.status === 'OK') {
         setPage(result.page);
+        setLoadedAccount(acct);
       } else {
         setError(result.errorMsg, result.responseCode);
         navigate('/error');
@@ -57,16 +60,18 @@ export function HistoryScreen() {
       setLocalError(validationError);
       return;
     }
+    const trimmed = account.trim();
     setLocalError('');
-    setAccountNo(account.trim());
-    void load(account, 1);
+    setAccount(trimmed);
+    setAccountNo(trimmed);
+    void load(trimmed, 1);
   };
 
   const goPrev = () => {
-    if (page?.hasPrevious) void load(account, page.page - 1);
+    if (page?.hasPrevious) void load(loadedAccount, page.page - 1);
   };
   const goNext = () => {
-    if (page?.hasNext) void load(account, page.page + 1);
+    if (page?.hasNext) void load(loadedAccount, page.page + 1);
   };
   const backToMenu = () => {
     clearError();
