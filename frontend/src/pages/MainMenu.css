@@ -1,0 +1,29 @@
+.main-menu {
+  width: 100%;
+  max-width: 640px;
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+}
+
+.main-menu__heading {
+  margin: 0 0 1.5rem;
+  font-size: 1.1rem;
+  color: var(--color-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.main-menu__options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.main-menu__hint {
+  margin: 1.75rem 0 0;
+  color: var(--color-muted);
+  font-size: 0.9rem;
+}

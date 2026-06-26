@@ -1,0 +1,27 @@
+.placeholder-page {
+  width: 100%;
+  max-width: 640px;
+  background: var(--color-panel);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 2rem;
+}
+
+.placeholder-page__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.4rem;
+}
+
+.placeholder-page__code {
+  margin: 0 0 1.25rem;
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 0.85rem;
+  color: var(--color-accent);
+}
+
+.placeholder-page__note {
+  margin: 0;
+  color: var(--color-muted);
+  line-height: 1.6;
+}
