@@ -1,0 +1,51 @@
+.app-shell {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.app-shell__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 1.25rem 2rem;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-panel);
+}
+
+.app-shell__title {
+  margin: 0;
+  font-size: 1.4rem;
+  letter-spacing: 0.02em;
+}
+
+.app-shell__subtitle {
+  color: var(--color-muted);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.app-shell__main {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2.5rem 1.5rem;
+}
+
+.app-shell__status {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+  padding: 0.6rem 2rem;
+  border-top: 1px solid var(--color-border);
+  background: var(--color-panel);
+  font-family: 'JetBrains Mono', 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  color: var(--color-muted);
+}
+
+.app-shell__status-item strong {
+  color: var(--color-accent);
+}
