@@ -1,0 +1,189 @@
+:root {
+  --bg: #0b1e2d;
+  --panel: #10293b;
+  --panel-border: #1d4661;
+  --text: #e6f1f5;
+  --muted: #9db8c6;
+  --accent: #37c2b8;
+  --accent-strong: #4fd8ce;
+  --focus: #ffd24a;
+  --danger: #ff6b6b;
+
+  font-family:
+    'Inter',
+    system-ui,
+    -apple-system,
+    'Segoe UI',
+    Roboto,
+    sans-serif;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  margin: 0;
+  min-height: 100vh;
+}
+
+body {
+  background: radial-gradient(circle at top, #123048, var(--bg));
+  color: var(--text);
+}
+
+.app-shell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0.9rem 1.5rem;
+  background: #08161f;
+  border-bottom: 1px solid var(--panel-border);
+}
+
+.app-header__brand {
+  font-weight: 700;
+  letter-spacing: 0.15em;
+  color: var(--accent-strong);
+}
+
+.app-header__system {
+  color: var(--muted);
+  font-size: 0.9rem;
+  letter-spacing: 0.05em;
+}
+
+.app-main {
+  flex: 1;
+  width: 100%;
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 2.5rem 1.5rem;
+}
+
+.screen-title {
+  margin: 0 0 1.5rem;
+  font-size: 1.8rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.menu-prompt {
+  color: var(--muted);
+  margin: 0 0 1rem;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.8rem;
+}
+
+.menu-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.menu-item {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  width: 100%;
+  padding: 1rem 1.25rem;
+  font-size: 1.1rem;
+  color: var(--text);
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  border-radius: 10px;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.15s ease,
+    transform 0.1s ease,
+    background 0.15s ease;
+}
+
+.menu-item:hover {
+  background: #14344a;
+  border-color: var(--accent);
+}
+
+.menu-item:active {
+  transform: translateY(1px);
+}
+
+.menu-item:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+.menu-item__number {
+  font-weight: 700;
+  color: var(--accent-strong);
+  min-width: 1.5rem;
+}
+
+.placeholder-note,
+.session-ended-note {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--accent-strong);
+  margin: 0 0 0.75rem;
+}
+
+.placeholder-detail {
+  color: var(--muted);
+  margin: 0 0 2rem;
+  line-height: 1.5;
+}
+
+.placeholder-detail code,
+code {
+  background: #08161f;
+  border: 1px solid var(--panel-border);
+  border-radius: 4px;
+  padding: 0.1rem 0.35rem;
+  font-size: 0.85em;
+  color: var(--accent-strong);
+}
+
+.back-link {
+  display: inline-block;
+  color: var(--accent);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 0.5rem 0;
+  border-bottom: 2px solid transparent;
+}
+
+.back-link:hover {
+  border-bottom-color: var(--accent);
+}
+
+.back-link:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 2px;
+}
+
+.session-ended-note {
+  color: var(--danger);
+}
+
+.app-footer {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--panel-border);
+  color: var(--muted);
+  font-size: 0.8rem;
+  text-align: center;
+}
