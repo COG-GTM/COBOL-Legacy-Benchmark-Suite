@@ -10,7 +10,7 @@ import { BackToMenuLink } from '../components/BackToMenuLink';
  */
 export function TransactionHistory() {
   return (
-    <Layout title="Transaction History">
+    <Layout title="Transaction History Inquiry">
       <p className="placeholder-note">Backend pending &mdash; coming soon.</p>
       <p className="placeholder-detail">
         This screen will list account transaction history (legacy function code{' '}

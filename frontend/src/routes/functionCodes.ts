@@ -67,18 +67,14 @@ export const MENU_OPTIONS: readonly MenuOption[] = [
     option: 1,
     label: 'Portfolio Position Inquiry',
     code: FunctionCode.PORTFOLIO,
-    route: Routes.PORTFOLIO,
   },
-  {
-    option: 2,
-    label: 'Transaction History',
-    code: FunctionCode.HISTORY,
-    route: Routes.HISTORY,
-  },
-  {
-    option: 3,
-    label: 'Exit',
-    code: FunctionCode.EXIT,
-    route: Routes.EXIT,
-  },
-];
+  { option: 2, label: 'Transaction History', code: FunctionCode.HISTORY },
+  { option: 3, label: 'Exit', code: FunctionCode.EXIT },
+].map(({ option, label, code }) => ({
+  option,
+  label,
+  code,
+  // Derive the route from the single-source-of-truth code->route mapping so the
+  // two can never drift apart.
+  route: FUNCTION_CODE_TO_ROUTE[code],
+}));

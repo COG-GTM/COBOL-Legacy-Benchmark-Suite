@@ -58,7 +58,7 @@ describe('Menu navigation', () => {
     );
 
     expect(
-      screen.getByRole('heading', { name: 'Transaction History' }),
+      screen.getByRole('heading', { name: 'Transaction History Inquiry' }),
     ).toBeInTheDocument();
   });
 
