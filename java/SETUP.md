@@ -42,19 +42,24 @@ The project uses Spring profiles for environment selection.
 
 - Connects to a local PostgreSQL instance.
 - Default connection string: `jdbc:postgresql://localhost:5432/clbs`
-- Default credentials: `clbs` / `clbs`
 - Hibernate `ddl-auto` is set to `update` so the schema is created/updated from entities.
+- Set the database credentials via environment variables; they are not checked in:
+
+```bash
+export SPRING_DATASOURCE_USERNAME=clbs
+export SPRING_DATASOURCE_PASSWORD=clbs
+```
 
 To run with the `dev` profile:
 
 ```bash
-./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
+SPRING_PROFILES_ACTIVE=dev ./mvnw spring-boot:run
 ```
 
 or
 
 ```bash
-SPRING_PROFILES_ACTIVE=dev ./mvnw spring-boot:run
+./mvnw spring-boot:run -Dspring-boot.run.profiles=dev
 ```
 
 ## Testing
