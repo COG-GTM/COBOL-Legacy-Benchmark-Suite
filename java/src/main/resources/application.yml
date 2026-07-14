@@ -1,0 +1,33 @@
+spring:
+  application:
+    name: clbs-portfolio
+
+  # Default/dev database. Final RDBMS selection for the DB2/VSAM data layer is
+  # tracked in MBA-1929; JPA is wired against an in-memory H2 instance for now.
+  datasource:
+    url: jdbc:h2:mem:clbs;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+
+  h2:
+    console:
+      enabled: true
+
+  batch:
+    # No jobs run on startup; batch jobs are launched explicitly in later phases.
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: embedded
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
