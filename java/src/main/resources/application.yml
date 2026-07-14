@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: clbs-migration
+  profiles:
+    default: h2
+    group:
+      test: h2
+  batch:
+    job:
+      enabled: false
+    jdbc:
+      initialize-schema: always
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: false
+    properties:
+      hibernate:
+        format_sql: false
+  datasource:
+    hikari:
+      maximum-pool-size: 5
