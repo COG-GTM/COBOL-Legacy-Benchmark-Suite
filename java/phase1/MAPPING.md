@@ -80,6 +80,8 @@ The ISO `X(26)` timestamps are stored as `TIMESTAMP` (microsecond precision) and
 
 The repository contains multiple, partially inconsistent definitions for the same logical entities (e.g. `POSHIST` in `POSHIST.sql` differs from the VSAM `POSHIST` in `vsam-definitions.txt`). The migration keeps the definitions as separate tables so that each original source is preserved and can be tested independently. The integration test `Phase1DataLayerIntegrationTest` inserts one representative row per table and verifies BigDecimal precision and composite keys.
 
+Additionally, the `PORTMSTR` key in `vsam-definitions.txt` is `Portfolio ID (8) + Account Type (2) + Branch ID (2)` = 12 bytes, while `PORTFLIO.cpy` defines `PORT-KEY` as `PORT-ID (8) + PORT-ACCOUNT-NO (10)` = 18 bytes. The `vsam_portmstr` table follows the copybook layout, with `PK (portfolio_id, account_no)`. A real migration from the VSAM file would need to reconcile this key difference.
+
 ## Build & Test
 
 ```bash
