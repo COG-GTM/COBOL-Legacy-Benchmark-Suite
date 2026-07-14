@@ -92,6 +92,8 @@ public class HistoryRecord {
     public void setFiller(String filler) { this.filler = filler; }
 
     public static class HistoryRecordId implements Serializable {
+
+        private static final long serialVersionUID = 1L;
         private String portfolioId;
         private LocalDate historyDate;
         private LocalTime historyTime;

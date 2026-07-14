@@ -78,6 +78,8 @@ public class Errlog {
     public void setAdditionalInfo(String additionalInfo) { this.additionalInfo = additionalInfo; }
 
     public static class ErrlogId implements Serializable {
+
+        private static final long serialVersionUID = 1L;
         private LocalDateTime errorTimestamp;
         private String programId;
 

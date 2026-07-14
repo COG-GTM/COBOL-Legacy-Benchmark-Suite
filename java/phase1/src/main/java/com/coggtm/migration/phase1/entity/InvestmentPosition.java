@@ -73,6 +73,8 @@ public class InvestmentPosition {
     public void setLastMaintUser(String lastMaintUser) { this.lastMaintUser = lastMaintUser; }
 
     public static class InvestmentPositionId implements Serializable {
+
+        private static final long serialVersionUID = 1L;
         private String portfolioId;
         private String investmentId;
         private LocalDate positionDate;

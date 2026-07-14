@@ -85,6 +85,8 @@ public class VsamPoshist {
     public void setFiller(String filler) { this.filler = filler; }
 
     public static class VsamPoshistId implements Serializable {
+
+        private static final long serialVersionUID = 1L;
         private String portfolioId;
         private LocalDate positionDate;
         private String investmentId;

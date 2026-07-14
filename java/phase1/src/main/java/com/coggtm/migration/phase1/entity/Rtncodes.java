@@ -52,6 +52,8 @@ public class Rtncodes {
     public void setMessageText(String messageText) { this.messageText = messageText; }
 
     public static class RtncodesId implements Serializable {
+
+        private static final long serialVersionUID = 1L;
         private LocalDateTime logTimestamp;
         private String programId;
 

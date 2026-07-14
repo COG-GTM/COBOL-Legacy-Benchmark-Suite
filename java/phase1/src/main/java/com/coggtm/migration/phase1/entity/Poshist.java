@@ -129,6 +129,8 @@ public class Poshist {
     public void setAuditTimestamp(LocalDateTime auditTimestamp) { this.auditTimestamp = auditTimestamp; }
 
     public static class PoshistId implements Serializable {
+
+        private static final long serialVersionUID = 1L;
         private String accountNo;
         private String portfolioId;
         private LocalDate transDate;
