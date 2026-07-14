@@ -7,7 +7,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.springframework.core.io.ClassPathResource;
 
@@ -49,11 +48,10 @@ public final class GoldenMasterFixture {
                     continue;
                 }
                 String[] parts = parseCsvLine(line);
-                if (parts.length < 2) {
-                    throw new IllegalStateException("Input fixture line must have at least two fields: " + line);
+                if (parts.length != 2) {
+                    throw new IllegalStateException("Input fixture line must have exactly two fields: " + line);
                 }
-                String inputValue = parts.length == 2 ? parts[1] : String.join(",", Arrays.copyOfRange(parts, 1, parts.length));
-                rows.add(new GoldenMasterInput(parts[0], inputValue));
+                rows.add(new GoldenMasterInput(parts[0], parts[1]));
             }
         }
         return rows;
@@ -68,12 +66,11 @@ public final class GoldenMasterFixture {
                     continue;
                 }
                 String[] parts = parseCsvLine(line);
-                if (parts.length < 3) {
-                    throw new IllegalStateException("Expected fixture line must have at least three fields: " + line);
+                if (parts.length != 4) {
+                    throw new IllegalStateException("Expected fixture line must have exactly four fields: " + line);
                 }
                 int rc = Integer.parseInt(parts[2].trim());
-                String msg = parts.length > 3 ? String.join(",", Arrays.copyOfRange(parts, 3, parts.length)) : "";
-                rows.add(new GoldenMasterExpected(parts[0], parts[1], rc, msg));
+                rows.add(new GoldenMasterExpected(parts[0], parts[1], rc, parts[3]));
             }
         }
         return rows;
