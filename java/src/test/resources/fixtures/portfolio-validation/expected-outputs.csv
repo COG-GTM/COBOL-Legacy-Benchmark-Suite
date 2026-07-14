@@ -1,0 +1,15 @@
+validationType,inputValue,returnCode,errorMessage
+I,PORT0001,0,
+I,PORT12,1,Invalid Portfolio ID format
+I,ABCD0001,1,Invalid Portfolio ID format
+A,1234567890,0,
+A,0000000000,2,Invalid Account Number format
+A,12345A7890,2,Invalid Account Number format
+T,STK,0,
+T,BND,0,
+T,XYZ,3,Invalid Investment Type
+M,100000.00,0,
+M,-9999999999999.99,0,
+M,9999999999999.99,0,
+M,10000000000000.00,4,Amount outside valid range
+X,anything,1,Invalid validation type

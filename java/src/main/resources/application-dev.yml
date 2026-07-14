@@ -1,0 +1,9 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/clbs
+  jpa:
+    hibernate:
+      ddl-auto: update
+  batch:
+    jdbc:
+      initialize-schema: never
