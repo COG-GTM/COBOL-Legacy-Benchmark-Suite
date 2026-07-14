@@ -99,4 +99,5 @@ java/
 ## Notes
 
 - Spring Batch jobs are disabled on startup (`spring.batch.job.enabled=false`) so the harness application can be exercised without running batch jobs.
-- Spring Batch metadata tables are created automatically by `spring.batch.jdbc.initialize-schema=always` for the H2 profile.
+- Spring Batch metadata tables are created automatically for the H2 profile (`spring.batch.jdbc.initialize-schema=always` in `application-h2.yml`).
+- For the `dev` profile, Spring Batch schema initialization is disabled (`spring.batch.jdbc.initialize-schema=never`) to avoid conflicts with an existing PostgreSQL schema. Create the batch metadata tables manually or set `SPRING_BATCH_JDBC_INITIALIZESCHEMA=always` for a fresh database.

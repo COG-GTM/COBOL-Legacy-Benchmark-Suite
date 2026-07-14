@@ -6,3 +6,6 @@ spring:
   h2:
     console:
       enabled: false
+  batch:
+    jdbc:
+      initialize-schema: always

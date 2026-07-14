@@ -9,7 +9,7 @@ spring:
     job:
       enabled: false
     jdbc:
-      initialize-schema: always
+      initialize-schema: embedded
   jpa:
     hibernate:
       ddl-auto: create-drop

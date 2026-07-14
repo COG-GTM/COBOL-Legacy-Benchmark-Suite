@@ -41,12 +41,13 @@ public class PortfolioValidationService {
      * @return a {@link ValidationResult} with the COBOL-style return code and message
      */
     public ValidationResult validate(String validationType, String inputValue) {
-        if (StringUtils.isBlank(validationType)) {
+        String type = StringUtils.trimToEmpty(validationType);
+        if (StringUtils.isBlank(type)) {
             return new ValidationResult(VAL_INVALID_ID, ERR_INVALID_TYPE);
         }
 
         String value = StringUtils.trimToEmpty(inputValue);
-        return switch (validationType.toUpperCase()) {
+        return switch (type.toUpperCase()) {
             case "I" -> validatePortfolioId(value);
             case "A" -> validateAccountNumber(value);
             case "T" -> validateInvestmentType(value);
@@ -84,7 +85,7 @@ public class PortfolioValidationService {
         BigDecimal amount;
         try {
             amount = new BigDecimal(value);
-        } catch (NumberFormatException | ArithmeticException e) {
+        } catch (NumberFormatException e) {
             return new ValidationResult(VAL_INVALID_AMT, ERR_AMT);
         }
 
