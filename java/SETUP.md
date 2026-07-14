@@ -36,7 +36,7 @@ The project uses Spring profiles for environment selection.
 
 - In-memory H2 database for unit tests and local exploration.
 - DDL is generated automatically (`spring.jpa.hibernate.ddl-auto=create-drop`).
-- H2 console is available at `/h2-console` when the app is running.
+- H2 console is disabled by default for security. Enable it locally by setting `SPRING_H2_CONSOLE_ENABLED=true`.
 
 ### `dev`
 

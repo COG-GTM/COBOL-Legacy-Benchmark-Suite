@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.springframework.core.io.ClassPathResource;
 
@@ -47,8 +48,12 @@ public final class GoldenMasterFixture {
                 if (line.isBlank()) {
                     continue;
                 }
-                String[] parts = line.split(",", -1);
-                rows.add(new GoldenMasterInput(parts[0], parts[1]));
+                String[] parts = parseCsvLine(line);
+                if (parts.length < 2) {
+                    throw new IllegalStateException("Input fixture line must have at least two fields: " + line);
+                }
+                String inputValue = parts.length == 2 ? parts[1] : String.join(",", Arrays.copyOfRange(parts, 1, parts.length));
+                rows.add(new GoldenMasterInput(parts[0], inputValue));
             }
         }
         return rows;
@@ -62,9 +67,12 @@ public final class GoldenMasterFixture {
                 if (line.isBlank()) {
                     continue;
                 }
-                String[] parts = line.split(",", -1);
+                String[] parts = parseCsvLine(line);
+                if (parts.length < 3) {
+                    throw new IllegalStateException("Expected fixture line must have at least three fields: " + line);
+                }
                 int rc = Integer.parseInt(parts[2].trim());
-                String msg = parts.length > 3 ? parts[3] : "";
+                String msg = parts.length > 3 ? String.join(",", Arrays.copyOfRange(parts, 3, parts.length)) : "";
                 rows.add(new GoldenMasterExpected(parts[0], parts[1], rc, msg));
             }
         }
@@ -75,6 +83,35 @@ public final class GoldenMasterFixture {
         ClassPathResource resource = new ClassPathResource(path);
         InputStream is = resource.getInputStream();
         return new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+    }
+
+    /**
+     * Parses a CSV line that may contain quoted fields and escaped quotes ("").
+     * This is a lightweight parser sufficient for golden-master fixtures; it does not
+     * handle every edge case of the full RFC 4180 spec.
+     */
+    static String[] parseCsvLine(String line) {
+        List<String> fields = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean inQuotes = false;
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            if (c == '"') {
+                if (inQuotes && i + 1 < line.length() && line.charAt(i + 1) == '"') {
+                    current.append('"');
+                    i++;
+                } else {
+                    inQuotes = !inQuotes;
+                }
+            } else if (c == ',' && !inQuotes) {
+                fields.add(current.toString());
+                current.setLength(0);
+            } else {
+                current.append(c);
+            }
+        }
+        fields.add(current.toString());
+        return fields.toArray(new String[0]);
     }
 
     private record GoldenMasterInput(String validationType, String inputValue) {

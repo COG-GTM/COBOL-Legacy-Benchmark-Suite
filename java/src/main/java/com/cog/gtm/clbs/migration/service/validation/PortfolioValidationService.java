@@ -95,6 +95,9 @@ public class PortfolioValidationService {
     }
 
     private boolean isAllZeros(String value) {
+        if (value.isEmpty()) {
+            return false;
+        }
         for (int i = 0; i < value.length(); i++) {
             if (value.charAt(i) != '0') {
                 return false;
