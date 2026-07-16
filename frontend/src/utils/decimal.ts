@@ -59,6 +59,11 @@ export function normalizeDecimal(value: string, fracDigits = 2): string {
   return negative && !isZero ? `-${body}` : body;
 }
 
+/** Inserts thousands separators into a run of integer digits. */
+function groupThousands(intPart: string): string {
+  return intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+}
+
 /**
  * Formats a decimal string as a currency value with grouped thousands.
  * Done purely with string manipulation to preserve precision.
@@ -71,7 +76,73 @@ export function formatCurrency(value: string, currency = 'USD'): string {
   const negative = normalized.startsWith('-');
   const unsigned = normalized.replace(/^-/, '');
   const [intPart, fracPart] = unsigned.split('.');
-  const grouped = intPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  const grouped = groupThousands(intPart);
   const symbol = currency === 'USD' ? '$' : `${currency} `;
   return `${negative ? '-' : ''}${symbol}${grouped}.${fracPart}`;
+}
+
+/**
+ * Formats a POS-QUANTITY (`S9(11)V9(4)`) with grouped thousands, trimming
+ * trailing fraction zeros for readability while never rounding. Integer-valued
+ * quantities render without a decimal point (e.g. "4,200").
+ */
+export function formatQuantity(value: string): string {
+  if (!isDecimalString(value)) {
+    return value;
+  }
+  const normalized = normalizeDecimal(value, 4);
+  const negative = normalized.startsWith('-');
+  const unsigned = normalized.replace(/^-/, '');
+  const [intPart, fracPart] = unsigned.split('.');
+  const trimmedFrac = fracPart.replace(/0+$/, '');
+  const grouped = groupThousands(intPart);
+  const body = trimmedFrac ? `${grouped}.${trimmedFrac}` : grouped;
+  return negative ? `-${body}` : body;
+}
+
+/**
+ * Converts a validated decimal string into an integer scaled by `scale`
+ * fraction digits. Uses BigInt so no precision is lost regardless of magnitude.
+ */
+function toScaledInt(value: string, scale: number): bigint {
+  const normalized = normalizeDecimal(value, scale);
+  const negative = normalized.startsWith('-');
+  const digits = normalized.replace(/^-/, '').replace('.', '');
+  const magnitude = BigInt(digits);
+  return negative ? -magnitude : magnitude;
+}
+
+/** Renders a scaled BigInt back into a decimal string with `scale` fractions. */
+function fromScaledInt(scaled: bigint, scale: number): string {
+  const negative = scaled < 0n;
+  const digits = (negative ? -scaled : scaled)
+    .toString()
+    .padStart(scale + 1, '0');
+  const intPart = digits.slice(0, digits.length - scale);
+  const fracPart = scale > 0 ? digits.slice(digits.length - scale) : '';
+  const body = scale > 0 ? `${intPart}.${fracPart}` : intPart;
+  const isZero = /^0(\.0+)?$/.test(body);
+  return negative && !isZero ? `-${body}` : body;
+}
+
+/**
+ * Adds two decimal strings without floating-point error. The result keeps
+ * `scale` fraction digits (default 2, for `S9(13)V9(2)` money fields).
+ */
+export function addDecimals(a: string, b: string, scale = 2): string {
+  return fromScaledInt(toScaledInt(a, scale) + toScaledInt(b, scale), scale);
+}
+
+/** Subtracts `b` from `a` as decimal strings, preserving precision. */
+export function subtractDecimals(a: string, b: string, scale = 2): string {
+  return fromScaledInt(toScaledInt(a, scale) - toScaledInt(b, scale), scale);
+}
+
+/** Sums a list of decimal strings, preserving precision. */
+export function sumDecimals(values: readonly string[], scale = 2): string {
+  const total = values.reduce(
+    (acc, value) => acc + toScaledInt(value, scale),
+    0n,
+  );
+  return fromScaledInt(total, scale);
 }

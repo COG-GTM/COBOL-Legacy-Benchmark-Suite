@@ -1,5 +1,13 @@
 import { describe, expect, it } from 'vitest';
-import { formatCurrency, normalizeDecimal, validateDecimal } from './decimal';
+import {
+  addDecimals,
+  formatCurrency,
+  formatQuantity,
+  normalizeDecimal,
+  subtractDecimals,
+  sumDecimals,
+  validateDecimal,
+} from './decimal';
 
 describe('validateDecimal', () => {
   const constraints = { maxIntDigits: 13, maxFracDigits: 2 };
@@ -49,5 +57,42 @@ describe('formatCurrency', () => {
     expect(formatCurrency('123456789012345.67')).toBe(
       '$123,456,789,012,345.67',
     );
+  });
+});
+
+describe('formatQuantity', () => {
+  it('groups thousands and trims trailing fraction zeros', () => {
+    expect(formatQuantity('4200.0000')).toBe('4,200');
+    expect(formatQuantity('1250.5000')).toBe('1,250.5');
+    expect(formatQuantity('1975.3300')).toBe('1,975.33');
+    expect(formatQuantity('157820.4000')).toBe('157,820.4');
+  });
+
+  it('preserves up to four fraction digits and handles negatives', () => {
+    expect(formatQuantity('0.0001')).toBe('0.0001');
+    expect(formatQuantity('-12.5000')).toBe('-12.5');
+  });
+});
+
+describe('decimal arithmetic', () => {
+  it('adds without floating-point error', () => {
+    expect(addDecimals('0.1', '0.2')).toBe('0.30');
+    expect(addDecimals('512300.75', '172480.20')).toBe('684780.95');
+  });
+
+  it('subtracts, including negative results', () => {
+    expect(subtractDecimals('684780.95', '579050.00')).toBe('105730.95');
+    expect(subtractDecimals('58940.10', '61200.00')).toBe('-2259.90');
+  });
+
+  it('sums a list preserving precision on large values', () => {
+    expect(sumDecimals(['0.01', '0.02', '0.03'])).toBe('0.06');
+    expect(
+      sumDecimals(['123456789012345.67', '1.11', '0.22']),
+    ).toBe('123456789012347.00');
+  });
+
+  it('returns 0.00 for an empty sum', () => {
+    expect(sumDecimals([])).toBe('0.00');
   });
 });

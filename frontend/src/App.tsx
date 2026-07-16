@@ -3,6 +3,7 @@ import { Layout } from './components/Layout';
 import { PortfolioListPage } from './features/portfolios/PortfolioListPage';
 import { PortfolioDetailPage } from './features/portfolios/PortfolioDetailPage';
 import { PortfolioFormPage } from './features/portfolios/PortfolioFormPage';
+import { PositionInquiryPage } from './features/positions/PositionInquiryPage';
 
 export function App() {
   return (
@@ -19,6 +20,7 @@ export function App() {
           path="portfolios/:id/edit"
           element={<PortfolioFormPage mode="edit" />}
         />
+        <Route path="positions" element={<PositionInquiryPage />} />
         <Route path="*" element={<Navigate to="/portfolios" replace />} />
       </Route>
     </Routes>

@@ -11,6 +11,7 @@
   --active: #1e9e63;
   --closed: #6b7280;
   --suspended: #d39200;
+  --pending: #1f4dd8;
   --radius: 10px;
   --shadow: 0 1px 3px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.06);
   font-family: system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial,
@@ -310,6 +311,51 @@ a:hover {
   color: var(--text-muted);
   font-size: 13px;
 }
+
+/* Valuation summary */
+.valuation {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+.valuation-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 20px;
+}
+.valuation-card__label {
+  color: var(--text-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.valuation-card__value {
+  font-size: 22px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.valuation-card__value--positive {
+  color: var(--active);
+}
+.valuation-card__value--negative {
+  color: var(--danger);
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 16px;
+}
+.pagination__status {
+  color: var(--text-muted);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
 .state-msg {
   padding: 32px;
   text-align: center;
@@ -384,6 +430,10 @@ a:hover {
   background: #fdf3e2;
   color: var(--suspended);
 }
+.badge--pending {
+  background: #eef2ff;
+  color: var(--pending);
+}
 
 /* Alert */
 .alert {
@@ -433,7 +483,8 @@ a:hover {
 
 @media (max-width: 720px) {
   .form__grid,
-  .detail-grid {
+  .detail-grid,
+  .valuation {
     grid-template-columns: 1fr;
   }
   .app__main {

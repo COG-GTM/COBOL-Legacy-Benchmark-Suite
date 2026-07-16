@@ -2,6 +2,7 @@ import { NavLink, Outlet } from 'react-router-dom';
 
 const NAV_ITEMS = [
   { to: '/portfolios', label: 'Portfolios', enabled: true },
+  { to: '/positions', label: 'Positions', enabled: true },
   { to: '/transactions', label: 'Transactions', enabled: false },
   { to: '/history', label: 'History', enabled: false },
   { to: '/reports', label: 'Reports', enabled: false },
