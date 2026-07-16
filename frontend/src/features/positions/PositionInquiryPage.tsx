@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useMemo, useRef, useState } from 'react';
 import { Pagination } from '../../components/Pagination';
 import { StatusBadge } from '../../components/StatusBadge';
 import { usePositionService } from '../../services/servicesContext';
@@ -24,19 +24,25 @@ export function PositionInquiryPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [page, setPage] = useState(1);
+  // Guards against out-of-order responses: only the latest search may commit.
+  const requestId = useRef(0);
 
   const load = useCallback(
     async (accountNo: string, status: PositionStatus | '') => {
+      const id = ++requestId.current;
       setLoading(true);
       setError(null);
       setPage(1);
       try {
-        setPositions(await service.listByAccount(accountNo, { status }));
+        const results = await service.listByAccount(accountNo, { status });
+        if (id !== requestId.current) return;
+        setPositions(results);
         setSearchedAccount(accountNo);
       } catch {
+        if (id !== requestId.current) return;
         setError('Unable to load positions. Please try again.');
       } finally {
-        setLoading(false);
+        if (id === requestId.current) setLoading(false);
       }
     },
     [service],
@@ -53,6 +59,7 @@ export function PositionInquiryPage() {
   };
 
   const onReset = () => {
+    requestId.current += 1;
     setAccountInput('');
     setStatusInput('');
     setPositions([]);
@@ -145,9 +152,7 @@ export function PositionInquiryPage() {
           <ValuationCard
             label="Gain / Loss"
             value={formatCurrency(valuation.gainLoss)}
-            tone={
-              valuation.gainLoss.startsWith('-') ? 'negative' : 'positive'
-            }
+            tone={gainLossTone(valuation.gainLoss)}
           />
         </div>
       )}
@@ -177,7 +182,9 @@ export function PositionInquiryPage() {
             </thead>
             <tbody>
               {pagePositions.map((position) => (
-                <tr key={`${position.portfolioId}-${position.investmentId}`}>
+                <tr
+                  key={`${position.portfolioId}-${position.date}-${position.investmentId}`}
+                >
                   <td>{position.investmentId}</td>
                   <td>{position.fundName}</td>
                   <td>
@@ -209,6 +216,13 @@ export function PositionInquiryPage() {
       )}
     </section>
   );
+}
+
+/** Break-even (0.00) is neutral; only true gains/losses get color. */
+function gainLossTone(gainLoss: string): 'positive' | 'negative' | undefined {
+  if (gainLoss.startsWith('-')) return 'negative';
+  if (/^0(\.0+)?$/.test(gainLoss)) return undefined;
+  return 'positive';
 }
 
 function ValuationCard({
