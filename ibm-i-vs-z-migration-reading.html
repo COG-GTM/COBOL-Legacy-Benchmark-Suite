@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IBM i vs IBM z &amp; Core Banking Migration &mdash; Reading + Quiz</title>
+<style>
+  :root{
+    --bg:#0f1720;
+    --panel:#ffffff;
+    --ink:#1a2330;
+    --muted:#5c6b7a;
+    --line:#e2e8f0;
+    --brand:#0b5cad;      /* IBM-ish blue */
+    --brand-dark:#083e75;
+    --accent-i:#0f8a6a;   /* IBM i green */
+    --accent-z:#8a3ffc;   /* IBM z purple */
+    --good:#128a45;
+    --bad:#c0392b;
+    --warn:#b7791f;
+    --code-bg:#0f1720;
+    --code-ink:#d7e3ef;
+    --radius:10px;
+    --maxw:960px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    color:var(--ink);
+    background:#eef2f6;
+    line-height:1.65;
+    font-size:17px;
+  }
+  a{color:var(--brand);}
+  .layout{
+    display:grid;
+    grid-template-columns:270px minmax(0,1fr);
+    gap:0;
+    align-items:start;
+    max-width:1280px;
+    margin:0 auto;
+  }
+  /* ---------- Sticky nav ---------- */
+  nav.toc{
+    position:sticky;
+    top:0;
+    align-self:start;
+    height:100vh;
+    overflow-y:auto;
+    background:var(--bg);
+    color:#c7d3df;
+    padding:26px 20px 40px;
+  }
+  nav.toc .brand{
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:.03em;
+    color:#fff;
+    margin-bottom:4px;
+  }
+  nav.toc .sub{font-size:12px;color:#7f92a3;margin-bottom:22px;}
+  nav.toc a{
+    display:block;
+    color:#c7d3df;
+    text-decoration:none;
+    font-size:13.5px;
+    padding:7px 10px;
+    border-radius:7px;
+    border-left:3px solid transparent;
+    margin-bottom:2px;
+  }
+  nav.toc a:hover{background:#1b2733;color:#fff;}
+  nav.toc a.active{background:#12324f;color:#fff;border-left-color:var(--brand);}
+  nav.toc .grp{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:#5f7284;margin:18px 0 6px 10px;}
+  .score-badge{
+    margin-top:22px;padding:12px;border-radius:8px;background:#12324f;color:#dbeafe;font-size:13px;
+  }
+  .score-badge b{color:#fff;}
+  /* ---------- Main ---------- */
+  main{padding:0 0 80px;}
+  header.hero{
+    background:linear-gradient(135deg,var(--brand-dark),#0a2a4d 60%,#0f1720);
+    color:#fff;
+    padding:54px 48px 46px;
+  }
+  header.hero h1{margin:0 0 10px;font-size:30px;line-height:1.2;}
+  header.hero p{margin:0;max-width:720px;color:#cfe0f0;font-size:16px;}
+  .hero-tags{margin-top:20px;display:flex;gap:10px;flex-wrap:wrap;}
+  .hero-tags span{
+    font-size:12px;padding:5px 11px;border-radius:20px;background:rgba(255,255,255,.12);
+    border:1px solid rgba(255,255,255,.2);
+  }
+  section{
+    background:var(--panel);
+    margin:26px 34px;
+    padding:34px 40px;
+    border-radius:var(--radius);
+    border:1px solid var(--line);
+    box-shadow:0 1px 3px rgba(15,23,32,.05);
+  }
+  section h2{
+    font-size:23px;margin:0 0 4px;color:var(--brand-dark);
+    display:flex;align-items:baseline;gap:10px;
+  }
+  section h2 .num{
+    font-size:13px;font-weight:700;color:#fff;background:var(--brand);
+    border-radius:6px;padding:2px 9px;letter-spacing:.02em;
+  }
+  section h3{font-size:18px;margin:26px 0 8px;color:var(--ink);}
+  section h4{font-size:15px;margin:18px 0 6px;color:var(--brand-dark);text-transform:uppercase;letter-spacing:.04em;}
+  p{margin:12px 0;}
+  ul,ol{margin:10px 0 10px 4px;padding-left:22px;}
+  li{margin:6px 0;}
+  .lede{font-size:18px;color:var(--muted);}
+  strong{color:var(--ink);}
+  code{
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    background:#eef2f6;padding:1.5px 6px;border-radius:5px;font-size:14px;color:#0a2a4d;
+  }
+  .callout{
+    border-left:4px solid var(--brand);
+    background:#f2f7fc;
+    padding:14px 18px;border-radius:0 8px 8px 0;margin:18px 0;font-size:15.5px;
+  }
+  .callout.i{border-left-color:var(--accent-i);background:#eefaf5;}
+  .callout.z{border-left-color:var(--accent-z);background:#f6f0ff;}
+  .callout.warn{border-left-color:var(--warn);background:#fdf7ec;}
+  .callout .lbl{font-weight:700;display:block;margin-bottom:2px;font-size:13px;text-transform:uppercase;letter-spacing:.05em;}
+  .callout.i .lbl{color:var(--accent-i);}
+  .callout.z .lbl{color:var(--accent-z);}
+  .callout.warn .lbl{color:var(--warn);}
+  /* code / ascii diagrams */
+  pre{
+    background:var(--code-bg);
+    color:var(--code-ink);
+    padding:18px 20px;
+    border-radius:8px;
+    overflow-x:auto;
+    font-family:"SFMono-Regular",Consolas,"Liberation Mono",Menlo,monospace;
+    font-size:12.5px;
+    line-height:1.5;
+    margin:16px 0;
+  }
+  pre.diagram{font-size:12px;line-height:1.35;}
+  pre b{color:#8fd0ff;}
+  .cap{font-size:13px;color:var(--muted);margin:-8px 0 18px;font-style:italic;}
+  /* grounding source box */
+  .src{
+    border:1px dashed #b8c6d4;background:#f7fafd;border-radius:8px;padding:14px 18px;margin:16px 0;font-size:14.5px;
+  }
+  .src .tag{font-size:11px;font-weight:700;color:var(--brand);text-transform:uppercase;letter-spacing:.06em;}
+  .src code{background:#e4ecf3;}
+  /* tables */
+  .tablewrap{overflow-x:auto;margin:18px 0;}
+  table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:640px;}
+  th,td{border:1px solid var(--line);padding:10px 13px;text-align:left;vertical-align:top;}
+  thead th{background:var(--brand-dark);color:#fff;font-weight:600;}
+  thead th.i{background:var(--accent-i);}
+  thead th.z{background:var(--accent-z);}
+  tbody tr:nth-child(even){background:#f6f9fc;}
+  td.dim{color:var(--muted);font-weight:600;width:170px;background:#eef2f6;}
+  /* R's cards */
+  .rgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:16px;margin:20px 0;}
+  .rcard{border:1px solid var(--line);border-radius:10px;padding:16px 18px;background:#fbfdff;}
+  .rcard h4{margin:0 0 4px;color:var(--brand-dark);font-size:15px;text-transform:none;letter-spacing:0;}
+  .rcard .rname{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;}
+  .pc{font-size:13.5px;margin:8px 0 0;}
+  .pc .pro{color:var(--good);font-weight:600;}
+  .pc .con{color:var(--bad);font-weight:600;}
+  .risk{display:inline-block;font-size:11px;font-weight:700;padding:2px 8px;border-radius:12px;margin-top:8px;}
+  .risk.low{background:#e3f6ea;color:var(--good);}
+  .risk.med{background:#fdf3e0;color:var(--warn);}
+  .risk.high{background:#fbe6e3;color:var(--bad);}
+  /* phased framework */
+  .phase{display:flex;gap:16px;margin:14px 0;align-items:flex-start;}
+  .phase .n{
+    flex:0 0 40px;height:40px;width:40px;border-radius:50%;background:var(--brand);color:#fff;
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;
+  }
+  .phase .body{flex:1;border-bottom:1px solid var(--line);padding-bottom:14px;}
+  .phase .body h4{margin:6px 0 2px;text-transform:none;letter-spacing:0;font-size:16px;color:var(--brand-dark);}
+  /* ---------- Quiz ---------- */
+  .quiz{border:2px solid var(--brand);border-radius:12px;padding:6px 0 0;margin:22px 0;overflow:hidden;background:#fff;}
+  .quiz-head{background:var(--brand);color:#fff;padding:14px 22px;margin:-6px 0 0;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;}
+  .quiz-head h3{margin:0;color:#fff;font-size:18px;}
+  .quiz-head .qscore{font-size:14px;background:rgba(255,255,255,.15);padding:5px 12px;border-radius:20px;}
+  .q{padding:20px 22px;border-bottom:1px solid var(--line);}
+  .q:last-of-type{border-bottom:none;}
+  .q .qtext{font-weight:600;margin:0 0 12px;}
+  .q .qtext .qn{color:var(--brand);margin-right:6px;}
+  .opts{list-style:none;margin:0;padding:0;}
+  .opts li{margin:8px 0;}
+  .opts button{
+    width:100%;text-align:left;background:#f6f9fc;border:1.5px solid var(--line);border-radius:8px;
+    padding:11px 15px;font-size:15px;cursor:pointer;color:var(--ink);transition:background .12s,border-color .12s;
+    font-family:inherit;line-height:1.4;
+  }
+  .opts button:hover:not(:disabled){border-color:var(--brand);background:#eef5fc;}
+  .opts button:disabled{cursor:default;}
+  .opts button.correct{background:#e6f7ec;border-color:var(--good);color:#0a5c30;font-weight:600;}
+  .opts button.wrong{background:#fbe9e7;border-color:var(--bad);color:#8a2018;font-weight:600;}
+  .opts button .mark{float:right;font-weight:700;}
+  .explain{
+    margin-top:12px;padding:12px 15px;border-radius:8px;font-size:14.5px;display:none;
+    background:#f2f7fc;border-left:4px solid var(--brand);
+  }
+  .explain.show{display:block;}
+  .explain.right{background:#eefaf5;border-left-color:var(--good);}
+  .explain.wrong{background:#fdf1ef;border-left-color:var(--bad);}
+  .explain b{text-transform:uppercase;font-size:12px;letter-spacing:.05em;}
+  .quiz-foot{padding:16px 22px;background:#f6f9fc;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px;}
+  .quiz-foot .result{font-weight:600;}
+  .btn{
+    background:var(--brand);color:#fff;border:none;border-radius:8px;padding:9px 18px;font-size:14px;
+    cursor:pointer;font-family:inherit;font-weight:600;
+  }
+  .btn:hover{background:var(--brand-dark);}
+  .btn.ghost{background:#fff;color:var(--brand);border:1.5px solid var(--brand);}
+  footer.foot{color:var(--muted);font-size:13px;text-align:center;padding:20px 34px 0;}
+  .totop{position:fixed;right:22px;bottom:22px;background:var(--brand);color:#fff;border-radius:50%;width:46px;height:46px;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:20px;box-shadow:0 3px 10px rgba(0,0,0,.25);opacity:.9;}
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr;}
+    nav.toc{position:static;height:auto;}
+    section{margin:20px 14px;padding:24px 20px;}
+    header.hero{padding:36px 22px;}
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+  <!-- ================= NAV ================= -->
+  <nav class="toc" id="toc">
+    <div class="brand">IBM i vs IBM z</div>
+    <div class="sub">Core Banking Migration &mdash; Reading + Quiz</div>
+    <div class="grp">Reading</div>
+    <a href="#s1">1. Why banks care</a>
+    <a href="#s2">2. IBM i (AS/400)</a>
+    <a href="#s3">3. IBM z (z/OS)</a>
+    <a href="#s4">4. i vs z side-by-side</a>
+    <a href="#s5">5. Migration options (6 R's)</a>
+    <a href="#s6">6. Migration framework</a>
+    <div class="grp">Assess yourself</div>
+    <a href="#quizA">Quiz A &mdash; i / z basics</a>
+    <a href="#quizB">Quiz B &mdash; Migration</a>
+    <div class="score-badge">
+      Total score: <b><span id="totalScore">0</span> / <span id="totalMax">0</span></b>
+    </div>
+  </nav>
+
+  <!-- ================= MAIN ================= -->
+  <main>
+    <header class="hero">
+      <h1>IBM i vs. IBM z, and How Banks Migrate Off Them</h1>
+      <p>A reading module for banking-technology teams. It explains the two dominant IBM platforms that
+      still run core banking &mdash; the midrange <strong>IBM i (AS/400)</strong> and the mainframe
+      <strong>IBM z (z/OS)</strong> &mdash; and the mainstream strategies for modernizing off them while
+      preserving <em>full</em> banking functionality. Examples are grounded in a real COBOL codebase, the
+      <strong>Investment Portfolio Management System</strong> from the COBOL&#8209;Legacy&#8209;Benchmark&#8209;Suite.</p>
+      <div class="hero-tags">
+        <span>Self-contained &middot; offline</span>
+        <span>2 interactive quizzes</span>
+        <span>ASCII architecture diagrams</span>
+        <span>Grounded in real COBOL/CICS/DB2/VSAM</span>
+      </div>
+    </header>
+
+    <!-- ============ SECTION 1 ============ -->
+    <section id="s1">
+      <h2><span class="num">01</span> Why a bank cares about IBM i and IBM z</h2>
+      <p class="lede">The "system of record" for accounts, balances and ledgers at most established banks
+      still lives on an IBM platform. Understanding these platforms is the starting point for any credible
+      modernization program.</p>
+
+      <p>Roughly speaking, when a bank runs core software on IBM hardware it is on one of two families:</p>
+      <ul>
+        <li><strong>IBM i</strong> &mdash; the midrange platform descended from the AS/400. Extremely common
+        for regional banks, credit unions and community banks. The widely deployed
+        <strong>Jack Henry SilverLake</strong> (formerly Silverlake Axis) core banking system runs on IBM i.</li>
+        <li><strong>IBM z</strong> &mdash; the mainframe (z/OS). The backbone of large "money-center" banks,
+        card networks and clearing/settlement, where transaction volumes and availability requirements are extreme.</li>
+      </ul>
+
+      <h3>What "maintaining full functionality" means for core banking</h3>
+      <p>A core banking migration is not a website rewrite. If a single ledger entry is lost or double-posted,
+      real money and regulatory standing are at stake. "Full functionality" is a demanding checklist:</p>
+      <ul>
+        <li><strong>Accounts &amp; ledgers</strong> &mdash; the authoritative record of balances and postings; must always foot.</li>
+        <li><strong>Batch settlement</strong> &mdash; overnight cycles: interest accrual, position updates, clearing, statementing.</li>
+        <li><strong>Regulatory reporting</strong> &mdash; scheduled, auditable extracts (e.g. positions, holdings, exposures).</li>
+        <li><strong>24&times;7 availability</strong> &mdash; digital and card channels never sleep; the shrinking batch window must not cause outages.</li>
+        <li><strong>ACID transactions</strong> &mdash; Atomic, Consistent, Isolated, Durable posting is non-negotiable.</li>
+        <li><strong>Audit trail</strong> &mdash; who changed what, when; immutable history for examiners.</li>
+      </ul>
+
+      <div class="src">
+        <span class="tag">Grounded in the benchmark repo</span>
+        <p style="margin:6px 0 0">The reference system exhibits every one of these traits. Its DB2 schema
+        (<code>src/database/db2/db2-definitions.sql</code>) defines <code>PORTFOLIO_MASTER</code>,
+        <code>INVESTMENT_POSITIONS</code> and <code>TRANSACTION_HISTORY</code> with foreign keys and
+        <code>LAST_MAINT_DATE</code>/<code>LAST_MAINT_USER</code> audit columns on <em>every</em> table &mdash;
+        exactly the "who/when" trail examiners expect. Overnight <strong>batch settlement</strong> appears as
+        JCL such as <code>src/jcl/batch/RPTPOS.jcl</code> (a daily position report), and <strong>ACID</strong>
+        behavior is centralized in <code>DB2CMT</code>, a commit controller issuing <code>COMMIT WORK</code>,
+        <code>ROLLBACK WORK</code> and <code>SAVEPOINT</code>.</p>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 2 ============ -->
+    <section id="s2">
+      <h2><span class="num">02</span> IBM i (AS/400), explained from scratch</h2>
+      <p class="lede">IBM i is best understood as an <em>integrated, database-centric operating system</em>: the
+      OS, the relational database and the security model are one product, not a stack you assemble.</p>
+
+      <h3>A short lineage</h3>
+      <pre class="diagram">
+  1978            1988             2000            2008 &rarr; today
+   |               |                |                |
+System/38  &rarr;   AS/400    &rarr;    iSeries   &rarr;   IBM i  (on IBM Power servers)
+(capability   (unified       (rebrand,        (current name; OS releases
+ architecture, midrange       eServer line)    7.3 / 7.4 / 7.5)
+ single-level  business
+ storage)      system)
+      </pre>
+      <p>The same architectural ideas from System/38 survive today. Programs written for the AS/400 in the late
+      1980s frequently still run on modern IBM i with little or no change &mdash; a deliberate compatibility promise
+      that is a big reason banks stayed.</p>
+
+      <h3>Defining characteristics</h3>
+      <ul>
+        <li><strong>Integrated OS + Db2 for i</strong> &mdash; the database is <em>built into</em> the operating
+        system. There is no separate "install the database" step; every file is effectively a database object.</li>
+        <li><strong>Single-level storage</strong> &mdash; main memory and disk are treated as one enormous flat
+        address space. Applications don't manage where data physically lives; the OS pages it transparently.</li>
+        <li><strong>Object-based architecture</strong> &mdash; everything (programs <code>*PGM</code>, files
+        <code>*FILE</code>, data areas, user profiles) is a typed <em>object</em> with an owner and authorities.
+        You cannot treat a program as raw bytes; the system enforces object integrity.</li>
+        <li><strong>DDS physical &amp; logical files</strong> &mdash; classic data definition uses <em>DDS</em>.
+        A <strong>physical file (PF)</strong> holds the actual records; a <strong>logical file (LF)</strong> is a
+        view/index/join over one or more PFs. (Modern IBM i also supports plain SQL DDL.)</li>
+        <li><strong>Language mix</strong> &mdash; <strong>RPG</strong> is the signature language (RPG III / ILE RPG /
+        free-format RPG), alongside <strong>COBOL/400</strong> and <strong>CL</strong> (Control Language) for scripting
+        and job control.</li>
+        <li><strong>5250 "green screen"</strong> &mdash; character terminals (and emulators) speaking the 5250 data
+        stream. Menu-driven, keyboard-first data entry.</li>
+        <li><strong>Journaling &amp; commitment control</strong> &mdash; the native recovery model. <em>Journaling</em>
+        records every change to a file; <em>commitment control</em> groups changes into ACID transactions that can be
+        committed or rolled back &mdash; conceptually the IBM i counterpart to database transaction logs.</li>
+      </ul>
+
+      <div class="callout i">
+        <span class="lbl">IBM i in banking</span>
+        Jack Henry's <strong>SilverLake</strong> core banking platform (originating from Silverlake Axis) runs on IBM i
+        and powers a large share of US community and mid-tier banks. If a bank says "we run on the AS/400", they almost
+        certainly mean IBM i.
+      </div>
+
+      <div class="src">
+        <span class="tag">Reading the benchmark on IBM i terms</span>
+        <p style="margin:6px 0 0">The benchmark is written for z/OS, but many patterns translate to IBM i concepts.
+        Its indexed <code>PORTMSTR</code> VSAM file (keyed master, <code>src/database/vsam/vsam-definitions.txt</code>)
+        maps naturally to an IBM i <strong>keyed physical file</strong>; the DB2 <code>SAVEPOINT</code> / <code>COMMIT WORK</code>
+        logic in <code>DB2CMT</code> is the direct analogue of IBM i <strong>commitment control</strong>; and the
+        checkpoint/restart program <code>CKPRST</code> resembles the kind of recovery scaffolding that IBM i
+        <strong>journaling</strong> provides more natively.</p>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 3 ============ -->
+    <section id="s3">
+      <h2><span class="num">03</span> IBM z (z/OS), explained from scratch</h2>
+      <p class="lede">IBM z is the <em>mainframe</em>. Where IBM i integrates everything into one product, z/OS is a
+      layered stack of specialized subsystems, each best-of-breed for scale, throughput and availability.</p>
+
+      <h3>Lineage in one line</h3>
+      <pre class="diagram">
+  System/360 (1964) &rarr; System/370 &rarr; System/390 &rarr; zSeries &rarr; IBM Z (z/Architecture, 64-bit)
+       the original                                          current mainframes running z/OS
+       "mainframe"                                           (plus z/VM, Linux on Z, z/VSE)
+      </pre>
+
+      <h3>The z/OS subsystem stack</h3>
+      <ul>
+        <li><strong>z/OS</strong> &mdash; the operating system that schedules work, manages storage and runs subsystems.</li>
+        <li><strong>CICS</strong> (Customer Information Control System) &mdash; the online <strong>transaction monitor</strong>.
+        It hosts thousands of concurrent terminal/API transactions with tiny, fast programs. The dominant pattern is
+        <strong>pseudo-conversational</strong>: a program sends a screen and <em>ends</em>, freeing resources; the next
+        keystroke starts a fresh transaction that picks up saved state.</li>
+        <li><strong>Db2 for z/OS</strong> &mdash; the relational database, tuned for enormous concurrency and data volumes.</li>
+        <li><strong>VSAM</strong> (Virtual Storage Access Method) &mdash; high-performance record files. <strong>KSDS</strong>
+        (Key-Sequenced Data Set) is the keyed/indexed flavor used for master and history files.</li>
+        <li><strong>JCL</strong> (Job Control Language) &mdash; how <strong>batch</strong> work is described: which program to
+        run, which datasets (DD statements) to allocate, and in what order (job steps).</li>
+        <li><strong>Languages</strong> &mdash; <strong>COBOL</strong> dominates business logic, with <strong>PL/I</strong> and
+        low-level <strong>HLASM</strong> (High Level Assembler) for performance-critical or system code.</li>
+        <li><strong>3270 "green screen"</strong> &mdash; the mainframe terminal. Screens are defined with <strong>BMS</strong>
+        (Basic Mapping Support) <em>maps</em> that lay out fields on a 24&times;80 character grid.</li>
+        <li><strong>Parallel Sysplex</strong> &mdash; the availability model: multiple z/OS images clustered with a shared
+        coupling facility so the "system" survives the loss of any one machine &mdash; enabling near-continuous uptime.</li>
+      </ul>
+
+      <div class="src">
+        <span class="tag">Every one of these appears in the benchmark</span>
+        <p style="margin:6px 0 0"><strong>CICS + pseudo-conversational:</strong> <code>src/programs/online/INQPORT.cbl</code>
+        issues <code>EXEC CICS READ FILE('POSFILE')</code>, <code>EXEC CICS SEND MAP('POSMAP') MAPSET('INQSET')</code>,
+        then <code>EXEC CICS RETURN</code> &mdash; a textbook send-and-end handler.
+        <strong>BMS 3270 maps:</strong> <code>src/maps/INQSET.bms</code> defines <code>DFHMDI ... SIZE=(24,80)</code> screens
+        with PF-key legends (<code>PF3=Exit PF7=Previous PF8=Next</code>).
+        <strong>VSAM KSDS:</strong> <code>PORTMSTR</code> is <code>ORGANIZATION: KSDS</code>, <code>KEY LENGTH: 12</code>, defined via
+        <code>IDCAMS DEFINE CLUSTER</code>.
+        <strong>JCL batch:</strong> <code>RPTPOS.jcl</code> shows <code>//STEP01 EXEC PGM=RPTPOS00</code> with
+        <code>STEPLIB</code>/<code>DD</code> dataset allocations.
+        <strong>Db2 for z/OS:</strong> the schema and the <code>DB2CMT</code> commit controller
+        (the program even declares <code>SOURCE-COMPUTER. IBM-ZOS</code>).</p>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 4 ============ -->
+    <section id="s4">
+      <h2><span class="num">04</span> IBM i vs. IBM z &mdash; side by side</h2>
+      <p class="lede">Both are IBM, both run COBOL, both have "green screens" &mdash; but their philosophies differ.
+      IBM i favors <em>integration and simplicity</em>; IBM z favors <em>specialized subsystems at extreme scale</em>.</p>
+
+      <div class="tablewrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Dimension</th>
+            <th class="i">IBM i (AS/400)</th>
+            <th class="z">IBM z (z/OS)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td class="dim">Category</td><td>Midrange / integrated business system</td><td>Mainframe / large-scale enterprise</td></tr>
+          <tr><td class="dim">OS &amp; DB integration</td><td>Database (<strong>Db2 for i</strong>) built <em>into</em> the OS; one product</td><td>OS plus separately-managed subsystems (Db2, CICS, VSAM)</td></tr>
+          <tr><td class="dim">Database</td><td>Db2 for i; DDS physical/logical files or SQL</td><td>Db2 for z/OS and/or VSAM datasets</td></tr>
+          <tr><td class="dim">Transaction manager</td><td>Native OS jobs; commitment control (no separate TP monitor needed)</td><td><strong>CICS</strong> (and IMS TM) as dedicated transaction monitors</td></tr>
+          <tr><td class="dim">Job / batch control</td><td><strong>CL</strong> (Control Language) programs &amp; job scheduler</td><td><strong>JCL</strong> with job steps and DD dataset allocation</td></tr>
+          <tr><td class="dim">Terminal UI</td><td><strong>5250</strong> green screen</td><td><strong>3270</strong> green screen via <strong>BMS</strong> maps</td></tr>
+          <tr><td class="dim">Language mix</td><td>RPG (signature), COBOL/400, CL</td><td>COBOL (dominant), PL/I, HLASM</td></tr>
+          <tr><td class="dim">Storage model</td><td>Single-level storage (memory+disk as one space)</td><td>Traditional virtual storage; explicit dataset management</td></tr>
+          <tr><td class="dim">Recovery model</td><td>Journaling + commitment control</td><td>Db2 logs; VSAM recovery; checkpoint/restart</td></tr>
+          <tr><td class="dim">Availability model</td><td>Clustering, PowerHA, logical replication</td><td><strong>Parallel Sysplex</strong> (shared coupling facility)</td></tr>
+          <tr><td class="dim">Typical customer</td><td>Community / regional banks, credit unions (e.g. JH SilverLake)</td><td>Money-center banks, card networks, clearing houses</td></tr>
+          <tr><td class="dim">Hardware</td><td>IBM Power servers</td><td>IBM Z (z16 / z15) mainframes</td></tr>
+        </tbody>
+      </table>
+      </div>
+
+      <h3>Architecture diagram A &mdash; IBM i: one integrated box</h3>
+      <pre class="diagram">
+   +====================================================================+
+   |                        IBM i  (on IBM Power)                       |
+   |                                                                    |
+   |   5250 green screen ── terminal / emulator                         |
+   |          │                                                         |
+   |          ▼                                                         |
+   |   +--------------------------------------------------------+       |
+   |   |  Application layer:  RPG / COBOL-400 / CL programs      |       |
+   |   |         (all typed *OBJECTs owned + authorized)         |       |
+   |   +--------------------------------------------------------+       |
+   |          │  (no separate DB install — it is the OS)                |
+   |          ▼                                                         |
+   |   +--------------------------------------------------------+       |
+   |   |  Db2 for i  ── DDS physical/logical files, SQL          |       |
+   |   |  Journaling + commitment control (ACID)                 |       |
+   |   +--------------------------------------------------------+       |
+   |          │                                                         |
+   |          ▼                                                         |
+   |   Single-level storage  (memory + disk = one address space)        |
+   +====================================================================+
+              INTEGRATED: OS + database + security are ONE product
+      </pre>
+      <p class="cap">On IBM i the boundaries between OS, database and application runtime are intentionally blurred &mdash; fewer moving parts to operate.</p>
+
+      <h3>Architecture diagram B &mdash; IBM z: cooperating subsystems</h3>
+      <pre class="diagram">
+   3270 screen                              Batch job (JCL)
+   (BMS map, 24x80)                          //STEP01 EXEC PGM=...
+        │                                          │
+        ▼                                          ▼
+  +--------------+     +---------------------------------------------+
+  |    CICS      |     |            z/OS  (the operating system)      |
+  |  online TP   |     |  schedules jobs, manages storage, subsystems |
+  |  monitor     |     +---------------------------------------------+
+  |  (pseudo-    |            │                    │
+  |  conversat.) |            ▼                    ▼
+  +------┬-------+     +--------------+     +----------------+
+         │             |  Db2 for     |     |     VSAM       |
+         └────────────►|   z/OS       |     |  KSDS files    |
+     COBOL / PL/I /     |  (relational)|     | (master/hist)  |
+     HLASM programs     +--------------+     +----------------+
+                                 │                    │
+                                 ▼                    ▼
+                  +-----------------------------------------------+
+                  |   Parallel Sysplex  (clustered z/OS images    |
+                  |   + coupling facility  =  near-continuous up)  |
+                  +-----------------------------------------------+
+          LAYERED: OS + CICS + Db2 + VSAM are SEPARATE, specialized parts
+      </pre>
+      <p class="cap">On IBM z each concern is a distinct, individually-tuned subsystem &mdash; more parts to run, but each scales enormously.</p>
+
+      <div class="callout">
+        <span class="lbl">The one-sentence contrast</span>
+        <strong>IBM i</strong> gives you fewer things to manage because the database <em>is</em> the OS;
+        <strong>IBM z</strong> gives you more things to manage because each subsystem (CICS, Db2, VSAM) is separately
+        engineered for the largest possible scale and availability.
+      </div>
+    </section>
+
+    <!-- ============ SECTION 5 ============ -->
+    <section id="s5">
+      <h2><span class="num">05</span> Migration options &mdash; the 6 R's</h2>
+      <p class="lede">"Getting off" IBM i or IBM z is not one decision. The industry frames the choices as the
+      <strong>6 R's</strong>. A large bank rarely picks one &mdash; it assigns a strategy per application domain.</p>
+
+      <div class="rgrid">
+        <div class="rcard">
+          <div class="rname">R &mdash; (a) Rehost</div>
+          <h4>Lift-and-shift / emulation</h4>
+          <p>Recompile the COBOL essentially unchanged and run it on Linux/x86 (or cloud) under an emulation runtime
+          &mdash; e.g. <strong>Micro Focus</strong>, <strong>GnuCOBOL</strong>, or a CICS/JCL emulator.</p>
+          <p class="pc"><span class="pro">Pros:</span> fastest, lowest logic risk; frees expensive MIPS/hardware.</p>
+          <p class="pc"><span class="con">Cons:</span> you keep the old design and COBOL; limited modernization; emulator licensing/fidelity.</p>
+          <span class="risk low">Risk: Low</span>
+        </div>
+
+        <div class="rcard">
+          <div class="rname">R &mdash; (b) Replatform</div>
+          <h4>Keep logic, modernize data</h4>
+          <p>Retain the application logic but move the data layer to a modern RDBMS (e.g. VSAM/Db2 &rarr; PostgreSQL,
+          Db2 LUW, Oracle) and/or a supported COBOL runtime.</p>
+          <p class="pc"><span class="pro">Pros:</span> unlocks modern data tooling/analytics; moderate effort.</p>
+          <p class="pc"><span class="con">Cons:</span> data access rewrites (EXEC SQL/CICS file I/O); careful data-type mapping (packed decimal!).</p>
+          <span class="risk med">Risk: Medium</span>
+        </div>
+
+        <div class="rcard">
+          <div class="rname">R &mdash; (c) Refactor</div>
+          <h4>Automated code transformation</h4>
+          <p>Convert COBOL to <strong>Java</strong> or <strong>C#</strong> via automated transformation tools (and,
+          increasingly, LLM-assisted translation &mdash; the very purpose of this benchmark suite).</p>
+          <p class="pc"><span class="pro">Pros:</span> exits COBOL skills scarcity; modern language &amp; CI/CD.</p>
+          <p class="pc"><span class="con">Cons:</span> machine-translated code can be unidiomatic ("JOBOL"); needs heavy testing &amp; equivalence proof.</p>
+          <span class="risk med">Risk: Medium</span>
+        </div>
+
+        <div class="rcard">
+          <div class="rname">R &mdash; (d) Rearchitect</div>
+          <h4>Cloud-native microservices</h4>
+          <p>Redesign around bounded domains as microservices/event-driven services on the cloud, replacing monolithic
+          batch + CICS patterns.</p>
+          <p class="pc"><span class="pro">Pros:</span> elastic scale, independent deploys, best long-term agility.</p>
+          <p class="pc"><span class="con">Cons:</span> highest cost/time; must re-derive decades of embedded business rules; distributed-systems complexity.</p>
+          <span class="risk high">Risk: High</span>
+        </div>
+
+        <div class="rcard">
+          <div class="rname">R &mdash; (e) Replace</div>
+          <h4>Buy a COTS core banking package</h4>
+          <p>Retire the custom system and adopt a packaged core (e.g. Temenos, Finacle, Thought Machine, Mambu, or a
+          JH product).</p>
+          <p class="pc"><span class="pro">Pros:</span> vendor-maintained, roadmap &amp; compliance built in.</p>
+          <p class="pc"><span class="con">Cons:</span> fit-gap pain; lose bespoke differentiators; big-bang risk; data migration is enormous.</p>
+          <span class="risk high">Risk: High</span>
+        </div>
+
+        <div class="rcard">
+          <div class="rname">R &mdash; (f) Retain / Encapsulate</div>
+          <h4>Wrap behind APIs (strangler fig)</h4>
+          <p>Deliberately keep the legacy running and expose it through APIs, peeling off functionality incrementally
+          &mdash; the <strong>strangler fig</strong> pattern.</p>
+          <p class="pc"><span class="pro">Pros:</span> immediate integration value; de-risks by slicing; no forced rewrite.</p>
+          <p class="pc"><span class="con">Cons:</span> legacy debt persists; needs disciplined routing/anti-corruption layer.</p>
+          <span class="risk low">Risk: Low&ndash;Med</span>
+        </div>
+      </div>
+
+      <div class="src">
+        <span class="tag">Mapped onto the benchmark code</span>
+        <ul style="margin:8px 0 0">
+          <li><strong>Rehost:</strong> take <code>RPTPOS00</code> and its <code>RPTPOS.jcl</code> and recompile under GnuCOBOL/Micro Focus with a JCL emulator &mdash; same logic, x86 host.</li>
+          <li><strong>Replatform:</strong> repoint <code>INQPORT</code>'s <code>EXEC CICS READ FILE('POSFILE')</code> and the DB2 schema onto PostgreSQL; the tricky part is mapping <code>COMP-3</code> packed decimals and <code>DECIMAL(18,4)</code> money fields losslessly.</li>
+          <li><strong>Refactor:</strong> translate <code>DB2CMT</code>'s <code>COMMIT</code>/<code>ROLLBACK</code>/<code>SAVEPOINT</code> logic into a Java transaction service &mdash; the kind of pair this suite exists to benchmark.</li>
+          <li><strong>Rearchitect:</strong> split "positions", "transactions" and "reporting" (today one VSAM/Db2 monolith) into separate services around the <code>PORTFOLIO_MASTER</code> / <code>INVESTMENT_POSITIONS</code> / <code>TRANSACTION_HISTORY</code> domains.</li>
+          <li><strong>Encapsulate:</strong> put a REST facade in front of the CICS <code>INQPORT</code> inquiry so channels call an API instead of a 3270 screen &mdash; strangler entry point.</li>
+        </ul>
+      </div>
+    </section>
+
+    <!-- ============ SECTION 6 ============ -->
+    <section id="s6">
+      <h2><span class="num">06</span> A canonical, phased migration framework</h2>
+      <p class="lede">The detailed recommended path is produced separately; what follows is a solid, general framework
+      that works regardless of which R's you choose. In banking, every phase is governed by <strong>risk controls</strong>.</p>
+
+      <div class="phase"><div class="n">1</div><div class="body">
+        <h4>Assess &amp; discover</h4>
+        <p>Build a full inventory: programs, copybooks, JCL, CICS transactions, VSAM/Db2 objects, batch schedules,
+        and their dependencies. Establish which code is dead, which is hot, and where the business rules actually
+        live. <em>Deliverable: application portfolio + dependency map + risk/complexity heatmap.</em></p>
+      </div></div>
+
+      <div class="phase"><div class="n">2</div><div class="body">
+        <h4>Establish target architecture &amp; guardrails</h4>
+        <p>Decide target runtime(s), data platform, integration standards, security/compliance controls, and the
+        per-domain choice of R. Define non-negotiable guardrails (data integrity, auditability, latency SLOs).</p>
+      </div></div>
+
+      <div class="phase"><div class="n">3</div><div class="body">
+        <h4>Decompose into domains / services</h4>
+        <p>Slice the monolith along business boundaries (accounts, positions, transactions, reporting). Identify seams
+        where an <strong>anti-corruption layer</strong> can isolate new code from legacy formats (e.g. packed-decimal).</p>
+      </div></div>
+
+      <div class="phase"><div class="n">4</div><div class="body">
+        <h4>Data migration strategy</h4>
+        <p>Plan the movement of master and history data: schema mapping, code-page/EBCDIC conversion, packed-decimal
+        fidelity, referential integrity, and a repeatable, reversible load. Decide on one-time vs. continuous
+        replication (change data capture) during coexistence.</p>
+      </div></div>
+
+      <div class="phase"><div class="n">5</div><div class="body">
+        <h4>Incremental migration (strangler) with parallel run &amp; reconciliation</h4>
+        <p>Migrate a domain at a time behind a routing facade. Run old and new <strong>in parallel</strong> and
+        <strong>reconcile</strong> outputs (balances, ledgers, report totals) until they match to the penny before
+        trusting the new path. Never big-bang the ledger.</p>
+      </div></div>
+
+      <div class="phase"><div class="n">6</div><div class="body">
+        <h4>Cutover &amp; decommission</h4>
+        <p>Once reconciliation is clean and regulators have signed off, cut traffic to the new system, keep the legacy
+        as a hot fallback for a defined window, then decommission and archive per retention rules.</p>
+      </div></div>
+
+      <h3>Framework as a flow</h3>
+      <pre class="diagram">
+ ASSESS ─► TARGET ARCH ─► DECOMPOSE ─► DATA STRATEGY ─► INCREMENTAL MIGRATE ─► CUTOVER
+ &amp;discover  &amp;guardrails    domains       schema+CDC       (strangler +           &amp;decommission
+    │            │            │           EBCDIC/COMP-3    parallel run +              │
+    │            │            │           mapping)         reconcile)                 │
+    ▼            ▼            ▼               ▼                  ▼                     ▼
+ ┌───────────────────────── BANKING RISK CONTROLS (every phase) ──────────────────────────┐
+ │  dual-run reconciliation • data-integrity checks • regulatory sign-off • rollback plan  │
+ │  immutable audit trail   • segregation of duties  • parallel-run exit criteria          │
+ └─────────────────────────────────────────────────────────────────────────────────────────┘
+      </pre>
+
+      <div class="callout warn">
+        <span class="lbl">Why the risk band spans every phase</span>
+        In core banking the migration mechanics are the easy part; <strong>proving equivalence</strong> is the hard part.
+        Dual-run reconciliation, penny-level balancing, regulatory sign-off and a tested rollback are what let a bank
+        move without a reportable incident. The reference system's per-table audit columns and its <code>DB2CMT</code>
+        commit/rollback discipline are exactly the hooks you lean on to prove that equivalence.
+      </div>
+    </section>
+
+    <!-- ============ QUIZ A ============ -->
+    <section id="quizA">
+      <h2><span class="num">Q&middot;A</span> Quiz A &mdash; IBM i / IBM z basics</h2>
+      <p>Ten questions on the platforms themselves. Pick an answer to see whether it's right, plus an explanation.</p>
+      <div class="quiz" data-quiz="A">
+        <div class="quiz-head">
+          <h3>IBM i / IBM z basics</h3>
+          <div class="qscore">Score: <span class="qs-val">0</span> / <span class="qs-max">0</span></div>
+        </div>
+        <!-- questions injected by JS -->
+        <div class="quiz-foot">
+          <button class="btn ghost" data-reset="A">Reset quiz</button>
+          <div class="result" data-result="A"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ QUIZ B ============ -->
+    <section id="quizB">
+      <h2><span class="num">Q&middot;B</span> Quiz B &mdash; Migration framework &amp; options</h2>
+      <p>Ten questions on the 6 R's and the phased framework, tied back to banking constraints.</p>
+      <div class="quiz" data-quiz="B">
+        <div class="quiz-head">
+          <h3>Migration framework &amp; options</h3>
+          <div class="qscore">Score: <span class="qs-val">0</span> / <span class="qs-max">0</span></div>
+        </div>
+        <div class="quiz-foot">
+          <button class="btn ghost" data-reset="B">Reset quiz</button>
+          <div class="result" data-result="B"></div>
+        </div>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <p>IBM i vs. IBM z &amp; Core Banking Migration &mdash; a self-contained learning module.
+      Examples grounded in the COBOL&#8209;Legacy&#8209;Benchmark&#8209;Suite (Investment Portfolio Management System).</p>
+    </footer>
+  </main>
+</div>
+<a href="#" class="totop" title="Back to top">&uarr;</a>
+
+<script>
+/* ============================================================
+   Quiz data
+   correct = index of the correct option
+   ============================================================ */
+const QUIZZES = {
+  A: [
+    {
+      q: "Which statement best captures the defining architectural idea of IBM i (AS/400)?",
+      opts: [
+        "The database is a separately licensed subsystem you install on top of the OS",
+        "The relational database (Db2 for i) is integrated into the operating system itself",
+        "It has no database and relies entirely on flat files",
+        "It requires CICS to run any transaction"
+      ],
+      correct: 1,
+      why: "On IBM i, Db2 for i is built into the OS \u2014 there is no separate 'install the database' step. This integration (OS + DB + security as one product) is its signature trait, unlike z/OS where Db2 and CICS are distinct subsystems."
+    },
+    {
+      q: "Put the IBM i lineage in the correct historical order.",
+      opts: [
+        "AS/400 \u2192 System/38 \u2192 iSeries \u2192 IBM i",
+        "System/38 \u2192 AS/400 \u2192 iSeries \u2192 IBM i",
+        "iSeries \u2192 System/38 \u2192 IBM i \u2192 AS/400",
+        "System/360 \u2192 AS/400 \u2192 z/OS \u2192 IBM i"
+      ],
+      correct: 1,
+      why: "System/38 (1978) introduced the ideas; the AS/400 (1988) unified the midrange line; it was rebranded iSeries around 2000 and is called IBM i today, running on IBM Power servers. System/360 is the mainframe lineage, not IBM i."
+    },
+    {
+      q: "In z/OS, what is CICS?",
+      opts: [
+        "A relational database",
+        "A batch job scheduler language",
+        "An online transaction-processing monitor",
+        "A terminal hardware standard"
+      ],
+      correct: 2,
+      why: "CICS (Customer Information Control System) is the online TP monitor that hosts many short, fast transactions. The benchmark's INQPORT.cbl runs under CICS (EXEC CICS READ / SEND MAP / RETURN)."
+    },
+    {
+      q: "The 'pseudo-conversational' CICS pattern means a program\u2026",
+      opts: [
+        "Holds the terminal and all resources open for the whole user session",
+        "Sends a screen and then ends, so state is saved and the next input starts a fresh transaction",
+        "Never sends any screen output",
+        "Can only be written in Assembler"
+      ],
+      correct: 1,
+      why: "Pseudo-conversational programs send output and RETURN immediately, freeing resources between keystrokes; saved state (e.g. COMMAREA) is reloaded on the next interaction. INQPORT does exactly this: SEND MAP then EXEC CICS RETURN."
+    },
+    {
+      q: "In VSAM, what is a KSDS?",
+      opts: [
+        "A packed-decimal numeric format",
+        "A Key-Sequenced Data Set \u2014 an indexed, keyed file",
+        "A JCL statement that allocates memory",
+        "A CICS screen map"
+      ],
+      correct: 1,
+      why: "KSDS = Key-Sequenced Data Set, VSAM's indexed/keyed organization. The benchmark's PORTMSTR is 'ORGANIZATION: KSDS' with a 12-byte key, defined via IDCAMS DEFINE CLUSTER."
+    },
+    {
+      q: "On z/OS, what is JCL used for?",
+      opts: [
+        "Defining 3270 screen layouts",
+        "Writing SQL queries against Db2",
+        "Describing batch jobs \u2014 which program to run and which datasets (DD) to allocate",
+        "Encrypting data at rest"
+      ],
+      correct: 2,
+      why: "JCL (Job Control Language) drives batch: job steps, the program to execute (EXEC PGM=), and DD dataset allocations. See RPTPOS.jcl with //STEP01 EXEC PGM=RPTPOS00 and its STEPLIB/DD statements."
+    },
+    {
+      q: "What are BMS maps on IBM z?",
+      opts: [
+        "Definitions of 3270 terminal screen layouts (fields on a 24x80 grid)",
+        "Backup Management System archives",
+        "A type of VSAM index",
+        "The IBM i equivalent of RPG"
+      ],
+      correct: 0,
+      why: "BMS (Basic Mapping Support) maps define 3270 screen layouts. INQSET.bms defines DFHMDI screens SIZE=(24,80) with fields and PF-key legends like 'PF3=Exit PF7=Previous PF8=Next'."
+    },
+    {
+      q: "Which language is most associated specifically with IBM i (and less so with the mainframe)?",
+      opts: [
+        "PL/I",
+        "HLASM (High Level Assembler)",
+        "RPG",
+        "JCL"
+      ],
+      correct: 2,
+      why: "RPG is the signature IBM i language (RPG III / ILE RPG / free-format), alongside COBOL/400 and CL. PL/I and HLASM are mainframe (z/OS) staples; JCL is z/OS job control, not an application language."
+    },
+    {
+      q: "'Single-level storage' on IBM i refers to\u2026",
+      opts: [
+        "Storing only one record per file",
+        "Treating main memory and disk as one large flat address space managed by the OS",
+        "A single hard drive with no RAID",
+        "Keeping the database on a single server"
+      ],
+      correct: 1,
+      why: "Single-level storage means the OS presents memory and disk as one enormous address space; applications don't manage where objects physically live. It's a core AS/400/IBM i concept."
+    },
+    {
+      q: "Which pairing correctly matches each platform's high-availability model?",
+      opts: [
+        "IBM i \u2192 Parallel Sysplex; IBM z \u2192 PowerHA",
+        "IBM i \u2192 PowerHA/clustering; IBM z \u2192 Parallel Sysplex",
+        "Both use Parallel Sysplex",
+        "Neither offers any high-availability option"
+      ],
+      correct: 1,
+      why: "Parallel Sysplex (clustered z/OS images + coupling facility) is the mainframe availability model. IBM i uses clustering / PowerHA / logical replication on Power servers."
+    }
+  ],
+  B: [
+    {
+      q: "In the '6 R's', which strategy is a lift-and-shift that recompiles COBOL to run under emulation on Linux/x86?",
+      opts: ["Rearchitect", "Replace", "Rehost", "Retain"],
+      correct: 2,
+      why: "Rehost = lift-and-shift: recompile the (largely unchanged) COBOL on x86/cloud using tools like Micro Focus or GnuCOBOL plus a CICS/JCL emulator. Lowest logic risk, but you keep the old design."
+    },
+    {
+      q: "A bank keeps its COBOL business logic but moves VSAM/Db2 data onto PostgreSQL. Which R is this?",
+      opts: ["Replatform", "Refactor", "Replace", "Rearchitect"],
+      correct: 0,
+      why: "Replatform keeps the application logic while modernizing the data layer (and/or runtime). The main effort is rewriting data access and mapping types like COMP-3 packed decimals losslessly."
+    },
+    {
+      q: "Automated (or LLM-assisted) conversion of COBOL into idiomatic Java or C# is best described as\u2026",
+      opts: ["Rehost", "Refactor", "Retain", "Replace"],
+      correct: 1,
+      why: "Refactor / automated code transformation converts COBOL to a modern language. This benchmark suite exists precisely to test such COBOL\u2192Java/C# translation. Watch for unidiomatic 'JOBOL' output \u2014 heavy testing is required."
+    },
+    {
+      q: "Which option carries the HIGHEST risk of losing decades of embedded, undocumented business rules?",
+      opts: [
+        "Rehost (emulation)",
+        "Retain / encapsulate behind APIs",
+        "Rearchitect to cloud-native microservices",
+        "Doing nothing"
+      ],
+      correct: 2,
+      why: "Rearchitecting redesigns from the ground up, so you must re-derive business rules that are only encoded in the legacy programs. It offers the best long-term agility but is the most expensive and highest-risk path."
+    },
+    {
+      q: "The 'strangler fig' pattern is used in which R, and what does it do?",
+      opts: [
+        "Replace \u2014 big-bang swap to a COTS package overnight",
+        "Retain/Encapsulate \u2014 wrap legacy behind APIs and peel off functionality incrementally",
+        "Rehost \u2014 recompile everything at once",
+        "Refactor \u2014 translate all code in a single pass"
+      ],
+      correct: 1,
+      why: "Strangler fig incrementally routes functionality to new services behind a facade while the legacy keeps running, gradually 'strangling' it. It de-risks by slicing rather than doing a big-bang cutover."
+    },
+    {
+      q: "In the phased framework, what is the FIRST phase?",
+      opts: [
+        "Cutover & decommission",
+        "Assess & discover (inventory + dependencies)",
+        "Data migration",
+        "Incremental migration"
+      ],
+      correct: 1,
+      why: "You must first assess & discover: inventory programs, copybooks, JCL, CICS transactions and data objects, map dependencies, and locate where business rules live. You can't safely migrate what you haven't inventoried."
+    },
+    {
+      q: "Why is 'parallel run with reconciliation' emphasized for a banking ledger migration?",
+      opts: [
+        "It makes the migration faster",
+        "It lets you run old and new simultaneously and prove outputs match to the penny before trusting the new path",
+        "It avoids the need for any testing",
+        "It is required only for the user interface"
+      ],
+      correct: 1,
+      why: "Running old and new in parallel and reconciling balances/ledgers/report totals proves functional equivalence before cutover. Proving equivalence \u2014 not the mechanics \u2014 is the hard part of core banking migration."
+    },
+    {
+      q: "Which is a banking-specific RISK CONTROL that should span every migration phase?",
+      opts: [
+        "Choosing the cheapest cloud region",
+        "Regulatory sign-off, dual-run reconciliation, immutable audit trail, and a tested rollback plan",
+        "Using the newest programming language available",
+        "Deleting the legacy system as early as possible"
+      ],
+      correct: 1,
+      why: "Banking migrations are governed throughout by controls: dual-run reconciliation, data-integrity checks, regulatory sign-off, segregation of duties, an immutable audit trail, and a tested rollback. These let a bank move without a reportable incident."
+    },
+    {
+      q: "During data migration off z/OS, which technical detail most threatens data integrity if mishandled?",
+      opts: [
+        "The color of the 3270 screens",
+        "Fidelity of packed-decimal (COMP-3) and EBCDIC\u2192code-page conversion of money fields",
+        "The name of the JCL job",
+        "The number of PF keys used"
+      ],
+      correct: 1,
+      why: "Money is stored as packed decimal (COMP-3) / DECIMAL(18,x) and text as EBCDIC. Mapping these to a target RDBMS/encoding without rounding or corruption is critical \u2014 a mismatched decimal can literally lose money."
+    },
+    {
+      q: "A bank retires its custom core and adopts a vendor package like Temenos or Thought Machine. Which R, and a key downside?",
+      opts: [
+        "Replace \u2014 downside is fit-gap pain and loss of bespoke differentiators",
+        "Rehost \u2014 downside is emulator licensing",
+        "Refactor \u2014 downside is 'JOBOL' code",
+        "Retain \u2014 downside is persistent legacy debt"
+      ],
+      correct: 0,
+      why: "Adopting a COTS core banking package is Replace. It brings a vendor-maintained roadmap and built-in compliance, but at the cost of fit-gap effort, losing custom differentiators, big-bang risk, and a massive data migration."
+    }
+  ]
+};
+
+/* ============================================================
+   Render + scoring
+   ============================================================ */
+const state = {A:{answered:0,correct:0}, B:{answered:0,correct:0}};
+
+function buildQuiz(key){
+  const data = QUIZZES[key];
+  const quizEl = document.querySelector('.quiz[data-quiz="'+key+'"]');
+  const foot = quizEl.querySelector('.quiz-foot');
+  data.forEach((item, qi)=>{
+    const q = document.createElement('div');
+    q.className='q';
+    const qt = document.createElement('p');
+    qt.className='qtext';
+    qt.innerHTML='<span class="qn">Q'+(qi+1)+'.</span>'+item.q;
+    q.appendChild(qt);
+    const ul = document.createElement('ul');
+    ul.className='opts';
+    item.opts.forEach((opt, oi)=>{
+      const li=document.createElement('li');
+      const btn=document.createElement('button');
+      btn.type='button';
+      btn.textContent=opt;
+      btn.addEventListener('click',()=>choose(key,qi,oi,q,item));
+      li.appendChild(btn);
+      ul.appendChild(li);
+    });
+    q.appendChild(ul);
+    const ex=document.createElement('div');
+    ex.className='explain';
+    q.appendChild(ex);
+    foot.parentNode.insertBefore(q, foot);
+  });
+  quizEl.querySelector('.qs-max').textContent=data.length;
+  updateTotals();
+}
+
+function choose(key,qi,oi,qEl,item){
+  if(qEl.dataset.done==='1') return;       // lock after first answer
+  qEl.dataset.done='1';
+  const btns=qEl.querySelectorAll('.opts button');
+  const isRight = oi===item.correct;
+  btns.forEach((b,i)=>{
+    b.disabled=true;
+    if(i===item.correct){b.classList.add('correct');b.querySelector('.mark')||b.insertAdjacentHTML('beforeend','<span class="mark">\u2713</span>');}
+    if(i===oi && !isRight){b.classList.add('wrong');b.insertAdjacentHTML('beforeend','<span class="mark">\u2717</span>');}
+  });
+  const ex=qEl.querySelector('.explain');
+  ex.classList.add('show', isRight?'right':'wrong');
+  ex.innerHTML='<b>'+(isRight?'Correct. ':'Not quite. ')+'</b>'+item.why;
+
+  state[key].answered++;
+  if(isRight) state[key].correct++;
+  refreshScore(key);
+}
+
+function refreshScore(key){
+  const quizEl=document.querySelector('.quiz[data-quiz="'+key+'"]');
+  quizEl.querySelector('.qs-val').textContent=state[key].correct;
+  const total=QUIZZES[key].length;
+  const res=quizEl.querySelector('[data-result="'+key+'"]');
+  if(state[key].answered===total){
+    const c=state[key].correct;
+    let msg;
+    if(c===total) msg='Perfect \u2014 '+c+'/'+total+'. You\u2019ve got this cold.';
+    else if(c>=Math.ceil(total*0.7)) msg='Strong \u2014 '+c+'/'+total+'. Solid grasp of the material.';
+    else if(c>=Math.ceil(total*0.5)) msg='Getting there \u2014 '+c+'/'+total+'. Review the sections above and retry.';
+    else msg='Keep going \u2014 '+c+'/'+total+'. Re-read the reading, then reset and try again.';
+    res.textContent=msg;
+  } else {
+    res.textContent=state[key].answered+' of '+total+' answered';
+  }
+  updateTotals();
+}
+
+function resetQuiz(key){
+  state[key]={answered:0,correct:0};
+  const quizEl=document.querySelector('.quiz[data-quiz="'+key+'"]');
+  quizEl.querySelectorAll('.q').forEach(q=>{
+    q.dataset.done='';
+    q.querySelectorAll('.opts button').forEach(b=>{
+      b.disabled=false;b.classList.remove('correct','wrong');
+      const m=b.querySelector('.mark'); if(m)m.remove();
+    });
+    const ex=q.querySelector('.explain'); ex.className='explain'; ex.innerHTML='';
+  });
+  quizEl.querySelector('.qs-val').textContent='0';
+  quizEl.querySelector('[data-result="'+key+'"]').textContent='';
+  updateTotals();
+}
+
+function updateTotals(){
+  const done=state.A.correct+state.B.correct;
+  const max=QUIZZES.A.length+QUIZZES.B.length;
+  document.getElementById('totalScore').textContent=done;
+  document.getElementById('totalMax').textContent=max;
+}
+
+/* build both quizzes */
+buildQuiz('A');
+buildQuiz('B');
+document.querySelectorAll('[data-reset]').forEach(b=>{
+  b.addEventListener('click',()=>resetQuiz(b.dataset.reset));
+});
+
+/* ============================================================
+   Sticky-nav active-section highlighting
+   ============================================================ */
+const links=[...document.querySelectorAll('nav.toc a[href^="#"]')];
+const map={};
+links.forEach(a=>{const id=a.getAttribute('href').slice(1); if(id) map[id]=a;});
+const obs=new IntersectionObserver((entries)=>{
+  entries.forEach(e=>{
+    if(e.isIntersecting){
+      links.forEach(l=>l.classList.remove('active'));
+      const a=map[e.target.id]; if(a)a.classList.add('active');
+    }
+  });
+},{rootMargin:'-45% 0px -50% 0px',threshold:0});
+document.querySelectorAll('main section[id]').forEach(s=>obs.observe(s));
+</script>
+</body>
+</html>
