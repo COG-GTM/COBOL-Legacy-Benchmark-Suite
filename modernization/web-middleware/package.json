@@ -1,0 +1,20 @@
+{
+  "name": "ocbc-web-middleware",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Modern web middleware replacing the CICS BMS 3270 UI (INQSET) for the Investment Portfolio Management System",
+  "workspaces": [
+    "server",
+    "client"
+  ],
+  "scripts": {
+    "dev": "concurrently -n api,web -c red,cyan \"npm run dev -w web-middleware-server\" \"npm run dev -w web-middleware-client\"",
+    "start:api": "npm run start -w web-middleware-server",
+    "build": "npm run build -w web-middleware-client",
+    "test": "npm run test -w web-middleware-server && npm run test -w web-middleware-client",
+    "theme:sync": "node scripts/sync-theme.mjs"
+  },
+  "devDependencies": {
+    "concurrently": "8.2.2"
+  }
+}
