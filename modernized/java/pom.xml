@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.clbs</groupId>
+  <artifactId>clbs-modernized</artifactId>
+  <version>0.1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>CLBS Modernized Java</name>
+  <description>
+    Java translation of the COBOL Legacy Benchmark Suite. Phase 0 covers the shared copybooks
+    (model), the subroutine contracts called by PORTTRAN (service) and the test harness that
+    stands in for the z/OS runtime the original code was never run on.
+  </description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <junit.version>5.10.2</junit.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <!--
+      The layout is dictated by the translation plan: copybook translations live in model/ and
+      subroutine contracts in service/, both directly under modernized/java. Package names follow
+      Java convention rather than the directory depth, so the compiler is handed the two roots
+      explicitly instead of inferring packages from the path.
+    -->
+    <sourceDirectory>${project.basedir}/model</sourceDirectory>
+    <testSourceDirectory>${project.basedir}/src/test/java</testSourceDirectory>
+
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.4.0</version>
+        <executions>
+          <execution>
+            <id>add-service-sources</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.basedir}/service</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.11.0</version>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
+      </plugin>
+    </plugins>
+  </build>
+</project>
