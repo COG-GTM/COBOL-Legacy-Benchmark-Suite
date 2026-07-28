@@ -38,9 +38,20 @@ public final class CobolText {
         return buffer.toString();
     }
 
-    /** {@code IF field = SPACES}. */
+    /**
+     * {@code IF field = SPACES}. Only the space character counts: COBOL compares the buffer against
+     * {@code X'40'}, so a tab or a low value is data, not blank.
+     */
     public static boolean isSpaces(String value) {
-        return value == null || value.trim().isEmpty();
+        if (value == null) {
+            return true;
+        }
+        for (int i = 0; i < value.length(); i++) {
+            if (value.charAt(i) != ' ') {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** The field content without its trailing pad, for logging and assertions. */

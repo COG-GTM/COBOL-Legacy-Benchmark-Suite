@@ -56,14 +56,18 @@ public final class CobolDecimal {
         return store(value, AMOUNT_DIGITS, AMOUNT_SCALE);
     }
 
-    /** Convenience factory for test data and literals. */
+    /** Convenience factory for test data and literals; null stores as zero, as {@link #store} does. */
     public static BigDecimal quantity(String value) {
-        return quantity(new BigDecimal(value));
+        return quantity(parse(value));
     }
 
-    /** Convenience factory for test data and literals. */
+    /** Convenience factory for test data and literals; null stores as zero, as {@link #store} does. */
     public static BigDecimal amount(String value) {
-        return amount(new BigDecimal(value));
+        return amount(parse(value));
+    }
+
+    private static BigDecimal parse(String value) {
+        return value == null ? null : new BigDecimal(value);
     }
 
     /**

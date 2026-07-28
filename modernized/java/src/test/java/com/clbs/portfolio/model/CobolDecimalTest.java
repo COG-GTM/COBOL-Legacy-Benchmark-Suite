@@ -28,6 +28,13 @@ class CobolDecimalTest {
     }
 
     @Test
+    @DisplayName("the String factories store null as zero, like the BigDecimal ones")
+    void stringFactoriesAcceptNull() {
+        assertEquals(CobolDecimal.ZERO_QUANTITY, CobolDecimal.quantity((String) null));
+        assertEquals(CobolDecimal.ZERO_AMOUNT, CobolDecimal.amount((String) null));
+    }
+
+    @Test
     @DisplayName("excess decimals are truncated toward zero, never rounded")
     void truncatesTowardZero() {
         assertEquals(new BigDecimal("1.23"), CobolDecimal.amount("1.239"));

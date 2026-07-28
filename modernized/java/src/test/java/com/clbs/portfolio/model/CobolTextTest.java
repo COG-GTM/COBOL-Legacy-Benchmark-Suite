@@ -33,6 +33,15 @@ class CobolTextTest {
     }
 
     @Test
+    @DisplayName("only the space character counts as SPACES")
+    void onlySpacesAreBlank() {
+        assertFalse(CobolText.isSpaces("\t"));
+        assertFalse(CobolText.isSpaces("\0"));
+        assertFalse(CobolText.isSpaces("\n"));
+        assertTrue(CobolText.isSpaces("   "));
+    }
+
+    @Test
     @DisplayName("trim removes only the pad")
     void trimRemovesOnlyThePad() {
         assertEquals("GROWTH PORTFOLIO", CobolText.trim(CobolText.picX("GROWTH PORTFOLIO", 30)));

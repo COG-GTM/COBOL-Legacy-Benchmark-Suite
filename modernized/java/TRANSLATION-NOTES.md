@@ -12,6 +12,8 @@ rewritten silently.
 | Child 3 - batch pipeline                      | Open   | `HISTLD00`, transaction validation                                   |
 | Child 4 - reporting                           | Open   | `RPTPOS00`, `RPTAUD00`, `RPTSTA00`                                   |
 
+Discrepancies found so far are catalogued as `G1`-`G10` in section 4.
+
 ## 0. Why this reads oddly in places
 
 The COBOL in this repository was generated as a translation benchmark and **was never compiled or
@@ -104,7 +106,9 @@ split applies to `TRN-STATUS`, `POS-STATUS`, `PORT-STATUS`, `PORT-CLIENT-TYPE`, 
 `PORT-CREATE-DATE`, `PORT-LAST-MAINT` and `PORT-LAST-TRANS` are unsigned `PIC 9(8)` display fields
 mapped to `int`. `toRecordImage()` renders the `01` buffer as characters for group moves such as
 `MOVE PORT-RECORD TO AUD-BEFORE-IMAGE`; packed fields have no text form, so they are rendered as a
-sign plus their unscaled digits and the image is an approximation by construction.
+sign plus their unscaled digits and the image is an approximation by construction. It is **not**
+byte-accurate and must not be treated as such: the rendering is 164 characters against the 148 bytes
+the copybook occupies, because a 16-character image stands in for each 8-byte packed field.
 
 The class also carries two fields that **no copybook defines** - see G1.
 
@@ -241,6 +245,33 @@ and `TRN-QUANTITY` are `COMP-3`. IBM Enterprise COBOL rejects a packed sender in
 written - one more sign the source was never built. The translation renders the packed fields the way
 `CobolDecimal.image` does, sign plus unscaled digits, which is the closest readable equivalent of the
 bytes the statement was reaching for. Child 1 records the exact rendering it uses.
+
+Note when checking this locally: GnuCOBOL 3.1.2 accepts a packed sender in `STRING`, in its default
+dialect and under `-std=ibm` alike, so `cobc` does not corroborate G8. The target platform is what
+matters here, and the Enterprise COBOL V6.4 rules for `STRING` are explicit - senders must be usage
+`DISPLAY`, `DISPLAY-1`, `NATIONAL` or `UTF-8`, and a numeric sender must be an integer - so the
+statement is invalid on two independent counts. `cobc` is a weak oracle for IBM-dialect claims
+generally; treat a GnuCOBOL result as evidence only when it agrees with the language reference.
+
+### G9 - the portfolio record area is referred to by two different names
+
+`2210`, `2220` and `2240` all write it back with `REWRITE PORTFOLIO-RECORD`
+(`PORTTRAN.cbl:194`, `:219`, `:242`), but `2300-UPDATE-AUDIT-TRAIL` reads it as
+`MOVE PORT-RECORD TO AUD-BEFORE-IMAGE` (`:278`). `PORT-RECORD` is the `01` level in `PORTFLIO.cpy`;
+`PORTFOLIO-RECORD` is presumably what the missing `PORTREC.cpy` declared under the `FD` (G1).
+Whichever copybook was intended, one of the two names is undefined and the program cannot compile.
+
+**Decision.** `PortfolioRecord` is the single translated record and both names resolve to it. This
+costs nothing behaviourally - the two statements are reading and writing the same file's record area
+in any reading of the source - but it is a second, independent symptom of the missing copybook.
+
+### G10 - `FUNCTION USER-ID` is not an intrinsic function
+
+`2300-UPDATE-AUDIT-TRAIL` populates the audit user with `MOVE FUNCTION USER-ID TO AUD-USER-ID`
+(`PORTTRAN.cbl:254`). IBM Enterprise COBOL has no `USER-ID` intrinsic (the neighbouring
+`FUNCTION CURRENT-DATE` on line 252 is real), so `AUD-USER-ID` has no defined source. The
+translation supplies the user id explicitly rather than inventing an equivalent; the slice that owns
+`PORTTRAN` documents where it gets the value from.
 
 ## 5. Subroutine contracts
 
