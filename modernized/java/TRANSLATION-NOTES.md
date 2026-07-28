@@ -7,7 +7,7 @@ rewritten silently.
 | Slice                                        | Status | Covers                                                              |
 | -------------------------------------------- | ------ | ------------------------------------------------------------------- |
 | Phase 0 - shared foundation                   | Landed | `TRNREC`, `POSREC`, `PORTFLIO`, `ERRHAND`, `AUDITLOG`, `AUDPROC`/`ERRPROC` contracts, test harness |
-| Child 1 - `PORTTRAN.cbl`                      | Open   | `PortfolioTransactionProcessor`, `PortfolioRepository`               |
+| Child 1 - `PORTTRAN.cbl`                      | Landed | `PortfolioTransactionProcessor`, `PortfolioRepository`, `TransactionSource` |
 | Child 2 - portfolio CRUD                      | Open   | `PORTMSTR`, `PORTADD`, `PORTUPDT`, `PORTDEL`, `PORTREAD`             |
 | Child 3 - batch pipeline                      | Open   | `HISTLD00`, transaction validation                                   |
 | Child 4 - reporting                           | Open   | `RPTPOS00`, `RPTAUD00`, `RPTSTA00`                                   |
@@ -242,6 +242,78 @@ written - one more sign the source was never built. The translation renders the 
 `CobolDecimal.image` does, sign plus unscaled digits, which is the closest readable equivalent of the
 bytes the statement was reaching for. Child 1 records the exact rendering it uses.
 
+### G9 - the portfolio record area has two different names
+
+`PORTTRAN` writes the record area back with `REWRITE PORTFOLIO-RECORD` (`2210`, `2220`, `2240`) but
+copies it with `MOVE PORT-RECORD TO AUD-BEFORE-IMAGE` (`2300`). `PORTFLIO.cpy` declares
+`01 PORT-RECORD` and nothing anywhere declares `PORTFOLIO-RECORD`; both names must have come from
+the `PORTREC` copybook that does not exist (G1), and only one `01` can sit under the `FD`.
+
+**Decision.** One record area, `PortfolioTransactionProcessor.getPortfolioRecord()`. Both statements
+address it, so the rewrite writes back every field the read delivered - not only the two the
+paragraph changed. Pinned by `Updates.rewriteWritesBackTheWholeRecordArea`.
+
+### G10 - `FUNCTION USER-ID` is not an IBM intrinsic function
+
+`2300-UPDATE-AUDIT-TRAIL` has `MOVE FUNCTION USER-ID TO AUD-USER-ID`. `USER-ID` is not in the
+intrinsic-function set of IBM Enterprise COBOL for z/OS (nor in the ISO standard); it is a GnuCOBOL
+extension. A z/OS program obtains the user id from the environment - `EXEC CICS ASSIGN USERID` or
+the security manager - not from a function call, so this statement is a third thing that would not
+have compiled.
+
+**Decision.** The value is supplied to the constructor rather than invented, defaulting to the
+`user.name` system property, and is stored in the eight bytes of `AUD-USER-ID` like any other
+`MOVE`. `FUNCTION CURRENT-DATE` on the line above is a real intrinsic and is rendered as its 21
+characters `YYYYMMDDhhmmssnn±hhmm` from an injectable `Clock`, which `MOVE` pads to the 26 bytes of
+`AUD-TIMESTAMP`. Pinned by `ControlFlow.userIdIsSupplied` and
+`AuditTrail.successfulUpdateIsAuditedSucc`.
+
+### G11 - an unrecognised transaction type is audited as if something had happened
+
+The `EVALUATE TRN-TYPE` in `2200-UPDATE-POSITIONS` has no `WHEN OTHER`, and neither does the one in
+`2300-UPDATE-AUDIT-TRAIL` that sets `AUD-ACTION`. A type that matches none of the four codes
+therefore updates nothing, falls straight through to the audit trail and writes a record whose
+action is still the spaces left by `INITIALIZE AUDIT-RECORD` - and whose status is `SUCC` whenever
+the previous file operation happened to succeed (G7). Only reachable by calling the paragraph, since
+nothing performs it (G2). Reproduced as written; pinned by `Updates.unrecognisedTypeStillAudits`.
+
+### G12 - the "before image" is captured after the update
+
+`2300-UPDATE-AUDIT-TRAIL` is performed at the end of `2200-UPDATE-POSITIONS`, by which point
+`2210`/`2220`/`2240` have already changed the record area and rewritten it. The comment above the
+statement says `Store original portfolio state`, but `AUD-BEFORE-IMAGE` receives the post-update
+record; there is no saved copy of the original anywhere in the program, and `AUD-AFTER-IMAGE` is
+never populated at all.
+
+**Decision.** Reproduced: the image is taken from the record area at the point the statement runs.
+It has a quiet interaction with G1 - the only fields the update paragraphs change are the two
+synthetic ones, which `toRecordImage()` excludes, so in the translation the image is byte-identical
+before and after a buy. Pinned by `AuditTrail.beforeImageIsTakenAfterTheUpdate`.
+
+### G13 - a portfolio file that will not open does not stop the run
+
+`1000-INITIALIZE` opens both files and logs an error for each open that fails, but `0000-MAIN` only
+tests `WS-TRAN-STATUS`. A failed `OPEN I-O PORTFOLIO-FILE` is therefore logged and then ignored: the
+loop runs, and every `READ PORTFOLIO-FILE` against an unopened file would fail with status `47`, so
+`2110-CHECK-PORTFOLIO` would reject every transaction as an invalid portfolio id. `3000-TERMINATE`
+then closes both files unconditionally, including one that never opened.
+
+**Decision.** Reproduced: the translated `initialize()` logs and continues, and `terminate()` closes
+both. What a read against an unopened file does is left to the `PortfolioRepository` implementation,
+since that is a property of the file system rather than of the program. Pinned by
+`ControlFlow.portfolioFileOpenFailure` and `ControlFlow.filesAreClosedAfterAFailedOpen`.
+
+### G14 - the error cutoff stops at 101 errors, and open failures count towards it
+
+`PERFORM 2000-PROCESS-TRANSACTIONS UNTIL END-OF-FILE OR WS-ERROR-COUNT > 100` is a test-before loop,
+so the count is inspected before each read: an iteration is entered on a count of exactly 100 and
+the loop ends once an iteration has pushed the count past it. The run therefore stops after the
+101st error, with 101 records read and the rest of the file unprocessed and unreported - the program
+neither says it stopped early nor returns a non-zero code. `WS-ERROR-COUNT` is also the counter
+`1000-INITIALIZE` increments for a failed open, so an open failure spends part of the same budget.
+Reproduced exactly; pinned by `ControlFlow.errorCutoff`,
+`ControlFlow.oneHundredErrorsIsUnderTheLimit` and `ControlFlow.transactionFileOpenFailure`.
+
 ## 5. Subroutine contracts
 
 | COBOL | Java | Returns |
@@ -276,3 +348,91 @@ buffer copying.
 4. Error and audit strings are copied byte for byte from the COBOL, including the trailing detail of
    `STRING` concatenations. Preserve short-circuit ordering exactly.
 5. Every discrepancy found gets a `G`-numbered entry in section 4 and a test that pins it.
+
+## 8. `PORTTRAN` - portfolio transaction processing (Child 1)
+
+`src/programs/portfolio/PORTTRAN.cbl` becomes `service/PortfolioTransactionProcessor.java`, tested by
+`src/test/java/com/clbs/portfolio/service/PortfolioTransactionProcessorTest.java`. The program's
+working storage becomes instance state - one `ERR-MESSAGE` area, one `AUDIT-RECORD` area, one
+transaction record area, one portfolio record area and the three counters - reused across
+transactions exactly as the COBOL reuses them, which is why the error and audit doubles snapshot
+what they are given.
+
+**The main flow validates and does nothing else.** `2000-PROCESS-TRANSACTIONS` performs
+`2100-VALIDATE-TRANSACTION` and nothing performs `2200-UPDATE-POSITIONS`, so no portfolio is ever
+updated and no audit record is ever written by a run of `main()`; that is G2 and it is reproduced,
+not repaired. The update subtree is translated anyway, as public methods nothing calls, so the logic
+is captured and can be driven directly by a test.
+
+### Files and subroutines
+
+| COBOL                                     | Java                                                       |
+| ----------------------------------------- | ---------------------------------------------------------- |
+| `FD TRANSACTION-FILE`, sequential input   | `TransactionSource` - `open()`, `read()` (`null` is `AT END`), `close()` |
+| `FD PORTFOLIO-FILE`, indexed I-O          | `PortfolioRepository` - `open()`, `findById()` (`Optional.empty()` is `INVALID KEY`), `update()`, `close()`, `getFileStatus()` |
+| `WS-TRAN-STATUS`, `WS-PORT-STATUS`        | the two-character status each interface reports; `WS-PORT-STATUS` is read back through `getFileStatus()` because `2300` branches on it (G7) |
+| `CALL 'AUDPROC'`, `CALL 'ERRPROC'`        | the Phase 0 `AuditProcessor` and `ErrorProcessor`           |
+| `DISPLAY` in `3000-TERMINATE`             | `getDisplayLines()`                                         |
+| `FUNCTION CURRENT-DATE`, `FUNCTION USER-ID` | an injected `Clock` and user id (G10)                     |
+
+All four collaborators are constructor-injected; the class does no I/O, holds no static state and
+depends on no framework.
+
+### Paragraphs
+
+| Paragraph                    | Method                    | Notes                                                                 |
+| ---------------------------- | ------------------------- | --------------------------------------------------------------------- |
+| `0000-MAIN`                  | `main()`                  | initialise, then loop `UNTIL END-OF-FILE OR WS-ERROR-COUNT > 100`, then terminate (G14) |
+| `1000-INITIALIZE`            | `initialize()`            | opens both files, logs either failure, only the transaction status gates the loop (G13) |
+| `2000-PROCESS-TRANSACTIONS`  | `processTransactions()`   | one `READ`; counts it and validates it - and nothing else (G2)         |
+| `2100-VALIDATE-TRANSACTION`  | `validateTransaction()`   | clears `ERR-TEXT`, then 2110, then 2120 and 2130 only while it is still spaces; counts the transaction or calls 9000 |
+| `2110-CHECK-PORTFOLIO`       | `checkPortfolio()`        | blank id, else read by key; the key is moved into the record area before the read and survives a failure |
+| `2120-CHECK-TRANSACTION-TYPE`| `checkTransactionType()`  | `BU`, `SL`, `TR`, `FE` pass                                            |
+| `2130-CHECK-AMOUNTS`         | `checkAmounts()`          | quantity always; price and amount only when the type is not `TR`       |
+| `2200-UPDATE-POSITIONS`      | `updatePositions()`       | dispatch then audit; no `WHEN OTHER` (G11); unreachable (G2)           |
+| `2210-PROCESS-BUY`           | `processBuy()`            | units += quantity, cost += amount (G1)                                 |
+| `2220-PROCESS-SELL`          | `processSell()`           | refuses `units < quantity`, else units -= quantity, cost -= amount     |
+| `2230-PROCESS-TRANSFER`      | `processTransfer()`       | sets the text and logs it; no transfer (G3)                            |
+| `2240-PROCESS-FEE`           | `processFee()`            | cost -= amount only; units untouched; its own not-found text           |
+| `2300-UPDATE-AUDIT-TRAIL`    | `updateAuditTrail()`      | `SUCC` only when the portfolio file status is `00` (G7)                |
+| `2310-WRITE-AUDIT-RECORD`    | `writeAuditRecord()`      | non-zero reported status takes the error path (G4)                     |
+| `3000-TERMINATE`             | `terminate()`             | closes both files unconditionally and reports the counters (G13)       |
+| `9000-ERROR-ROUTINE`         | `errorRoutine()`          | counts, stamps `PR` and `PORTTRAN`, calls `ERRPROC`; no code, no severity (G6) |
+
+### Error strings
+
+Every text is a public constant on the class, spelled as the COBOL spells it. How it reaches the
+80-byte `ERR-TEXT` depends on the statement:
+
+| Statement | Text | Rendering |
+| --------- | ---- | --------- |
+| `MOVE` (2110) | `Portfolio ID is required` | replaces the field, space-padded to 80 |
+| `STRING` (2110) | `Invalid Portfolio ID: ` + `TRN-PORTFOLIO-ID` | `DELIMITED BY SIZE`, so all eight bytes of the id, trailing spaces included: `Invalid Portfolio ID: PORT99  ` for an id of `PORT99` |
+| `STRING` (2120) | `Invalid Transaction Type: ` + `TRN-TYPE` | both bytes of the type: `Invalid Transaction Type: XX` |
+| `MOVE` (2130) | `Quantity must be greater than zero`, `Price must be greater than zero`, `Amount must be greater than zero` | replace the field |
+| `MOVE` (2210, 2220) | `Portfolio not found for update` | replaces the field |
+| `MOVE` (2220) | `Insufficient units for sale` | replaces the field |
+| `MOVE` (2230) | `Transfer processing not implemented` | replaces the field |
+| `MOVE` (2240) | `Portfolio not found for fee` | replaces the field |
+| `MOVE` (2210, 2220, 2240) | `Error updating portfolio` | replaces the field |
+| `MOVE` (2310) | `Error writing audit record` | replaces the field |
+| `MOVE` (1000) | `Error opening transaction file`, `Error opening portfolio file` | replace the field |
+
+`STRING ... DELIMITED BY SIZE INTO` overlays the receiver from the left and leaves the rest of it as
+it was rather than padding, and neither statement has an `ON OVERFLOW` phrase; the private
+`stringInto` helper reproduces exactly that. Because `2100-VALIDATE-TRANSACTION` clears `ERR-TEXT`
+first, the residue is spaces on every path the main flow takes.
+
+### The audit message
+
+`AUD-MESSAGE` is built by the same `STRING` mechanism over two `COMP-3` senders, which is not legal
+COBOL (G8). The packed values are rendered as `CobolDecimal.image` renders them - a sign followed by
+the field's unscaled digits, fifteen for both `TRN-AMOUNT` (`S9(13)V99`) and `TRN-QUANTITY`
+(`S9(11)V9(4)`) - so the seeded buy of 100 units for 12,500.00 produces:
+
+```
+Transaction: BU Amount: +000000001250000 Units: +000000001000000
+```
+
+`AUD-BEFORE-IMAGE` is `PortfolioRecord.toRecordImage()` truncated to its hundred bytes by the group
+move, and it is taken after the update has already happened (G12).
