@@ -12,6 +12,8 @@ rewritten silently.
 | Child 3 - batch pipeline                      | Open   | `HISTLD00`, transaction validation                                   |
 | Child 4 - reporting                           | Open   | `RPTPOS00`, `RPTAUD00`, `RPTSTA00`                                   |
 
+Discrepancies found so far are catalogued as `G1`-`G10` in section 4.
+
 ## 0. Why this reads oddly in places
 
 The COBOL in this repository was generated as a translation benchmark and **was never compiled or
@@ -104,7 +106,9 @@ split applies to `TRN-STATUS`, `POS-STATUS`, `PORT-STATUS`, `PORT-CLIENT-TYPE`, 
 `PORT-CREATE-DATE`, `PORT-LAST-MAINT` and `PORT-LAST-TRANS` are unsigned `PIC 9(8)` display fields
 mapped to `int`. `toRecordImage()` renders the `01` buffer as characters for group moves such as
 `MOVE PORT-RECORD TO AUD-BEFORE-IMAGE`; packed fields have no text form, so they are rendered as a
-sign plus their unscaled digits and the image is an approximation by construction.
+sign plus their unscaled digits and the image is an approximation by construction. It is **not**
+byte-accurate and must not be treated as such: the rendering is 164 characters against the 148 bytes
+the copybook occupies, because a 16-character image stands in for each 8-byte packed field.
 
 The class also carries two fields that **no copybook defines** - see G1.
 
@@ -242,30 +246,40 @@ written - one more sign the source was never built. The translation renders the 
 `CobolDecimal.image` does, sign plus unscaled digits, which is the closest readable equivalent of the
 bytes the statement was reaching for. Child 1 records the exact rendering it uses.
 
-### G9 - the portfolio record area has two different names
+Note when checking this locally: GnuCOBOL 3.1.2 accepts a packed sender in `STRING`, in its default
+dialect and under `-std=ibm` alike, so `cobc` does not corroborate G8. The target platform is what
+matters here, and the Enterprise COBOL V6.4 rules for `STRING` are explicit - senders must be usage
+`DISPLAY`, `DISPLAY-1`, `NATIONAL` or `UTF-8`, and a numeric sender must be an integer - so the
+statement is invalid on two independent counts. `cobc` is a weak oracle for IBM-dialect claims
+generally; treat a GnuCOBOL result as evidence only when it agrees with the language reference.
 
-`PORTTRAN` writes the record area back with `REWRITE PORTFOLIO-RECORD` (`2210`, `2220`, `2240`) but
-copies it with `MOVE PORT-RECORD TO AUD-BEFORE-IMAGE` (`2300`). `PORTFLIO.cpy` declares
-`01 PORT-RECORD` and nothing anywhere declares `PORTFOLIO-RECORD`; both names must have come from
-the `PORTREC` copybook that does not exist (G1), and only one `01` can sit under the `FD`.
+### G9 - the portfolio record area is referred to by two different names
 
-**Decision.** One record area, `PortfolioTransactionProcessor.getPortfolioRecord()`. Both statements
-address it, so the rewrite writes back every field the read delivered - not only the two the
-paragraph changed. Pinned by `Updates.rewriteWritesBackTheWholeRecordArea`.
+`2210`, `2220` and `2240` all write it back with `REWRITE PORTFOLIO-RECORD`
+(`PORTTRAN.cbl:194`, `:219`, `:242`), but `2300-UPDATE-AUDIT-TRAIL` reads it as
+`MOVE PORT-RECORD TO AUD-BEFORE-IMAGE` (`:278`). `PORT-RECORD` is the `01` level in `PORTFLIO.cpy`;
+`PORTFOLIO-RECORD` is presumably what the missing `PORTREC.cpy` declared under the `FD` (G1).
+Whichever copybook was intended, one of the two names is undefined and the program cannot compile.
 
-### G10 - `FUNCTION USER-ID` is not an IBM intrinsic function
+**Decision.** `PortfolioRecord` is the single translated record and both names resolve to it. This
+costs nothing behaviourally - the two statements are reading and writing the same file's record area
+in any reading of the source - but it is a second, independent symptom of the missing copybook.
 
-`2300-UPDATE-AUDIT-TRAIL` has `MOVE FUNCTION USER-ID TO AUD-USER-ID`. `USER-ID` is not in the
-intrinsic-function set of IBM Enterprise COBOL for z/OS (nor in the ISO standard); it is a GnuCOBOL
-extension. A z/OS program obtains the user id from the environment - `EXEC CICS ASSIGN USERID` or
-the security manager - not from a function call, so this statement is a third thing that would not
-have compiled.
+Pinned by `PortfolioTransactionProcessorTest.Updates.rewriteWritesBackTheWholeRecordArea`: the
+rewrite writes back every field the read delivered, not only the two the paragraph changed.
 
-**Decision.** The value is supplied to the constructor rather than invented, defaulting to the
-`user.name` system property, and is stored in the eight bytes of `AUD-USER-ID` like any other
-`MOVE`. `FUNCTION CURRENT-DATE` on the line above is a real intrinsic and is rendered as its 21
-characters `YYYYMMDDhhmmssnn±hhmm` from an injectable `Clock`, which `MOVE` pads to the 26 bytes of
-`AUD-TIMESTAMP`. Pinned by `ControlFlow.userIdIsSupplied` and
+### G10 - `FUNCTION USER-ID` is not an intrinsic function
+
+`2300-UPDATE-AUDIT-TRAIL` populates the audit user with `MOVE FUNCTION USER-ID TO AUD-USER-ID`
+(`PORTTRAN.cbl:254`). IBM Enterprise COBOL has no `USER-ID` intrinsic (the neighbouring
+`FUNCTION CURRENT-DATE` on line 252 is real), so `AUD-USER-ID` has no defined source. The
+translation supplies the user id explicitly rather than inventing an equivalent; the slice that owns
+`PORTTRAN` documents where it gets the value from.
+
+Child 1 injects it into `PortfolioTransactionProcessor`, defaulting to the `user.name` system
+property, and stores it in the eight bytes of `AUD-USER-ID` like any other `MOVE`; `FUNCTION
+CURRENT-DATE` comes from an injected `Clock` as its 21 characters `YYYYMMDDhhmmssnn±hhmm`, which
+`MOVE` pads to the 26 bytes of `AUD-TIMESTAMP`. Pinned by `ControlFlow.userIdIsSupplied` and
 `AuditTrail.successfulUpdateIsAuditedSucc`.
 
 ### G11 - an unrecognised transaction type is audited as if something had happened
