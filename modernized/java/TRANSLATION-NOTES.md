@@ -54,7 +54,7 @@ packages from directory depth.
 | `PIC S9(11)V9(4) COMP-3`             | `BigDecimal`, scale 4                                        | `CobolDecimal.quantity` |
 | `PIC S9(13)V9(2) COMP-3`, `S9(13)V99`| `BigDecimal`, scale 2                                        | `CobolDecimal.amount` |
 | `PIC 9(8)` (display)                 | `int`, sign dropped, high-order truncated                    | `CobolText.pic9` |
-| `PIC S9(4) COMP`                     | `int`                                                        | severity fields |
+| `PIC S9(4) COMP`                     | `int`, capacity deliberately not enforced                    | severity fields, see 3.4 |
 | `PIC X(n)`                           | `String` stored space-padded to `n`, truncated beyond it     | `CobolText.picX` |
 | level-88 condition set                | `enum` with `code()` / `fromCode()`                          | see below |
 | group item (`TRN-KEY`)               | derived getter returning the concatenated children           | `getTrnKey()` |
@@ -122,6 +122,12 @@ The copybook is a set of constant tables plus the `ERR-MESSAGE` area. Constants 
 `IF ERR-TEXT = SPACES`. It is therefore stored padded to its full 80 characters and read through
 `isErrTextSpaces()`, with `clearErrText()` for `MOVE SPACES TO ERR-TEXT`. `getErrTextTrimmed()`
 exists for assertions and logging only.
+
+`ERR-SEVERITY` is the one numeric field whose picture is **not** enforced: `setErrSeverity` takes an
+`int` and stores it, where `PIC S9(4) COMP` holds four digits. This is a deliberate simplification -
+the only values any program assigns are the `ERR-RETURN-CODES` constants 0, 4, 8, 12 and 16, and
+`ERRPROC` does nothing with the field but copy it into its return code. A slice that starts
+computing a severity should clamp it the way the packed fields do.
 
 ### 3.5 `AUDITLOG.cpy` -> `AuditRecord`, `AuditType`, `AuditAction`, `AuditStatus`
 

@@ -315,4 +315,47 @@ class CopybookFidelityTest {
     private static Set<String> codes(String... values) {
         return new LinkedHashSet<>(Arrays.asList(values));
     }
+
+    // ------------------------------------------------------------------ overload symmetry
+
+    /**
+     * The checks above drive each packed field through its {@code String} setter, which leaves the
+     * {@code BigDecimal} overload of the same field unguarded - the exact asymmetry that let the
+     * two convenience factories differ on null. Every numeric field is therefore also stored both
+     * ways and the results compared, so a picture applied to only one overload fails here.
+     */
+    @Test
+    @DisplayName("both overloads of every packed setter store the field identically")
+    void overloadsAgree() throws Exception {
+        for (String field : new String[] {"TrnQuantity", "TrnPrice", "TrnAmount"}) {
+            assertOverloadsAgree(TransactionRecord.class, field);
+        }
+        for (String field : new String[] {"PosQuantity", "PosCostBasis", "PosMarketValue"}) {
+            assertOverloadsAgree(PositionRecord.class, field);
+        }
+        for (String field : new String[] {
+                "PortTotalValue", "PortCashBalance", "PortTotalUnits", "PortTotalCost"}) {
+            assertOverloadsAgree(PortfolioRecord.class, field);
+        }
+    }
+
+    /**
+     * Stores a value carrying more decimals and more integer digits than any picture in the slice
+     * allows, so both the scale and the capacity of the two overloads have to agree.
+     */
+    private static void assertOverloadsAgree(Class<?> type, String field) throws Exception {
+        String sample = "123456789012345.98765";
+
+        Object viaString = type.getDeclaredConstructor().newInstance();
+        type.getMethod("set" + field, String.class).invoke(viaString, sample);
+
+        Object viaDecimal = type.getDeclaredConstructor().newInstance();
+        type.getMethod("set" + field, BigDecimal.class).invoke(viaDecimal, new BigDecimal(sample));
+
+        Method getter = type.getMethod("get" + field);
+        // BigDecimal.equals compares scale as well as value, so a picture applied to one overload
+        // and not the other fails here whether it differs in scale or in capacity.
+        assertEquals(getter.invoke(viaString), getter.invoke(viaDecimal),
+                field + ": the String and BigDecimal overloads must store the same field");
+    }
 }
