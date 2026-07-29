@@ -12,7 +12,7 @@ rewritten silently.
 | Child 3 - batch pipeline                      | Open   | `HISTLD00`, transaction validation                                   |
 | Child 4 - reporting                           | Open   | `RPTPOS00`, `RPTAUD00`, `RPTSTA00`                                   |
 
-Discrepancies found so far are catalogued as `G1`-`G10` in section 4.
+Discrepancies found so far are catalogued as `G1`-`G14` in section 4.
 
 ## 0. Why this reads oddly in places
 
