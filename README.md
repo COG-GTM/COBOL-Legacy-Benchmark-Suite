@@ -13,7 +13,7 @@ This project presents a comprehensive COBOL-based system that simulates the comp
 
 ### Purpose
 
-- **Benchmarking LLMs**: Provides a complex, production-grade COBOL codebase to assess the capabilities of LLMs in translating legacy code to modern languages like Java or C#.
+- **Benchmarking LLMs**: Provides a complex, production-grade COBOL codebase to assess the capabilities of LLMs in translating legacy code to modern languages like Java, C#, or Python.
 - **COBOL Modernization Reference**: Serves as a detailed example for the COBOL modernization community, addressing the scarcity of publicly available, complex COBOL projects.
 - **LLM Development and Testing**: Aids in the development and fine-tuning of LLM translation tools by offering realistic challenges beyond simplistic code snippets.
 
@@ -52,34 +52,37 @@ project-root/
 │   ├── user/              # User documentation and guides
 │   └── assets/            # Shared documentation assets
 │
-└── src/                   # Source code root
-    ├── programs/         # COBOL source programs
-    │   ├── batch/       # Batch processing programs
-    │   ├── online/      # Online transaction programs
-    │   ├── utility/     # Utility programs
-    │   ├── test/        # Test programs
-    │   ├── common/      # Shared utility programs
-    │   └── portfolio/   # Portfolio management programs
-    │
-    ├── copybook/         # COBOL copybooks
-    │   ├── batch/       # Batch processing copybooks
-    │   ├── online/      # Online processing copybooks
-    │   ├── db2/         # Database-related copybooks
-    │   └── common/      # Shared system copybooks
-    │
-    ├── database/         # Database definitions
-    │   ├── vsam/        # VSAM file definitions
-    │   └── db2/         # DB2 table and index definitions
-    │
-    ├── jcl/              # Job Control Language scripts
-    │   ├── batch/       # Batch processing jobs
-    │   ├── utility/     # Utility and maintenance jobs
-    │   ├── test/        # Test execution jobs
-    │   └── portfolio/   # Portfolio management jobs
-    │
-    ├── maps/             # BMS screen definitions
-    ├── cics/             # CICS resource definitions
-    └── templates/        # Code templates and standards
+├── src/                   # Source code root
+│   ├── programs/         # COBOL source programs
+│   │   ├── batch/       # Batch processing programs
+│   │   ├── online/      # Online transaction programs
+│   │   ├── utility/     # Utility programs
+│   │   ├── test/        # Test programs
+│   │   ├── common/      # Shared utility programs
+│   │   └── portfolio/   # Portfolio management programs
+│   │
+│   ├── copybook/         # COBOL copybooks
+│   │   ├── batch/       # Batch processing copybooks
+│   │   ├── online/      # Online processing copybooks
+│   │   ├── db2/         # Database-related copybooks
+│   │   └── common/      # Shared system copybooks
+│   │
+│   ├── database/         # Database definitions
+│   │   ├── vsam/        # VSAM file definitions
+│   │   └── db2/         # DB2 table and index definitions
+│   │
+│   ├── jcl/              # Job Control Language scripts
+│   │   ├── batch/       # Batch processing jobs
+│   │   ├── utility/     # Utility and maintenance jobs
+│   │   ├── test/        # Test execution jobs
+│   │   └── portfolio/   # Portfolio management jobs
+│   │
+│   ├── maps/             # BMS screen definitions
+│   ├── cics/             # CICS resource definitions
+│   └── templates/        # Code templates and standards
+│
+└── translations/          # Reference translations to modern languages
+    └── python/           # Python translation pairs and parity tests
 ```
 
 ## System Architecture Overview
@@ -116,6 +119,7 @@ Comprehensive documentation is provided to facilitate understanding and translat
 
 - [System Architecture Document (SAD)](documentation/technical/system-architecture.md)
 - [Data Dictionary](documentation/technical/data-dictionary.md)
+- [Python Migration Plan](documentation/technical/python-migration-plan.md)
 - [Operations Guide](documentation/operations/README.md)
 - [Test Data Specifications](documentation/operations/test-data-specs.md)
 
@@ -136,7 +140,8 @@ Comprehensive documentation is provided to facilitate understanding and translat
 
 ## Future Plans
 
-- **LLM Translation Training Pairs**: Create benchmark translations to modern languages like Java or C#.
+- **LLM Translation Training Pairs**: Create benchmark translations to modern languages like Java, C#, or Python.
+- **Python Translation Pairs**: Translate the suite to Python one program at a time, verified against the COBOL programs themselves. See the [Python Migration Plan](documentation/technical/python-migration-plan.md) for the feasibility assessment, scope and roadmap, and [translations/python](translations/python) for the pairs delivered so far.
 - **Fine-Tuning LLMs**: Use the project to enhance the capabilities of LLM translation tools in handling complex legacy codebases.
 - **Community Contribution**: Encourage collaboration within the COBOL modernization community to improve and expand the benchmark.
 

@@ -1,0 +1,30 @@
+C001|    1|Invalid Portfolio ID format
+C002|    1|Invalid Portfolio ID format
+C003|    1|Invalid Portfolio ID format
+C004|    1|Invalid Portfolio ID format
+C005|    1|Invalid Portfolio ID format
+C006|    1|Invalid Portfolio ID format
+C007|    1|Invalid Portfolio ID format
+C008|    2|Invalid Account Number format
+C009|    2|Invalid Account Number format
+C010|    2|Invalid Account Number format
+C011|    2|Invalid Account Number format
+C012|    0|
+C013|    2|Invalid Account Number format
+C014|    0|
+C015|    0|
+C016|    0|
+C017|    0|
+C018|    3|Invalid Investment Type
+C019|    3|Invalid Investment Type
+C020|    3|Invalid Investment Type
+C021|    0|
+C022|    0|
+C023|    0|
+C024|    0|
+C025|    0|
+C026|    0|
+C027|    0|
+C028|    0|
+C029|    1|Invalid validation type
+C030|    1|Invalid validation type
