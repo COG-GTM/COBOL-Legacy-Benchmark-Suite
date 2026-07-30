@@ -1,0 +1,604 @@
+# OpenAPI 3 contract for the portfolio transaction service.
+# Generated from the running service (GET /v3/api-docs.yaml); regenerate with:
+#   mvn spring-boot:run & curl -s localhost:8080/v3/api-docs.yaml
+openapi: 3.0.1
+info:
+  title: Portfolio Transaction Service
+  description: |
+    Java 21 / Spring Boot 3 migration of the COBOL portfolio transaction entity.
+
+    Source of truth: copybook TRNREC.cpy (VSAM KSDS TRANHIST); business rules
+    extracted from PORTTRAN.cbl, PORTVALD.cbl and PRCSEQ00.cbl. Every operation
+    below documents the COBOL paragraph it replaces; see MIGRATION-NOTES.md for the
+    numbered rule list and the field mapping table.
+  contact:
+    name: Portfolio Modernization
+  license:
+    name: Internal
+  version: 1.0.0
+tags:
+- name: Portfolio Transactions
+  description: Migrated from COBOL copybook TRNREC and programs PORTTRAN / PORTVALD
+    / PRCSEQ00
+paths:
+  /api/v1/transactions/{transactionKey}:
+    get:
+      tags:
+      - Portfolio Transactions
+      summary: Read a transaction by its VSAM key
+      description: "Keyed READ on TRANHIST. The path variable is the 28 character\
+        \ TRN-KEY: TRN-DATE(8) + TRN-TIME(6) + TRN-PORTFOLIO-ID(8) + TRN-SEQUENCE-NO(6)."
+      operationId: read
+      parameters:
+      - name: transactionKey
+        in: path
+        description: 28 character TRN-KEY
+        required: true
+        schema:
+          type: string
+        example: 20240320093015PORT0001000001
+      responses:
+        "404":
+          description: INVALID KEY - no such transaction
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Error"
+        "400":
+          description: Malformed TRN-KEY
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Error"
+        "200":
+          description: Transaction found
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Transaction"
+    put:
+      tags:
+      - Portfolio Transactions
+      summary: Rewrite an existing transaction
+      description: REWRITE TRANSACTION-RECORD. TRN-KEY is immutable; only TRN-DATA
+        and TRN-AUDIT change.
+      operationId: rewrite
+      parameters:
+      - name: transactionKey
+        in: path
+        description: 28 character TRN-KEY
+        required: true
+        schema:
+          type: string
+        example: 20240320093015PORT0001000001
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/UpdateTransactionRequest"
+        required: true
+      responses:
+        "404":
+          description: INVALID KEY - no such transaction
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Error"
+        "200":
+          description: Transaction rewritten
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Transaction"
+        "400":
+          description: Validation failure carrying the COBOL ERR-TEXT
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/transactions:
+    get:
+      tags:
+      - Portfolio Transactions
+      summary: Browse transactions in VSAM key sequence
+      description: "Sequential read of TRANHIST as performed by PORTTRAN 2000-PROCESS-TRANSACTIONS,\
+        \ ordered by TRN-DATE, TRN-TIME, TRN-PORTFOLIO-ID, TRN-SEQUENCE-NO (BR-21)."
+      operationId: browse
+      parameters:
+      - name: portfolioId
+        in: query
+        description: Filter on TRN-PORTFOLIO-ID
+        required: false
+        schema:
+          type: string
+        example: PORT0001
+      - name: status
+        in: query
+        description: "Filter on TRN-STATUS (P, D, F, R)"
+        required: false
+        schema:
+          type: string
+        example: P
+      - name: page
+        in: query
+        description: Zero based page index
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 0
+      - name: size
+        in: query
+        description: Page size
+        required: false
+        schema:
+          type: integer
+          format: int32
+          default: 20
+      responses:
+        "200":
+          description: Page of transactions
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/PageTransaction"
+    post:
+      tags:
+      - Portfolio Transactions
+      summary: Write a new transaction
+      description: "WRITE TRANSACTION-RECORD. Validated by PORTTRAN 2100-VALIDATE-TRANSACTION\
+        \ (BR-01 to BR-07). TRN-SEQUENCE-NO is assigned per BR-20 when omitted, and\
+        \ TRN-AMOUNT is derived as quantity x price truncated to two decimals per\
+        \ BR-22 when omitted."
+      operationId: insert
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateTransactionRequest"
+        required: true
+      responses:
+        "201":
+          description: Transaction written
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Transaction"
+        "409":
+          description: Duplicate TRN-KEY (VSAM status 22)
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Error"
+        "400":
+          description: Validation failure carrying the COBOL ERR-TEXT
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/transactions/{transactionKey}/status:
+    post:
+      tags:
+      - Portfolio Transactions
+      summary: Transition TRN-STATUS
+      description: "Applies a TRN-STATUS transition. Allowed transitions (BR-23, derived):\
+        \ P -> D, P -> F, D -> R; F and R are terminal."
+      operationId: transitionStatus
+      parameters:
+      - name: transactionKey
+        in: path
+        description: 28 character TRN-KEY
+        required: true
+        schema:
+          type: string
+        example: 20240320093015PORT0001000001
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/StatusTransitionRequest"
+        required: true
+      responses:
+        "404":
+          description: INVALID KEY - no such transaction
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Error"
+        "200":
+          description: Status changed
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Transaction"
+        "400":
+          description: Transition not allowed
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Error"
+  /api/v1/transactions/{transactionKey}/process:
+    post:
+      tags:
+      - Portfolio Transactions
+      summary: Process a transaction against the portfolio
+      description: "Runs PORTTRAN 2100-VALIDATE-TRANSACTION then 2200-UPDATE-POSITIONS\
+        \ and returns the deltas for PORT-TOTAL-UNITS and PORT-TOTAL-COST. TR transactions\
+        \ always fail with 'Transfer processing not implemented' (BR-11), matching\
+        \ the legacy behaviour."
+      operationId: process
+      parameters:
+      - name: transactionKey
+        in: path
+        description: 28 character TRN-KEY
+        required: true
+        schema:
+          type: string
+        example: 20240320093015PORT0001000001
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProcessTransactionRequest"
+      responses:
+        "404":
+          description: INVALID KEY - no such transaction
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/Error"
+        "200":
+          description: "Processing outcome, successful or failed"
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/ProcessTransactionResponse"
+components:
+  schemas:
+    UpdateTransactionRequest:
+      required:
+      - currency
+      - investmentId
+      - price
+      - quantity
+      - type
+      type: object
+      properties:
+        investmentId:
+          maxLength: 10
+          minLength: 0
+          type: string
+          description: TRN-INVESTMENT-ID PIC X(10)
+          example: AAPL000001
+        type:
+          type: string
+          description: TRN-TYPE PIC X(02)
+          example: BU
+          enum:
+          - BU
+          - SL
+          - TR
+          - FE
+        quantity:
+          type: number
+          description: TRN-QUANTITY PIC S9(11)V9(4) COMP-3
+          example: 150.0
+        price:
+          type: number
+          description: TRN-PRICE PIC S9(11)V9(4) COMP-3
+          example: 187.45
+        amount:
+          type: number
+          description: TRN-AMOUNT PIC S9(13)V9(2) COMP-3; derived from quantity x
+            price when omitted (BR-22)
+          example: 28117.5
+        currency:
+          maxLength: 3
+          minLength: 0
+          type: string
+          description: TRN-CURRENCY PIC X(03)
+          example: USD
+        processDate:
+          maxLength: 26
+          minLength: 0
+          type: string
+          description: TRN-PROCESS-DATE PIC X(26)
+          example: 2024-03-20-09.30.15.123456
+        processUser:
+          maxLength: 8
+          minLength: 0
+          type: string
+          description: TRN-PROCESS-USER PIC X(08)
+          example: BATCH001
+      description: REWRITE payload; TRN-KEY is immutable
+    Error:
+      type: object
+      properties:
+        message:
+          type: string
+          description: COBOL ERR-TEXT or equivalent
+          example: Quantity must be greater than zero
+        ruleId:
+          type: string
+          description: Business rule id from MIGRATION-NOTES.md
+          example: BR-04
+        cobolParagraph:
+          type: string
+          description: Originating COBOL paragraph
+          example: PORTTRAN 2130-CHECK-AMOUNTS
+      description: Error carrying the original COBOL error text and its origin
+    Transaction:
+      type: object
+      properties:
+        transactionKey:
+          type: string
+          description: 28 character VSAM key TRN-KEY
+          example: 20240320093015PORT0001000001
+        transactionDate:
+          type: string
+          description: "TRN-DATE PIC X(08), YYYYMMDD"
+          example: "20240320"
+        transactionTime:
+          type: string
+          description: "TRN-TIME PIC X(06), HHMMSS"
+          example: "093015"
+        portfolioId:
+          type: string
+          description: TRN-PORTFOLIO-ID PIC X(08)
+          example: PORT0001
+        sequenceNo:
+          type: string
+          description: TRN-SEQUENCE-NO PIC X(06)
+          example: "000001"
+        investmentId:
+          type: string
+          description: TRN-INVESTMENT-ID PIC X(10)
+          example: AAPL000001
+        type:
+          type: string
+          description: "TRN-TYPE PIC X(02): BU, SL, TR, FE"
+          example: BU
+        quantity:
+          type: number
+          description: TRN-QUANTITY PIC S9(11)V9(4) COMP-3
+          example: 150.0
+        price:
+          type: number
+          description: TRN-PRICE PIC S9(11)V9(4) COMP-3
+          example: 187.45
+        amount:
+          type: number
+          description: TRN-AMOUNT PIC S9(13)V9(2) COMP-3
+          example: 28117.5
+        currency:
+          type: string
+          description: TRN-CURRENCY PIC X(03)
+          example: USD
+        status:
+          type: string
+          description: "TRN-STATUS PIC X(01): P, D, F, R"
+          example: P
+        processDate:
+          type: string
+          description: TRN-PROCESS-DATE PIC X(26)
+          example: 2024-03-20-09.30.15.123456
+        processUser:
+          type: string
+          description: TRN-PROCESS-USER PIC X(08)
+          example: BATCH001
+      description: "Portfolio transaction (COBOL copybook TRNREC, VSAM file TRANHIST)"
+    CreateTransactionRequest:
+      required:
+      - currency
+      - investmentId
+      - portfolioId
+      - price
+      - quantity
+      - transactionDate
+      - transactionTime
+      - type
+      type: object
+      properties:
+        transactionDate:
+          pattern: "\\d{8}"
+          type: string
+          description: "TRN-DATE PIC X(08), YYYYMMDD"
+          example: "20240320"
+        transactionTime:
+          pattern: "\\d{6}"
+          type: string
+          description: "TRN-TIME PIC X(06), HHMMSS"
+          example: "093015"
+        portfolioId:
+          maxLength: 8
+          minLength: 0
+          type: string
+          description: TRN-PORTFOLIO-ID PIC X(08)
+          example: PORT0001
+        sequenceNo:
+          pattern: "\\d{6}"
+          type: string
+          description: TRN-SEQUENCE-NO PIC X(06); assigned automatically when omitted
+          example: "000001"
+        investmentId:
+          maxLength: 10
+          minLength: 0
+          type: string
+          description: TRN-INVESTMENT-ID PIC X(10)
+          example: AAPL000001
+        type:
+          type: string
+          description: TRN-TYPE PIC X(02)
+          example: BU
+          enum:
+          - BU
+          - SL
+          - TR
+          - FE
+        quantity:
+          type: number
+          description: TRN-QUANTITY PIC S9(11)V9(4) COMP-3
+          example: 150.0
+        price:
+          type: number
+          description: TRN-PRICE PIC S9(11)V9(4) COMP-3
+          example: 187.45
+        amount:
+          type: number
+          description: TRN-AMOUNT PIC S9(13)V9(2) COMP-3; derived from quantity x
+            price when omitted (BR-22)
+          example: 28117.5
+        currency:
+          maxLength: 3
+          minLength: 0
+          type: string
+          description: TRN-CURRENCY PIC X(03)
+          example: USD
+        status:
+          type: string
+          description: TRN-STATUS PIC X(01); defaults to P (pending)
+          example: P
+          enum:
+          - P
+          - D
+          - F
+          - R
+        processDate:
+          maxLength: 26
+          minLength: 0
+          type: string
+          description: TRN-PROCESS-DATE PIC X(26)
+          example: 2024-03-20-09.30.15.123456
+        processUser:
+          maxLength: 8
+          minLength: 0
+          type: string
+          description: TRN-PROCESS-USER PIC X(08)
+          example: BATCH001
+      description: New TRANSACTION-RECORD to write to TRANHIST
+    StatusTransitionRequest:
+      required:
+      - status
+      type: object
+      properties:
+        status:
+          type: string
+          description: Target TRN-STATUS PIC X(01)
+          example: D
+          enum:
+          - P
+          - D
+          - F
+          - R
+        processUser:
+          maxLength: 8
+          minLength: 0
+          type: string
+          description: TRN-PROCESS-USER PIC X(08) applying the change
+          example: BATCH001
+      description: TRN-STATUS transition (BR-23)
+    ProcessTransactionRequest:
+      type: object
+      properties:
+        availableUnits:
+          type: number
+          description: "Current PORT-TOTAL-UNITS, required for SL transactions"
+          example: 500.0
+      description: Inputs for PORTTRAN 2200-UPDATE-POSITIONS
+    ProcessTransactionResponse:
+      type: object
+      properties:
+        transaction:
+          $ref: "#/components/schemas/Transaction"
+        unitsDelta:
+          type: number
+          description: Delta applied to PORT-TOTAL-UNITS
+          example: 150.0
+        costDelta:
+          type: number
+          description: Delta applied to PORT-TOTAL-COST
+          example: 28117.5
+        auditAction:
+          type: string
+          description: Audit action written by PORTTRAN 2300-UPDATE-AUDIT-TRAIL
+          example: CREATE
+        errorText:
+          type: string
+          description: COBOL ERR-TEXT when the record failed
+          example: Insufficient units for sale
+        ruleId:
+          type: string
+          description: Business rule that rejected the record
+          example: BR-10
+        cobolParagraph:
+          type: string
+          description: Originating COBOL paragraph
+          example: PORTTRAN 2220-PROCESS-SELL
+      description: Outcome of PORTTRAN 2100/2200 processing
+    PageTransaction:
+      type: object
+      properties:
+        totalElements:
+          type: integer
+          format: int64
+        totalPages:
+          type: integer
+          format: int32
+        pageable:
+          $ref: "#/components/schemas/PageableObject"
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/Transaction"
+        number:
+          type: integer
+          format: int32
+        sort:
+          type: array
+          items:
+            $ref: "#/components/schemas/SortObject"
+        first:
+          type: boolean
+        last:
+          type: boolean
+        numberOfElements:
+          type: integer
+          format: int32
+        empty:
+          type: boolean
+    PageableObject:
+      type: object
+      properties:
+        paged:
+          type: boolean
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        offset:
+          type: integer
+          format: int64
+        sort:
+          type: array
+          items:
+            $ref: "#/components/schemas/SortObject"
+        unpaged:
+          type: boolean
+    SortObject:
+      type: object
+      properties:
+        direction:
+          type: string
+        nullHandling:
+          type: string
+        ascending:
+          type: boolean
+        property:
+          type: string
+        ignoreCase:
+          type: boolean
