@@ -46,3 +46,11 @@ environment-substituted (`DB_URL`, `DB_USERNAME`, `DB_PASSWORD`); no credential 
 
 `{key}` is the 28-character VSAM key: `TRN-DATE(8) || TRN-TIME(6) || TRN-PORTFOLIO-ID(8) ||
 TRN-SEQUENCE-NO(6)`, e.g. `20240320093015PORT0001000001`.
+
+## Security
+
+**The module ships no authentication or authorization** — there is no `spring-boot-starter-security`
+dependency and no `SecurityFilterChain`. The legacy programs inherit their access control from RACF
+and CICS, neither of which has an equivalent in this slice, and the target architecture fronts these
+services with Apigee, which owns OAuth token validation and scope enforcement. Do not expose this
+service directly: it must sit behind the gateway, or gain its own security configuration first.

@@ -112,11 +112,18 @@ public class PortfolioTransactionService {
   /**
    * Update: {@code REWRITE TRANSACTION-RECORD}. The key is immutable (it is the VSAM key), so only
    * the data and audit groups are replaced.
+   *
+   * <p>The incoming record is validated before anything is copied onto the managed entity, so a
+   * rejected update cannot leave a partially mutated record behind even if the caller swallows the
+   * exception inside an outer transaction.
    */
   @Transactional
   @CobolOrigin(program = "PORTMSTR", paragraph = "4000-UPDATE-PORTFOLIO", rules = {"BR-07"})
   public PortfolioTransaction rewrite(TransactionKey key, PortfolioTransaction updated) {
     PortfolioTransaction existing = findByKey(key);
+    updated.setTrnKey(key);
+    updated.setTrnStatus(existing.getTrnStatus());
+    assertValid(updated);
     existing.setTrnInvestmentId(updated.getTrnInvestmentId());
     existing.setTrnType(updated.getTrnType());
     existing.setTrnQuantity(updated.getTrnQuantity());
@@ -125,7 +132,6 @@ public class PortfolioTransactionService {
     existing.setTrnCurrency(updated.getTrnCurrency());
     existing.setTrnProcessDate(updated.getTrnProcessDate());
     existing.setTrnProcessUser(updated.getTrnProcessUser());
-    assertValid(existing);
     return repository.save(existing);
   }
 
