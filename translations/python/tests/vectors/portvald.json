@@ -1,0 +1,173 @@
+{
+  "program": "PORTVALD",
+  "source": "src/programs/portfolio/PORTVALD.cbl",
+  "reference": "expected values recorded from GnuCOBOL 3.1.2; re-verified by tests/test_portvald_equivalence.py",
+  "cases": [
+    {
+      "name": "id-well-formed-still-rejected",
+      "validate_type": "I",
+      "input_value": "PORT0001",
+      "return_code": 1,
+      "error_msg": "Invalid Portfolio ID format",
+      "note": "quirk: the 4 digits are moved into a PIC X(10) work field, so the class test sees trailing spaces"
+    },
+    {
+      "name": "id-wrong-prefix",
+      "validate_type": "I",
+      "input_value": "ACCT0001",
+      "return_code": 1,
+      "error_msg": "Invalid Portfolio ID format"
+    },
+    {
+      "name": "id-non-numeric-suffix",
+      "validate_type": "I",
+      "input_value": "PORTABCD",
+      "return_code": 1,
+      "error_msg": "Invalid Portfolio ID format"
+    },
+    {
+      "name": "id-empty",
+      "validate_type": "I",
+      "input_value": "",
+      "return_code": 1,
+      "error_msg": "Invalid Portfolio ID format"
+    },
+    {
+      "name": "account-ten-digits-still-rejected",
+      "validate_type": "A",
+      "input_value": "1234567890",
+      "return_code": 2,
+      "error_msg": "Invalid Account Number format",
+      "note": "quirk: the class test runs on the space padded PIC X(50) item, so no account number can pass"
+    },
+    {
+      "name": "account-all-zeros",
+      "validate_type": "A",
+      "input_value": "0000000000",
+      "return_code": 2,
+      "error_msg": "Invalid Account Number format"
+    },
+    {
+      "name": "account-alphabetic",
+      "validate_type": "A",
+      "input_value": "ABCDEFGHIJ",
+      "return_code": 2,
+      "error_msg": "Invalid Account Number format"
+    },
+    {
+      "name": "account-empty",
+      "validate_type": "A",
+      "input_value": "",
+      "return_code": 2,
+      "error_msg": "Invalid Account Number format"
+    },
+    {
+      "name": "type-stock",
+      "validate_type": "T",
+      "input_value": "STK",
+      "return_code": 0,
+      "error_msg": ""
+    },
+    {
+      "name": "type-bond",
+      "validate_type": "T",
+      "input_value": "BND",
+      "return_code": 0,
+      "error_msg": ""
+    },
+    {
+      "name": "type-money-market",
+      "validate_type": "T",
+      "input_value": "MMF",
+      "return_code": 0,
+      "error_msg": ""
+    },
+    {
+      "name": "type-etf",
+      "validate_type": "T",
+      "input_value": "ETF",
+      "return_code": 0,
+      "error_msg": ""
+    },
+    {
+      "name": "type-unknown",
+      "validate_type": "T",
+      "input_value": "XYZ",
+      "return_code": 3,
+      "error_msg": "Invalid Investment Type"
+    },
+    {
+      "name": "type-lowercase",
+      "validate_type": "T",
+      "input_value": "stk",
+      "return_code": 3,
+      "error_msg": "Invalid Investment Type",
+      "note": "EBCDIC/ASCII case sensitivity: literals are compared byte for byte"
+    },
+    {
+      "name": "type-empty",
+      "validate_type": "T",
+      "input_value": "",
+      "return_code": 3,
+      "error_msg": "Invalid Investment Type"
+    },
+    {
+      "name": "amount-decimal",
+      "validate_type": "M",
+      "input_value": "1000.00",
+      "return_code": 0,
+      "error_msg": ""
+    },
+    {
+      "name": "amount-negative",
+      "validate_type": "M",
+      "input_value": "-100",
+      "return_code": 0,
+      "error_msg": ""
+    },
+    {
+      "name": "amount-non-numeric-accepted",
+      "validate_type": "M",
+      "input_value": "ABC",
+      "return_code": 0,
+      "error_msg": "",
+      "note": "quirk: an unparsable amount moves as zero, which is inside the range"
+    },
+    {
+      "name": "amount-empty-accepted",
+      "validate_type": "M",
+      "input_value": "",
+      "return_code": 0,
+      "error_msg": ""
+    },
+    {
+      "name": "amount-overflow-accepted",
+      "validate_type": "M",
+      "input_value": "99999999999999999",
+      "return_code": 0,
+      "error_msg": "",
+      "note": "quirk: high order digits are truncated by the MOVE, so the range test can never fail"
+    },
+    {
+      "name": "amount-grouped-digits",
+      "validate_type": "M",
+      "input_value": "1,234.56",
+      "return_code": 0,
+      "error_msg": ""
+    },
+    {
+      "name": "unknown-validate-type",
+      "validate_type": "Z",
+      "input_value": "PORT0001",
+      "return_code": 1,
+      "error_msg": "Invalid validation type"
+    },
+    {
+      "name": "blank-validate-type",
+      "validate_type": "",
+      "input_value": "PORT0001",
+      "return_code": 1,
+      "error_msg": "Invalid validation type"
+    }
+  ]
+}
