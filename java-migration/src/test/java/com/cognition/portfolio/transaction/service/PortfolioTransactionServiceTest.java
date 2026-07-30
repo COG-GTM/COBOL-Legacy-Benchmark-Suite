@@ -13,6 +13,7 @@ import com.cognition.portfolio.transaction.exception.TransactionNotFoundExceptio
 import com.cognition.portfolio.transaction.exception.TransactionProcessingException;
 import com.cognition.portfolio.transaction.exception.TransactionValidationException;
 import com.cognition.portfolio.transaction.repository.PortfolioTransactionRepository;
+import com.cognition.portfolio.transaction.validation.TransactionValidator;
 import java.math.BigDecimal;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
@@ -20,6 +21,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.PlatformTransactionManager;
 
 /** End-to-end service behaviour against the migrated schema. */
 @SpringBootTest(properties = "spring.datasource.url=jdbc:h2:mem:svc-test;DB_CLOSE_DELAY=-1")
@@ -28,6 +30,9 @@ class PortfolioTransactionServiceTest {
   @Autowired private PortfolioTransactionService service;
   @Autowired private TransactionSequenceService sequenceService;
   @Autowired private PortfolioTransactionRepository repository;
+  @Autowired private TransactionValidator validator;
+  @Autowired private TransactionPostingService postingService;
+  @Autowired private PlatformTransactionManager transactionManager;
 
   @BeforeEach
   void clean() {
@@ -138,6 +143,63 @@ class PortfolioTransactionServiceTest {
   }
 
   @Test
+  @DisplayName("BR-23: a record that is no longer pending cannot be processed again")
+  void terminalRecordsCannotBeReprocessed() {
+    PortfolioTransaction saved = service.insert(TestTransactions.buy());
+    service.process(saved.getTrnKey(), null);
+
+    assertThatThrownBy(() -> service.process(saved.getTrnKey(), null))
+        .isInstanceOf(TransactionProcessingException.class)
+        .hasMessage("Transaction is not pending: TRN-STATUS D");
+
+    service.transitionStatus(saved.getTrnKey(), TransactionStatus.REVERSED, "ONLINE01");
+    assertThatThrownBy(() -> service.process(saved.getTrnKey(), null))
+        .isInstanceOf(TransactionProcessingException.class)
+        .hasMessage("Transaction is not pending: TRN-STATUS R");
+  }
+
+  @Test
+  @DisplayName("OQ-2: processing SL without PORT-TOTAL-UNITS is a caller error, not a failed record")
+  void sellRequiresThePortfolioPosition() {
+    PortfolioTransaction saved = service.insert(TestTransactions.sell());
+
+    assertThatThrownBy(() -> service.process(saved.getTrnKey(), null))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("PORT-TOTAL-UNITS must be supplied");
+
+    assertThat(repository.findById(saved.getTrnKey()).orElseThrow().getTrnStatus())
+        .isEqualTo(TransactionStatus.PENDING);
+  }
+
+  @Test
+  @DisplayName("BR-13: a failed posting still carries the AUD-ACTION, with AUD-STATUS 'FAIL'")
+  void failedPostingKeepsAuditAction() {
+    PortfolioTransaction sell = service.insert(TestTransactions.sell());
+    PortfolioTransaction transfer = service.insert(TestTransactions.transfer());
+
+    TransactionProcessingResult sellResult = service.process(sell.getTrnKey(), BigDecimal.ZERO);
+    TransactionProcessingResult transferResult = service.process(transfer.getTrnKey(), null);
+
+    assertThat(sellResult.auditAction()).isEqualTo("DELETE");
+    assertThat(sellResult.auditStatus()).isEqualTo(TransactionProcessingResult.AUDIT_FAILURE);
+    assertThat(transferResult.auditAction()).isEqualTo("UPDATE");
+    assertThat(transferResult.auditStatus()).isEqualTo(TransactionProcessingResult.AUDIT_FAILURE);
+  }
+
+  @Test
+  @DisplayName("BR-13: a validation failure never reaches 2300, so it carries no audit entry")
+  void validationFailureHasNoAuditEntry() {
+    PortfolioTransaction invalid =
+        TestTransactions.builder("20240320", "093015", "XXXX0001", "000001").build();
+
+    TransactionProcessingResult result = service.processDetached(invalid, null);
+
+    assertThat(result.errorText()).isEqualTo("Invalid Portfolio ID: XXXX0001");
+    assertThat(result.auditAction()).isNull();
+    assertThat(result.auditStatus()).isNull();
+  }
+
+  @Test
   @DisplayName("BR-08: the batch counts valid records as processed and invalid ones as errors")
   void batchCounters() {
     PortfolioTransaction invalid =
@@ -211,5 +273,46 @@ class PortfolioTransactionServiceTest {
     service.insert(TestTransactions.sell());
     assertThat(sequenceService.nextSequenceNo("20240320", "PORT0001")).isEqualTo("000003");
     assertThat(sequenceService.nextSequenceNo("20240321", "PORT0001")).isEqualTo("000001");
+  }
+
+  @Test
+  @DisplayName("BR-20: the insert assigns TRN-SEQUENCE-NO itself, so no caller can read a stale max")
+  void insertAssignsSequenceNumber() {
+    PortfolioTransaction first =
+        service.insertNextInSequence(
+            TestTransactions.builder("20240321", "093015", "PORT0001", null).build());
+    PortfolioTransaction second =
+        service.insertNextInSequence(
+            TestTransactions.builder("20240321", "101122", "PORT0001", null).build());
+
+    assertThat(first.getTrnKey().getTrnSequenceNo()).isEqualTo("000001");
+    assertThat(second.getTrnKey().getTrnSequenceNo()).isEqualTo("000002");
+    assertThat(repository.count()).isEqualTo(2);
+  }
+
+  @Test
+  @DisplayName("BR-20: a sequence number taken by a concurrent writer is retried, not rejected")
+  void insertRetriesWhenTheSequenceNumberIsTaken() {
+    service.insert(TestTransactions.builder("20240322", "093015", "PORT0001", "000001").build());
+    // First derivation returns a number a concurrent writer already used, as a stale read would.
+    TransactionSequenceService stale =
+        new TransactionSequenceService(repository) {
+          private int calls;
+
+          @Override
+          public String nextSequenceNo(String trnDate, String portfolioId) {
+            return ++calls == 1 ? "000001" : super.nextSequenceNo(trnDate, portfolioId);
+          }
+        };
+    PortfolioTransactionService racing =
+        new PortfolioTransactionService(
+            repository, validator, postingService, stale, transactionManager);
+
+    PortfolioTransaction saved =
+        racing.insertNextInSequence(
+            TestTransactions.builder("20240322", "093015", "PORT0001", null).build());
+
+    assertThat(saved.getTrnKey().getTrnSequenceNo()).isEqualTo("000002");
+    assertThat(repository.count()).isEqualTo(2);
   }
 }

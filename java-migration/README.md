@@ -11,7 +11,7 @@ questions for the legacy owners.
 ## Build and run
 
 ```bash
-mvn clean test                                        # 76 tests
+mvn clean test                                        # 87 tests
 mvn spring-boot:run                                   # http://localhost:8080/swagger-ui.html
 mvn spring-boot:run -Dspring-boot.run.profiles=seed   # loads the representative records
 ```

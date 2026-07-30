@@ -1,6 +1,7 @@
 package com.cognition.portfolio.transaction.service;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
 import org.junit.jupiter.api.DisplayName;
@@ -50,6 +51,22 @@ class TransactionAmountCalculatorTest {
             calculator.isConsistent(
                 new BigDecimal("150.0000"), new BigDecimal("187.4500"), new BigDecimal("28117.51")))
         .isFalse();
+  }
+
+  @Test
+  @DisplayName("OQ-10: a product that does not fit TRN-AMOUNT S9(13)V9(2) is refused, not truncated")
+  void productOutsideTheTargetPrecisionIsRefused() {
+    // Both operands fit S9(11)V9(4); their product needs 15 integer digits.
+    assertThatThrownBy(
+            () ->
+                calculator.computeAmount(
+                    new BigDecimal("99999999999.0000"), new BigDecimal("10000.0000")))
+        .isInstanceOf(IllegalArgumentException.class)
+        .hasMessageContaining("does not fit TRN-AMOUNT PIC S9(13)V9(2)");
+
+    // The largest value the field can hold is still accepted.
+    assertThat(calculator.computeAmount(new BigDecimal("9999999999999.0000"), BigDecimal.ONE))
+        .isEqualByComparingTo("9999999999999.00");
   }
 
   @Test

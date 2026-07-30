@@ -25,16 +25,30 @@ public class TransactionAmountCalculator {
   /** Scale of {@code TRN-QUANTITY} / {@code TRN-PRICE} {@code PIC S9(11)V9(4)}. */
   public static final int QUANTITY_SCALE = 4;
 
+  /** Integer digits of {@code TRN-AMOUNT PIC S9(13)V9(2)}. */
+  public static final int AMOUNT_INTEGER_DIGITS = 13;
+
   /**
    * BR-22 — amount = quantity × price, truncated (never rounded up) to two decimal places, matching
    * a COBOL {@code COMPUTE} without the {@code ROUNDED} phrase.
+   *
+   * <p>The product of two {@code S9(11)V9(4)} fields can carry more than the 13 integer digits of
+   * {@code TRN-AMOUNT}. A COBOL {@code COMPUTE} without {@code ON SIZE ERROR} would drop the
+   * high-order digits silently; the service refuses the record instead, because storing a corrupted
+   * money value is the worse of the two behaviours. Recorded as open question OQ-10.
    */
   @CobolOrigin(program = "PORTTRAN", paragraph = "2130-CHECK-AMOUNTS", rules = {"BR-22"}, derived = true)
   public BigDecimal computeAmount(BigDecimal quantity, BigDecimal price) {
     if (quantity == null || price == null) {
       throw new IllegalArgumentException("TRN-QUANTITY and TRN-PRICE are required to compute TRN-AMOUNT");
     }
-    return quantity.multiply(price).setScale(AMOUNT_SCALE, RoundingMode.DOWN);
+    BigDecimal amount = quantity.multiply(price).setScale(AMOUNT_SCALE, RoundingMode.DOWN);
+    if (amount.precision() - amount.scale() > AMOUNT_INTEGER_DIGITS) {
+      throw new IllegalArgumentException(
+          "TRN-QUANTITY * TRN-PRICE = " + amount.toPlainString()
+              + " does not fit TRN-AMOUNT PIC S9(13)V9(2)");
+    }
+    return amount;
   }
 
   /**

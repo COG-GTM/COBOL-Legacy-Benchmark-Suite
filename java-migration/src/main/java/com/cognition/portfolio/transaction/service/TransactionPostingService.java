@@ -47,10 +47,19 @@ public class TransactionPostingService {
    * BR-10 — {@code 2220-PROCESS-SELL}: reject when {@code PORT-TOTAL-UNITS < TRN-QUANTITY}
    * ('Insufficient units for sale'), otherwise {@code SUBTRACT TRN-QUANTITY FROM PORT-TOTAL-UNITS}
    * and {@code SUBTRACT TRN-AMOUNT FROM PORT-TOTAL-COST}.
+   *
+   * <p>The COBOL reads {@code PORT-TOTAL-UNITS} from {@code PORTFILE}, so "position not supplied"
+   * is not a legacy state: a missing {@code availableUnits} is a caller error and is reported as
+   * such rather than as the business rejection.
    */
   @CobolOrigin(program = "PORTTRAN", paragraph = "2220-PROCESS-SELL", rules = {"BR-10"})
   public PortfolioPostingEffect processSell(PortfolioTransaction transaction, BigDecimal availableUnits) {
-    if (availableUnits == null || availableUnits.compareTo(transaction.getTrnQuantity()) < 0) {
+    if (availableUnits == null) {
+      throw new IllegalArgumentException(
+          "PORT-TOTAL-UNITS must be supplied to process an SL transaction; the legacy program reads "
+              + "it from PORTFILE (MIGRATION-NOTES OQ-2)");
+    }
+    if (availableUnits.compareTo(transaction.getTrnQuantity()) < 0) {
       throw new TransactionProcessingException(
           "Insufficient units for sale", "BR-10", "PORTTRAN 2220-PROCESS-SELL");
     }

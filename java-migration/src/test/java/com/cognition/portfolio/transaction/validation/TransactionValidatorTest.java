@@ -135,8 +135,12 @@ class TransactionValidatorTest {
   @DisplayName("BR-03: a TRN-TYPE outside the 88-levels hits the WHEN OTHER branch of 2120")
   void unknownTypeRejected() {
     assertThat(TransactionType.fromCode("XX")).isEmpty();
-    assertThat(validator.checkTransactionType(null).message()).startsWith("Invalid Transaction Type");
-    assertThat(validator.checkTransactionType(null).ruleId()).isEqualTo("BR-03");
+
+    ValidationOutcome outcome = validator.checkTransactionType("XX");
+
+    assertThat(outcome.message()).isEqualTo("Invalid Transaction Type: XX");
+    assertThat(outcome.ruleId()).isEqualTo("BR-03");
+    assertThat(validator.checkTransactionType((TransactionType) null).ruleId()).isEqualTo("BR-03");
   }
 
   @Test

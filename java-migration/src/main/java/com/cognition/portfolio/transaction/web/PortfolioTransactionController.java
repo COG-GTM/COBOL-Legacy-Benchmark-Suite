@@ -7,7 +7,6 @@ import com.cognition.portfolio.transaction.domain.TransactionStatus;
 import com.cognition.portfolio.transaction.service.PortfolioTransactionService;
 import com.cognition.portfolio.transaction.service.TransactionAmountCalculator;
 import com.cognition.portfolio.transaction.service.TransactionProcessingResult;
-import com.cognition.portfolio.transaction.service.TransactionSequenceService;
 import com.cognition.portfolio.transaction.web.dto.CreateTransactionRequest;
 import com.cognition.portfolio.transaction.web.dto.ErrorResponse;
 import com.cognition.portfolio.transaction.web.dto.ProcessTransactionRequest;
@@ -50,16 +49,12 @@ import org.springframework.web.bind.annotation.RestController;
 public class PortfolioTransactionController {
 
   private final PortfolioTransactionService service;
-  private final TransactionSequenceService sequenceService;
   private final TransactionAmountCalculator amountCalculator;
 
   public PortfolioTransactionController(
-      PortfolioTransactionService service,
-      TransactionSequenceService sequenceService,
-      TransactionAmountCalculator amountCalculator) {
+      PortfolioTransactionService service, TransactionAmountCalculator amountCalculator) {
     this.service = service;
     this.amountCalculator = amountCalculator;
-    this.sequenceService = sequenceService;
   }
 
   /** Keyed read. */
@@ -126,15 +121,14 @@ public class PortfolioTransactionController {
   })
   @CobolOrigin(program = "PORTTRAN", paragraph = "2100-VALIDATE-TRANSACTION", rules = {"BR-07", "BR-20", "BR-22"})
   public ResponseEntity<TransactionResponse> insert(@Valid @RequestBody CreateTransactionRequest request) {
-    String sequenceNo =
-        request.sequenceNo() == null || request.sequenceNo().isBlank()
-            ? sequenceService.nextSequenceNo(request.transactionDate(), request.portfolioId())
-            : request.sequenceNo();
     BigDecimal amount =
         request.amount() == null
             ? amountCalculator.computeAmount(request.quantity(), request.price())
             : request.amount();
-    PortfolioTransaction saved = service.insert(request.toEntity(sequenceNo, amount));
+    boolean assignSequence = request.sequenceNo() == null || request.sequenceNo().isBlank();
+    PortfolioTransaction transaction = request.toEntity(request.sequenceNo(), amount);
+    PortfolioTransaction saved =
+        assignSequence ? service.insertNextInSequence(transaction) : service.insert(transaction);
     return ResponseEntity.created(URI.create("/api/v1/transactions/" + saved.getTrnKey().toKeyString()))
         .body(TransactionResponse.from(saved));
   }
@@ -198,9 +192,14 @@ public class PortfolioTransactionController {
       description =
           "Runs PORTTRAN 2100-VALIDATE-TRANSACTION then 2200-UPDATE-POSITIONS and returns the "
               + "deltas for PORT-TOTAL-UNITS and PORT-TOTAL-COST. TR transactions always fail with "
-              + "'Transfer processing not implemented' (BR-11), matching the legacy behaviour.")
+              + "'Transfer processing not implemented' (BR-11), matching the legacy behaviour. "
+              + "Only a pending (P) transaction can be processed (BR-23), and availableUnits is "
+              + "required for SL because the legacy program reads it from PORTFILE.")
   @ApiResponses({
     @ApiResponse(responseCode = "200", description = "Processing outcome, successful or failed"),
+    @ApiResponse(responseCode = "400",
+        description = "Record is no longer pending, or availableUnits is missing for an SL record",
+        content = @Content(schema = @Schema(implementation = ErrorResponse.class))),
     @ApiResponse(responseCode = "404", description = "INVALID KEY - no such transaction",
         content = @Content(schema = @Schema(implementation = ErrorResponse.class)))
   })

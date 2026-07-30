@@ -102,6 +102,12 @@ class PortfolioTransactionRepositoryTest {
 
     assertThat(repository.browse(null, TransactionStatus.DONE, PageRequest.of(0, 10)).getTotalElements())
         .isEqualTo(1);
+    assertThat(repository.browse(null, null, PageRequest.of(0, 10)).getTotalElements()).isEqualTo(4);
+    assertThat(
+            repository
+                .browse("PORT0002", TransactionStatus.DONE, PageRequest.of(0, 10))
+                .getTotalElements())
+        .isEqualTo(1);
   }
 
   @Test

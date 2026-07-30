@@ -13,8 +13,11 @@ public record ProcessTransactionResponse(
     @Schema(description = "Transaction after processing") TransactionResponse transaction,
     @Schema(description = "Delta applied to PORT-TOTAL-UNITS", example = "150.0000") BigDecimal unitsDelta,
     @Schema(description = "Delta applied to PORT-TOTAL-COST", example = "28117.50") BigDecimal costDelta,
-    @Schema(description = "Audit action written by PORTTRAN 2300-UPDATE-AUDIT-TRAIL", example = "CREATE")
+    @Schema(description = "AUD-ACTION written by PORTTRAN 2300-UPDATE-AUDIT-TRAIL", example = "CREATE")
         String auditAction,
+    @Schema(description = "AUD-STATUS written by PORTTRAN 2300-UPDATE-AUDIT-TRAIL", example = "SUCC",
+            allowableValues = {"SUCC", "FAIL"})
+        String auditStatus,
     @Schema(description = "COBOL ERR-TEXT when the record failed", example = "Insufficient units for sale")
         String errorText,
     @Schema(description = "Business rule that rejected the record", example = "BR-10") String ruleId,
@@ -26,7 +29,8 @@ public record ProcessTransactionResponse(
         TransactionResponse.from(result.transaction()),
         result.effect() == null ? null : result.effect().unitsDelta(),
         result.effect() == null ? null : result.effect().costDelta(),
-        result.effect() == null ? null : result.effect().auditAction(),
+        result.auditAction(),
+        result.auditStatus(),
         result.errorText(),
         result.ruleId(),
         result.cobolParagraph());

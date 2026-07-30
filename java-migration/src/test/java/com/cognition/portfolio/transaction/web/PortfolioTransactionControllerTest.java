@@ -148,6 +148,82 @@ class PortfolioTransactionControllerTest {
   }
 
   @Test
+  @DisplayName("BR-23: POST /process is refused once the record is no longer pending")
+  void processRefusedOnceTerminal() throws Exception {
+    mockMvc.perform(post("/api/v1/transactions").contentType(MediaType.APPLICATION_JSON).content(createBuyPayload()));
+    mockMvc.perform(
+        post("/api/v1/transactions/{key}/process", KEY)
+            .contentType(MediaType.APPLICATION_JSON)
+            .content("{\"availableUnits\":1000.0000}"));
+
+    mockMvc
+        .perform(
+            post("/api/v1/transactions/{key}/process", KEY)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"availableUnits\":1000.0000}"))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.ruleId").value("BR-23"))
+        .andExpect(jsonPath("$.message").value("Transaction is not pending: TRN-STATUS D"));
+  }
+
+  @Test
+  @DisplayName("BR-13: a failed posting still reports AUD-ACTION with AUD-STATUS 'FAIL'")
+  void failedPostingReportsAuditEntry() throws Exception {
+    String sell =
+        objectMapper.writeValueAsString(
+            java.util.Map.of(
+                "transactionDate", "20240320",
+                "transactionTime", "101122",
+                "portfolioId", "PORT0001",
+                "investmentId", "AAPL000001",
+                "type", "SL",
+                "quantity", new BigDecimal("50.0000"),
+                "price", new BigDecimal("191.2000"),
+                "currency", "USD"));
+    mockMvc.perform(post("/api/v1/transactions").contentType(MediaType.APPLICATION_JSON).content(sell));
+    String sellKey = "20240320101122PORT0001000001";
+
+    mockMvc
+        .perform(
+            post("/api/v1/transactions/{key}/process", sellKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"availableUnits\":10.0000}"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.errorText").value("Insufficient units for sale"))
+        .andExpect(jsonPath("$.auditAction").value("DELETE"))
+        .andExpect(jsonPath("$.auditStatus").value("FAIL"));
+
+    // The position is read from PORTFILE in COBOL, so omitting it is a caller error, not BR-10.
+    mockMvc
+        .perform(
+            post("/api/v1/transactions/{key}/process", sellKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{}"))
+        .andExpect(status().isBadRequest());
+  }
+
+  @Test
+  @DisplayName("BR-03: a rejected TRN-TYPE is echoed in the COBOL ERR-TEXT")
+  void invalidTypeCarriesTheOffendingValue() throws Exception {
+    String unknownType =
+        objectMapper.writeValueAsString(
+            java.util.Map.of(
+                "transactionDate", "20240320",
+                "transactionTime", "093015",
+                "portfolioId", "PORT0001",
+                "investmentId", "AAPL000001",
+                "type", "ZZ",
+                "quantity", new BigDecimal("150.0000"),
+                "price", new BigDecimal("187.4500"),
+                "currency", "USD"));
+
+    mockMvc
+        .perform(post("/api/v1/transactions").contentType(MediaType.APPLICATION_JSON).content(unknownType))
+        .andExpect(status().isBadRequest())
+        .andExpect(jsonPath("$.message").value("Invalid Transaction Type: ZZ"));
+  }
+
+  @Test
   @DisplayName("A validation failure returns the COBOL ERR-TEXT with its rule and paragraph")
   void validationFailureCarriesCobolErrorText() throws Exception {
     String zeroQuantity =

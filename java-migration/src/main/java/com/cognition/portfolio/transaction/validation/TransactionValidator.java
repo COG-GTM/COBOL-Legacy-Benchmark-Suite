@@ -62,17 +62,32 @@ public class TransactionValidator {
     return ValidationOutcome.success("PORTTRAN 2110-CHECK-PORTFOLIO");
   }
 
-  /** BR-03 — {@code 2120-CHECK-TRANSACTION-TYPE}: {@code TRN-TYPE} must be BU, SL, TR or FE. */
+  /**
+   * BR-03 — {@code 2120-CHECK-TRANSACTION-TYPE}: {@code TRN-TYPE} must be BU, SL, TR or FE. The
+   * {@code WHEN OTHER} branch builds {@code STRING 'Invalid Transaction Type: ' TRN-TYPE}, so the
+   * rejected value is part of the message.
+   */
+  @CobolOrigin(program = "PORTTRAN", paragraph = "2120-CHECK-TRANSACTION-TYPE", rules = {"BR-03"})
+  public ValidationOutcome checkTransactionType(String trnType) {
+    return TransactionType.fromCode(trnType)
+        .map(type -> ValidationOutcome.success("PORTTRAN 2120-CHECK-TRANSACTION-TYPE"))
+        .orElseGet(
+            () ->
+                ValidationOutcome.failure(
+                    ValidationReturnCode.INVALID_TYPE,
+                    "Invalid Transaction Type: " + (trnType == null ? "" : trnType),
+                    "BR-03",
+                    "PORTTRAN 2120-CHECK-TRANSACTION-TYPE"));
+  }
+
+  /**
+   * BR-03 for a record whose {@code TRN-TYPE} has already been resolved against the 88-levels; an
+   * unresolved value never reaches this point, it is rejected at the API boundary with the raw code
+   * in the message.
+   */
   @CobolOrigin(program = "PORTTRAN", paragraph = "2120-CHECK-TRANSACTION-TYPE", rules = {"BR-03"})
   public ValidationOutcome checkTransactionType(TransactionType type) {
-    if (type == null) {
-      return ValidationOutcome.failure(
-          ValidationReturnCode.INVALID_TYPE,
-          "Invalid Transaction Type: ",
-          "BR-03",
-          "PORTTRAN 2120-CHECK-TRANSACTION-TYPE");
-    }
-    return ValidationOutcome.success("PORTTRAN 2120-CHECK-TRANSACTION-TYPE");
+    return checkTransactionType(type == null ? null : type.getCode());
   }
 
   /**

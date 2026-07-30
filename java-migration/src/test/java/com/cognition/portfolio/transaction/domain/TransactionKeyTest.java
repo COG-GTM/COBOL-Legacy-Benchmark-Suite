@@ -19,8 +19,18 @@ class TransactionKeyTest {
 
     assertThat(key.toKeyString()).isEqualTo("20240320093015PORT0001000001");
     assertThat(key.toKeyString()).hasSize(TransactionKey.KEY_LENGTH).hasSize(28);
-    assertThat(key.getTransactionDate()).isEqualTo(LocalDate.of(2024, 3, 20));
-    assertThat(key.getTransactionTime()).isEqualTo(LocalTime.of(9, 30, 15));
+    assertThat(key.getTransactionDate()).contains(LocalDate.of(2024, 3, 20));
+    assertThat(key.getTransactionTime()).contains(LocalTime.of(9, 30, 15));
+  }
+
+  @Test
+  @DisplayName("OQ-11: TRN-DATE/TRN-TIME are PIC X, so the typed views are empty, never throwing")
+  void typedViewsToleratePicXValues() {
+    TransactionKey key = new TransactionKey("20240230", "999999", "PORT0001", "000001");
+
+    assertThat(key.getTransactionDate()).isEmpty();
+    assertThat(key.getTransactionTime()).isEmpty();
+    assertThat(key.toKeyString()).isEqualTo("20240230999999PORT0001000001");
   }
 
   @Test

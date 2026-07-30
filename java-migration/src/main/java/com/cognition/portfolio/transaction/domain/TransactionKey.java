@@ -8,8 +8,11 @@ import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Composite primary key, from {@code 05 TRN-KEY} in {@code TRNREC.cpy} — the 28-byte VSAM KSDS key
@@ -28,8 +31,10 @@ public class TransactionKey implements Serializable, Comparable<TransactionKey> 
   /** Byte length of {@code TRN-KEY}: 8 + 6 + 8 + 6. */
   public static final int KEY_LENGTH = 28;
 
-  private static final DateTimeFormatter COBOL_DATE = DateTimeFormatter.ofPattern("yyyyMMdd");
-  private static final DateTimeFormatter COBOL_TIME = DateTimeFormatter.ofPattern("HHmmss");
+  private static final DateTimeFormatter COBOL_DATE =
+      DateTimeFormatter.ofPattern("uuuuMMdd").withResolverStyle(ResolverStyle.STRICT);
+  private static final DateTimeFormatter COBOL_TIME =
+      DateTimeFormatter.ofPattern("HHmmss").withResolverStyle(ResolverStyle.STRICT);
 
   private static final Comparator<TransactionKey> VSAM_ORDER =
       Comparator.comparing(TransactionKey::getTrnDate)
@@ -83,14 +88,26 @@ public class TransactionKey implements Serializable, Comparable<TransactionKey> 
     return trnSequenceNo;
   }
 
-  /** {@code TRN-DATE} as a date; the copybook documents the field as {@code YYYYMMDD}. */
-  public LocalDate getTransactionDate() {
-    return LocalDate.parse(trnDate, COBOL_DATE);
+  /**
+   * {@code TRN-DATE} as a date; the copybook documents the field as {@code YYYYMMDD} but declares
+   * it {@code PIC X(08)}, so a stored value need not be a real calendar date (OQ-11). Empty for
+   * anything that does not parse, so a read path never fails on legacy data.
+   */
+  public Optional<LocalDate> getTransactionDate() {
+    try {
+      return Optional.of(LocalDate.parse(trnDate, COBOL_DATE));
+    } catch (DateTimeParseException | NullPointerException e) {
+      return Optional.empty();
+    }
   }
 
-  /** {@code TRN-TIME} as a time; the copybook documents the field as {@code HHMMSS}. */
-  public LocalTime getTransactionTime() {
-    return LocalTime.parse(trnTime, COBOL_TIME);
+  /** {@code TRN-TIME} as a time; {@code PIC X(06)}, so the same caveat as {@code TRN-DATE} applies. */
+  public Optional<LocalTime> getTransactionTime() {
+    try {
+      return Optional.of(LocalTime.parse(trnTime, COBOL_TIME));
+    } catch (DateTimeParseException | NullPointerException e) {
+      return Optional.empty();
+    }
   }
 
   /**
