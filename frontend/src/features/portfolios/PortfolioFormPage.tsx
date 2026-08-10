@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
+import { FormField } from '../../components/FormField';
 import { usePortfolioService } from '../../services/servicesContext';
 import {
   CLIENT_TYPES,
@@ -280,39 +281,5 @@ export function PortfolioFormPage({ mode }: { mode: 'create' | 'edit' }) {
         </div>
       </form>
     </section>
-  );
-}
-
-function FormField({
-  id,
-  label,
-  required,
-  error,
-  hint,
-  wide,
-  children,
-}: {
-  id: string;
-  label: string;
-  required?: boolean;
-  error?: string;
-  hint?: string;
-  wide?: boolean;
-  children: React.ReactNode;
-}) {
-  return (
-    <div className={wide ? 'field field--wide' : 'field'}>
-      <label htmlFor={id}>
-        {label}
-        {required && <span className="field__required"> *</span>}
-      </label>
-      {children}
-      {hint && !error && <span className="field__hint">{hint}</span>}
-      {error && (
-        <span className="field__error" role="alert">
-          {error}
-        </span>
-      )}
-    </div>
   );
 }

@@ -434,6 +434,18 @@ a:hover {
   background: #eef2ff;
   color: var(--pending);
 }
+.badge--done {
+  background: #e6f6ee;
+  color: var(--active);
+}
+.badge--failed {
+  background: #fdecea;
+  color: var(--danger-dark);
+}
+.badge--reversed {
+  background: #fdf3e2;
+  color: var(--suspended);
+}
 
 /* Alert */
 .alert {
@@ -446,6 +458,52 @@ a:hover {
   background: #fdecea;
   color: var(--danger-dark);
   border: 1px solid #f5c6c2;
+}
+.alert--success {
+  background: #e6f6ee;
+  color: #14603c;
+  border: 1px solid #b7e3cd;
+}
+
+/* Wizard steps */
+.steps {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin: 0 0 16px;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  color: var(--text-muted);
+}
+.steps__item {
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.steps__item.is-current {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  font-weight: 600;
+}
+
+/* Review step */
+.review__intro {
+  margin: 4px 0 20px;
+  color: var(--text-muted);
+  font-size: 14px;
+}
+
+/* Computed (read-only) form value */
+.field__computed {
+  display: block;
+  padding: 9px 12px;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+  background: var(--bg);
+  font-weight: 600;
 }
 
 /* Modal */

@@ -138,6 +138,38 @@ export function subtractDecimals(a: string, b: string, scale = 2): string {
   return fromScaledInt(toScaledInt(a, scale) - toScaledInt(b, scale), scale);
 }
 
+/**
+ * Multiplies two decimal strings, keeping `scale` fraction digits in the
+ * result. Extra digits are truncated rather than rounded, matching an
+ * unqualified COBOL `COMPUTE` into a `V9(2)` field (no `ROUNDED` phrase).
+ *
+ * `aScale` / `bScale` are the fraction digits of the operands — 4 by default
+ * for the `S9(11)V9(4)` quantity and price fields.
+ */
+export function multiplyDecimals(
+  a: string,
+  b: string,
+  { scale = 2, aScale = 4, bScale = 4 } = {},
+): string {
+  const product = toScaledInt(a, aScale) * toScaledInt(b, bScale);
+  const excess = aScale + bScale - scale;
+  const divisor = 10n ** BigInt(Math.max(excess, 0));
+  const scaled =
+    excess >= 0 ? product / divisor : product * 10n ** BigInt(-excess);
+  return fromScaledInt(scaled, scale);
+}
+
+/**
+ * Compares two decimal strings, returning a negative number when `a < b`,
+ * zero when equal and a positive number when `a > b`.
+ */
+export function compareDecimals(a: string, b: string, scale = 4): number {
+  const left = toScaledInt(a, scale);
+  const right = toScaledInt(b, scale);
+  if (left === right) return 0;
+  return left < right ? -1 : 1;
+}
+
 /** Sums a list of decimal strings, preserving precision. */
 export function sumDecimals(values: readonly string[], scale = 2): string {
   const total = values.reduce(
