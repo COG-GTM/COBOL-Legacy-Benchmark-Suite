@@ -146,3 +146,69 @@ export function sumDecimals(values: readonly string[], scale = 2): string {
   );
   return fromScaledInt(total, scale);
 }
+
+/**
+ * Working precision for division. Operands are read at this many fraction
+ * digits before the quotient is rounded down to the caller's `scale`, so
+ * inputs carrying up to 4 decimals (POS-QUANTITY) divide without truncation.
+ */
+const DIVISION_SCALE = 6;
+
+/**
+ * Divides two decimal strings, rounding the quotient half-away-from-zero to
+ * `scale` fraction digits. Returns null when the divisor is zero, which lets
+ * callers render the COBOL convention of leaving a rate blank rather than
+ * reporting a misleading 0.00 (the batch reports simply skip the COMPUTE).
+ */
+export function divideDecimals(a: string, b: string, scale = 2): string | null {
+  const numerator = toScaledInt(a, DIVISION_SCALE);
+  const denominator = toScaledInt(b, DIVISION_SCALE);
+  if (denominator === 0n) {
+    return null;
+  }
+  const negative = numerator < 0n !== denominator < 0n;
+  const absNumerator = numerator < 0n ? -numerator : numerator;
+  const absDenominator = denominator < 0n ? -denominator : denominator;
+  const scaled =
+    (absNumerator * 10n ** BigInt(scale) * 2n + absDenominator) /
+    (absDenominator * 2n);
+  return fromScaledInt(negative ? -scaled : scaled, scale);
+}
+
+/**
+ * `part / whole × 100`, e.g. the WS-SUCCESS-RATE and WS-POS-CHANGE-PCT
+ * computations in RPTSTA00 / RPTPOS00. Returns null when `whole` is zero.
+ */
+export function percentageOf(
+  part: string,
+  whole: string,
+  scale = 2,
+): string | null {
+  return divideDecimals(shiftDecimalPoint(part, 2), whole, scale);
+}
+
+/**
+ * Shifts the decimal point of a decimal string right by `power` digits, i.e.
+ * multiplies by 10^power without touching floating point.
+ */
+export function shiftDecimalPoint(value: string, power: number): string {
+  const scaled = toScaledInt(value, DIVISION_SCALE) * 10n ** BigInt(power);
+  return fromScaledInt(scaled, DIVISION_SCALE);
+}
+
+/**
+ * Renders a percentage decimal string for display. A null value (undefined
+ * rate) renders as an em dash; `signed` prefixes non-negative values with '+'
+ * to mirror the `+ZZ9.99` edited picture used for change columns.
+ */
+export function formatPercent(
+  value: string | null,
+  { signed = false }: { signed?: boolean } = {},
+): string {
+  if (value === null || !isDecimalString(value)) {
+    return '—';
+  }
+  const normalized = normalizeDecimal(value, 2);
+  const sign = signed && !normalized.startsWith('-') ? '+' : '';
+  return `${sign}${normalized}%`;
+}

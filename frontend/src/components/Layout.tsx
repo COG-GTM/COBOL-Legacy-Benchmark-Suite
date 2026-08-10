@@ -5,7 +5,7 @@ const NAV_ITEMS = [
   { to: '/positions', label: 'Positions', enabled: true },
   { to: '/transactions', label: 'Transactions', enabled: false },
   { to: '/history', label: 'History', enabled: false },
-  { to: '/reports', label: 'Reports', enabled: false },
+  { to: '/reports', label: 'Reports', enabled: true },
 ];
 
 /** App shell: header + primary navigation, with routed content in the outlet. */

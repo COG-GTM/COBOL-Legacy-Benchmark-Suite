@@ -1,9 +1,13 @@
 import { describe, expect, it } from 'vitest';
 import {
   addDecimals,
+  divideDecimals,
   formatCurrency,
+  formatPercent,
   formatQuantity,
   normalizeDecimal,
+  percentageOf,
+  shiftDecimalPoint,
   subtractDecimals,
   sumDecimals,
   validateDecimal,
@@ -94,5 +98,42 @@ describe('decimal arithmetic', () => {
 
   it('returns 0.00 for an empty sum', () => {
     expect(sumDecimals([])).toBe('0.00');
+  });
+
+  it('divides with half-away-from-zero rounding', () => {
+    expect(divideDecimals('10.00', '4.00')).toBe('2.50');
+    expect(divideDecimals('1.00', '3.00')).toBe('0.33');
+    expect(divideDecimals('2.00', '3.00')).toBe('0.67');
+    expect(divideDecimals('-2.00', '3.00')).toBe('-0.67');
+    expect(divideDecimals('40.00', '1500', 3)).toBe('0.027');
+  });
+
+  it('leaves a division by zero undefined rather than reporting 0.00', () => {
+    expect(divideDecimals('10.00', '0.00')).toBeNull();
+    expect(percentageOf('1.00', '0')).toBeNull();
+  });
+
+  it('computes percentages of a whole', () => {
+    expect(percentageOf('105730.95', '579050.00')).toBe('18.26');
+    expect(percentageOf('-1000.00', '5000.00')).toBe('-20.00');
+    expect(percentageOf('1', '3')).toBe('33.33');
+  });
+
+  it('shifts the decimal point without floating point', () => {
+    expect(shiftDecimalPoint('40.00', 3)).toBe('40000.000000');
+    expect(shiftDecimalPoint('0.1', 2)).toBe('10.000000');
+  });
+});
+
+describe('formatPercent', () => {
+  it('renders a percentage with an optional explicit sign', () => {
+    expect(formatPercent('18.26')).toBe('18.26%');
+    expect(formatPercent('18.26', { signed: true })).toBe('+18.26%');
+    expect(formatPercent('-4.50', { signed: true })).toBe('-4.50%');
+    expect(formatPercent('0', { signed: true })).toBe('+0.00%');
+  });
+
+  it('renders an undefined rate as a dash', () => {
+    expect(formatPercent(null)).toBe('—');
   });
 });
