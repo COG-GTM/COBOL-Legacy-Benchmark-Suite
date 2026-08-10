@@ -1,8 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import {
   addDecimals,
+  compareDecimals,
   formatCurrency,
   formatQuantity,
+  multiplyDecimals,
   normalizeDecimal,
   subtractDecimals,
   sumDecimals,
@@ -94,5 +96,19 @@ describe('decimal arithmetic', () => {
 
   it('returns 0.00 for an empty sum', () => {
     expect(sumDecimals([])).toBe('0.00');
+  });
+
+  it('multiplies with truncation to the target scale', () => {
+    expect(multiplyDecimals('250', '409.82')).toBe('102455.00');
+    expect(multiplyDecimals('1.9999', '1.9999')).toBe('3.99');
+    expect(multiplyDecimals('-2.5', '4')).toBe('-10.00');
+  });
+
+  it('compares without converting to a lossy number', () => {
+    expect(compareDecimals('1250.5000', '1250.5')).toBe(0);
+    expect(compareDecimals('99.9999', '100')).toBeLessThan(0);
+    expect(
+      compareDecimals('123456789012345.68', '123456789012345.67', 2),
+    ).toBeGreaterThan(0);
   });
 });

@@ -1,6 +1,7 @@
 import { useMemo, type ReactNode } from 'react';
 import { MockPortfolioService } from './mockPortfolioService';
 import { MockPositionService } from './mockPositionService';
+import { MockTransactionService } from './mockTransactionService';
 import { ServicesContext, type Services } from './servicesContext';
 
 /**
@@ -19,6 +20,7 @@ export function ServicesProvider({
     () => ({
       portfolios: services?.portfolios ?? new MockPortfolioService(),
       positions: services?.positions ?? new MockPositionService(),
+      transactions: services?.transactions ?? new MockTransactionService(),
     }),
     [services],
   );

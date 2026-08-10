@@ -1,10 +1,12 @@
 import { createContext, useContext } from 'react';
 import type { PortfolioService } from './portfolioService';
 import type { PositionService } from './positionService';
+import type { TransactionService } from './transactionService';
 
 export interface Services {
   portfolios: PortfolioService;
   positions: PositionService;
+  transactions: TransactionService;
 }
 
 export const ServicesContext = createContext<Services | null>(null);
@@ -23,4 +25,8 @@ export function usePortfolioService(): PortfolioService {
 
 export function usePositionService(): PositionService {
   return useServices().positions;
+}
+
+export function useTransactionService(): TransactionService {
+  return useServices().transactions;
 }
