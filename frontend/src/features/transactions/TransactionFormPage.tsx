@@ -324,7 +324,7 @@ export function TransactionFormPage() {
       ) : (
         <div className="card form">
           <h2 className="detail-card__title">Review transaction</h2>
-          <p className="page-header__subtitle">
+          <p className="review__intro">
             Confirm the details below. The transaction is written with status
             Pending and settled by the next PORTTRAN run.
           </p>
