@@ -7,9 +7,25 @@ The C/R/U/D dispatcher — the program that becomes the Lambda entry point. Base
 
 `PORTMSTR.cbl` has a `PROCEDURE DIVISION USING` clause but is built as an executable rather
 than a called subprogram, and it references `LS-*` linkage fields and `ERR-*` error fields that
-no copybook in this repository defines. GnuCOBOL rejects it on undefined identifiers. Unlike
-`PORTTRAN`, the *logic* here is complete and unambiguous — only the linkage is broken — so the
-derived expectation is a much shorter reach: one `WHEN OTHER` arm.
+no copybook in this repository defines.
+
+Those are not, however, what a plain `cobc -x src/programs/portfolio/PORTMSTR.cbl` prints. That
+reports three errors at line 1 (`PROGRAM-ID header missing`, `PROCEDURE DIVISION header
+missing`, `syntax error, unexpected *`) and stops, because the banner comment's `*` sits in
+column 8 instead of column 7 — the same fixed-format misalignment that staging transform 1
+fixes for the programs that do run. Apply that transform and the real blockers appear:
+
+```
+:83:  error: executable program requested but PROCEDURE/ENTRY has USING clause
+:244: error: 'LS-PROGRAM-ID' is not defined
+:245: error: 'ERR-CAT-VSAM' is not defined
+... 20 further undefined LS-* / ERR-* / WS-FILE-STATUS / PORT-KEY references
+```
+
+These cannot be staged away the way transforms 1-3 are: the missing linkage section and `ERR-*`
+copybook would have to be *authored*, which is writing new logic rather than compiling existing
+logic. Unlike `PORTTRAN`, though, the *logic* here is complete and unambiguous — only the
+linkage is broken — so the derived expectation is a much shorter reach: one `WHEN OTHER` arm.
 
 ## Before
 

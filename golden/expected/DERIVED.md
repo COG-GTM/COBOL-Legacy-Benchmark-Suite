@@ -9,6 +9,24 @@ compiled without writing new logic:
 - **`PORTMSTR`** — passes `USING` on a program compiled as an executable and references
   `LS-*` / `ERR-*` fields that no copybook in this repo defines.
 
+  Note the order in which GnuCOBOL reports this. Compiled as-is, the *only* errors you see are
+  at line 1 — `PROGRAM-ID header missing`, `PROCEDURE DIVISION header missing`,
+  `syntax error, unexpected *` — because the banner comment's `*` sits in column 8 rather than
+  column 7, which is the same fixed-format misalignment that staging transform 1 fixes for the
+  programs that do run. Applying that transform is what surfaces the real blockers:
+
+  ```
+  :83:  error: executable program requested but PROCEDURE/ENTRY has USING clause
+  :244: error: 'LS-PROGRAM-ID' is not defined
+  :245: error: 'ERR-CAT-VSAM' is not defined
+  ... 20 further undefined LS-* / ERR-* / WS-FILE-STATUS / PORT-KEY references
+  ```
+
+  So the reason given above is accurate, but it is not what a naive `cobc -x` prints — that
+  reports a fixed-format problem and stops. Unlike transforms 1-3, no mechanical staging fix
+  gets past these: the missing `LS-*` linkage and `ERR-*` copybook would have to be authored,
+  which is writing new logic, not staging existing logic. Hence DERIVED.
+
 Everything below is **hand-derived by reading the COBOL**, and is labelled `DERIVED` in the
 parity report. It is reasoned, not observed. Do not present it as captured output.
 
