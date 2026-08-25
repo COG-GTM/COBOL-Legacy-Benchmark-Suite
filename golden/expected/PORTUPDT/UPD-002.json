@@ -1,0 +1,40 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTUPDT",
+  "caseId": "UPD-002",
+  "type": "FUNCTIONAL",
+  "description": "Valid client name update (space padded X(30) target)",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTUPDT",
+    "caseId": "UPD-002",
+    "counters": {
+      "updates": 1,
+      "errors": 0
+    },
+    "events": [],
+    "finalState": [
+      {
+        "portId": "PORT0001",
+        "accountNo": "1000000001",
+        "clientName": "ALICE CONSERVATIVE FUND",
+        "clientType": "I",
+        "createDate": "20240320",
+        "lastMaint": "20240320",
+        "status": "A",
+        "totalValue": "12345678.99",
+        "cashBalance": "1000.00",
+        "lastUser": "TESTUSR1",
+        "lastTrans": "20240320",
+        "filler": ""
+      }
+    ],
+    "audit": null
+  }
+}

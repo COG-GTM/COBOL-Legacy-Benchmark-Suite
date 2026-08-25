@@ -1,0 +1,32 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTVALD",
+  "caseId": "VAL-005",
+  "type": "FUNCTIONAL",
+  "description": "Account number as a 50 digit zero padded value",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTVALD",
+    "caseId": "VAL-005",
+    "counters": {
+      "validations": 1
+    },
+    "events": [
+      {
+        "kind": "validation",
+        "caseId": "VAL-005",
+        "validateType": "A",
+        "returnCode": 0,
+        "message": ""
+      }
+    ],
+    "finalState": null,
+    "audit": null
+  }
+}

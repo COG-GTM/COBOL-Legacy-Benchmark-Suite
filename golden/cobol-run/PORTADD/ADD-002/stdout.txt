@@ -1,0 +1,4 @@
+Duplicate record: PORT0001
+Records added:    0000000
+Duplicate records:0000001
+Errors occurred:  0000000

@@ -1,0 +1,15 @@
+Portfolio Record: 0000001
+  ID: PORT0002
+  Account: 1000000002
+  Client: BETA INCOME TRUST             
+  Status: A
+  Total Value: +0000098765432.10
+ 
+Portfolio Record: 0000002
+  ID: PORT0002
+  Account: 2000000002
+  Client: BETA INCOME TRUST SERIES B    
+  Status: A
+  Total Value: +0000000000111.11
+ 
+Total Records Read: 0000002

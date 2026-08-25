@@ -1,0 +1,115 @@
+{
+  "program": "PORTDEL",
+  "inputLayout": "DELETE_RECORD",
+  "cases": [
+    {
+      "id": "DEL-001",
+      "type": "FUNCTIONAL",
+      "description": "Valid delete, reason 01 account closed, audit record written",
+      "seed": ["P0001", "P0002"],
+      "input": ["D_P0001_CLOSED"]
+    },
+    {
+      "id": "DEL-002",
+      "type": "ERROR",
+      "description": "Delete of a key that does not exist - VSAM status 23",
+      "seed": ["P0001"],
+      "input": ["D_MISSING"]
+    },
+    {
+      "id": "DEL-003",
+      "type": "INTEGRATE",
+      "description": "Batch delete, reasons 02 and 03 plus one missing key",
+      "seed": ["P0001", "P0002", "P0003"],
+      "input": ["D_P0002_TRANSFER", "D_P0003_REQUEST", "D_MISSING"]
+    },
+    {
+      "id": "DEL-004",
+      "type": "ERROR",
+      "description": "Same key deleted twice in one run - second attempt not found",
+      "seed": ["P0001"],
+      "input": ["D_P0001_CLOSED", "D_P0001_CLOSED"]
+    },
+    {
+      "id": "DEL-005",
+      "type": "ERROR",
+      "description": "Unknown reason code is not validated by PORTDEL - record still deleted",
+      "seed": ["P0001"],
+      "input": ["D_P0001_BAD_REASON"]
+    }
+  ],
+  "records": {
+    "P0001": {
+      "portId": "PORT0001",
+      "accountNo": "1000000001",
+      "clientName": "ALICE GROWTH FUND",
+      "clientType": "I",
+      "createDate": "20240320",
+      "lastMaint": "20240320",
+      "status": "A",
+      "totalValue": "12345678.99",
+      "cashBalance": "1000.00",
+      "lastUser": "TESTUSR1",
+      "lastTrans": "20240320",
+      "filler": ""
+    },
+    "P0002": {
+      "portId": "PORT0002",
+      "accountNo": "1000000002",
+      "clientName": "BETA INCOME TRUST",
+      "clientType": "C",
+      "createDate": "20240301",
+      "lastMaint": "20240315",
+      "status": "A",
+      "totalValue": "98765432.10",
+      "cashBalance": "5000.00",
+      "lastUser": "TESTUSR2",
+      "lastTrans": "20240315",
+      "filler": ""
+    },
+    "P0003": {
+      "portId": "PORT0003",
+      "accountNo": "1000000003",
+      "clientName": "GAMMA BALANCED",
+      "clientType": "T",
+      "createDate": "20240210",
+      "lastMaint": "20240310",
+      "status": "S",
+      "totalValue": "5555555.55",
+      "cashBalance": "0.00",
+      "lastUser": "TESTUSR3",
+      "lastTrans": "20240310",
+      "filler": ""
+    },
+    "D_P0001_CLOSED": {
+      "portId": "PORT0001",
+      "accountNo": "1000000001",
+      "reasonCode": "01",
+      "filler": ""
+    },
+    "D_P0002_TRANSFER": {
+      "portId": "PORT0002",
+      "accountNo": "1000000002",
+      "reasonCode": "02",
+      "filler": ""
+    },
+    "D_P0003_REQUEST": {
+      "portId": "PORT0003",
+      "accountNo": "1000000003",
+      "reasonCode": "03",
+      "filler": ""
+    },
+    "D_MISSING": {
+      "portId": "PORT9999",
+      "accountNo": "9999999999",
+      "reasonCode": "01",
+      "filler": ""
+    },
+    "D_P0001_BAD_REASON": {
+      "portId": "PORT0001",
+      "accountNo": "1000000001",
+      "reasonCode": "99",
+      "filler": ""
+    }
+  }
+}

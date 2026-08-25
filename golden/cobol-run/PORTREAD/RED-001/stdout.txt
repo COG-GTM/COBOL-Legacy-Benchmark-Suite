@@ -1,0 +1,22 @@
+Portfolio Record: 0000001
+  ID: PORT0001
+  Account: 1000000001
+  Client: ALICE GROWTH FUND             
+  Status: A
+  Total Value: +0000012345678.99
+ 
+Portfolio Record: 0000002
+  ID: PORT0002
+  Account: 1000000002
+  Client: BETA INCOME TRUST             
+  Status: A
+  Total Value: +0000098765432.10
+ 
+Portfolio Record: 0000003
+  ID: PORT0003
+  Account: 1000000003
+  Client: GAMMA BALANCED                
+  Status: S
+  Total Value: +0000005555555.55
+ 
+Total Records Read: 0000003

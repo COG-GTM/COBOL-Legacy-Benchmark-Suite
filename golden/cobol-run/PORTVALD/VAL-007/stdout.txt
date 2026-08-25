@@ -1,0 +1,2 @@
+VALD CASE=VAL-007    TYPE=A RC=+0002 MSG=Invalid Account Number format                     
+Validations performed: 0000001

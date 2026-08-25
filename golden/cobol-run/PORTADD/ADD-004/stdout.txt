@@ -1,0 +1,3 @@
+Records added:    0000001
+Duplicate records:0000000
+Errors occurred:  0000000

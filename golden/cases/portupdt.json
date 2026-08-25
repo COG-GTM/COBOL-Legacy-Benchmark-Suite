@@ -1,0 +1,121 @@
+{
+  "program": "PORTUPDT",
+  "inputLayout": "UPDATE_RECORD",
+  "cases": [
+    {
+      "id": "UPD-001",
+      "type": "FUNCTIONAL",
+      "description": "Valid status update A -> C",
+      "seed": ["P0001"],
+      "input": ["U_STATUS_C"]
+    },
+    {
+      "id": "UPD-002",
+      "type": "FUNCTIONAL",
+      "description": "Valid client name update (space padded X(30) target)",
+      "seed": ["P0001"],
+      "input": ["U_NAME"]
+    },
+    {
+      "id": "UPD-003",
+      "type": "FUNCTIONAL",
+      "description": "Valid total value update - right justified numeric string",
+      "seed": ["P0001"],
+      "input": ["U_VALUE_PADDED"]
+    },
+    {
+      "id": "UPD-004",
+      "type": "ERROR",
+      "description": "Update against a key that does not exist - VSAM status 23",
+      "seed": ["P0001"],
+      "input": ["U_MISSING"]
+    },
+    {
+      "id": "UPD-005",
+      "type": "ERROR",
+      "description": "Unrecognised action code - no field mapped, record still rewritten",
+      "seed": ["P0001"],
+      "input": ["U_BAD_ACTION"]
+    },
+    {
+      "id": "UPD-006",
+      "type": "INTEGRATE",
+      "description": "Batch of updates across two keys plus one missing key",
+      "seed": ["P0001", "P0002"],
+      "input": ["U_STATUS_C", "U_NAME_P0002", "U_MISSING"]
+    },
+    {
+      "id": "UPD-007",
+      "type": "FUNCTIONAL",
+      "description": "Two updates to the same key in one run - second sees the first",
+      "seed": ["P0001"],
+      "input": ["U_STATUS_C", "U_NAME"]
+    }
+  ],
+  "records": {
+    "P0001": {
+      "portId": "PORT0001",
+      "accountNo": "1000000001",
+      "clientName": "ALICE GROWTH FUND",
+      "clientType": "I",
+      "createDate": "20240320",
+      "lastMaint": "20240320",
+      "status": "A",
+      "totalValue": "12345678.99",
+      "cashBalance": "1000.00",
+      "lastUser": "TESTUSR1",
+      "lastTrans": "20240320",
+      "filler": ""
+    },
+    "P0002": {
+      "portId": "PORT0002",
+      "accountNo": "1000000002",
+      "clientName": "BETA INCOME TRUST",
+      "clientType": "C",
+      "createDate": "20240301",
+      "lastMaint": "20240315",
+      "status": "A",
+      "totalValue": "98765432.10",
+      "cashBalance": "5000.00",
+      "lastUser": "TESTUSR2",
+      "lastTrans": "20240315",
+      "filler": ""
+    },
+    "U_STATUS_C": {
+      "portId": "PORT0001",
+      "accountNo": "1000000001",
+      "action": "S",
+      "newValue": "C"
+    },
+    "U_NAME": {
+      "portId": "PORT0001",
+      "accountNo": "1000000001",
+      "action": "N",
+      "newValue": "ALICE CONSERVATIVE FUND"
+    },
+    "U_NAME_P0002": {
+      "portId": "PORT0002",
+      "accountNo": "1000000002",
+      "action": "N",
+      "newValue": "BETA INCOME TRUST II"
+    },
+    "U_VALUE_PADDED": {
+      "portId": "PORT0001",
+      "accountNo": "1000000001",
+      "action": "V",
+      "newValue": "00000000000000000000000000000000000000000002500075"
+    },
+    "U_MISSING": {
+      "portId": "PORT9999",
+      "accountNo": "9999999999",
+      "action": "S",
+      "newValue": "C"
+    },
+    "U_BAD_ACTION": {
+      "portId": "PORT0001",
+      "accountNo": "1000000001",
+      "action": "X",
+      "newValue": "IGNORED"
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTDEL",
+  "caseId": "DEL-004",
+  "type": "ERROR",
+  "description": "Same key deleted twice in one run - second attempt not found",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTDEL",
+    "caseId": "DEL-004",
+    "counters": {
+      "deleted": 1,
+      "notFound": 1,
+      "errors": 0
+    },
+    "events": [
+      {
+        "kind": "not-found",
+        "key": "PORT00011000000001"
+      }
+    ],
+    "finalState": [],
+    "audit": [
+      {
+        "timestamp": "@RUNSTAMP",
+        "action": "DELETE",
+        "key": "PORT00011000000001",
+        "reason": "01",
+        "status": "A",
+        "filler": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+      }
+    ]
+  }
+}

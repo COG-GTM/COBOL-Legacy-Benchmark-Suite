@@ -1,0 +1,2 @@
+VALD CASE=VAL-008    TYPE=T RC=+0000 MSG=                                                  
+Validations performed: 0000001

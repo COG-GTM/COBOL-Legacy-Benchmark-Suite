@@ -1,0 +1,50 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTDEL",
+  "caseId": "DEL-001",
+  "type": "FUNCTIONAL",
+  "description": "Valid delete, reason 01 account closed, audit record written",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTDEL",
+    "caseId": "DEL-001",
+    "counters": {
+      "deleted": 1,
+      "notFound": 0,
+      "errors": 0
+    },
+    "events": [],
+    "finalState": [
+      {
+        "portId": "PORT0002",
+        "accountNo": "1000000002",
+        "clientName": "BETA INCOME TRUST",
+        "clientType": "C",
+        "createDate": "20240301",
+        "lastMaint": "20240315",
+        "status": "A",
+        "totalValue": "98765432.10",
+        "cashBalance": "5000.00",
+        "lastUser": "TESTUSR2",
+        "lastTrans": "20240315",
+        "filler": ""
+      }
+    ],
+    "audit": [
+      {
+        "timestamp": "@RUNSTAMP",
+        "action": "DELETE",
+        "key": "PORT00011000000001",
+        "reason": "01",
+        "status": "A",
+        "filler": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+      }
+    ]
+  }
+}

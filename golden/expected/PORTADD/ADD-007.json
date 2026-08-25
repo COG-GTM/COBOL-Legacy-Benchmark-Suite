@@ -1,0 +1,31 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTADD",
+  "caseId": "ADD-007",
+  "type": "ERROR",
+  "description": "Reject record whose status is not 'A'",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTADD",
+    "caseId": "ADD-007",
+    "counters": {
+      "added": 0,
+      "duplicates": 0,
+      "errors": 1
+    },
+    "events": [
+      {
+        "kind": "invalid-record",
+        "portId": "PORT0042"
+      }
+    ],
+    "finalState": [],
+    "audit": null
+  }
+}

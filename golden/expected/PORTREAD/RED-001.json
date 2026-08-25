@@ -1,0 +1,95 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTREAD",
+  "caseId": "RED-001",
+  "type": "FUNCTIONAL",
+  "description": "Sequential browse returns records in PORT-KEY order, not load order",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTREAD",
+    "caseId": "RED-001",
+    "counters": {
+      "recordsRead": 3
+    },
+    "events": [
+      {
+        "kind": "record",
+        "sequence": 1,
+        "portId": "PORT0001",
+        "accountNo": "1000000001",
+        "clientName": "ALICE GROWTH FUND",
+        "status": "A",
+        "totalValue": "12345678.99"
+      },
+      {
+        "kind": "record",
+        "sequence": 2,
+        "portId": "PORT0002",
+        "accountNo": "1000000002",
+        "clientName": "BETA INCOME TRUST",
+        "status": "A",
+        "totalValue": "98765432.10"
+      },
+      {
+        "kind": "record",
+        "sequence": 3,
+        "portId": "PORT0003",
+        "accountNo": "1000000003",
+        "clientName": "GAMMA BALANCED",
+        "status": "S",
+        "totalValue": "5555555.55"
+      }
+    ],
+    "finalState": [
+      {
+        "portId": "PORT0001",
+        "accountNo": "1000000001",
+        "clientName": "ALICE GROWTH FUND",
+        "clientType": "I",
+        "createDate": "20240320",
+        "lastMaint": "20240321",
+        "status": "A",
+        "totalValue": "12345678.99",
+        "cashBalance": "1000.00",
+        "lastUser": "TESTUSR1",
+        "lastTrans": "20240321",
+        "filler": ""
+      },
+      {
+        "portId": "PORT0002",
+        "accountNo": "1000000002",
+        "clientName": "BETA INCOME TRUST",
+        "clientType": "C",
+        "createDate": "20240301",
+        "lastMaint": "20240315",
+        "status": "A",
+        "totalValue": "98765432.10",
+        "cashBalance": "5000.00",
+        "lastUser": "TESTUSR2",
+        "lastTrans": "20240315",
+        "filler": ""
+      },
+      {
+        "portId": "PORT0003",
+        "accountNo": "1000000003",
+        "clientName": "GAMMA BALANCED",
+        "clientType": "T",
+        "createDate": "20240210",
+        "lastMaint": "20240310",
+        "status": "S",
+        "totalValue": "5555555.55",
+        "cashBalance": "0.00",
+        "lastUser": "TESTUSR3",
+        "lastTrans": "20240310",
+        "filler": ""
+      }
+    ],
+    "audit": null
+  }
+}

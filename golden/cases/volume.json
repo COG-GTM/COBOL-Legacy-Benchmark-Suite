@@ -1,0 +1,14 @@
+{
+  "program": "PORTADD",
+  "inputLayout": "PORT_RECORD",
+  "note": "Generated volume fixture. Records are produced by the seeded generator in tools/golden/lib/generate.mjs using golden/config/golden-config.json randomSeed, mirroring how src/programs/test/TSTGEN00.cbl drives generation from its RANDSEED file. Generation is pure and reproducible: same seed in, byte identical inputs out.",
+  "cases": [
+    {
+      "id": "PERF-001",
+      "type": "PERFORM",
+      "description": "Seeded volume load - generated portfolio records, every Nth key pre-seeded to force duplicates",
+      "generator": { "kind": "volumeAdd" }
+    }
+  ],
+  "records": {}
+}

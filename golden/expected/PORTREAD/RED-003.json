@@ -1,0 +1,72 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTREAD",
+  "caseId": "RED-003",
+  "type": "FUNCTIONAL",
+  "description": "Browse surfaces negative and maximum COMP-3 money values",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTREAD",
+    "caseId": "RED-003",
+    "counters": {
+      "recordsRead": 2
+    },
+    "events": [
+      {
+        "kind": "record",
+        "sequence": 1,
+        "portId": "PORT0021",
+        "accountNo": "1000000021",
+        "clientName": "MINIMUM VALUE PORTFOLIO",
+        "status": "A",
+        "totalValue": "-9999999999999.99"
+      },
+      {
+        "kind": "record",
+        "sequence": 2,
+        "portId": "PORT0030",
+        "accountNo": "1000000030",
+        "clientName": "MAXIMUM VALUE PORTFOLIO",
+        "status": "A",
+        "totalValue": "9999999999999.99"
+      }
+    ],
+    "finalState": [
+      {
+        "portId": "PORT0021",
+        "accountNo": "1000000021",
+        "clientName": "MINIMUM VALUE PORTFOLIO",
+        "clientType": "I",
+        "createDate": "20240101",
+        "lastMaint": "20240101",
+        "status": "A",
+        "totalValue": "-9999999999999.99",
+        "cashBalance": "-0.01",
+        "lastUser": "GOLDEN01",
+        "lastTrans": "20240101",
+        "filler": ""
+      },
+      {
+        "portId": "PORT0030",
+        "accountNo": "1000000030",
+        "clientName": "MAXIMUM VALUE PORTFOLIO",
+        "clientType": "C",
+        "createDate": "20240101",
+        "lastMaint": "20240101",
+        "status": "A",
+        "totalValue": "9999999999999.99",
+        "cashBalance": "9999999999999.99",
+        "lastUser": "GOLDEN01",
+        "lastTrans": "20240101",
+        "filler": ""
+      }
+    ],
+    "audit": null
+  }
+}

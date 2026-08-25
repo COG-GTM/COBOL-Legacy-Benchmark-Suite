@@ -1,0 +1,46 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTADD",
+  "caseId": "ADD-002",
+  "type": "ERROR",
+  "description": "Duplicate portfolio creation - VSAM status 22",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTADD",
+    "caseId": "ADD-002",
+    "counters": {
+      "added": 0,
+      "duplicates": 1,
+      "errors": 0
+    },
+    "events": [
+      {
+        "kind": "duplicate-record",
+        "portId": "PORT0001"
+      }
+    ],
+    "finalState": [
+      {
+        "portId": "PORT0001",
+        "accountNo": "1000000001",
+        "clientName": "ALICE GROWTH FUND",
+        "clientType": "I",
+        "createDate": "20240320",
+        "lastMaint": "20240320",
+        "status": "A",
+        "totalValue": "12345678.99",
+        "cashBalance": "1000.00",
+        "lastUser": "TESTUSR1",
+        "lastTrans": "20240320",
+        "filler": ""
+      }
+    ],
+    "audit": null
+  }
+}

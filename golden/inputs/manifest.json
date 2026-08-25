@@ -1,0 +1,1006 @@
+{
+  "randomSeed": "123456789",
+  "cases": [
+    {
+      "program": "PORTADD",
+      "id": "ADD-001",
+      "type": "FUNCTIONAL",
+      "description": "Valid portfolio creation - two new keys",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTADD/ADD-001/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "625522f82a7cd525871ef4bdcf051d41c55ff48a6b3e84effc52aab26db33496"
+        },
+        {
+          "file": "inputs/PORTADD/ADD-001/input.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 2,
+          "sha256": "8290295e34a4e1a305a29b26885bec64b85e8cd00ad78164ef2521581047681e"
+        }
+      ]
+    },
+    {
+      "program": "PORTADD",
+      "id": "ADD-002",
+      "type": "ERROR",
+      "description": "Duplicate portfolio creation - VSAM status 22",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTADD/ADD-002/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "625522f82a7cd525871ef4bdcf051d41c55ff48a6b3e84effc52aab26db33496"
+        },
+        {
+          "file": "inputs/PORTADD/ADD-002/input.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "18a8f7d61504683af9d9d9b1e7253ac71482347926a48b9c8361db5f887cc972"
+        }
+      ]
+    },
+    {
+      "program": "PORTADD",
+      "id": "ADD-003",
+      "type": "FUNCTIONAL",
+      "description": "Create with minimum money values (zero and negative)",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTADD/ADD-003/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "file": "inputs/PORTADD/ADD-003/input.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 2,
+          "sha256": "a8994cbb7b2aed03944e7a1a8afa98601826efec3ca8d39b5fe46b82fd7a7058"
+        }
+      ]
+    },
+    {
+      "program": "PORTADD",
+      "id": "ADD-004",
+      "type": "FUNCTIONAL",
+      "description": "Create with maximum money values",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTADD/ADD-004/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "file": "inputs/PORTADD/ADD-004/input.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "9aa19733f6bd0ae2026801c62e02763c244873ea859e0a8294251aca658831f2"
+        }
+      ]
+    },
+    {
+      "program": "PORTADD",
+      "id": "ADD-005",
+      "type": "ERROR",
+      "description": "Reject record with blank portfolio ID",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTADD/ADD-005/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "file": "inputs/PORTADD/ADD-005/input.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "3286fcd2563ea0b2883dc5d88645fe9d987f316cf70a8e1ecebb40ea033a8c5f"
+        }
+      ]
+    },
+    {
+      "program": "PORTADD",
+      "id": "ADD-006",
+      "type": "ERROR",
+      "description": "Reject record with blank client name",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTADD/ADD-006/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "file": "inputs/PORTADD/ADD-006/input.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "9e9c3a79d423e29c074d33a2014f4edddf388ad05b40957cf2131c5317dca8c5"
+        }
+      ]
+    },
+    {
+      "program": "PORTADD",
+      "id": "ADD-007",
+      "type": "ERROR",
+      "description": "Reject record whose status is not 'A'",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTADD/ADD-007/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        },
+        {
+          "file": "inputs/PORTADD/ADD-007/input.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "6b19710d00cf4ebca07de2c36b3779685cc670788bfd999998a8fc8395ea00b3"
+        }
+      ]
+    },
+    {
+      "program": "PORTADD",
+      "id": "ADD-008",
+      "type": "INTEGRATE",
+      "description": "Mixed batch - one add, one duplicate, one invalid",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTADD/ADD-008/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "625522f82a7cd525871ef4bdcf051d41c55ff48a6b3e84effc52aab26db33496"
+        },
+        {
+          "file": "inputs/PORTADD/ADD-008/input.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 3,
+          "sha256": "f787fbac2da7f49d906516a292e3aa02b9ba8cce56421d9a132f2a56d21dcbe3"
+        }
+      ]
+    },
+    {
+      "program": "PORTREAD",
+      "id": "RED-001",
+      "type": "FUNCTIONAL",
+      "description": "Sequential browse returns records in PORT-KEY order, not load order",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTREAD/RED-001/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 3,
+          "sha256": "2b108ea8e6a3dfb008a9be3b779fc87a67c6c2a8fefbc7868d4a79701ffb4cbb"
+        }
+      ]
+    },
+    {
+      "program": "PORTREAD",
+      "id": "RED-002",
+      "type": "ERROR",
+      "description": "Browse of an empty portfolio file reports zero records (immediate EOF)",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTREAD/RED-002/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 0,
+          "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+        }
+      ]
+    },
+    {
+      "program": "PORTREAD",
+      "id": "RED-003",
+      "type": "FUNCTIONAL",
+      "description": "Browse surfaces negative and maximum COMP-3 money values",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTREAD/RED-003/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 2,
+          "sha256": "33c7c777ee9b0fb6261a19fdc86e69cf57226698bd348520b0c8bb8d257a0dfa"
+        }
+      ]
+    },
+    {
+      "program": "PORTREAD",
+      "id": "RED-004",
+      "type": "FUNCTIONAL",
+      "description": "Same PORT-ID with two accounts - full 18 byte key ordering",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTREAD/RED-004/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 2,
+          "sha256": "5e468b9976b7e3594dd3006bc70f2280ff466ff91bd3ca4167244ac2c53d0394"
+        }
+      ]
+    },
+    {
+      "program": "PORTUPDT",
+      "id": "UPD-001",
+      "type": "FUNCTIONAL",
+      "description": "Valid status update A -> C",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTUPDT/UPD-001/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "625522f82a7cd525871ef4bdcf051d41c55ff48a6b3e84effc52aab26db33496"
+        },
+        {
+          "file": "inputs/PORTUPDT/UPD-001/input.dat",
+          "layout": "UPDATE_RECORD",
+          "recordLength": 69,
+          "records": 1,
+          "sha256": "7a82d5009ba908d964c0b5a0fa04e3818765c9fc72522aa15dede0e953968de0"
+        }
+      ]
+    },
+    {
+      "program": "PORTUPDT",
+      "id": "UPD-002",
+      "type": "FUNCTIONAL",
+      "description": "Valid client name update (space padded X(30) target)",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTUPDT/UPD-002/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "625522f82a7cd525871ef4bdcf051d41c55ff48a6b3e84effc52aab26db33496"
+        },
+        {
+          "file": "inputs/PORTUPDT/UPD-002/input.dat",
+          "layout": "UPDATE_RECORD",
+          "recordLength": 69,
+          "records": 1,
+          "sha256": "a5560bee1b3b1b0dd4d4633e0c9e497e131e242f9ac13b89dc1687fb35f20c1c"
+        }
+      ]
+    },
+    {
+      "program": "PORTUPDT",
+      "id": "UPD-003",
+      "type": "FUNCTIONAL",
+      "description": "Valid total value update - right justified numeric string",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTUPDT/UPD-003/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "625522f82a7cd525871ef4bdcf051d41c55ff48a6b3e84effc52aab26db33496"
+        },
+        {
+          "file": "inputs/PORTUPDT/UPD-003/input.dat",
+          "layout": "UPDATE_RECORD",
+          "recordLength": 69,
+          "records": 1,
+          "sha256": "45518991b304338d2bf2aab005dcf06e7628d258cd7e3074a33f73741f9bd1a3"
+        }
+      ]
+    },
+    {
+      "program": "PORTUPDT",
+      "id": "UPD-004",
+      "type": "ERROR",
+      "description": "Update against a key that does not exist - VSAM status 23",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTUPDT/UPD-004/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "625522f82a7cd525871ef4bdcf051d41c55ff48a6b3e84effc52aab26db33496"
+        },
+        {
+          "file": "inputs/PORTUPDT/UPD-004/input.dat",
+          "layout": "UPDATE_RECORD",
+          "recordLength": 69,
+          "records": 1,
+          "sha256": "3221619b3149cec577a80aa85c17f3a867706c45df0e598d56708b15fd33dd05"
+        }
+      ]
+    },
+    {
+      "program": "PORTUPDT",
+      "id": "UPD-005",
+      "type": "ERROR",
+      "description": "Unrecognised action code - no field mapped, record still rewritten",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTUPDT/UPD-005/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "625522f82a7cd525871ef4bdcf051d41c55ff48a6b3e84effc52aab26db33496"
+        },
+        {
+          "file": "inputs/PORTUPDT/UPD-005/input.dat",
+          "layout": "UPDATE_RECORD",
+          "recordLength": 69,
+          "records": 1,
+          "sha256": "0009b9eb884cccd3f3656b2f9df65c859f8ceb102ca670080694bec2e198aa4e"
+        }
+      ]
+    },
+    {
+      "program": "PORTUPDT",
+      "id": "UPD-006",
+      "type": "INTEGRATE",
+      "description": "Batch of updates across two keys plus one missing key",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTUPDT/UPD-006/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 2,
+          "sha256": "f0c6124559752143ef03d2cb6283a7d00707e37893f8b9e74e04056a69f1d8e7"
+        },
+        {
+          "file": "inputs/PORTUPDT/UPD-006/input.dat",
+          "layout": "UPDATE_RECORD",
+          "recordLength": 69,
+          "records": 3,
+          "sha256": "84eb6de708bc0f35d43180ef763147f85ca8480516ee85bbc436aef039ddf1ca"
+        }
+      ]
+    },
+    {
+      "program": "PORTUPDT",
+      "id": "UPD-007",
+      "type": "FUNCTIONAL",
+      "description": "Two updates to the same key in one run - second sees the first",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTUPDT/UPD-007/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "625522f82a7cd525871ef4bdcf051d41c55ff48a6b3e84effc52aab26db33496"
+        },
+        {
+          "file": "inputs/PORTUPDT/UPD-007/input.dat",
+          "layout": "UPDATE_RECORD",
+          "recordLength": 69,
+          "records": 2,
+          "sha256": "83d86c19d8bd6e83e89a24109b7b95857e589764a7975c86352830d25cec8e87"
+        }
+      ]
+    },
+    {
+      "program": "PORTDEL",
+      "id": "DEL-001",
+      "type": "FUNCTIONAL",
+      "description": "Valid delete, reason 01 account closed, audit record written",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTDEL/DEL-001/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 2,
+          "sha256": "f0c6124559752143ef03d2cb6283a7d00707e37893f8b9e74e04056a69f1d8e7"
+        },
+        {
+          "file": "inputs/PORTDEL/DEL-001/input.dat",
+          "layout": "DELETE_RECORD",
+          "recordLength": 80,
+          "records": 1,
+          "sha256": "32054be3a9b2bd13aa310978dad71194b71743bef95325fa43560d0e3052c6e2"
+        }
+      ]
+    },
+    {
+      "program": "PORTDEL",
+      "id": "DEL-002",
+      "type": "ERROR",
+      "description": "Delete of a key that does not exist - VSAM status 23",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTDEL/DEL-002/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "625522f82a7cd525871ef4bdcf051d41c55ff48a6b3e84effc52aab26db33496"
+        },
+        {
+          "file": "inputs/PORTDEL/DEL-002/input.dat",
+          "layout": "DELETE_RECORD",
+          "recordLength": 80,
+          "records": 1,
+          "sha256": "281ec0c28df036c6eb5ffe5efc6a76e8cbdb7f88c89eca9465e560dc07b3cf50"
+        }
+      ]
+    },
+    {
+      "program": "PORTDEL",
+      "id": "DEL-003",
+      "type": "INTEGRATE",
+      "description": "Batch delete, reasons 02 and 03 plus one missing key",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTDEL/DEL-003/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 3,
+          "sha256": "8988b7164494b8824d6b00805bd0fda5e357d96c55342f64774fbb0cb2b46f7c"
+        },
+        {
+          "file": "inputs/PORTDEL/DEL-003/input.dat",
+          "layout": "DELETE_RECORD",
+          "recordLength": 80,
+          "records": 3,
+          "sha256": "1310ece2de0e28e2f0c3e613071d7e057f1ff607ea0f33eddaae3051f68e0e85"
+        }
+      ]
+    },
+    {
+      "program": "PORTDEL",
+      "id": "DEL-004",
+      "type": "ERROR",
+      "description": "Same key deleted twice in one run - second attempt not found",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTDEL/DEL-004/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "625522f82a7cd525871ef4bdcf051d41c55ff48a6b3e84effc52aab26db33496"
+        },
+        {
+          "file": "inputs/PORTDEL/DEL-004/input.dat",
+          "layout": "DELETE_RECORD",
+          "recordLength": 80,
+          "records": 2,
+          "sha256": "8dfe5f6522a6e2eef5aee4747decc2485fdcb26350b6eff3a6df92ea8ed687af"
+        }
+      ]
+    },
+    {
+      "program": "PORTDEL",
+      "id": "DEL-005",
+      "type": "ERROR",
+      "description": "Unknown reason code is not validated by PORTDEL - record still deleted",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTDEL/DEL-005/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "625522f82a7cd525871ef4bdcf051d41c55ff48a6b3e84effc52aab26db33496"
+        },
+        {
+          "file": "inputs/PORTDEL/DEL-005/input.dat",
+          "layout": "DELETE_RECORD",
+          "recordLength": 80,
+          "records": 1,
+          "sha256": "53245dda9e3cb36535eeec003d65ee67e9b230325213978146a3b6dda93db233"
+        }
+      ]
+    },
+    {
+      "program": "PORTTRAN",
+      "id": "TRN-001",
+      "type": "FUNCTIONAL",
+      "description": "Valid buy - units and cost increase",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTTRAN/TRN-001/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "99e62c043a64310ff65e22738907c94eb840ed66d06eaf2fda9779601f1c7bec"
+        },
+        {
+          "file": "inputs/PORTTRAN/TRN-001/input.dat",
+          "layout": "TRANSACTION_RECORD",
+          "recordLength": 152,
+          "records": 1,
+          "sha256": "7f545d17e805fd6145fa7134de0850e2e2772f90d4309d441534efdd8c48f789"
+        }
+      ]
+    },
+    {
+      "program": "PORTTRAN",
+      "id": "TRN-002",
+      "type": "FUNCTIONAL",
+      "description": "Valid sell of part of the position",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTTRAN/TRN-002/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "acf5f4f990ea4d8e85a92d761e3d956bc0a793247c1b526fccedf08d7ffe1b12"
+        },
+        {
+          "file": "inputs/PORTTRAN/TRN-002/input.dat",
+          "layout": "TRANSACTION_RECORD",
+          "recordLength": 152,
+          "records": 1,
+          "sha256": "592063de647ecb88a23ce773bfe88f477c3edfb48a52d03817e58c570fb95fc1"
+        }
+      ]
+    },
+    {
+      "program": "PORTTRAN",
+      "id": "TRN-003",
+      "type": "ERROR",
+      "description": "Overdraw sell - insufficient units",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTTRAN/TRN-003/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "acf5f4f990ea4d8e85a92d761e3d956bc0a793247c1b526fccedf08d7ffe1b12"
+        },
+        {
+          "file": "inputs/PORTTRAN/TRN-003/input.dat",
+          "layout": "TRANSACTION_RECORD",
+          "recordLength": 152,
+          "records": 1,
+          "sha256": "a1f082f6aa58d5c8ed92918e4bb7308277d030a72d2f0e6a3a0fecd3fedb70ef"
+        }
+      ]
+    },
+    {
+      "program": "PORTTRAN",
+      "id": "TRN-004",
+      "type": "ERROR",
+      "description": "Unknown transaction type",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTTRAN/TRN-004/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "99e62c043a64310ff65e22738907c94eb840ed66d06eaf2fda9779601f1c7bec"
+        },
+        {
+          "file": "inputs/PORTTRAN/TRN-004/input.dat",
+          "layout": "TRANSACTION_RECORD",
+          "recordLength": 152,
+          "records": 1,
+          "sha256": "0a3ab61492be2b6982dfe7b4425ab61571f8ea65bcf895515c8fa4f4b999fafe"
+        }
+      ]
+    },
+    {
+      "program": "PORTTRAN",
+      "id": "TRN-005",
+      "type": "ERROR",
+      "description": "Transaction against a portfolio that does not exist",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTTRAN/TRN-005/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "99e62c043a64310ff65e22738907c94eb840ed66d06eaf2fda9779601f1c7bec"
+        },
+        {
+          "file": "inputs/PORTTRAN/TRN-005/input.dat",
+          "layout": "TRANSACTION_RECORD",
+          "recordLength": 152,
+          "records": 1,
+          "sha256": "18d9611624bb02574b1439d1e59881aa4d472092746a9d582e2e242ebc50f798"
+        }
+      ]
+    },
+    {
+      "program": "PORTTRAN",
+      "id": "TRN-006",
+      "type": "ERROR",
+      "description": "Non positive quantity is rejected",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTTRAN/TRN-006/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "99e62c043a64310ff65e22738907c94eb840ed66d06eaf2fda9779601f1c7bec"
+        },
+        {
+          "file": "inputs/PORTTRAN/TRN-006/input.dat",
+          "layout": "TRANSACTION_RECORD",
+          "recordLength": 152,
+          "records": 1,
+          "sha256": "00939240ca4d78e033bea49676aeb0484a86b23fb15cef0e1c742ecdc8e81b68"
+        }
+      ]
+    },
+    {
+      "program": "PORTTRAN",
+      "id": "TRN-007",
+      "type": "ERROR",
+      "description": "Non positive price is rejected",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTTRAN/TRN-007/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "99e62c043a64310ff65e22738907c94eb840ed66d06eaf2fda9779601f1c7bec"
+        },
+        {
+          "file": "inputs/PORTTRAN/TRN-007/input.dat",
+          "layout": "TRANSACTION_RECORD",
+          "recordLength": 152,
+          "records": 1,
+          "sha256": "c1718bf123a950faab78190e29644c3e321eea94a235f965eb93cb24422dde5a"
+        }
+      ]
+    },
+    {
+      "program": "PORTTRAN",
+      "id": "TRN-008",
+      "type": "FUNCTIONAL",
+      "description": "Fee transaction reduces cost",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTTRAN/TRN-008/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "acf5f4f990ea4d8e85a92d761e3d956bc0a793247c1b526fccedf08d7ffe1b12"
+        },
+        {
+          "file": "inputs/PORTTRAN/TRN-008/input.dat",
+          "layout": "TRANSACTION_RECORD",
+          "recordLength": 152,
+          "records": 1,
+          "sha256": "da8b3f904e23912f70a15e268b63cb6141bf115d3c4f8b46b64fb3fe8d24d7a1"
+        }
+      ]
+    },
+    {
+      "program": "PORTTRAN",
+      "id": "TRN-009",
+      "type": "ERROR",
+      "description": "Transfer is accepted by validation but explicitly not implemented",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTTRAN/TRN-009/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "acf5f4f990ea4d8e85a92d761e3d956bc0a793247c1b526fccedf08d7ffe1b12"
+        },
+        {
+          "file": "inputs/PORTTRAN/TRN-009/input.dat",
+          "layout": "TRANSACTION_RECORD",
+          "recordLength": 152,
+          "records": 1,
+          "sha256": "b36f25c5a5a373949ae46e20e3abe37504faee2184ed34b00cbe0fc43c170a15"
+        }
+      ]
+    },
+    {
+      "program": "PORTTRAN",
+      "id": "TRN-010",
+      "type": "INTEGRATE",
+      "description": "Mixed batch - buy, sell, overdraw sell, bad type",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTTRAN/TRN-010/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 1,
+          "sha256": "acf5f4f990ea4d8e85a92d761e3d956bc0a793247c1b526fccedf08d7ffe1b12"
+        },
+        {
+          "file": "inputs/PORTTRAN/TRN-010/input.dat",
+          "layout": "TRANSACTION_RECORD",
+          "recordLength": 152,
+          "records": 4,
+          "sha256": "efeca9194f88454e5502f88142176a312cafcdad7873dc3b63ff8dcd07a6bdec"
+        }
+      ]
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-001",
+      "type": "FUNCTIONAL",
+      "description": "ID with PORT prefix and 4 digits",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTVALD/VAL-001/input.dat",
+          "layout": "VALIDATION_REQUEST_RECORD",
+          "recordLength": 61,
+          "records": 1,
+          "sha256": "63a47b3b7855249730bde3431ccd75deb67f5a01a63af7e0c9f78ec3b7d5d87e"
+        }
+      ]
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-002",
+      "type": "ERROR",
+      "description": "ID with wrong prefix",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTVALD/VAL-002/input.dat",
+          "layout": "VALIDATION_REQUEST_RECORD",
+          "recordLength": 61,
+          "records": 1,
+          "sha256": "a190f96f7d7558d51e93403d7b6cefee20018f23eb9b95e4f9f386aa639ecb78"
+        }
+      ]
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-003",
+      "type": "ERROR",
+      "description": "ID with non numeric digit positions",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTVALD/VAL-003/input.dat",
+          "layout": "VALIDATION_REQUEST_RECORD",
+          "recordLength": 61,
+          "records": 1,
+          "sha256": "aa15f57f73b630189cd9464ac6bc44a3106a8339c4400ad6cecf2d200c5d9041"
+        }
+      ]
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-004",
+      "type": "ERROR",
+      "description": "ID that is entirely blank",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTVALD/VAL-004/input.dat",
+          "layout": "VALIDATION_REQUEST_RECORD",
+          "recordLength": 61,
+          "records": 1,
+          "sha256": "5edbe90b278caea0ea42af8dad8d4a7c2941436461f309335aeb2e351aa1d201"
+        }
+      ]
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-005",
+      "type": "FUNCTIONAL",
+      "description": "Account number as a 50 digit zero padded value",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTVALD/VAL-005/input.dat",
+          "layout": "VALIDATION_REQUEST_RECORD",
+          "recordLength": 61,
+          "records": 1,
+          "sha256": "3c368b3103e302290a804398c6ae0819e68bc844b20ab09ad7cb310fd9fc345a"
+        }
+      ]
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-006",
+      "type": "ERROR",
+      "description": "Account number left justified with trailing spaces",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTVALD/VAL-006/input.dat",
+          "layout": "VALIDATION_REQUEST_RECORD",
+          "recordLength": 61,
+          "records": 1,
+          "sha256": "7cc0fb52fc56a952e14176509b7eceec0bbfe47f0b0f123413177d07532067a3"
+        }
+      ]
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-007",
+      "type": "ERROR",
+      "description": "Account number of all zeros",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTVALD/VAL-007/input.dat",
+          "layout": "VALIDATION_REQUEST_RECORD",
+          "recordLength": 61,
+          "records": 1,
+          "sha256": "dc88f47e01b6591a3ee84c6882aa36819e180291ca7ee0fbb649a9a4ffda9512"
+        }
+      ]
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-008",
+      "type": "FUNCTIONAL",
+      "description": "Investment type STK",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTVALD/VAL-008/input.dat",
+          "layout": "VALIDATION_REQUEST_RECORD",
+          "recordLength": 61,
+          "records": 1,
+          "sha256": "1528800b6094d5eee6c7eb1210efc0139a3ad565deb6200595d3464417971eb6"
+        }
+      ]
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-009",
+      "type": "FUNCTIONAL",
+      "description": "Investment type ETF",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTVALD/VAL-009/input.dat",
+          "layout": "VALIDATION_REQUEST_RECORD",
+          "recordLength": 61,
+          "records": 1,
+          "sha256": "2b5dfae9c5f21946825b203eff80acc136f60512c24d9fb85fd2b28aea06e396"
+        }
+      ]
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-010",
+      "type": "ERROR",
+      "description": "Unknown investment type",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTVALD/VAL-010/input.dat",
+          "layout": "VALIDATION_REQUEST_RECORD",
+          "recordLength": 61,
+          "records": 1,
+          "sha256": "fc01aa0ba7705492b3dc816142140a6e875c45725a537c4373aa3549f8d60463"
+        }
+      ]
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-011",
+      "type": "FUNCTIONAL",
+      "description": "Amount inside the allowed range",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTVALD/VAL-011/input.dat",
+          "layout": "VALIDATION_REQUEST_RECORD",
+          "recordLength": 61,
+          "records": 1,
+          "sha256": "7f74763d177a38605515b95d973da6702dba6ad0abe6e83a231f7fbe4d7eddce"
+        }
+      ]
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-012",
+      "type": "FUNCTIONAL",
+      "description": "Amount at the maximum boundary",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTVALD/VAL-012/input.dat",
+          "layout": "VALIDATION_REQUEST_RECORD",
+          "recordLength": 61,
+          "records": 1,
+          "sha256": "6469361ae08c01039ec83ff5726b478277377ebcab24e9b3910a9c187c6ea8e2"
+        }
+      ]
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-013",
+      "type": "FUNCTIONAL",
+      "description": "Amount of zero",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTVALD/VAL-013/input.dat",
+          "layout": "VALIDATION_REQUEST_RECORD",
+          "recordLength": 61,
+          "records": 1,
+          "sha256": "5e60970303e82ab096ff677ad6a3aa4dbc783a1f9299782e004eafee0c5aec2f"
+        }
+      ]
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-014",
+      "type": "ERROR",
+      "description": "Unknown validation request type",
+      "generated": false,
+      "files": [
+        {
+          "file": "inputs/PORTVALD/VAL-014/input.dat",
+          "layout": "VALIDATION_REQUEST_RECORD",
+          "recordLength": 61,
+          "records": 1,
+          "sha256": "2c4c19b980b0c994c0c247ccfcb537782f83fbf41ae329a2c440ea81c7fea740"
+        }
+      ]
+    },
+    {
+      "program": "PORTADD",
+      "id": "PERF-001",
+      "type": "PERFORM",
+      "description": "Seeded volume load - generated portfolio records, every Nth key pre-seeded to force duplicates",
+      "generated": true,
+      "files": [
+        {
+          "file": "inputs/PORTADD/PERF-001/seed.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 5,
+          "sha256": "6631a11fe66588b0193f46ec1a147eff967e7bc2b26f3cdc3e5ea93d63ddecfe"
+        },
+        {
+          "file": "inputs/PORTADD/PERF-001/input.dat",
+          "layout": "PORT_RECORD",
+          "recordLength": 148,
+          "records": 25,
+          "sha256": "d2db0ed59d5e9ab28c5f606143cf93f2810b05e7982521f335706f6f342dd0ae"
+        }
+      ]
+    }
+  ]
+}

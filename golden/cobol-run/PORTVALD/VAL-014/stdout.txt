@@ -1,0 +1,2 @@
+VALD CASE=VAL-014    TYPE=Z RC=+0001 MSG=Invalid validation type                           
+Validations performed: 0000001

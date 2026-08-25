@@ -1,0 +1,31 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTADD",
+  "caseId": "ADD-005",
+  "type": "ERROR",
+  "description": "Reject record with blank portfolio ID",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTADD",
+    "caseId": "ADD-005",
+    "counters": {
+      "added": 0,
+      "duplicates": 0,
+      "errors": 1
+    },
+    "events": [
+      {
+        "kind": "invalid-record",
+        "portId": ""
+      }
+    ],
+    "finalState": [],
+    "audit": null
+  }
+}

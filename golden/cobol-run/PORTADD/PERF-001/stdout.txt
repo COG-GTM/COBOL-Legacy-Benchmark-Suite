@@ -1,0 +1,8 @@
+Duplicate record: PORT0001
+Duplicate record: PORT0006
+Duplicate record: PORT0011
+Duplicate record: PORT0016
+Duplicate record: PORT0021
+Records added:    0000020
+Duplicate records:0000005
+Errors occurred:  0000000

@@ -1,0 +1,59 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTUPDT",
+  "caseId": "UPD-006",
+  "type": "INTEGRATE",
+  "description": "Batch of updates across two keys plus one missing key",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTUPDT",
+    "caseId": "UPD-006",
+    "counters": {
+      "updates": 2,
+      "errors": 1
+    },
+    "events": [
+      {
+        "kind": "not-found",
+        "key": "PORT99999999999999"
+      }
+    ],
+    "finalState": [
+      {
+        "portId": "PORT0001",
+        "accountNo": "1000000001",
+        "clientName": "ALICE GROWTH FUND",
+        "clientType": "I",
+        "createDate": "20240320",
+        "lastMaint": "20240320",
+        "status": "C",
+        "totalValue": "12345678.99",
+        "cashBalance": "1000.00",
+        "lastUser": "TESTUSR1",
+        "lastTrans": "20240320",
+        "filler": ""
+      },
+      {
+        "portId": "PORT0002",
+        "accountNo": "1000000002",
+        "clientName": "BETA INCOME TRUST II",
+        "clientType": "C",
+        "createDate": "20240301",
+        "lastMaint": "20240315",
+        "status": "A",
+        "totalValue": "98765432.10",
+        "cashBalance": "5000.00",
+        "lastUser": "TESTUSR2",
+        "lastTrans": "20240315",
+        "filler": ""
+      }
+    ],
+    "audit": null
+  }
+}

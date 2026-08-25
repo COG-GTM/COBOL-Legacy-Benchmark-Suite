@@ -1,0 +1,19 @@
+{
+  "name": "cobol-legacy-benchmark-suite",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Golden-dataset parity harness proving the JS serverless conversion matches the original COBOL portfolio programs",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "golden:inputs": "node tools/golden/build-inputs.mjs",
+    "golden:expected": "node tools/golden/normalize-cobol.mjs",
+    "golden:capture": "bash tools/golden/capture-cobol.sh",
+    "parity": "node --test serverless/test/parity.test.mjs",
+    "test": "node --test serverless/test/",
+    "lint": "find serverless tools -name '*.mjs' -o -name '*.js' | xargs -n1 node --check",
+    "verify": "npm run golden:inputs && npm test"
+  }
+}

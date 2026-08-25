@@ -1,0 +1,63 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTDEL",
+  "caseId": "DEL-003",
+  "type": "INTEGRATE",
+  "description": "Batch delete, reasons 02 and 03 plus one missing key",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTDEL",
+    "caseId": "DEL-003",
+    "counters": {
+      "deleted": 2,
+      "notFound": 1,
+      "errors": 0
+    },
+    "events": [
+      {
+        "kind": "not-found",
+        "key": "PORT99999999999999"
+      }
+    ],
+    "finalState": [
+      {
+        "portId": "PORT0001",
+        "accountNo": "1000000001",
+        "clientName": "ALICE GROWTH FUND",
+        "clientType": "I",
+        "createDate": "20240320",
+        "lastMaint": "20240320",
+        "status": "A",
+        "totalValue": "12345678.99",
+        "cashBalance": "1000.00",
+        "lastUser": "TESTUSR1",
+        "lastTrans": "20240320",
+        "filler": ""
+      }
+    ],
+    "audit": [
+      {
+        "timestamp": "@RUNSTAMP",
+        "action": "DELETE",
+        "key": "PORT00021000000002",
+        "reason": "02",
+        "status": "A",
+        "filler": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+      },
+      {
+        "timestamp": "@RUNSTAMP",
+        "action": "DELETE",
+        "key": "PORT00031000000003",
+        "reason": "03",
+        "status": "S",
+        "filler": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+      }
+    ]
+  }
+}

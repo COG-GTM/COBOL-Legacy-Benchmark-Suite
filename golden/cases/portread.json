@@ -1,0 +1,120 @@
+{
+  "program": "PORTREAD",
+  "inputLayout": null,
+  "cases": [
+    {
+      "id": "RED-001",
+      "type": "FUNCTIONAL",
+      "description": "Sequential browse returns records in PORT-KEY order, not load order",
+      "seed": ["P0003", "P0001", "P0002"],
+      "input": []
+    },
+    {
+      "id": "RED-002",
+      "type": "ERROR",
+      "description": "Browse of an empty portfolio file reports zero records (immediate EOF)",
+      "seed": [],
+      "input": []
+    },
+    {
+      "id": "RED-003",
+      "type": "FUNCTIONAL",
+      "description": "Browse surfaces negative and maximum COMP-3 money values",
+      "seed": ["P0021_NEGATIVE", "P0030_MAX"],
+      "input": []
+    },
+    {
+      "id": "RED-004",
+      "type": "FUNCTIONAL",
+      "description": "Same PORT-ID with two accounts - full 18 byte key ordering",
+      "seed": ["P0002_ACCT_B", "P0002"],
+      "input": []
+    }
+  ],
+  "records": {
+    "P0001": {
+      "portId": "PORT0001",
+      "accountNo": "1000000001",
+      "clientName": "ALICE GROWTH FUND",
+      "clientType": "I",
+      "createDate": "20240320",
+      "lastMaint": "20240321",
+      "status": "A",
+      "totalValue": "12345678.99",
+      "cashBalance": "1000.00",
+      "lastUser": "TESTUSR1",
+      "lastTrans": "20240321",
+      "filler": ""
+    },
+    "P0002": {
+      "portId": "PORT0002",
+      "accountNo": "1000000002",
+      "clientName": "BETA INCOME TRUST",
+      "clientType": "C",
+      "createDate": "20240301",
+      "lastMaint": "20240315",
+      "status": "A",
+      "totalValue": "98765432.10",
+      "cashBalance": "5000.00",
+      "lastUser": "TESTUSR2",
+      "lastTrans": "20240315",
+      "filler": ""
+    },
+    "P0002_ACCT_B": {
+      "portId": "PORT0002",
+      "accountNo": "2000000002",
+      "clientName": "BETA INCOME TRUST SERIES B",
+      "clientType": "C",
+      "createDate": "20240302",
+      "lastMaint": "20240316",
+      "status": "A",
+      "totalValue": "111.11",
+      "cashBalance": "22.22",
+      "lastUser": "TESTUSR2",
+      "lastTrans": "20240316",
+      "filler": ""
+    },
+    "P0003": {
+      "portId": "PORT0003",
+      "accountNo": "1000000003",
+      "clientName": "GAMMA BALANCED",
+      "clientType": "T",
+      "createDate": "20240210",
+      "lastMaint": "20240310",
+      "status": "S",
+      "totalValue": "5555555.55",
+      "cashBalance": "0.00",
+      "lastUser": "TESTUSR3",
+      "lastTrans": "20240310",
+      "filler": ""
+    },
+    "P0021_NEGATIVE": {
+      "portId": "PORT0021",
+      "accountNo": "1000000021",
+      "clientName": "MINIMUM VALUE PORTFOLIO",
+      "clientType": "I",
+      "createDate": "20240101",
+      "lastMaint": "20240101",
+      "status": "A",
+      "totalValue": "-9999999999999.99",
+      "cashBalance": "-0.01",
+      "lastUser": "GOLDEN01",
+      "lastTrans": "20240101",
+      "filler": ""
+    },
+    "P0030_MAX": {
+      "portId": "PORT0030",
+      "accountNo": "1000000030",
+      "clientName": "MAXIMUM VALUE PORTFOLIO",
+      "clientType": "C",
+      "createDate": "20240101",
+      "lastMaint": "20240101",
+      "status": "A",
+      "totalValue": "9999999999999.99",
+      "cashBalance": "9999999999999.99",
+      "lastUser": "GOLDEN01",
+      "lastTrans": "20240101",
+      "filler": ""
+    }
+  }
+}

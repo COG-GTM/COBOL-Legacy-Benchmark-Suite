@@ -1,0 +1,2 @@
+VALD CASE=VAL-002    TYPE=I RC=+0001 MSG=Invalid Portfolio ID format                       
+Validations performed: 0000001

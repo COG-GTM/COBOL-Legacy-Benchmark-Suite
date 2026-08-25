@@ -1,0 +1,3 @@
+Records deleted:  0000001
+Records not found:0000000
+Errors occurred:  0000000

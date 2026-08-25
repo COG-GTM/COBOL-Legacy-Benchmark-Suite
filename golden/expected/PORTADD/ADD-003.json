@@ -1,0 +1,55 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTADD",
+  "caseId": "ADD-003",
+  "type": "FUNCTIONAL",
+  "description": "Create with minimum money values (zero and negative)",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTADD",
+    "caseId": "ADD-003",
+    "counters": {
+      "added": 2,
+      "duplicates": 0,
+      "errors": 0
+    },
+    "events": [],
+    "finalState": [
+      {
+        "portId": "PORT0020",
+        "accountNo": "1000000020",
+        "clientName": "ZERO VALUE PORTFOLIO",
+        "clientType": "I",
+        "createDate": "@RUNDATE",
+        "lastMaint": "@RUNDATE",
+        "status": "A",
+        "totalValue": "0.00",
+        "cashBalance": "0.00",
+        "lastUser": "GOLDEN01",
+        "lastTrans": "00000000",
+        "filler": ""
+      },
+      {
+        "portId": "PORT0021",
+        "accountNo": "1000000021",
+        "clientName": "MINIMUM VALUE PORTFOLIO",
+        "clientType": "I",
+        "createDate": "@RUNDATE",
+        "lastMaint": "@RUNDATE",
+        "status": "A",
+        "totalValue": "-9999999999999.99",
+        "cashBalance": "-0.01",
+        "lastUser": "GOLDEN01",
+        "lastTrans": "00000000",
+        "filler": ""
+      }
+    ],
+    "audit": null
+  }
+}
