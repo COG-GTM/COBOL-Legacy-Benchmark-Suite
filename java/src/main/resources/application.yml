@@ -7,7 +7,9 @@ spring:
     password: ""
   jpa:
     hibernate:
-      ddl-auto: create
+      # Safe default for a real (DB2) datasource; the histld00 sample profile
+      # and tests override this to create the embedded H2 schema.
+      ddl-auto: validate
     open-in-view: false
   sql:
     init:
@@ -26,6 +28,8 @@ spring:
     activate:
       on-profile: histld00
   jpa:
+    hibernate:
+      ddl-auto: create
     defer-datasource-initialization: true
   sql:
     init:

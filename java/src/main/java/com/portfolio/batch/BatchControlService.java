@@ -42,10 +42,14 @@ public class BatchControlService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public BatchControl.Key markActive(String jobName, String processDate) {
         BatchControl control = find(jobName, processDate);
+        // Restart = previous attempt did not finish cleanly (still ACTIVE or ERROR)
+        if (BatchControlConstants.STAT_ACTIVE.equals(control.getStatus())
+                || BatchControlConstants.STAT_ERROR.equals(control.getStatus())) {
+            control.setRestartCount(control.getRestartCount() + 1);
+        }
         control.setStatus(BatchControlConstants.STAT_ACTIVE);
         control.setStartTime(LocalTime.now().format(TIME_FMT));
         control.setAttemptTimestamp(LocalDateTime.now().format(TS_FMT));
-        control.setRestartCount(control.getRestartCount() + 1);
         repository.save(control);
         return control.getKey();
     }

@@ -121,7 +121,7 @@ class HistoryLoadJobTest {
         assertThat(control.getRecordsRead()).isEqualTo(1);
         assertThat(control.getRecordsWritten()).isEqualTo(1);
         assertThat(control.getReturnCode()).isZero();
-        assertThat(control.getRestartCount()).isEqualTo(1);
+        assertThat(control.getRestartCount()).isZero();
     }
 
     @Test

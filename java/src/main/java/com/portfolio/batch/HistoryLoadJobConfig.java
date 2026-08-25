@@ -94,6 +94,8 @@ public class HistoryLoadJobConfig {
                 // -803 increments WS-ERROR-COUNT and processing continues until
                 // the count exceeds 100 (WS-ERROR-COUNT > 100 abort).
                 .faultTolerant()
+                // Required: the processor counts reads/errors, so it must not
+                // be re-run during the fault-tolerant chunk scan.
                 .processorNonTransactional()
                 .skipPolicy((throwable, skipCount) ->
                         throwable instanceof DataAccessException
