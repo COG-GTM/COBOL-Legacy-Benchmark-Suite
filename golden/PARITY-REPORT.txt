@@ -1,0 +1,70 @@
+************************************************************************************************************************************
+                              PORTFOLIO COBOL -> JS PARITY REPORT                                                                   
+************************************************************************************************************************************
+TEST-ID       PROGRAM     BASELINE  DESCRIPTION                                           STAT
+------------------------------------------------------------------------------------------------------------------------------------
+COMP3-01      codec       EXECUTED  S9(13)V99 0.00                                        PASS
+COMP3-02      codec       EXECUTED  S9(13)V99 1.00                                        PASS
+COMP3-03      codec       EXECUTED  S9(13)V99 0.01                                        PASS
+COMP3-04      codec       EXECUTED  S9(13)V99 12345678.90                                 PASS
+COMP3-05      codec       EXECUTED  S9(13)V99 -12345678.90                                PASS
+COMP3-06      codec       EXECUTED  S9(13)V99 9999999999999.99                            PASS
+COMP3-07      codec       EXECUTED  S9(13)V99 -9999999999999.99                           PASS
+COMP3-08      codec       EXECUTED  S9(13)V99 -0.05                                       PASS
+COMP3-09      codec       EXECUTED  S9(11)V9(4) 0.0000                                    PASS
+COMP3-10      codec       EXECUTED  S9(11)V9(4) 100.5000                                  PASS
+COMP3-11      codec       EXECUTED  S9(11)V9(4) -100.5000                                 PASS
+COMP3-12      codec       EXECUTED  S9(11)V9(4) 0.0001                                    PASS
+VALD-01       PORTVALD    EXECUTED  type I <- "PORT0001"                                  PASS
+VALD-02       PORTVALD    EXECUTED  type I <- "PORT9999"                                  PASS
+VALD-03       PORTVALD    EXECUTED  type I <- "XXXX0001"                                  PASS
+VALD-04       PORTVALD    EXECUTED  type I <- "PORTABCD"                                  PASS
+VALD-05       PORTVALD    EXECUTED  type I <- ""                                          PASS
+VALD-06       PORTVALD    EXECUTED  type A <- "0000000001"                                PASS
+VALD-07       PORTVALD    EXECUTED  type A <- "1234567890"                                PASS
+VALD-08       PORTVALD    EXECUTED  type A <- "0000000000"                                PASS
+VALD-09       PORTVALD    EXECUTED  type A <- "12345ABCDE"                                PASS
+VALD-10       PORTVALD    EXECUTED  type T <- "STK"                                       PASS
+VALD-11       PORTVALD    EXECUTED  type T <- "BND"                                       PASS
+VALD-12       PORTVALD    EXECUTED  type T <- "MMF"                                       PASS
+VALD-13       PORTVALD    EXECUTED  type T <- "ETF"                                       PASS
+VALD-14       PORTVALD    EXECUTED  type T <- "XYZ"                                       PASS
+VALD-15       PORTVALD    EXECUTED  type T <- "stk"                                       PASS
+VALD-16       PORTVALD    EXECUTED  type M <- "000000000100000"                           PASS
+VALD-17       PORTVALD    EXECUTED  type M <- "999999999999999"                           PASS
+VALD-18       PORTVALD    EXECUTED  type M <- "1000.00"                                   PASS
+VALD-19       PORTVALD    EXECUTED  type M <- "NOTANUM"                                   PASS
+VALD-20       PORTVALD    EXECUTED  type Z <- "PORT0001"                                  PASS
+READ-LIST     PORTREAD    EXECUTED  sequential READ NEXT in PORT-KEY order (JS seeded in  PASS
+ADD-COUNTS    PORTADD     EXECUTED  create + duplicate-key detection tallies              PASS
+ADD-MSGS      PORTADD     EXECUTED  per-record diagnostics, in emission order             PASS
+ADD-STATE     PORTADD     EXECUTED  resulting KSDS contents                               PASS
+UPDT-COUNTS   PORTUPDT    EXECUTED  update tallies (unknown action counts as success)     PASS
+UPDT-MSGS     PORTUPDT    EXECUTED  per-record diagnostics, in emission order             PASS
+UPDT-STATE    PORTUPDT    EXECUTED  resulting KSDS contents after status/name/value upda  PASS
+DEL-COUNTS    PORTDEL     EXECUTED  delete tallies                                        PASS
+DEL-MSGS      PORTDEL     EXECUTED  per-record diagnostics, in emission order             PASS
+DEL-STATE     PORTDEL     EXECUTED  resulting KSDS contents and audit trail               PASS
+TRAN-L-CNT    PORTTRAN    DERIVED   reachable legacy path: validate and count only        PASS
+TRAN-L-MSG    PORTTRAN    DERIVED   reachable legacy path: rejection messages             PASS
+TRAN-L-POS    PORTTRAN    DERIVED   2200-UPDATE-POSITIONS unreachable, so no position ch  PASS
+TRAN-M-CNT    PORTTRAN    DERIVED   intended position math: tallies                       PASS
+TRAN-M-POS    PORTTRAN    DERIVED   intended position math: BU/SL/TR/FE applied to holdi  PASS
+TRAN-M-MSG    PORTTRAN    DERIVED   intended position math: rejection messages            PASS
+TRAN-M-AUD    PORTTRAN    DERIVED   audit trail written after the EVALUATE, even for rej  PASS
+MSTR-OTHER    PORTMSTR    DERIVED   WHEN OTHER arm of the command EVALUATE                PASS
+------------------------------------------------------------------------------------------------------------------------------------
+TOTAL TESTS:       50  PASSED:          50  FAILED:           0  SUCCESS:     100.00%
+BASELINE:          42 EXECUTED against GnuCOBOL, 8 DERIVED from source (see golden/expected/DERIVED.md)
+
+KNOWN INTENTIONAL DIVERGENCES (legacy vs modernized, not failures):
+  DIV-VALD-I               PORTVALD
+                           Legacy 1000-VALIDATE-ID moves 4 chars into PIC X(10), so IS NUMERIC fails on the space padding and every ID is rejected. Modernized mode applies PORT + 4 digits.
+  DIV-VALD-A               PORTVALD
+                           Legacy 2000-VALIDATE-ACCOUNT tests all 50 bytes of LS-INPUT-VALUE for NUMERIC, so a 10-digit account plus 40 spaces is always rejected. Modernized mode applies 10 digits.
+  DIV-VALD-M               PORTVALD
+                           Legacy 4000-VALIDATE-AMOUNT bounds are the field's own representable range, so the test never fails and even non-numeric text passes. Modernized mode requires a numeric value within VAL-MIN/MAX.
+  DIV-TRAN-POSITIONS       PORTTRAN
+                           2200-UPDATE-POSITIONS is unreachable in the legacy source, so no position is ever updated. Modernized mode implements the intended buy/sell/transfer/fee math.
+  DIV-UPDT-UNKNOWN-ACTION  PORTUPDT
+                           2200-APPLY-UPDATE has no WHEN OTHER, so an unrecognised action rewrites the record unchanged and is counted as a successful update. Legacy mode reproduces this; modernized mode rejects the action.

@@ -1,0 +1,17 @@
+{
+  "name": "cobol-legacy-benchmark-suite",
+  "version": "1.0.0",
+  "private": true,
+  "type": "commonjs",
+  "scripts": {
+    "test": "jest modernized/test golden/parity",
+    "lint": "eslint modernized/src modernized/test golden/parity"
+  },
+  "dependencies": {
+    "decimal.js": "10.4.3"
+  },
+  "devDependencies": {
+    "eslint": "9.17.0",
+    "jest": "29.7.0"
+  }
+}

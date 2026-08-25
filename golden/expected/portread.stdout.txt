@@ -1,0 +1,22 @@
+Portfolio Record: 0000001
+  ID: PORT0001
+  Account: 0000000001
+  Client: ACME CAPITAL PARTNERS         
+  Status: A
+  Total Value: +0000001250000.00
+ 
+Portfolio Record: 0000002
+  ID: PORT0002
+  Account: 0000000002
+  Client: JANE Q PUBLIC                 
+  Status: A
+  Total Value: +0000000045000.50
+ 
+Portfolio Record: 0000003
+  ID: PORT0003
+  Account: 0000000003
+  Client: SMITH FAMILY TRUST            
+  Status: S
+  Total Value: -0000000780000.00
+ 
+Total Records Read: 0000003
