@@ -1,6 +1,7 @@
 package com.portfolio.batch;
 
 import com.portfolio.common.FileProcessingException;
+import com.portfolio.model.copybook.BatchControlConstants;
 import com.portfolio.domain.BatchControl;
 import com.portfolio.repository.BatchControlRepository;
 import org.springframework.stereotype.Service;
@@ -16,7 +17,7 @@ import java.time.format.DateTimeFormatter;
  * 2310-UPDATE-CHECKPOINT) against the BCHCTL migration table.
  *
  * <p>Status values are from {@code src/copybook/batch/BCHCON.cpy}:
- * 'A' = active, 'C'/'D' = complete/done, 'E' = error.
+ * 'R' = ready, 'A' = active, 'W' = waiting, 'D' = done, 'E' = error.
  */
 @Service
 public class BatchControlService {
@@ -41,7 +42,7 @@ public class BatchControlService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public BatchControl.Key markActive(String jobName, String processDate) {
         BatchControl control = find(jobName, processDate);
-        control.setStatus("A");
+        control.setStatus(BatchControlConstants.STAT_ACTIVE);
         control.setStartTime(LocalTime.now().format(TIME_FMT));
         control.setAttemptTimestamp(LocalDateTime.now().format(TS_FMT));
         control.setRestartCount(control.getRestartCount() + 1);
@@ -65,7 +66,9 @@ public class BatchControlService {
                              long recordsRead, long recordsWritten, int returnCode,
                              boolean jobFailed) {
         BatchControl control = find(jobName, processDate);
-        control.setStatus(jobFailed || returnCode > HistoryLoadStats.MAX_ERRORS ? "E" : "C");
+        control.setStatus(jobFailed || returnCode > HistoryLoadStats.MAX_ERRORS
+                ? BatchControlConstants.STAT_ERROR
+                : BatchControlConstants.STAT_DONE);
         control.setRecordsRead(recordsRead);
         control.setRecordsWritten(recordsWritten);
         control.setReturnCode(returnCode);

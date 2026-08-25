@@ -115,7 +115,7 @@ class HistoryLoadJobTest {
 
         BatchControl control = batchControlRepository
                 .findById(new BatchControl.Key("HISTLD00", PROCESS_DATE, 1)).orElseThrow();
-        assertThat(control.getStatus()).isEqualTo("C");
+        assertThat(control.getStatus()).isEqualTo("D");
         assertThat(control.getRecordsRead()).isEqualTo(1);
         assertThat(control.getRecordsWritten()).isEqualTo(1);
         assertThat(control.getReturnCode()).isZero();
@@ -177,7 +177,7 @@ class HistoryLoadJobTest {
         BatchControl control = batchControlRepository
                 .findById(new BatchControl.Key("HISTLD00", PROCESS_DATE, 1)).orElseThrow();
         assertThat(control.getReturnCode()).isEqualTo(1);
-        assertThat(control.getStatus()).isEqualTo("C");
+        assertThat(control.getStatus()).isEqualTo("D");
     }
 
     @Test
