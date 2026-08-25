@@ -50,7 +50,7 @@ public class ErrorHandlingService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public int logError(String programId, String errorType, int severity,
                         String errorCode, String message, String details) {
-        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime now = uniqueTimestamp(programId);
 
         ErrorLog entry = new ErrorLog();
         entry.setKey(new ErrorLog.Key(now, programId));
@@ -68,6 +68,19 @@ public class ErrorHandlingService {
                 programId, errorType, errorCode, severity, message, details);
 
         return severity;
+    }
+
+    /**
+     * The ERRLOG key is (ERROR_TIMESTAMP, PROGRAM_ID); two errors from the same
+     * program within the clock resolution would silently overwrite each other,
+     * so the timestamp is nudged forward by a microsecond until it is unique.
+     */
+    private LocalDateTime uniqueTimestamp(String programId) {
+        LocalDateTime ts = LocalDateTime.now();
+        while (errorLogRepository.existsById(new ErrorLog.Key(ts, programId))) {
+            ts = ts.plusNanos(1_000);
+        }
+        return ts;
     }
 
     private static String truncate(String value, int max) {

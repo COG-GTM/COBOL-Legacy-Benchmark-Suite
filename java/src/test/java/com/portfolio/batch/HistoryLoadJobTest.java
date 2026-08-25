@@ -194,6 +194,8 @@ class HistoryLoadJobTest {
 
         assertThat(execution.getStatus()).isEqualTo(BatchStatus.FAILED);
         assertThat(stats.getErrorCount()).isEqualTo(101);
+        // every counted error has its own ERRLOG row (no key collisions)
+        assertThat(errorLogRepository.count()).isEqualTo(101);
         assertThat(execution.getAllFailureExceptions())
                 .anyMatch(e -> e instanceof ErrorLimitExceededException);
 

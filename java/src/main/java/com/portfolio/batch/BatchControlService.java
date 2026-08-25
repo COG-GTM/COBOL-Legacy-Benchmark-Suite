@@ -62,9 +62,10 @@ public class BatchControlService {
     /** Final control update at job end: status, counters, and return code. */
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void markComplete(String jobName, String processDate,
-                             long recordsRead, long recordsWritten, int returnCode) {
+                             long recordsRead, long recordsWritten, int returnCode,
+                             boolean jobFailed) {
         BatchControl control = find(jobName, processDate);
-        control.setStatus(returnCode > HistoryLoadStats.MAX_ERRORS ? "E" : "C");
+        control.setStatus(jobFailed || returnCode > HistoryLoadStats.MAX_ERRORS ? "E" : "C");
         control.setRecordsRead(recordsRead);
         control.setRecordsWritten(recordsWritten);
         control.setReturnCode(returnCode);

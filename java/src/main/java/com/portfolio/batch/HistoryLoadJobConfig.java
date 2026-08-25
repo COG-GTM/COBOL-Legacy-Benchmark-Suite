@@ -12,7 +12,9 @@ import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.data.RepositoryItemReader;
 import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
@@ -54,6 +56,7 @@ public class HistoryLoadJobConfig {
     public static final String PROGRAM_ID = "HISTLD00";
 
     @Bean
+    @StepScope
     public RepositoryItemReader<TransactionHistoryFileRecord> historyItemReader(
             TransactionHistoryFileRepository repository) {
         Map<String, Sort.Direction> sorts = new LinkedHashMap<>();
@@ -118,7 +121,8 @@ public class HistoryLoadJobConfig {
                                 jobExecution.getJobParameters().getString("processDate"),
                                 stats.getRecordsRead(),
                                 stats.getRecordsWritten(),
-                                (int) Math.min(stats.getErrorCount(), Integer.MAX_VALUE));
+                                (int) Math.min(stats.getErrorCount(), Integer.MAX_VALUE),
+                                jobExecution.getStatus() == BatchStatus.FAILED);
                     }
                 })
                 .start(histld00Step)
