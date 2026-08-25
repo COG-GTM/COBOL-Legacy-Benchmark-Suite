@@ -1,0 +1,20 @@
+VAL|VAL-01    |I|PORT0001                                          | 1|Invalid Portfolio ID format                       
+VAL|VAL-02    |I|PORT9999                                          | 1|Invalid Portfolio ID format                       
+VAL|VAL-03    |I|XXXX0001                                          | 1|Invalid Portfolio ID format                       
+VAL|VAL-04    |I|PORTABCD                                          | 1|Invalid Portfolio ID format                       
+VAL|VAL-05    |I|                                                  | 1|Invalid Portfolio ID format                       
+VAL|VAL-06    |A|0000000001                                        | 2|Invalid Account Number format                     
+VAL|VAL-07    |A|1234567890                                        | 2|Invalid Account Number format                     
+VAL|VAL-08    |A|0000000000                                        | 2|Invalid Account Number format                     
+VAL|VAL-09    |A|12345ABCDE                                        | 2|Invalid Account Number format                     
+VAL|VAL-10    |T|STK                                               | 0|                                                  
+VAL|VAL-11    |T|BND                                               | 0|                                                  
+VAL|VAL-12    |T|MMF                                               | 0|                                                  
+VAL|VAL-13    |T|ETF                                               | 0|                                                  
+VAL|VAL-14    |T|XYZ                                               | 3|Invalid Investment Type                           
+VAL|VAL-15    |T|stk                                               | 3|Invalid Investment Type                           
+VAL|VAL-16    |M|000000000100000                                   | 0|                                                  
+VAL|VAL-17    |M|999999999999999                                   | 0|                                                  
+VAL|VAL-18    |M|1000.00                                           | 0|                                                  
+VAL|VAL-19    |M|NOTANUM                                           | 0|                                                  
+VAL|VAL-20    |Z|PORT0001                                          | 1|Invalid validation type                           
