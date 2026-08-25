@@ -5,7 +5,7 @@ package com.portfolio.model.copybook;
  *
  * <p>The SQLCA itself (SQLCODE/SQLSTATE communication area) has no direct Java
  * equivalent: SQL error signalling is replaced by exceptions
- * ({@code DataAccessException} hierarchy / {@link com.portfolio.common.DatabaseException}).
+ * ({@code DataAccessException} hierarchy / {@link com.portfolio.common.SqlProcessingException}).
  * The well-known SQLSTATE values checked by the COBOL programs are preserved here.
  */
 public final class SqlStatusCodes {

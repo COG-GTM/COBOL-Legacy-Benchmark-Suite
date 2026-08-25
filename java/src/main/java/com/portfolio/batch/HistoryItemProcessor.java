@@ -70,9 +70,15 @@ public class HistoryItemProcessor
         history.setProcessDate(now.toLocalDate());
         history.setProcessTime(now.toLocalTime());
         history.setProgramId("HISTLD00");
-        history.setUserId(System.getProperty("user.name", "BATCH"));
+        history.setUserId(currentUserId());
         history.setAuditTimestamp(now);
         return history;
+    }
+
+    /** USER_ID is CHAR(8); COBOL PIC X(8) truncated silently. */
+    private static String currentUserId() {
+        String user = System.getProperty("user.name", "BATCH");
+        return user.length() <= 8 ? user : user.substring(0, 8);
     }
 
     private String validate(TransactionHistoryFileRecord item) {

@@ -60,7 +60,8 @@ public class ErrorHandlingService {
         entry.setErrorMessage(truncate(message, 200));
         entry.setProcessDate(now.toLocalDate());
         entry.setProcessTime(now.toLocalTime());
-        entry.setUserId(System.getProperty("user.name", "BATCH"));
+        // USER_ID is CHAR(8); COBOL PIC X(8) truncated silently
+        entry.setUserId(truncate(System.getProperty("user.name", "BATCH"), 8));
         entry.setAdditionalInfo(truncate(details, 500));
         errorLogRepository.save(entry);
 
