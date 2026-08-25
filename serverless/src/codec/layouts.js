@@ -83,7 +83,7 @@ export const DELETE_RECORD = {
   ],
 };
 
-/** PORTDEL.cbl FD AUDIT-FILE - deletion audit record (60 bytes). */
+/** PORTDEL.cbl FD AUDIT-FILE - deletion audit record (80 bytes). */
 export const DELETE_AUDIT_RECORD = {
   name: 'AUDIT-RECORD',
   fields: [
