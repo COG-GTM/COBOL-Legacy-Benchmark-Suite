@@ -121,7 +121,15 @@ function validationCases() {
 // PORTREAD  --  EXECUTED
 // ---------------------------------------------------------------------------
 async function readCases(seed) {
-  const { handler } = createSystem({ seed, mode: 'legacy', runDate: decks.baselineRunDate() });
+  // Seeded in descending order on purpose. The COBOL side cannot do this (an INDEXED file
+  // OPEN OUTPUT must be written ascending), so it is the only way to make this case prove the
+  // store sorts by PORT-KEY rather than returning insertion order.
+  const shuffled = [...seed].reverse();
+  const { handler } = createSystem({
+    seed: shuffled,
+    mode: 'legacy',
+    runDate: decks.baselineRunDate(),
+  });
   const listing = normalize.parseReadListing(decks.expected('portread.stdout.txt'));
   const response = await handler({ action: 'list' });
 
@@ -130,7 +138,7 @@ async function readCases(seed) {
       id: 'READ-LIST',
       program: 'PORTREAD',
       baseline: EXECUTED,
-      description: 'sequential READ NEXT in PORT-KEY order',
+      description: 'sequential READ NEXT in PORT-KEY order (JS seeded in reverse)',
       expected: {
         total: listing.total,
         records: listing.records.map((record) => ({

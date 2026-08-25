@@ -30,8 +30,14 @@ clean, with no staging transform at all.
 ```
 
 `READ ... NEXT RECORD` on a KSDS returns records in **ascending primary-key order**, which is
-not insertion order. The golden seed deck is written deliberately out of order so the
-distinction is actually tested; `AT END` sets FILE STATUS `10`.
+not insertion order. `AT END` sets FILE STATUS `10`.
+
+Proving that distinction takes some care, because the seed deck cannot help: an INDEXED file
+opened `OUTPUT` must be written in ascending key order, so `GOLDGEN` necessarily writes
+`PORT0001`, `PORT0002`, `PORT0003` and the COBOL baseline's insertion order and sorted order
+coincide. A JS store that ignored ordering entirely would still match it. So the `READ-LIST`
+parity case seeds the JS store with the same three records **reversed** — the case fails unless
+`readNext` genuinely sorts.
 
 ## After
 

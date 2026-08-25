@@ -35,7 +35,7 @@ VALD-17       PORTVALD    EXECUTED  type M <- "999999999999999"                 
 VALD-18       PORTVALD    EXECUTED  type M <- "1000.00"                                   PASS
 VALD-19       PORTVALD    EXECUTED  type M <- "NOTANUM"                                   PASS
 VALD-20       PORTVALD    EXECUTED  type Z <- "PORT0001"                                  PASS
-READ-LIST     PORTREAD    EXECUTED  sequential READ NEXT in PORT-KEY order                PASS
+READ-LIST     PORTREAD    EXECUTED  sequential READ NEXT in PORT-KEY order (JS seeded in  PASS
 ADD-COUNTS    PORTADD     EXECUTED  create + duplicate-key detection tallies              PASS
 ADD-MSGS      PORTADD     EXECUTED  per-record diagnostics, in emission order             PASS
 ADD-STATE     PORTADD     EXECUTED  resulting KSDS contents                               PASS
