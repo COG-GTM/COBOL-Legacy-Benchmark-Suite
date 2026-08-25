@@ -18,8 +18,11 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.data.RepositoryItemReader;
 import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
+import org.springframework.batch.core.SkipListener;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.dao.DataAccessException;
 import org.springframework.data.domain.Sort;
+import com.portfolio.common.ErrorHandlingService;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import java.util.LinkedHashMap;
@@ -80,12 +83,31 @@ public class HistoryLoadJobConfig {
                              HistoryItemProcessor processor,
                              HistoryItemWriter writer,
                              BatchControlService batchControlService,
-                             HistoryLoadStats stats) {
+                             HistoryLoadStats stats,
+                             ErrorHandlingService errorHandlingService) {
         return new StepBuilder("histld00Step", jobRepository)
                 .<TransactionHistoryFileRecord, PositionHistory>chunk(COMMIT_THRESHOLD, transactionManager)
                 .reader(historyItemReader)
                 .processor(processor)
                 .writer(writer)
+                // COBOL 2200-LOAD-TO-DB2: an INSERT failure other than SQLCODE
+                // -803 increments WS-ERROR-COUNT and processing continues until
+                // the count exceeds 100 (WS-ERROR-COUNT > 100 abort).
+                .faultTolerant()
+                .processorNonTransactional()
+                .skipPolicy((throwable, skipCount) ->
+                        throwable instanceof DataAccessException
+                                && stats.getErrorCount() < HistoryLoadStats.MAX_ERRORS)
+                .listener(new SkipListener<TransactionHistoryFileRecord, PositionHistory>() {
+                    @Override
+                    public void onSkipInWrite(PositionHistory item, Throwable t) {
+                        stats.incrementErrorCount();
+                        errorHandlingService.logError(PROGRAM_ID, "S", 3, "HIST0002",
+                                "POSHIST insert failed: " + t.getMessage(),
+                                String.valueOf(item.getKey().getAccountNo() + "/"
+                                        + item.getKey().getPortfolioId()));
+                    }
+                })
                 .listener(new ChunkListener() {
                     @Override
                     public void afterChunk(ChunkContext context) {

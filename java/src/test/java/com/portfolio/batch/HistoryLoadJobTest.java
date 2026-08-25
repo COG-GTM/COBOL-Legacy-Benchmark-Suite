@@ -18,6 +18,7 @@ import org.springframework.batch.core.JobParametersBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.jdbc.core.JdbcTemplate;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -42,6 +43,7 @@ class HistoryLoadJobTest {
     @Autowired private PositionHistoryRepository positionHistoryRepository;
     @Autowired private BatchControlRepository batchControlRepository;
     @Autowired private ErrorLogRepository errorLogRepository;
+    @Autowired private JdbcTemplate jdbcTemplate;
 
     @BeforeEach
     void setUp() {
@@ -197,12 +199,52 @@ class HistoryLoadJobTest {
         // every counted error has its own ERRLOG row (no key collisions)
         assertThat(errorLogRepository.count()).isEqualTo(101);
         assertThat(execution.getAllFailureExceptions())
-                .anyMatch(e -> e instanceof ErrorLimitExceededException);
+                .anyMatch(HistoryLoadJobTest::causedByErrorLimit);
 
         BatchControl control = batchControlRepository
                 .findById(new BatchControl.Key("HISTLD00", PROCESS_DATE, 1)).orElseThrow();
         assertThat(control.getStatus()).isEqualTo("E");
         assertThat(control.getReturnCode()).isEqualTo(101);
+    }
+
+    @Test
+    void countsDbInsertErrorsAndContinuesLikeDb2ErrorRoutine() throws Exception {
+        tranHistRepository.save(validRecord("PORT00001", "000001", LocalTime.of(9, 30)));
+        TransactionHistoryFileRecord bad = validRecord("PORT00002", "000002", LocalTime.of(10, 0));
+        bad.setSecurityId("BADSEC");
+        tranHistRepository.save(bad);
+        tranHistRepository.save(validRecord("PORT00003", "000003", LocalTime.of(10, 30)));
+
+        // Simulate a DB2 insert failure (non-zero SQLCODE other than -803)
+        jdbcTemplate.execute(
+                "ALTER TABLE POSHIST ADD CONSTRAINT CHK_TEST_SEC CHECK (SECURITY_ID <> 'BADSEC')");
+        try {
+            JobExecution execution = runJob();
+
+            assertThat(execution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
+            assertThat(positionHistoryRepository.count()).isEqualTo(2);
+            assertThat(stats.getRecordsWritten()).isEqualTo(2);
+            assertThat(stats.getErrorCount()).isEqualTo(1);
+            assertThat(errorLogRepository.count()).isEqualTo(1);
+            assertThat(errorLogRepository.findAll().get(0).getErrorMessage())
+                    .contains("POSHIST insert failed");
+
+            BatchControl control = batchControlRepository
+                    .findById(new BatchControl.Key("HISTLD00", PROCESS_DATE, 1)).orElseThrow();
+            assertThat(control.getStatus()).isEqualTo("D");
+            assertThat(control.getReturnCode()).isEqualTo(1);
+        } finally {
+            jdbcTemplate.execute("ALTER TABLE POSHIST DROP CONSTRAINT CHK_TEST_SEC");
+        }
+    }
+
+    private static boolean causedByErrorLimit(Throwable t) {
+        for (Throwable c = t; c != null; c = c.getCause()) {
+            if (c instanceof ErrorLimitExceededException) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Test

@@ -29,8 +29,8 @@ public class HistoryLoadStats {
         return recordsRead.incrementAndGet();
     }
 
-    public long incrementRecordsWritten() {
-        return recordsWritten.incrementAndGet();
+    public long addRecordsWritten(long delta) {
+        return recordsWritten.addAndGet(delta);
     }
 
     public long incrementErrorCount() {

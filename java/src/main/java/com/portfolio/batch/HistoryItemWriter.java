@@ -5,6 +5,8 @@ import com.portfolio.repository.PositionHistoryRepository;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * Insert step of the HISTLD00 migration (COBOL
@@ -15,6 +17,13 @@ import org.springframework.stereotype.Component;
  * exists is skipped without counting as written or as an error. Chunk-based
  * commits by Spring Batch replace the manual WS-COMMIT-THRESHOLD (1000)
  * commit logic in 2300-CHECK-COMMIT.
+ *
+ * <p>Other insert failures propagate as {@code DataAccessException} and are
+ * handled by the step's skip policy, which counts them toward WS-ERROR-COUNT
+ * like COBOL's DB2-ERROR-ROUTINE. Each item is flushed individually so a
+ * failure is attributed to the correct record, and the written counter is
+ * updated only after the chunk transaction commits so rolled-back chunks are
+ * not counted.
  */
 @Component
 public class HistoryItemWriter implements ItemWriter<PositionHistory> {
@@ -29,12 +38,20 @@ public class HistoryItemWriter implements ItemWriter<PositionHistory> {
 
     @Override
     public void write(Chunk<? extends PositionHistory> chunk) {
+        long written = 0;
         for (PositionHistory item : chunk) {
             if (repository.existsById(item.getKey())) {
                 continue;
             }
-            repository.save(item);
-            stats.incrementRecordsWritten();
+            repository.saveAndFlush(item);
+            written++;
         }
+        final long delta = written;
+        TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+            @Override
+            public void afterCommit() {
+                stats.addRecordsWritten(delta);
+            }
+        });
     }
 }
