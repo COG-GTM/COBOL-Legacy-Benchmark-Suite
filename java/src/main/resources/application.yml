@@ -1,0 +1,33 @@
+spring:
+  datasource:
+    # Embedded H2 stands in for DB2; point at a DB2 JDBC URL in production.
+    url: jdbc:h2:mem:portfolio;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+  jpa:
+    hibernate:
+      ddl-auto: create
+    open-in-view: false
+  sql:
+    init:
+      mode: never
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false  # jobs are launched explicitly (HistoryLoadJobRunner / tests)
+
+---
+# Sample run profile: loads a small TRANHIST + BCHCTL dataset, then runs HISTLD00.
+#   mvn spring-boot:run -Dspring-boot.run.profiles=histld00
+spring:
+  config:
+    activate:
+      on-profile: histld00
+  jpa:
+    defer-datasource-initialization: true
+  sql:
+    init:
+      mode: always
+      data-locations: classpath:sample-data.sql

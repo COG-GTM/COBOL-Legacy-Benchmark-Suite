@@ -1,0 +1,127 @@
+package com.portfolio.batch;
+
+import com.portfolio.domain.PositionHistory;
+import com.portfolio.domain.TransactionHistoryFileRecord;
+import com.portfolio.repository.TransactionHistoryFileRepository;
+import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobExecution;
+import org.springframework.batch.core.JobExecutionListener;
+import org.springframework.batch.core.JobParameters;
+import org.springframework.batch.core.Step;
+import org.springframework.batch.core.job.builder.JobBuilder;
+import org.springframework.batch.core.repository.JobRepository;
+import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.builder.StepBuilder;
+import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.item.data.RepositoryItemReader;
+import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.data.domain.Sort;
+import org.springframework.transaction.PlatformTransactionManager;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+/**
+ * Spring Batch migration of {@code src/programs/batch/HISTLD00.cbl}
+ * (Position History DB2 Load) — the reference vertical slice.
+ *
+ * <p>COBOL → Spring Batch mapping:
+ * <ul>
+ *   <li>Sequential READ of the indexed TRANSACTION-HISTORY file (2100) →
+ *       {@link RepositoryItemReader} over the VSAM_TRANHIST table, ordered by
+ *       the COBOL RECORD KEY</li>
+ *   <li>2200-LOAD-TO-DB2 field mapping/validation → {@link HistoryItemProcessor}</li>
+ *   <li>INSERT INTO POSHIST + SQLCODE -803 handling → {@link HistoryItemWriter}</li>
+ *   <li>2300-CHECK-COMMIT with WS-COMMIT-THRESHOLD 1000 → chunk size 1000
+ *       (each chunk boundary is a commit)</li>
+ *   <li>2310-UPDATE-CHECKPOINT (REWRITE of the BCHCTL record) → afterChunk
+ *       listener updating the batch control table</li>
+ *   <li>WS-ERROR-COUNT > 100 abort → {@link ErrorLimitExceededException}
+ *       thrown from the processor</li>
+ *   <li>MOVE WS-ERROR-COUNT TO RETURN-CODE → process exit code from
+ *       {@link HistoryLoadJobRunner}</li>
+ * </ul>
+ */
+@Configuration
+public class HistoryLoadJobConfig {
+
+    /** WS-COMMIT-THRESHOLD PIC S9(4) COMP VALUE 1000. */
+    public static final int COMMIT_THRESHOLD = 1000;
+
+    public static final String JOB_NAME = "histld00Job";
+    public static final String PROGRAM_ID = "HISTLD00";
+
+    @Bean
+    public RepositoryItemReader<TransactionHistoryFileRecord> historyItemReader(
+            TransactionHistoryFileRepository repository) {
+        Map<String, Sort.Direction> sorts = new LinkedHashMap<>();
+        sorts.put("key.transDate", Sort.Direction.ASC);
+        sorts.put("key.transTime", Sort.Direction.ASC);
+        sorts.put("key.portfolioId", Sort.Direction.ASC);
+        sorts.put("key.sequenceNo", Sort.Direction.ASC);
+        return new RepositoryItemReaderBuilder<TransactionHistoryFileRecord>()
+                .name("historyItemReader")
+                .repository(repository)
+                .methodName("findAll")
+                .pageSize(COMMIT_THRESHOLD)
+                .sorts(sorts)
+                .build();
+    }
+
+    @Bean
+    public Step histld00Step(JobRepository jobRepository,
+                             PlatformTransactionManager transactionManager,
+                             RepositoryItemReader<TransactionHistoryFileRecord> historyItemReader,
+                             HistoryItemProcessor processor,
+                             HistoryItemWriter writer,
+                             BatchControlService batchControlService,
+                             HistoryLoadStats stats) {
+        return new StepBuilder("histld00Step", jobRepository)
+                .<TransactionHistoryFileRecord, PositionHistory>chunk(COMMIT_THRESHOLD, transactionManager)
+                .reader(historyItemReader)
+                .processor(processor)
+                .writer(writer)
+                .listener(new ChunkListener() {
+                    @Override
+                    public void afterChunk(ChunkContext context) {
+                        JobParameters params = context.getStepContext()
+                                .getStepExecution().getJobParameters();
+                        batchControlService.updateCheckpoint(
+                                PROGRAM_ID,
+                                params.getString("processDate"),
+                                stats.getRecordsRead(),
+                                stats.getRecordsWritten());
+                    }
+                })
+                .build();
+    }
+
+    @Bean
+    public Job histld00Job(JobRepository jobRepository,
+                           Step histld00Step,
+                           BatchControlService batchControlService,
+                           HistoryLoadStats stats) {
+        return new JobBuilder(JOB_NAME, jobRepository)
+                .listener(new JobExecutionListener() {
+                    @Override
+                    public void beforeJob(JobExecution jobExecution) {
+                        stats.reset();
+                        batchControlService.markActive(PROGRAM_ID,
+                                jobExecution.getJobParameters().getString("processDate"));
+                    }
+
+                    @Override
+                    public void afterJob(JobExecution jobExecution) {
+                        batchControlService.markComplete(PROGRAM_ID,
+                                jobExecution.getJobParameters().getString("processDate"),
+                                stats.getRecordsRead(),
+                                stats.getRecordsWritten(),
+                                (int) Math.min(stats.getErrorCount(), Integer.MAX_VALUE));
+                    }
+                })
+                .start(histld00Step)
+                .build();
+    }
+}
