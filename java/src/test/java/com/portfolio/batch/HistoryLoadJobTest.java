@@ -238,6 +238,40 @@ class HistoryLoadJobTest {
         }
     }
 
+    @Test
+    void abortsWithSameReturnCodeWhenInsertErrorsExceedOneHundred() throws Exception {
+        for (int i = 0; i < 105; i++) {
+            TransactionHistoryFileRecord bad = validRecord("PORT00001",
+                    String.format("%06d", i + 1),
+                    LocalTime.of(9, 0).plusSeconds(i));
+            bad.setSecurityId("BADSEC");
+            tranHistRepository.save(bad);
+        }
+
+        jdbcTemplate.execute(
+                "ALTER TABLE POSHIST ADD CONSTRAINT CHK_TEST_SEC CHECK (SECURITY_ID <> 'BADSEC')");
+        try {
+            JobExecution execution = runJob();
+
+            assertThat(execution.getStatus()).isEqualTo(BatchStatus.FAILED);
+            // same RETURN-CODE as the validation-error abort path
+            assertThat(stats.getErrorCount()).isEqualTo(101);
+            // per-item logs from the aborted chunk roll back with it (as in
+            // COBOL, where uncommitted ERRLOG inserts are lost on ROLLBACK);
+            // the aborting error itself is logged in its own transaction
+            assertThat(errorLogRepository.count()).isEqualTo(1);
+            assertThat(errorLogRepository.findAll().get(0).getErrorMessage())
+                    .contains("error limit exceeded");
+
+            BatchControl control = batchControlRepository
+                    .findById(new BatchControl.Key("HISTLD00", PROCESS_DATE, 1)).orElseThrow();
+            assertThat(control.getStatus()).isEqualTo("E");
+            assertThat(control.getReturnCode()).isEqualTo(101);
+        } finally {
+            jdbcTemplate.execute("ALTER TABLE POSHIST DROP CONSTRAINT CHK_TEST_SEC");
+        }
+    }
+
     private static boolean causedByErrorLimit(Throwable t) {
         for (Throwable c = t; c != null; c = c.getCause()) {
             if (c instanceof ErrorLimitExceededException) {

@@ -33,6 +33,10 @@ public class HistoryLoadStats {
         return recordsWritten.addAndGet(delta);
     }
 
+    public long addErrorCount(long delta) {
+        return errorCount.addAndGet(delta);
+    }
+
     public long incrementErrorCount() {
         return errorCount.incrementAndGet();
     }

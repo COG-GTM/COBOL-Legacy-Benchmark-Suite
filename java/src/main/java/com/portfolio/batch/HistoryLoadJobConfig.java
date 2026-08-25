@@ -14,6 +14,9 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ChunkListener;
+import org.springframework.batch.core.ExitStatus;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.StepExecutionListener;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.data.RepositoryItemReader;
 import org.springframework.batch.item.data.builder.RepositoryItemReaderBuilder;
@@ -97,17 +100,38 @@ public class HistoryLoadJobConfig {
                 // Required: the processor counts reads/errors, so it must not
                 // be re-run during the fault-tolerant chunk scan.
                 .processorNonTransactional()
+                // skipCount is Spring Batch's live write-skip counter, so the
+                // WS-ERROR-COUNT > 100 limit combines validation errors (in
+                // stats) with insert failures as they happen. During the run,
+                // stats.errorCount holds validation errors only; write skips
+                // are folded in once in afterStep below.
                 .skipPolicy((throwable, skipCount) ->
                         throwable instanceof DataAccessException
-                                && stats.getErrorCount() < HistoryLoadStats.MAX_ERRORS)
+                                && stats.getErrorCount() + skipCount < HistoryLoadStats.MAX_ERRORS)
                 .listener(new SkipListener<TransactionHistoryFileRecord, PositionHistory>() {
                     @Override
                     public void onSkipInWrite(PositionHistory item, Throwable t) {
-                        stats.incrementErrorCount();
                         errorHandlingService.logError(PROGRAM_ID, "S", 3, "HIST0002",
                                 "POSHIST insert failed: " + t.getMessage(),
                                 String.valueOf(item.getKey().getAccountNo() + "/"
                                         + item.getKey().getPortfolioId()));
+                    }
+                })
+                .listener(new StepExecutionListener() {
+                    @Override
+                    public ExitStatus afterStep(StepExecution stepExecution) {
+                        stats.addErrorCount(stepExecution.getWriteSkipCount());
+                        // The insert failure that breaches the limit is not
+                        // skipped (it aborts the step); count and log it once
+                        // here so RETURN-CODE is 101 like the validation path.
+                        if (stepExecution.getStatus() == BatchStatus.FAILED
+                                && stepExecution.getFailureExceptions().stream()
+                                        .anyMatch(HistoryLoadJobConfig::causedByDataAccess)) {
+                            stats.incrementErrorCount();
+                            errorHandlingService.logError(PROGRAM_ID, "S", 3, "HIST0002",
+                                    "POSHIST insert failed: error limit exceeded", PROGRAM_ID);
+                        }
+                        return stepExecution.getExitStatus();
                     }
                 })
                 .listener(new ChunkListener() {
@@ -123,6 +147,15 @@ public class HistoryLoadJobConfig {
                     }
                 })
                 .build();
+    }
+
+    private static boolean causedByDataAccess(Throwable t) {
+        for (Throwable c = t; c != null; c = c.getCause()) {
+            if (c instanceof DataAccessException) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Bean
