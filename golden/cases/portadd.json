@@ -1,0 +1,204 @@
+{
+  "program": "PORTADD",
+  "inputLayout": "PORT_RECORD",
+  "cases": [
+    {
+      "id": "ADD-001",
+      "type": "FUNCTIONAL",
+      "description": "Valid portfolio creation - two new keys",
+      "seed": ["P0001"],
+      "input": ["N0010", "N0011"]
+    },
+    {
+      "id": "ADD-002",
+      "type": "ERROR",
+      "description": "Duplicate portfolio creation - VSAM status 22",
+      "seed": ["P0001"],
+      "input": ["P0001_RESUBMIT"]
+    },
+    {
+      "id": "ADD-003",
+      "type": "FUNCTIONAL",
+      "description": "Create with minimum money values (zero and negative)",
+      "seed": [],
+      "input": ["N0020_MIN", "N0021_NEGATIVE"]
+    },
+    {
+      "id": "ADD-004",
+      "type": "FUNCTIONAL",
+      "description": "Create with maximum money values",
+      "seed": [],
+      "input": ["N0030_MAX"]
+    },
+    {
+      "id": "ADD-005",
+      "type": "ERROR",
+      "description": "Reject record with blank portfolio ID",
+      "seed": [],
+      "input": ["BAD_BLANK_ID"]
+    },
+    {
+      "id": "ADD-006",
+      "type": "ERROR",
+      "description": "Reject record with blank client name",
+      "seed": [],
+      "input": ["BAD_BLANK_NAME"]
+    },
+    {
+      "id": "ADD-007",
+      "type": "ERROR",
+      "description": "Reject record whose status is not 'A'",
+      "seed": [],
+      "input": ["BAD_STATUS_S"]
+    },
+    {
+      "id": "ADD-008",
+      "type": "INTEGRATE",
+      "description": "Mixed batch - one add, one duplicate, one invalid",
+      "seed": ["P0001"],
+      "input": ["N0010", "P0001_RESUBMIT", "BAD_STATUS_S"]
+    }
+  ],
+  "records": {
+    "P0001": {
+      "portId": "PORT0001",
+      "accountNo": "1000000001",
+      "clientName": "ALICE GROWTH FUND",
+      "clientType": "I",
+      "createDate": "20240320",
+      "lastMaint": "20240320",
+      "status": "A",
+      "totalValue": "12345678.99",
+      "cashBalance": "1000.00",
+      "lastUser": "TESTUSR1",
+      "lastTrans": "20240320",
+      "filler": ""
+    },
+    "P0001_RESUBMIT": {
+      "portId": "PORT0001",
+      "accountNo": "1000000001",
+      "clientName": "ALICE GROWTH FUND RESUBMITTED",
+      "clientType": "I",
+      "createDate": "00000000",
+      "lastMaint": "00000000",
+      "status": "A",
+      "totalValue": "1.00",
+      "cashBalance": "2.00",
+      "lastUser": "GOLDEN01",
+      "lastTrans": "00000000",
+      "filler": ""
+    },
+    "N0010": {
+      "portId": "PORT0010",
+      "accountNo": "1000000010",
+      "clientName": "DELTA CORPORATE FUND",
+      "clientType": "C",
+      "createDate": "00000000",
+      "lastMaint": "00000000",
+      "status": "A",
+      "totalValue": "250000.75",
+      "cashBalance": "1500.25",
+      "lastUser": "GOLDEN01",
+      "lastTrans": "00000000",
+      "filler": ""
+    },
+    "N0011": {
+      "portId": "PORT0011",
+      "accountNo": "1000000011",
+      "clientName": "EPSILON TRUST",
+      "clientType": "T",
+      "createDate": "00000000",
+      "lastMaint": "00000000",
+      "status": "A",
+      "totalValue": "0.01",
+      "cashBalance": "0.99",
+      "lastUser": "GOLDEN01",
+      "lastTrans": "00000000",
+      "filler": ""
+    },
+    "N0020_MIN": {
+      "portId": "PORT0020",
+      "accountNo": "1000000020",
+      "clientName": "ZERO VALUE PORTFOLIO",
+      "clientType": "I",
+      "createDate": "00000000",
+      "lastMaint": "00000000",
+      "status": "A",
+      "totalValue": "0.00",
+      "cashBalance": "0.00",
+      "lastUser": "GOLDEN01",
+      "lastTrans": "00000000",
+      "filler": ""
+    },
+    "N0021_NEGATIVE": {
+      "portId": "PORT0021",
+      "accountNo": "1000000021",
+      "clientName": "MINIMUM VALUE PORTFOLIO",
+      "clientType": "I",
+      "createDate": "00000000",
+      "lastMaint": "00000000",
+      "status": "A",
+      "totalValue": "-9999999999999.99",
+      "cashBalance": "-0.01",
+      "lastUser": "GOLDEN01",
+      "lastTrans": "00000000",
+      "filler": ""
+    },
+    "N0030_MAX": {
+      "portId": "PORT0030",
+      "accountNo": "1000000030",
+      "clientName": "MAXIMUM VALUE PORTFOLIO",
+      "clientType": "C",
+      "createDate": "00000000",
+      "lastMaint": "00000000",
+      "status": "A",
+      "totalValue": "9999999999999.99",
+      "cashBalance": "9999999999999.99",
+      "lastUser": "GOLDEN01",
+      "lastTrans": "00000000",
+      "filler": ""
+    },
+    "BAD_BLANK_ID": {
+      "portId": "",
+      "accountNo": "1000000040",
+      "clientName": "NO ID PORTFOLIO",
+      "clientType": "I",
+      "createDate": "00000000",
+      "lastMaint": "00000000",
+      "status": "A",
+      "totalValue": "10.00",
+      "cashBalance": "0.00",
+      "lastUser": "GOLDEN01",
+      "lastTrans": "00000000",
+      "filler": ""
+    },
+    "BAD_BLANK_NAME": {
+      "portId": "PORT0041",
+      "accountNo": "1000000041",
+      "clientName": "",
+      "clientType": "I",
+      "createDate": "00000000",
+      "lastMaint": "00000000",
+      "status": "A",
+      "totalValue": "10.00",
+      "cashBalance": "0.00",
+      "lastUser": "GOLDEN01",
+      "lastTrans": "00000000",
+      "filler": ""
+    },
+    "BAD_STATUS_S": {
+      "portId": "PORT0042",
+      "accountNo": "1000000042",
+      "clientName": "SUSPENDED ON CREATE",
+      "clientType": "I",
+      "createDate": "00000000",
+      "lastMaint": "00000000",
+      "status": "S",
+      "totalValue": "10.00",
+      "cashBalance": "0.00",
+      "lastUser": "GOLDEN01",
+      "lastTrans": "00000000",
+      "filler": ""
+    }
+  }
+}

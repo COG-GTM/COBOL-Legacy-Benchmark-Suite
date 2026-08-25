@@ -1,0 +1,2 @@
+VALD CASE=VAL-010    TYPE=T RC=+0003 MSG=Invalid Investment Type                           
+Validations performed: 0000001

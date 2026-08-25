@@ -1,0 +1,32 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTVALD",
+  "caseId": "VAL-011",
+  "type": "FUNCTIONAL",
+  "description": "Amount inside the allowed range",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTVALD",
+    "caseId": "VAL-011",
+    "counters": {
+      "validations": 1
+    },
+    "events": [
+      {
+        "kind": "validation",
+        "caseId": "VAL-011",
+        "validateType": "M",
+        "returnCode": 0,
+        "message": ""
+      }
+    ],
+    "finalState": null,
+    "audit": null
+  }
+}

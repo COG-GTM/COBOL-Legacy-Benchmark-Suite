@@ -1,0 +1,57 @@
+{
+  "program": "PORTVALD",
+  "inputLayout": "VALIDATION_REQUEST_RECORD",
+  "note": "PORTVALD is a CALLed subroutine, so it is driven by the harness program golden/cobol/GLDVALD.cbl which reads one request record per case and DISPLAYs the returned LS-RETURN-CODE and LS-ERROR-MSG. Cases deliberately include values that expose PORTVALD's real behaviour with X(50) operands (space padded compares, MOVE of alphanumeric into numeric), not the behaviour the comments claim.",
+  "cases": [
+    { "id": "VAL-001", "type": "FUNCTIONAL", "description": "ID with PORT prefix and 4 digits", "input": ["V_ID_GOOD"] },
+    { "id": "VAL-002", "type": "ERROR", "description": "ID with wrong prefix", "input": ["V_ID_BAD_PREFIX"] },
+    { "id": "VAL-003", "type": "ERROR", "description": "ID with non numeric digit positions", "input": ["V_ID_NON_NUMERIC"] },
+    { "id": "VAL-004", "type": "ERROR", "description": "ID that is entirely blank", "input": ["V_ID_BLANK"] },
+    { "id": "VAL-005", "type": "FUNCTIONAL", "description": "Account number as a 50 digit zero padded value", "input": ["V_ACCT_PADDED"] },
+    { "id": "VAL-006", "type": "ERROR", "description": "Account number left justified with trailing spaces", "input": ["V_ACCT_TRAILING_SPACES"] },
+    { "id": "VAL-007", "type": "ERROR", "description": "Account number of all zeros", "input": ["V_ACCT_ZEROS"] },
+    { "id": "VAL-008", "type": "FUNCTIONAL", "description": "Investment type STK", "input": ["V_TYPE_STK"] },
+    { "id": "VAL-009", "type": "FUNCTIONAL", "description": "Investment type ETF", "input": ["V_TYPE_ETF"] },
+    { "id": "VAL-010", "type": "ERROR", "description": "Unknown investment type", "input": ["V_TYPE_BAD"] },
+    { "id": "VAL-011", "type": "FUNCTIONAL", "description": "Amount inside the allowed range", "input": ["V_AMT_MID"] },
+    { "id": "VAL-012", "type": "FUNCTIONAL", "description": "Amount at the maximum boundary", "input": ["V_AMT_MAX"] },
+    { "id": "VAL-013", "type": "FUNCTIONAL", "description": "Amount of zero", "input": ["V_AMT_ZERO"] },
+    { "id": "VAL-014", "type": "ERROR", "description": "Unknown validation request type", "input": ["V_UNKNOWN_TYPE"] }
+  ],
+  "records": {
+    "V_ID_GOOD": { "caseId": "VAL-001", "validateType": "I", "inputValue": "PORT0001" },
+    "V_ID_BAD_PREFIX": { "caseId": "VAL-002", "validateType": "I", "inputValue": "XXXX0001" },
+    "V_ID_NON_NUMERIC": { "caseId": "VAL-003", "validateType": "I", "inputValue": "PORT00A1" },
+    "V_ID_BLANK": { "caseId": "VAL-004", "validateType": "I", "inputValue": "" },
+    "V_ACCT_PADDED": {
+      "caseId": "VAL-005",
+      "validateType": "A",
+      "inputValue": "00000000000000000000000000000000000000001000000001"
+    },
+    "V_ACCT_TRAILING_SPACES": { "caseId": "VAL-006", "validateType": "A", "inputValue": "1000000001" },
+    "V_ACCT_ZEROS": {
+      "caseId": "VAL-007",
+      "validateType": "A",
+      "inputValue": "00000000000000000000000000000000000000000000000000"
+    },
+    "V_TYPE_STK": { "caseId": "VAL-008", "validateType": "T", "inputValue": "STK" },
+    "V_TYPE_ETF": { "caseId": "VAL-009", "validateType": "T", "inputValue": "ETF" },
+    "V_TYPE_BAD": { "caseId": "VAL-010", "validateType": "T", "inputValue": "XYZ" },
+    "V_AMT_MID": {
+      "caseId": "VAL-011",
+      "validateType": "M",
+      "inputValue": "00000000000000000000000000000000000000000012345678"
+    },
+    "V_AMT_MAX": {
+      "caseId": "VAL-012",
+      "validateType": "M",
+      "inputValue": "00000000000000000000000000000000000999999999999999"
+    },
+    "V_AMT_ZERO": {
+      "caseId": "VAL-013",
+      "validateType": "M",
+      "inputValue": "00000000000000000000000000000000000000000000000000"
+    },
+    "V_UNKNOWN_TYPE": { "caseId": "VAL-014", "validateType": "Z", "inputValue": "PORT0001" }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTDEL",
+  "caseId": "DEL-005",
+  "type": "ERROR",
+  "description": "Unknown reason code is not validated by PORTDEL - record still deleted",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTDEL",
+    "caseId": "DEL-005",
+    "counters": {
+      "deleted": 1,
+      "notFound": 0,
+      "errors": 0
+    },
+    "events": [],
+    "finalState": [],
+    "audit": [
+      {
+        "timestamp": "@RUNSTAMP",
+        "action": "DELETE",
+        "key": "PORT00011000000001",
+        "reason": "99",
+        "status": "A",
+        "filler": "\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000\u0000"
+      }
+    ]
+  }
+}

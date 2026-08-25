@@ -1,0 +1,43 @@
+{
+  "source": "derived",
+  "derived": true,
+  "derivation": "DERIVED, not captured from COBOL. PORTTRAN.cbl cannot be compiled in this repo: it copies a PORTREC copybook that does not exist in src/copybook and references PORT-TOTAL-UNITS / PORT-TOTAL-COST, which no copybook in this repo defines. The expected result below is derived from the code paths that PORTTRAN.cbl actually executes: 0000-MAIN performs 1000-INITIALIZE, then 2000-PROCESS-TRANSACTIONS until end of file or WS-ERROR-COUNT > 100, then 3000-TERMINATE. 2000-PROCESS-TRANSACTIONS reads one transaction, adds 1 to WS-READ-COUNT and performs 2100-VALIDATE-TRANSACTION, which performs 2110-CHECK-PORTFOLIO / 2120-CHECK-TRANSACTION-TYPE / 2130-CHECK-AMOUNTS and then adds 1 to WS-PROCESS-COUNT when ERR-TEXT is still SPACES, else performs 9000-ERROR-ROUTINE which adds 1 to WS-ERROR-COUNT. Nothing in the program performs 2200-UPDATE-POSITIONS, so the buy / sell / transfer / fee paragraphs, the insufficient units check and the AUDPROC audit trail are unreachable dead code: the portfolio file is opened I-O but never rewritten, so the final state equals the seed state.",
+  "program": "PORTTRAN",
+  "caseId": "TRN-004",
+  "type": "ERROR",
+  "description": "Unknown transaction type",
+  "result": {
+    "program": "PORTTRAN",
+    "caseId": "TRN-004",
+    "counters": {
+      "read": 1,
+      "processed": 0,
+      "errors": 1
+    },
+    "events": [
+      {
+        "kind": "transaction-error",
+        "portfolioId": "PORT0001",
+        "sequenceNo": "000004",
+        "message": "Invalid Transaction Type: ZZ"
+      }
+    ],
+    "finalState": [
+      {
+        "portId": "PORT0001",
+        "accountNo": "1000000001",
+        "clientName": "ALICE GROWTH FUND",
+        "clientType": "I",
+        "createDate": "20240320",
+        "lastMaint": "20240320",
+        "status": "A",
+        "totalValue": "0.00",
+        "cashBalance": "1000.00",
+        "lastUser": "TESTUSR1",
+        "lastTrans": "20240320",
+        "filler": ""
+      }
+    ],
+    "audit": null
+  }
+}

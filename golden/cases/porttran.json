@@ -1,0 +1,251 @@
+{
+  "program": "PORTTRAN",
+  "inputLayout": "TRANSACTION_RECORD",
+  "note": "PORTTRAN.cbl does not compile on GnuCOBOL (it references a PORTREC copybook that is absent from src/copybook and the fields PORT-TOTAL-UNITS / PORT-TOTAL-COST that exist in no copybook in this repo). Expected results for these cases are therefore DERIVED from the business rules readable in PORTTRAN.cbl PROCESS-TRANSACTION / VALIDATE-TRANSACTION, and are flagged derived=true in the golden metadata.",
+  "cases": [
+    {
+      "id": "TRN-001",
+      "type": "FUNCTIONAL",
+      "description": "Valid buy - units and cost increase",
+      "seed": ["P0001"],
+      "input": ["T_BUY_100"]
+    },
+    {
+      "id": "TRN-002",
+      "type": "FUNCTIONAL",
+      "description": "Valid sell of part of the position",
+      "seed": ["P0001_WITH_UNITS"],
+      "input": ["T_SELL_40"]
+    },
+    {
+      "id": "TRN-003",
+      "type": "ERROR",
+      "description": "Overdraw sell - insufficient units",
+      "seed": ["P0001_WITH_UNITS"],
+      "input": ["T_SELL_5000"]
+    },
+    {
+      "id": "TRN-004",
+      "type": "ERROR",
+      "description": "Unknown transaction type",
+      "seed": ["P0001"],
+      "input": ["T_BAD_TYPE"]
+    },
+    {
+      "id": "TRN-005",
+      "type": "ERROR",
+      "description": "Transaction against a portfolio that does not exist",
+      "seed": ["P0001"],
+      "input": ["T_MISSING_PORT"]
+    },
+    {
+      "id": "TRN-006",
+      "type": "ERROR",
+      "description": "Non positive quantity is rejected",
+      "seed": ["P0001"],
+      "input": ["T_ZERO_QTY"]
+    },
+    {
+      "id": "TRN-007",
+      "type": "ERROR",
+      "description": "Non positive price is rejected",
+      "seed": ["P0001"],
+      "input": ["T_ZERO_PRICE"]
+    },
+    {
+      "id": "TRN-008",
+      "type": "FUNCTIONAL",
+      "description": "Fee transaction reduces cost",
+      "seed": ["P0001_WITH_UNITS"],
+      "input": ["T_FEE"]
+    },
+    {
+      "id": "TRN-009",
+      "type": "ERROR",
+      "description": "Transfer is accepted by validation but explicitly not implemented",
+      "seed": ["P0001_WITH_UNITS"],
+      "input": ["T_TRANSFER"]
+    },
+    {
+      "id": "TRN-010",
+      "type": "INTEGRATE",
+      "description": "Mixed batch - buy, sell, overdraw sell, bad type",
+      "seed": ["P0001_WITH_UNITS"],
+      "input": ["T_BUY_100", "T_SELL_40", "T_SELL_5000", "T_BAD_TYPE"]
+    }
+  ],
+  "records": {
+    "P0001": {
+      "portId": "PORT0001",
+      "accountNo": "1000000001",
+      "clientName": "ALICE GROWTH FUND",
+      "clientType": "I",
+      "createDate": "20240320",
+      "lastMaint": "20240320",
+      "status": "A",
+      "totalValue": "0.00",
+      "cashBalance": "1000.00",
+      "lastUser": "TESTUSR1",
+      "lastTrans": "20240320",
+      "filler": ""
+    },
+    "P0001_WITH_UNITS": {
+      "portId": "PORT0001",
+      "accountNo": "1000000001",
+      "clientName": "ALICE GROWTH FUND",
+      "clientType": "I",
+      "createDate": "20240320",
+      "lastMaint": "20240320",
+      "status": "A",
+      "totalValue": "50000.00",
+      "cashBalance": "1000.00",
+      "lastUser": "TESTUSR1",
+      "lastTrans": "20240320",
+      "filler": ""
+    },
+    "T_BUY_100": {
+      "trnDate": "20240325",
+      "trnTime": "100000",
+      "portfolioId": "PORT0001",
+      "sequenceNo": "000001",
+      "investmentId": "STK0000123",
+      "type": "BU",
+      "quantity": "100.0000",
+      "price": "25.5000",
+      "amount": "2550.00",
+      "currency": "USD",
+      "status": "P",
+      "processDate": "",
+      "processUser": "",
+      "filler": ""
+    },
+    "T_SELL_40": {
+      "trnDate": "20240325",
+      "trnTime": "101000",
+      "portfolioId": "PORT0001",
+      "sequenceNo": "000002",
+      "investmentId": "STK0000123",
+      "type": "SL",
+      "quantity": "40.0000",
+      "price": "26.0000",
+      "amount": "1040.00",
+      "currency": "USD",
+      "status": "P",
+      "processDate": "",
+      "processUser": "",
+      "filler": ""
+    },
+    "T_SELL_5000": {
+      "trnDate": "20240325",
+      "trnTime": "102000",
+      "portfolioId": "PORT0001",
+      "sequenceNo": "000003",
+      "investmentId": "STK0000123",
+      "type": "SL",
+      "quantity": "5000.0000",
+      "price": "26.0000",
+      "amount": "130000.00",
+      "currency": "USD",
+      "status": "P",
+      "processDate": "",
+      "processUser": "",
+      "filler": ""
+    },
+    "T_BAD_TYPE": {
+      "trnDate": "20240325",
+      "trnTime": "103000",
+      "portfolioId": "PORT0001",
+      "sequenceNo": "000004",
+      "investmentId": "STK0000123",
+      "type": "ZZ",
+      "quantity": "10.0000",
+      "price": "1.0000",
+      "amount": "10.00",
+      "currency": "USD",
+      "status": "P",
+      "processDate": "",
+      "processUser": "",
+      "filler": ""
+    },
+    "T_MISSING_PORT": {
+      "trnDate": "20240325",
+      "trnTime": "104000",
+      "portfolioId": "PORT9999",
+      "sequenceNo": "000005",
+      "investmentId": "STK0000123",
+      "type": "BU",
+      "quantity": "10.0000",
+      "price": "1.0000",
+      "amount": "10.00",
+      "currency": "USD",
+      "status": "P",
+      "processDate": "",
+      "processUser": "",
+      "filler": ""
+    },
+    "T_ZERO_QTY": {
+      "trnDate": "20240325",
+      "trnTime": "105000",
+      "portfolioId": "PORT0001",
+      "sequenceNo": "000006",
+      "investmentId": "STK0000123",
+      "type": "BU",
+      "quantity": "0.0000",
+      "price": "25.0000",
+      "amount": "0.00",
+      "currency": "USD",
+      "status": "P",
+      "processDate": "",
+      "processUser": "",
+      "filler": ""
+    },
+    "T_ZERO_PRICE": {
+      "trnDate": "20240325",
+      "trnTime": "106000",
+      "portfolioId": "PORT0001",
+      "sequenceNo": "000007",
+      "investmentId": "STK0000123",
+      "type": "BU",
+      "quantity": "10.0000",
+      "price": "0.0000",
+      "amount": "0.00",
+      "currency": "USD",
+      "status": "P",
+      "processDate": "",
+      "processUser": "",
+      "filler": ""
+    },
+    "T_FEE": {
+      "trnDate": "20240325",
+      "trnTime": "107000",
+      "portfolioId": "PORT0001",
+      "sequenceNo": "000008",
+      "investmentId": "FEE0000001",
+      "type": "FE",
+      "quantity": "1.0000",
+      "price": "12.5000",
+      "amount": "12.50",
+      "currency": "USD",
+      "status": "P",
+      "processDate": "",
+      "processUser": "",
+      "filler": ""
+    },
+    "T_TRANSFER": {
+      "trnDate": "20240325",
+      "trnTime": "108000",
+      "portfolioId": "PORT0001",
+      "sequenceNo": "000009",
+      "investmentId": "STK0000123",
+      "type": "TR",
+      "quantity": "5.0000",
+      "price": "26.0000",
+      "amount": "130.00",
+      "currency": "USD",
+      "status": "P",
+      "processDate": "",
+      "processUser": "",
+      "filler": ""
+    }
+  }
+}

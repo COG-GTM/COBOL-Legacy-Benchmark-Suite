@@ -1,0 +1,64 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTADD",
+  "caseId": "ADD-008",
+  "type": "INTEGRATE",
+  "description": "Mixed batch - one add, one duplicate, one invalid",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTADD",
+    "caseId": "ADD-008",
+    "counters": {
+      "added": 1,
+      "duplicates": 1,
+      "errors": 1
+    },
+    "events": [
+      {
+        "kind": "duplicate-record",
+        "portId": "PORT0001"
+      },
+      {
+        "kind": "invalid-record",
+        "portId": "PORT0042"
+      }
+    ],
+    "finalState": [
+      {
+        "portId": "PORT0001",
+        "accountNo": "1000000001",
+        "clientName": "ALICE GROWTH FUND",
+        "clientType": "I",
+        "createDate": "20240320",
+        "lastMaint": "20240320",
+        "status": "A",
+        "totalValue": "12345678.99",
+        "cashBalance": "1000.00",
+        "lastUser": "TESTUSR1",
+        "lastTrans": "20240320",
+        "filler": ""
+      },
+      {
+        "portId": "PORT0010",
+        "accountNo": "1000000010",
+        "clientName": "DELTA CORPORATE FUND",
+        "clientType": "C",
+        "createDate": "@RUNDATE",
+        "lastMaint": "@RUNDATE",
+        "status": "A",
+        "totalValue": "250000.75",
+        "cashBalance": "1500.25",
+        "lastUser": "GOLDEN01",
+        "lastTrans": "00000000",
+        "filler": ""
+      }
+    ],
+    "audit": null
+  }
+}

@@ -1,0 +1,4 @@
+Invalid record data: PORT0042
+Records added:    0000000
+Duplicate records:0000000
+Errors occurred:  0000001

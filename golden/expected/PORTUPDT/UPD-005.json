@@ -1,0 +1,40 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTUPDT",
+  "caseId": "UPD-005",
+  "type": "ERROR",
+  "description": "Unrecognised action code - no field mapped, record still rewritten",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTUPDT",
+    "caseId": "UPD-005",
+    "counters": {
+      "updates": 1,
+      "errors": 0
+    },
+    "events": [],
+    "finalState": [
+      {
+        "portId": "PORT0001",
+        "accountNo": "1000000001",
+        "clientName": "ALICE GROWTH FUND",
+        "clientType": "I",
+        "createDate": "20240320",
+        "lastMaint": "20240320",
+        "status": "A",
+        "totalValue": "12345678.99",
+        "cashBalance": "1000.00",
+        "lastUser": "TESTUSR1",
+        "lastTrans": "20240320",
+        "filler": ""
+      }
+    ],
+    "audit": null
+  }
+}

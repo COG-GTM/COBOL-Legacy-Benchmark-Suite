@@ -1,0 +1,41 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTADD",
+  "caseId": "ADD-004",
+  "type": "FUNCTIONAL",
+  "description": "Create with maximum money values",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTADD",
+    "caseId": "ADD-004",
+    "counters": {
+      "added": 1,
+      "duplicates": 0,
+      "errors": 0
+    },
+    "events": [],
+    "finalState": [
+      {
+        "portId": "PORT0030",
+        "accountNo": "1000000030",
+        "clientName": "MAXIMUM VALUE PORTFOLIO",
+        "clientType": "C",
+        "createDate": "@RUNDATE",
+        "lastMaint": "@RUNDATE",
+        "status": "A",
+        "totalValue": "9999999999999.99",
+        "cashBalance": "9999999999999.99",
+        "lastUser": "GOLDEN01",
+        "lastTrans": "00000000",
+        "filler": ""
+      }
+    ],
+    "audit": null
+  }
+}

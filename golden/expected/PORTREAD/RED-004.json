@@ -1,0 +1,72 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTREAD",
+  "caseId": "RED-004",
+  "type": "FUNCTIONAL",
+  "description": "Same PORT-ID with two accounts - full 18 byte key ordering",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTREAD",
+    "caseId": "RED-004",
+    "counters": {
+      "recordsRead": 2
+    },
+    "events": [
+      {
+        "kind": "record",
+        "sequence": 1,
+        "portId": "PORT0002",
+        "accountNo": "1000000002",
+        "clientName": "BETA INCOME TRUST",
+        "status": "A",
+        "totalValue": "98765432.10"
+      },
+      {
+        "kind": "record",
+        "sequence": 2,
+        "portId": "PORT0002",
+        "accountNo": "2000000002",
+        "clientName": "BETA INCOME TRUST SERIES B",
+        "status": "A",
+        "totalValue": "111.11"
+      }
+    ],
+    "finalState": [
+      {
+        "portId": "PORT0002",
+        "accountNo": "1000000002",
+        "clientName": "BETA INCOME TRUST",
+        "clientType": "C",
+        "createDate": "20240301",
+        "lastMaint": "20240315",
+        "status": "A",
+        "totalValue": "98765432.10",
+        "cashBalance": "5000.00",
+        "lastUser": "TESTUSR2",
+        "lastTrans": "20240315",
+        "filler": ""
+      },
+      {
+        "portId": "PORT0002",
+        "accountNo": "2000000002",
+        "clientName": "BETA INCOME TRUST SERIES B",
+        "clientType": "C",
+        "createDate": "20240302",
+        "lastMaint": "20240316",
+        "status": "A",
+        "totalValue": "111.11",
+        "cashBalance": "22.22",
+        "lastUser": "TESTUSR2",
+        "lastTrans": "20240316",
+        "filler": ""
+      }
+    ],
+    "audit": null
+  }
+}

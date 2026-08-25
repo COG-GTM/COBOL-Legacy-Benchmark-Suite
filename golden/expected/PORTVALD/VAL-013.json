@@ -1,0 +1,32 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTVALD",
+  "caseId": "VAL-013",
+  "type": "FUNCTIONAL",
+  "description": "Amount of zero",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTVALD",
+    "caseId": "VAL-013",
+    "counters": {
+      "validations": 1
+    },
+    "events": [
+      {
+        "kind": "validation",
+        "caseId": "VAL-013",
+        "validateType": "M",
+        "returnCode": 0,
+        "message": ""
+      }
+    ],
+    "finalState": null,
+    "audit": null
+  }
+}

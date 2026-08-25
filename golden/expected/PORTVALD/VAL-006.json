@@ -1,0 +1,32 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTVALD",
+  "caseId": "VAL-006",
+  "type": "ERROR",
+  "description": "Account number left justified with trailing spaces",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTVALD",
+    "caseId": "VAL-006",
+    "counters": {
+      "validations": 1
+    },
+    "events": [
+      {
+        "kind": "validation",
+        "caseId": "VAL-006",
+        "validateType": "A",
+        "returnCode": 2,
+        "message": "Invalid Account Number format"
+      }
+    ],
+    "finalState": null,
+    "audit": null
+  }
+}

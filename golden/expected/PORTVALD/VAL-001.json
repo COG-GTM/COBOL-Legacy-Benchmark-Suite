@@ -1,0 +1,32 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTVALD",
+  "caseId": "VAL-001",
+  "type": "FUNCTIONAL",
+  "description": "ID with PORT prefix and 4 digits",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTVALD",
+    "caseId": "VAL-001",
+    "counters": {
+      "validations": 1
+    },
+    "events": [
+      {
+        "kind": "validation",
+        "caseId": "VAL-001",
+        "validateType": "I",
+        "returnCode": 1,
+        "message": "Invalid Portfolio ID format"
+      }
+    ],
+    "finalState": null,
+    "audit": null
+  }
+}

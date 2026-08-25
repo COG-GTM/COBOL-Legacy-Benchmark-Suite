@@ -1,0 +1,69 @@
+{
+  "source": "cobol",
+  "derived": false,
+  "program": "PORTADD",
+  "caseId": "ADD-001",
+  "type": "FUNCTIONAL",
+  "description": "Valid portfolio creation - two new keys",
+  "capture": {
+    "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+    "indexedFileHandler": "BDB",
+    "captureRunDate": "20260825",
+    "exitCode": 0
+  },
+  "result": {
+    "program": "PORTADD",
+    "caseId": "ADD-001",
+    "counters": {
+      "added": 2,
+      "duplicates": 0,
+      "errors": 0
+    },
+    "events": [],
+    "finalState": [
+      {
+        "portId": "PORT0001",
+        "accountNo": "1000000001",
+        "clientName": "ALICE GROWTH FUND",
+        "clientType": "I",
+        "createDate": "20240320",
+        "lastMaint": "20240320",
+        "status": "A",
+        "totalValue": "12345678.99",
+        "cashBalance": "1000.00",
+        "lastUser": "TESTUSR1",
+        "lastTrans": "20240320",
+        "filler": ""
+      },
+      {
+        "portId": "PORT0010",
+        "accountNo": "1000000010",
+        "clientName": "DELTA CORPORATE FUND",
+        "clientType": "C",
+        "createDate": "@RUNDATE",
+        "lastMaint": "@RUNDATE",
+        "status": "A",
+        "totalValue": "250000.75",
+        "cashBalance": "1500.25",
+        "lastUser": "GOLDEN01",
+        "lastTrans": "00000000",
+        "filler": ""
+      },
+      {
+        "portId": "PORT0011",
+        "accountNo": "1000000011",
+        "clientName": "EPSILON TRUST",
+        "clientType": "T",
+        "createDate": "@RUNDATE",
+        "lastMaint": "@RUNDATE",
+        "status": "A",
+        "totalValue": "0.01",
+        "cashBalance": "0.99",
+        "lastUser": "GOLDEN01",
+        "lastTrans": "00000000",
+        "filler": ""
+      }
+    ],
+    "audit": null
+  }
+}

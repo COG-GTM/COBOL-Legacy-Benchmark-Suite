@@ -1,0 +1,10 @@
+{
+  "randomSeed": "123456789",
+  "randomSeedNote": "Fixed RANDOM-SEED used for every generated (non hand written) golden record, mirroring the RANDSEED file that src/programs/test/TSTGEN00.cbl reads. Changing it changes the generated volume fixtures and therefore the goldens.",
+  "volumeRecordCount": 25,
+  "captureUser": "GOLDEN01",
+  "runDateToken": "@RUNDATE",
+  "runTimestampToken": "@RUNSTAMP",
+  "captureRunDate": "20260825",
+  "captureNote": "captureRunDate is written by tools/golden/capture-cobol.sh when the COBOL goldens are captured. PORTADD and PORTUPDT stamp PORT-CREATE-DATE / PORT-LAST-MAINT from the system clock, so the normalizer rewrites any date field equal to the run date to the runDateToken on both the COBOL and the JS side."
+}

@@ -1,0 +1,163 @@
+{
+  "gnucobolVersion": "cobc (GnuCOBOL) 3.1.2.0",
+  "indexedFileHandler": "BDB",
+  "captureRunDate": "20260825",
+  "cases": [
+    {
+      "program": "PORTADD",
+      "id": "ADD-001"
+    },
+    {
+      "program": "PORTADD",
+      "id": "ADD-002"
+    },
+    {
+      "program": "PORTADD",
+      "id": "ADD-003"
+    },
+    {
+      "program": "PORTADD",
+      "id": "ADD-004"
+    },
+    {
+      "program": "PORTADD",
+      "id": "ADD-005"
+    },
+    {
+      "program": "PORTADD",
+      "id": "ADD-006"
+    },
+    {
+      "program": "PORTADD",
+      "id": "ADD-007"
+    },
+    {
+      "program": "PORTADD",
+      "id": "ADD-008"
+    },
+    {
+      "program": "PORTREAD",
+      "id": "RED-001"
+    },
+    {
+      "program": "PORTREAD",
+      "id": "RED-002"
+    },
+    {
+      "program": "PORTREAD",
+      "id": "RED-003"
+    },
+    {
+      "program": "PORTREAD",
+      "id": "RED-004"
+    },
+    {
+      "program": "PORTUPDT",
+      "id": "UPD-001"
+    },
+    {
+      "program": "PORTUPDT",
+      "id": "UPD-002"
+    },
+    {
+      "program": "PORTUPDT",
+      "id": "UPD-003"
+    },
+    {
+      "program": "PORTUPDT",
+      "id": "UPD-004"
+    },
+    {
+      "program": "PORTUPDT",
+      "id": "UPD-005"
+    },
+    {
+      "program": "PORTUPDT",
+      "id": "UPD-006"
+    },
+    {
+      "program": "PORTUPDT",
+      "id": "UPD-007"
+    },
+    {
+      "program": "PORTDEL",
+      "id": "DEL-001"
+    },
+    {
+      "program": "PORTDEL",
+      "id": "DEL-002"
+    },
+    {
+      "program": "PORTDEL",
+      "id": "DEL-003"
+    },
+    {
+      "program": "PORTDEL",
+      "id": "DEL-004"
+    },
+    {
+      "program": "PORTDEL",
+      "id": "DEL-005"
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-001"
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-002"
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-003"
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-004"
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-005"
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-006"
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-007"
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-008"
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-009"
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-010"
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-011"
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-012"
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-013"
+    },
+    {
+      "program": "PORTVALD",
+      "id": "VAL-014"
+    },
+    {
+      "program": "PORTADD",
+      "id": "PERF-001"
+    }
+  ]
+}

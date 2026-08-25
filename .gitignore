@@ -1,0 +1,4 @@
+build/
+node_modules/
+golden/cobol-run/.scratch/
+golden/reports/
