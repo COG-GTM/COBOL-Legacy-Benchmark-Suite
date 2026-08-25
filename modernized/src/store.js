@@ -116,6 +116,7 @@ class DocumentStore {
 
   findById(portId) {
     const id = String(portId || '');
+    // PORTTRAN declares an 8-byte RECORD KEY IS PORT-ID; other programs use the 18-byte PORT-KEY.
     const matches = [...this.records.entries()].filter(([key]) => key.slice(0, 8) === id);
     if (matches.length === 0) return { status: '23' };
     if (matches.length > 1) return { status: '22' };

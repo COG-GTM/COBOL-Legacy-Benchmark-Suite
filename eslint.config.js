@@ -2,7 +2,7 @@ const globals = require('globals');
 
 module.exports = [
   {
-    files: ['modernized/**/*.js'],
+    files: ['modernized/**/*.js', 'golden/parity/**/*.js'],
     ignores: ['modernized/coverage/**'],
     languageOptions: {
       ecmaVersion: 2022,

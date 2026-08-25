@@ -18,6 +18,7 @@ function validationResult(message, returnCode = 8) {
     result: 'validationError',
     http: 400,
     returnCode,
+    code: returnCode,
     message,
   };
 }

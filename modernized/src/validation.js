@@ -18,7 +18,7 @@ const divergences = [
 ];
 
 function result(code, message) {
-  return { code, message: message || '' };
+  return { returnCode: code, code, message: message || '' };
 }
 
 function validateLegacy(type, input) {

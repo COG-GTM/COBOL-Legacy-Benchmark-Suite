@@ -4,8 +4,8 @@
   "private": true,
   "type": "commonjs",
   "scripts": {
-    "test": "jest",
-    "lint": "eslint modernized/src modernized/test"
+    "test": "jest modernized/test golden/parity",
+    "lint": "eslint modernized/src modernized/test golden/parity"
   },
   "dependencies": {
     "decimal.js": "10.4.3"
