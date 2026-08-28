@@ -112,6 +112,9 @@ Currently implemented components:
 
 ## Documentation
 
+The React/TypeScript portfolio operations console is documented in
+[frontend/README.md](frontend/README.md).
+
 Comprehensive documentation is provided to facilitate understanding and translation:
 
 - [System Architecture Document (SAD)](documentation/technical/system-architecture.md)
