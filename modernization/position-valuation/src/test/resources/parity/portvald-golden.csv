@@ -1,0 +1,34 @@
+type|input|rc|message
+I|PORT0001|0001|Invalid Portfolio ID format
+I|PORT9999|0001|Invalid Portfolio ID format
+I|PORT0001XXXX|0001|Invalid Portfolio ID format
+I|PORT001A|0001|Invalid Portfolio ID format
+I|PORT 001|0001|Invalid Portfolio ID format
+I|PRTF0001|0001|Invalid Portfolio ID format
+I|port0001|0001|Invalid Portfolio ID format
+I|PORT|0001|Invalid Portfolio ID format
+I||0001|Invalid Portfolio ID format
+A|0000000001|0002|Invalid Account Number format
+A|1234567890|0002|Invalid Account Number format
+A|0000000000|0002|Invalid Account Number format
+A|ABCDEFGHIJ|0002|Invalid Account Number format
+A||0002|Invalid Account Number format
+A|11111111111111111111111111111111111111111111111111|0000|
+A|00000000000000000000000000000000000000000000000000|0002|Invalid Account Number format
+T|STK|0000|
+T|BND|0000|
+T|MMF|0000|
+T|ETF|0000|
+T|XYZ|0003|Invalid Investment Type
+T|stk|0003|Invalid Investment Type
+T||0003|Invalid Investment Type
+M|0|0000|
+M|100|0000|
+M|000000000010000|0000|
+M|-100|0000|
+M|999999999999999|0000|
+M|1000000000000000|0000|
+M|ABC|0000|
+M||0000|
+X|0001|0001|Invalid validation type
+ |0001|0001|Invalid validation type

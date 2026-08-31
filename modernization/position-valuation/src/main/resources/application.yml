@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: position-valuation
+
+clbs:
+  porttran:
+    # PORTTRAN never performs 2200-UPDATE-POSITIONS, so the faithful default is validate-only.
+    # Set to true to also run the buy/sell/transfer/fee paragraphs the program contains but never
+    # reaches. See docs/modernization/position-valuation-spec.md, open question OQ-2.
+    apply-updates: ${CLBS_PORTTRAN_APPLY_UPDATES:false}
+
+logging:
+  level:
+    com.clbs.posval: INFO
