@@ -52,6 +52,11 @@ project-root/
 │   ├── user/              # User documentation and guides
 │   └── assets/            # Shared documentation assets
 │
+├── java/                   # Java migration implementation
+│   ├── portfolio-domain/   # JPA domain model and enum converters
+│   ├── portfolio-persistence/ # Repositories and Flyway migrations
+│   └── portfolio-app/      # Spring Boot application and tests
+│
 └── src/                   # Source code root
     ├── programs/         # COBOL source programs
     │   ├── batch/       # Batch processing programs
@@ -81,6 +86,14 @@ project-root/
     ├── cics/             # CICS resource definitions
     └── templates/        # Code templates and standards
 ```
+
+## Java Migration
+
+The Java implementation is being added alongside the existing COBOL sources;
+the COBOL layout under `src/` is unchanged. See the
+[Java migration foundation guide](documentation/technical/java-migration.md)
+for the module structure, copybook mappings, build instructions, and
+PostgreSQL/H2 test setup.
 
 ## System Architecture Overview
 
