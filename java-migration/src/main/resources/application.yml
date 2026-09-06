@@ -1,0 +1,61 @@
+spring:
+  application:
+    name: portfolio
+  datasource:
+    url: jdbc:h2:mem:portfolio;MODE=LEGACY;DB_CLOSE_DELAY=-1
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+    hikari:
+      # Replaces DB2ONLN / DB2CONN connection pooling (WS-MAX-CONNECTIONS = 100)
+      maximum-pool-size: 100
+      minimum-idle: 5
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+      pool-name: PortfolioPool
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+  batch:
+    jdbc:
+      initialize-schema: always
+    job:
+      enabled: false
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+  thymeleaf:
+    cache: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus
+  endpoint:
+    health:
+      show-details: when_authorized
+
+portfolio:
+  batch:
+    # HISTLD00 WS-COMMIT-THRESHOLD
+    commit-interval: 1000
+    # PORTTRAN / HISTLD00 "UNTIL WS-ERROR-COUNT > 100"
+    max-errors: 100
+  maintenance:
+    # ERRLOG_CLEANUP(RETENTION_DAYS)
+    retention-days: 90
+    cron: "0 0 2 * * *"
+
+logging:
+  level:
+    com.cog.portfolio: INFO

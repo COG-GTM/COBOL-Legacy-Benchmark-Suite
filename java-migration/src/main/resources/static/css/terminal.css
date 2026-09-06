@@ -1,0 +1,16 @@
+body { background: #000; color: #0f0; font-family: "Courier New", monospace; margin: 0; }
+.screen { max-width: 80ch; margin: 2rem auto; padding: 1rem; }
+h1 { font-size: 1.1rem; margin: 0 0 1rem; }
+.bright { color: #fff; }
+.value { color: #40e0d0; }
+.num { text-align: right; }
+.errmsg { color: #f33; font-weight: bold; margin-top: 2rem; }
+.footer { margin-top: 2rem; color: #0f0; }
+.footer a { color: #0f0; margin-right: 1.5rem; }
+.options { list-style: none; padding-left: 2ch; }
+.options a { color: #0f0; text-decoration: none; }
+table.data { border-collapse: collapse; margin-top: 1rem; width: 100%; }
+table.data th { color: #fff; text-align: left; padding: 0 1ch; }
+table.data td { padding: 0 1ch; }
+input { background: #000; color: #0f0; border: 1px solid #0f0; font-family: inherit; }
+button { background: #000; color: #0f0; border: 1px solid #0f0; font-family: inherit; }

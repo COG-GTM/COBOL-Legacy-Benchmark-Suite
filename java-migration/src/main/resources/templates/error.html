@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Error</title>
+    <link rel="stylesheet" th:href="@{/css/terminal.css}">
+</head>
+<body>
+<!-- INQSET.bms ERRMAP / ERRHNDL -->
+<main class="screen">
+    <h1 class="bright">Portfolio Management System - Error</h1>
+    <div th:if="${error}">
+        <p class="errmsg" th:text="${error.message}"></p>
+        <p>Error code: <span class="value" th:text="${error.errorCode}"></span>
+           Return code: <span class="value" th:text="${error.returnCode}"></span></p>
+    </div>
+    <div th:unless="${error}">
+        <p class="errmsg" th:text="${message} ?: 'An unexpected error occurred'"></p>
+        <p th:if="${status}">HTTP status: <span class="value" th:text="${status}"></span></p>
+    </div>
+    <p class="footer"><a th:href="@{/menu}">PF3=Return to menu</a></p>
+</main>
+</body>
+</html>

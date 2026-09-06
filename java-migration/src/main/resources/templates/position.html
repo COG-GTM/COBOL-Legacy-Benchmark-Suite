@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Portfolio Position Inquiry</title>
+    <link rel="stylesheet" th:href="@{/css/terminal.css}">
+</head>
+<body>
+<!-- INQSET.bms POSMAP (INQP / INQPORT) -->
+<main class="screen">
+    <h1 class="bright">Portfolio Position Inquiry</h1>
+    <form method="get" th:action="@{/inquiry/position}">
+        <label>Account: <input type="text" name="accountNo" maxlength="10" size="10" th:value="${accountNo}" autofocus></label>
+        <button type="submit">Enter</button>
+    </form>
+
+    <table class="data" th:if="${positions}">
+        <thead>
+        <tr>
+            <th>Fund ID</th>
+            <th>Fund Name</th>
+            <th>Units</th>
+            <th>Cost Basis</th>
+            <th>Market Value</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="p : ${positions}">
+            <td class="value" th:text="${p.id.investmentId}"></td>
+            <td class="value" th:text="${p.description}"></td>
+            <td class="value num" th:text="${#numbers.formatDecimal(p.quantity, 1, 'COMMA', 4, 'POINT')}"></td>
+            <td class="value num" th:text="${#numbers.formatDecimal(p.costBasis, 1, 'COMMA', 2, 'POINT')}"></td>
+            <td class="value num" th:text="${#numbers.formatDecimal(p.marketValue, 1, 'COMMA', 2, 'POINT')}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <p class="footer"><a th:href="@{/menu}">PF3=Exit</a></p>
+    <p class="errmsg" th:if="${errmsg}" th:text="${errmsg}"></p>
+</main>
+</body>
+</html>
