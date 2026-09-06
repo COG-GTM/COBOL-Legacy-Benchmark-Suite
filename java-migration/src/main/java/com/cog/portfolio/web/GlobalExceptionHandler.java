@@ -14,6 +14,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 /**
  * ERRHNDL.cbl / ERRHND.cpy: uniform error response. HTML requests get ERRMAP
@@ -49,6 +50,12 @@ public class GlobalExceptionHandler {
         return respond(request, HttpStatus.BAD_REQUEST, ReturnCode.WARNING.code(), ErrorCode.VALIDATION.code(), message);
     }
 
+    @ExceptionHandler(NoResourceFoundException.class)
+    public Object handleNoResource(NoResourceFoundException e, HttpServletRequest request) {
+        return respond(request, HttpStatus.NOT_FOUND, ReturnCode.WARNING.code(), ErrorCode.NOT_FOUND.code(),
+                "Resource not found");
+    }
+
     @ExceptionHandler(Exception.class)
     public Object handleOther(Exception e, HttpServletRequest request) throws Exception {
         if (e instanceof AccessDeniedException) {
@@ -64,7 +71,7 @@ public class GlobalExceptionHandler {
         if (wantsHtml(request)) {
             ModelAndView mav = new ModelAndView("error");
             mav.setStatus(status);
-            mav.addObject("error", body);
+            mav.addObject("errorBody", body);
             return mav;
         }
         return ResponseEntity.status(status).body(body);

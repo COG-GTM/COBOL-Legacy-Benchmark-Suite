@@ -9,13 +9,14 @@
 <!-- INQSET.bms ERRMAP / ERRHNDL -->
 <main class="screen">
     <h1 class="bright">Portfolio Management System - Error</h1>
-    <div th:if="${error}">
-        <p class="errmsg" th:text="${error.message}"></p>
-        <p>Error code: <span class="value" th:text="${error.errorCode}"></span>
-           Return code: <span class="value" th:text="${error.returnCode}"></span></p>
+    <div th:if="${errorBody}">
+        <p class="errmsg" th:text="${errorBody.message}"></p>
+        <p>Error code: <span class="value" th:text="${errorBody.errorCode}"></span>
+           Return code: <span class="value" th:text="${errorBody.returnCode}"></span></p>
     </div>
-    <div th:unless="${error}">
-        <p class="errmsg" th:text="${message} ?: 'An unexpected error occurred'"></p>
+    <!-- Spring Boot /error model: status, error (reason phrase), message -->
+    <div th:unless="${errorBody}">
+        <p class="errmsg" th:text="${message} ?: (${error} ?: 'An unexpected error occurred')"></p>
         <p th:if="${status}">HTTP status: <span class="value" th:text="${status}"></span></p>
     </div>
     <p class="footer"><a th:href="@{/menu}">PF3=Return to menu</a></p>
