@@ -44,6 +44,7 @@ public class TransactionValidationTasklet implements Tasklet {
     List<Transaction> transactions = transactionRepository.findByStatus(TransactionStatus.PENDING);
     for (Transaction transaction : transactions) {
       recordsRead++;
+      contribution.incrementReadCount();
       try {
         validationService.requirePortfolioId(transaction.getPortfolioId());
         validationService.requireInvestmentType(
@@ -61,6 +62,7 @@ public class TransactionValidationTasklet implements Tasklet {
             exception.getCode(),
             exception.getMessage(),
             transaction.getTransactionId());
+        contribution.incrementWriteCount(1);
       }
     }
     int returnCode = invalidRecords > 0 ? 4 : 0;

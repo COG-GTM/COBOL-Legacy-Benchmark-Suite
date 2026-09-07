@@ -46,19 +46,23 @@ public class PositionUpdateTasklet implements Tasklet {
     List<Transaction> transactions = transactionRepository.findByStatus(TransactionStatus.PENDING);
     for (Transaction transaction : transactions) {
       recordsRead++;
+      contribution.incrementReadCount();
       try {
         portfolioTransactionService.process(transaction);
         upsertPosition(transaction);
+        contribution.incrementWriteCount(1);
       } catch (BusinessException | UnsupportedOperationException exception) {
         errors++;
         returnCode = Math.max(returnCode, 4);
         transaction.setStatus(TransactionStatus.FAILED);
         transactionRepository.save(transaction);
+        contribution.incrementWriteCount(1);
       } catch (Exception exception) {
         errors++;
         returnCode = Math.max(returnCode, 8);
         transaction.setStatus(TransactionStatus.FAILED);
         transactionRepository.save(transaction);
+        contribution.incrementWriteCount(1);
       }
     }
     var executionContext = chunkContext.getStepContext().getStepExecution().getExecutionContext();

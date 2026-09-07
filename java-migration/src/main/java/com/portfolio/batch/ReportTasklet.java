@@ -38,6 +38,7 @@ public class ReportTasklet implements Tasklet {
         .getStepExecution()
         .getExecutionContext()
         .putInt("returnCode", result.returnCode());
+    contribution.incrementWriteCount(1);
     contribution.setExitStatus(new ExitStatus("COMPLETED", "RC=" + result.returnCode()));
     return RepeatStatus.FINISHED;
   }
