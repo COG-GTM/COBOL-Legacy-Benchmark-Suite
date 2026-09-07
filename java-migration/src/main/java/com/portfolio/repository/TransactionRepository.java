@@ -18,5 +18,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
 
   List<Transaction> findByPortfolioIdOrderByTransactionDateDesc(String portfolioId);
 
+  boolean existsByPortfolioId(String portfolioId);
+
   long countByPortfolioIdAndTransactionDate(String portfolioId, LocalDate transactionDate);
 }

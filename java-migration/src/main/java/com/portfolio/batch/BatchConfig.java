@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.FlowBuilder;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.job.flow.Flow;
@@ -79,10 +80,12 @@ public class BatchConfig {
   }
 
   @Bean
+  @StepScope
   RepositoryItemReader<Transaction> historyReader() {
     Map<String, Sort.Direction> sorts = new LinkedHashMap<>();
     sorts.put("transactionDate", Sort.Direction.ASC);
     sorts.put("transactionTime", Sort.Direction.ASC);
+    sorts.put("transactionId", Sort.Direction.ASC);
     return new RepositoryItemReaderBuilder<Transaction>()
         .name("histLoadReader")
         .repository(transactionRepository)
@@ -105,6 +108,7 @@ public class BatchConfig {
         .skip(DataIntegrityViolationException.class)
         .skipLimit(Integer.MAX_VALUE)
         .listener(new HistLoadStepListener(historyWriter))
+        .listener(historyProcessor)
         .listener(returnCodeRecordingListener)
         .build();
   }

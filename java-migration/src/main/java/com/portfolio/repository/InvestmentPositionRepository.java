@@ -11,6 +11,8 @@ public interface InvestmentPositionRepository
     extends JpaRepository<InvestmentPosition, InvestmentPositionId> {
   List<InvestmentPosition> findByIdPortfolioIdOrderByIdInvestmentId(String portfolioId);
 
+  boolean existsByIdPortfolioId(String portfolioId);
+
   List<InvestmentPosition> findByIdPortfolioIdAndIdPositionDate(
       String portfolioId, java.time.LocalDate positionDate);
 

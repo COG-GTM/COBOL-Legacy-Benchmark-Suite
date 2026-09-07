@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import com.portfolio.config.ErrorLoggingService;
 import com.portfolio.domain.Portfolio;
 import com.portfolio.domain.Transaction;
+import com.portfolio.domain.TransactionStatus;
 import com.portfolio.domain.TransactionType;
 import com.portfolio.dto.TransactionDto;
 import com.portfolio.repository.AuditLogRepository;
@@ -16,6 +17,7 @@ import com.portfolio.repository.PortfolioRepository;
 import com.portfolio.repository.TransactionRepository;
 import com.portfolio.service.BusinessException;
 import com.portfolio.service.PortfolioTransactionService;
+import com.portfolio.service.PortfolioValidationService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
@@ -36,7 +38,11 @@ class PortfolioTransactionServiceTest {
     MockitoAnnotations.openMocks(this);
     transactionService =
         new PortfolioTransactionService(
-            portfolioRepository, transactionRepository, auditLogRepository, errorLoggingService);
+            portfolioRepository,
+            transactionRepository,
+            auditLogRepository,
+            errorLoggingService,
+            new PortfolioValidationService());
     portfolio = new Portfolio();
     portfolio.setPortfolioId("PORT0001");
     portfolio.setAccountNo("1234567890");
@@ -56,6 +62,7 @@ class PortfolioTransactionServiceTest {
     transaction.setTransactionId("id");
     transaction.setPortfolioId("PORT0001");
     transaction.setTransactionType(transactionType);
+    transaction.setInvestmentId("STK000001");
     transaction.setQuantity(quantity);
     transaction.setPrice(price);
     transaction.setAmount(transactionAmount);
@@ -105,12 +112,26 @@ class PortfolioTransactionServiceTest {
 
   @Test
   void transferIsNotImplemented() {
+    Transaction transaction =
+        createTransaction(
+            TransactionType.TRANSFER, BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ZERO);
     assertThrows(
-        UnsupportedOperationException.class,
-        () ->
-            transactionService.process(
-                createTransaction(
-                    TransactionType.TRANSFER, BigDecimal.ONE, BigDecimal.ZERO, BigDecimal.ZERO)));
+        UnsupportedOperationException.class, () -> transactionService.process(transaction));
+    assertEquals(TransactionStatus.FAILED, transaction.getStatus());
+  }
+
+  @Test
+  void nullInvestmentIdFailsValidationAndMarksTransactionFailed() {
+    Transaction transaction =
+        createTransaction(TransactionType.BUY, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE);
+    transaction.setInvestmentId(null);
+
+    BusinessException businessException =
+        assertThrows(BusinessException.class, () -> transactionService.process(transaction));
+
+    assertEquals("E008", businessException.getCode());
+    assertEquals("Invalid Investment ID", businessException.getMessage());
+    assertEquals(TransactionStatus.FAILED, transaction.getStatus());
   }
 
   @Test

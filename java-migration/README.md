@@ -29,7 +29,7 @@ URLs:
 * <http://localhost:8080/actuator/health>
 
 The H2 console uses JDBC URL `jdbc:h2:mem:posmvp`, username `sa`, and an empty
-password.
+password, and requires login (any demo user).
 
 ## Demo credentials and authorization
 
@@ -46,6 +46,10 @@ AUTHFILE rights:
 | admin | `INQONLN/READ`, `PORTMSTR/READ`, `PORTMSTR/UPDATE`, `BATCH/EXECUTE` |
 | operator | `INQONLN/READ`, `PORTMSTR/READ`, `BATCH/EXECUTE` |
 | user | `INQONLN/READ`, `PORTMSTR/READ` |
+
+Demo users and the empty `sa` H2 password exist only for the `demo` profile;
+disable the profile (`--spring.profiles.active=prod`) for any non-local
+deployment.
 
 ## Demo dataset
 
@@ -230,6 +234,9 @@ curl -u admin:admin123 http://localhost:8080/api/transactions/PORT0001/history
 `COMPLETED` batch jobs return HTTP 200, `STOPPED` jobs return 409, and failed
 jobs return 500. The JSON includes execution ID, exit description, and step
 read/write/skip/return-code summaries.
+
+`/api/**` is CSRF-exempt because it is meant for HTTP Basic clients (curl/JCL
+replacement), not browser sessions.
 
 ## Verification
 

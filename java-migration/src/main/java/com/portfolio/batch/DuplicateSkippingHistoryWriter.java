@@ -5,10 +5,14 @@ import com.portfolio.domain.PositionHistoryId;
 import com.portfolio.repository.PositionHistoryRepository;
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.Chunk;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.data.RepositoryItemWriter;
+import org.springframework.stereotype.Component;
 
+@Component
+@StepScope
 public class DuplicateSkippingHistoryWriter implements ItemWriter<PositionHistory> {
   private final PositionHistoryRepository historyRepository;
   private final RepositoryItemWriter<PositionHistory> delegate;

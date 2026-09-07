@@ -20,7 +20,7 @@ public class SecurityConfig {
     return http.authorizeHttpRequests(
             authorization ->
                 authorization
-                    .requestMatchers("/login", "/h2-console/**", "/css/**", "/actuator/health")
+                    .requestMatchers("/login", "/css/**", "/actuator/health")
                     .permitAll()
                     .anyRequest()
                     .authenticated())

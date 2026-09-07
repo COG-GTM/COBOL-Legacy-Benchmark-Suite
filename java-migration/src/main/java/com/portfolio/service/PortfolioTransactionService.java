@@ -35,16 +35,19 @@ public class PortfolioTransactionService {
   private final TransactionRepository transactionRepository;
   private final AuditLogRepository auditLogRepository;
   private final ErrorLoggingService errorLoggingService;
+  private final PortfolioValidationService validationService;
 
   public PortfolioTransactionService(
       PortfolioRepository portfolioRepository,
       TransactionRepository transactionRepository,
       AuditLogRepository auditLogRepository,
-      ErrorLoggingService errorLoggingService) {
+      ErrorLoggingService errorLoggingService,
+      PortfolioValidationService validationService) {
     this.portfolioRepository = portfolioRepository;
     this.transactionRepository = transactionRepository;
     this.auditLogRepository = auditLogRepository;
     this.errorLoggingService = errorLoggingService;
+    this.validationService = validationService;
   }
 
   @Transactional(noRollbackFor = {BusinessException.class, UnsupportedOperationException.class})
@@ -65,6 +68,7 @@ public class PortfolioTransactionService {
                       new BusinessException(
                           "E008", "Invalid Portfolio ID: " + transaction.getPortfolioId()));
       validateTransactionType(transaction);
+      validateInvestment(transaction);
       validateAmounts(transaction);
       beforeImage = state(portfolio);
       updatePositions(portfolio, transaction);
@@ -79,7 +83,7 @@ public class PortfolioTransactionService {
       portfolioRepository.save(portfolio);
       updateAuditTrail(transaction, portfolio, AuditStatus.SUCCESS, beforeImage);
       return new TransactionResult(transaction.getTransactionId(), true, "Processed");
-    } catch (BusinessException ex) {
+    } catch (BusinessException | UnsupportedOperationException ex) {
       if (transaction != null) {
         transaction.setStatus(TransactionStatus.FAILED);
         if (transaction.getTransactionId() != null) {
@@ -104,6 +108,24 @@ public class PortfolioTransactionService {
   private void validateTransactionType(Transaction transaction) {
     if (transaction.getTransactionType() == null) {
       throw new BusinessException("E008", "Invalid Transaction Type: null");
+    }
+  }
+
+  public void validateInvestment(Transaction transaction) {
+    if (transaction.getInvestmentId() == null
+        || transaction.getInvestmentId().isBlank()
+        || !isValidInvestmentType(
+            validationService.investmentTypeOf(transaction.getInvestmentId()))) {
+      throw new BusinessException("E008", "Invalid Investment ID");
+    }
+  }
+
+  private boolean isValidInvestmentType(String investmentType) {
+    try {
+      validationService.requireInvestmentType(investmentType);
+      return true;
+    } catch (BusinessException exception) {
+      return false;
     }
   }
 

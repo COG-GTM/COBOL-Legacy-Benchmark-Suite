@@ -47,8 +47,7 @@ public class TransactionValidationTasklet implements Tasklet {
       contribution.incrementReadCount();
       try {
         validationService.requirePortfolioId(transaction.getPortfolioId());
-        validationService.requireInvestmentType(
-            validationService.investmentTypeOf(transaction.getInvestmentId()));
+        transactionService.validateInvestment(transaction);
         validationService.requireAmount(transaction.getAmount());
         transactionService.validateAmounts(transaction);
       } catch (BusinessException exception) {

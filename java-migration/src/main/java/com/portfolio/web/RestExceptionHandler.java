@@ -45,6 +45,12 @@ public class RestExceptionHandler {
     return response("E008", "Invalid request");
   }
 
+  @ExceptionHandler(UnsupportedOperationException.class)
+  public ResponseEntity<Map<String, String>> unsupported(UnsupportedOperationException exception) {
+    logWarning("E009", exception.getMessage());
+    return response("E009", exception.getMessage());
+  }
+
   @ExceptionHandler(Exception.class)
   public ResponseEntity<Map<String, String>> generic(Exception exception) {
     errorLoggingService.log(
@@ -61,6 +67,7 @@ public class RestExceptionHandler {
       case "E002" -> HttpStatus.NOT_FOUND;
       case "E006" -> HttpStatus.FORBIDDEN;
       case "E007" -> HttpStatus.INTERNAL_SERVER_ERROR;
+      case "E009" -> HttpStatus.NOT_IMPLEMENTED;
       default -> HttpStatus.BAD_REQUEST;
     };
   }

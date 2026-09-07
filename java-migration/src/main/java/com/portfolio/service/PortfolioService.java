@@ -12,6 +12,7 @@ import com.portfolio.dto.PortfolioDto;
 import com.portfolio.repository.AuditLogRepository;
 import com.portfolio.repository.InvestmentPositionRepository;
 import com.portfolio.repository.PortfolioRepository;
+import com.portfolio.repository.TransactionRepository;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
@@ -31,16 +32,19 @@ public class PortfolioService {
   private final PortfolioRepository portfolioRepository;
   private final InvestmentPositionRepository positionRepository;
   private final AuditLogRepository auditLogRepository;
+  private final TransactionRepository transactionRepository;
   private final PortfolioValidationService validationService;
 
   public PortfolioService(
       PortfolioRepository portfolioRepository,
       InvestmentPositionRepository positionRepository,
       AuditLogRepository auditLogRepository,
+      TransactionRepository transactionRepository,
       PortfolioValidationService validationService) {
     this.portfolioRepository = portfolioRepository;
     this.positionRepository = positionRepository;
     this.auditLogRepository = auditLogRepository;
+    this.transactionRepository = transactionRepository;
     this.validationService = validationService;
   }
 
@@ -52,6 +56,8 @@ public class PortfolioService {
       throw new BusinessException("E001", "Client name is required");
     if (portfolioRepository.existsById(portfolioDto.getPortfolioId()))
       throw new BusinessException("E003", "Portfolio ID already exists");
+    if (portfolioRepository.existsByAccountNo(portfolioDto.getAccountNo()))
+      throw new BusinessException("E003", "Account number already exists");
     Portfolio portfolio = new Portfolio();
     portfolio.setPortfolioId(portfolioDto.getPortfolioId());
     portfolio.setAccountNo(portfolioDto.getAccountNo());
@@ -106,6 +112,10 @@ public class PortfolioService {
         portfolioRepository
             .findById(portfolioId)
             .orElseThrow(() -> new ResourceNotFoundException("Portfolio not found for deletion"));
+    if (positionRepository.existsByIdPortfolioId(portfolioId)
+        || transactionRepository.existsByPortfolioId(portfolioId)) {
+      throw new BusinessException("E004", "Portfolio has positions or transactions");
+    }
     portfolioRepository.delete(portfolio);
     writeAudit(AuditAction.DELETE, portfolio, "PORTDEL");
   }

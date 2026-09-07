@@ -3,6 +3,7 @@ package com.portfolio.dto;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -18,7 +19,7 @@ public class TransactionDto {
   @Pattern(regexp = "STK|BND|MMF|ETF")
   private String investmentType;
 
-  private String investmentId;
+  @NotBlank private String investmentId;
   private String transactionType;
 
   @DecimalMin("0")

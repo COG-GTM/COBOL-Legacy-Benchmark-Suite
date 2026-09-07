@@ -13,6 +13,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.batch.core.StepExecution;
+import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
@@ -24,6 +26,11 @@ public class TransactionToPositionHistoryProcessor
 
   public TransactionToPositionHistoryProcessor(PortfolioRepository portfolioRepository) {
     this.portfolioRepository = portfolioRepository;
+  }
+
+  @BeforeStep
+  public void clearPortfolioCache(StepExecution stepExecution) {
+    portfolioCache.clear();
   }
 
   @Override
