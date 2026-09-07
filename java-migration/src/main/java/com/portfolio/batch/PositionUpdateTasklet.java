@@ -7,6 +7,7 @@ import com.portfolio.domain.InvestmentPositionId;
 import com.portfolio.domain.PositionStatus;
 import com.portfolio.domain.Transaction;
 import com.portfolio.domain.TransactionStatus;
+import com.portfolio.domain.TransactionType;
 import com.portfolio.repository.InvestmentPositionRepository;
 import com.portfolio.repository.TransactionRepository;
 import com.portfolio.service.BusinessException;
@@ -16,6 +17,7 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
@@ -82,10 +84,11 @@ public class PositionUpdateTasklet implements Tasklet {
     InvestmentPositionId positionId =
         new InvestmentPositionId(
             transaction.getPortfolioId(), transaction.getInvestmentId(), positionDate);
-    InvestmentPosition position =
-        positionRepository
-            .findById(positionId)
-            .orElseGet(() -> newPosition(positionId, transaction));
+    Optional<InvestmentPosition> existing = positionRepository.findById(positionId);
+    if (existing.isEmpty() && transaction.getTransactionType() == TransactionType.FEE) {
+      return;
+    }
+    InvestmentPosition position = existing.orElseGet(() -> newPosition(positionId, transaction));
     BigDecimal quantity = zeroIfNull(position.getQuantity());
     BigDecimal costBasis = zeroIfNull(position.getCostBasis());
     BigDecimal transactionQuantity = zeroIfNull(transaction.getQuantity());

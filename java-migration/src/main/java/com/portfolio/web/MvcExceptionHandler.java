@@ -12,9 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.ModelAndView;
 
-@ControllerAdvice(
-    basePackages = "com.portfolio.web",
-    assignableTypes = {InquiryController.class})
+@ControllerAdvice(assignableTypes = {InquiryController.class})
 public class MvcExceptionHandler {
   private final ErrorLoggingService errorLoggingService;
 
