@@ -1,0 +1,1478 @@
+{
+  "copybooks": {
+    "AUDITLOG": {
+      "group": "common",
+      "path": "src/copybook/common/AUDITLOG.cpy"
+    },
+    "BCHCON": {
+      "group": "batch",
+      "path": "src/copybook/batch/BCHCON.cpy"
+    },
+    "BCHCTL": {
+      "group": "batch",
+      "path": "src/copybook/batch/BCHCTL.cpy"
+    },
+    "CKPRST": {
+      "group": "batch",
+      "path": "src/copybook/batch/CKPRST.cpy"
+    },
+    "COMMON": {
+      "group": "common",
+      "path": "src/copybook/common/COMMON.cpy"
+    },
+    "DB2REQ": {
+      "group": "online",
+      "path": "src/copybook/online/DB2REQ.cpy"
+    },
+    "DBPROC": {
+      "group": "db2",
+      "path": "src/copybook/db2/DBPROC.cpy"
+    },
+    "DBTBLS": {
+      "group": "db2",
+      "path": "src/copybook/db2/DBTBLS.cpy"
+    },
+    "ERRHAND": {
+      "group": "common",
+      "path": "src/copybook/common/ERRHAND.cpy"
+    },
+    "ERRHND": {
+      "group": "online",
+      "path": "src/copybook/online/ERRHND.cpy"
+    },
+    "HISTREC": {
+      "group": "common",
+      "path": "src/copybook/common/HISTREC.cpy"
+    },
+    "INQCOM": {
+      "group": "online",
+      "path": "src/copybook/online/INQCOM.cpy"
+    },
+    "PORTFLIO": {
+      "group": "common",
+      "path": "src/copybook/common/PORTFLIO.cpy"
+    },
+    "PORTVAL": {
+      "group": "common",
+      "path": "src/copybook/common/PORTVAL.cpy"
+    },
+    "POSREC": {
+      "group": "common",
+      "path": "src/copybook/common/POSREC.cpy"
+    },
+    "PRCSEQ": {
+      "group": "batch",
+      "path": "src/copybook/batch/PRCSEQ.cpy"
+    },
+    "RETHND": {
+      "group": "common",
+      "path": "src/copybook/common/RETHND.cpy"
+    },
+    "RTNCODE": {
+      "group": "common",
+      "path": "src/copybook/common/RTNCODE.cpy"
+    },
+    "SQLCA": {
+      "group": "db2",
+      "path": "src/copybook/db2/SQLCA.cpy"
+    },
+    "TRNREC": {
+      "group": "common",
+      "path": "src/copybook/common/TRNREC.cpy"
+    }
+  },
+  "edges": [
+    {
+      "from": "BCHCTL00",
+      "kind": "CALL",
+      "resolved": true,
+      "to": "ERRPROC"
+    },
+    {
+      "from": "BCHCTL00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "BCHCTL"
+    },
+    {
+      "from": "BCHCTL00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "BCHCON"
+    },
+    {
+      "from": "BCHCTL00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHAND"
+    },
+    {
+      "file": "BATCH-CONTROL-FILE",
+      "from": "BCHCTL00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "BCHCTL"
+    },
+    {
+      "from": "CKPRST",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "CKPRST"
+    },
+    {
+      "from": "CKPRST",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "RETHND"
+    },
+    {
+      "file": "CHECKPOINT-FILE",
+      "from": "CKPRST",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "CKPTFILE"
+    },
+    {
+      "from": "HISTLD00",
+      "kind": "CALL",
+      "resolved": true,
+      "to": "ERRPROC"
+    },
+    {
+      "from": "HISTLD00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "HISTREC"
+    },
+    {
+      "from": "HISTLD00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "BCHCTL"
+    },
+    {
+      "from": "HISTLD00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "DBTBLS"
+    },
+    {
+      "from": "HISTLD00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "SQLCA"
+    },
+    {
+      "from": "HISTLD00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "DBPROC"
+    },
+    {
+      "from": "HISTLD00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHAND"
+    },
+    {
+      "from": "HISTLD00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "BCHCON"
+    },
+    {
+      "from": "HISTLD00",
+      "kind": "SQL",
+      "resolved": true,
+      "to": "POSHIST"
+    },
+    {
+      "file": "TRANSACTION-HISTORY",
+      "from": "HISTLD00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "TRANHIST"
+    },
+    {
+      "file": "BATCH-CONTROL-FILE",
+      "from": "HISTLD00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "BCHCTL"
+    },
+    {
+      "from": "PRCSEQ00",
+      "kind": "CALL",
+      "resolved": true,
+      "to": "ERRPROC"
+    },
+    {
+      "from": "PRCSEQ00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "PRCSEQ"
+    },
+    {
+      "from": "PRCSEQ00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "BCHCTL"
+    },
+    {
+      "from": "PRCSEQ00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "BCHCON"
+    },
+    {
+      "from": "PRCSEQ00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHAND"
+    },
+    {
+      "file": "PROCESS-SEQ-FILE",
+      "from": "PRCSEQ00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "PRCSEQ"
+    },
+    {
+      "file": "BATCH-CONTROL-FILE",
+      "from": "PRCSEQ00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "BCHCTL"
+    },
+    {
+      "from": "RCVPRC00",
+      "kind": "CALL",
+      "resolved": true,
+      "to": "ERRPROC"
+    },
+    {
+      "from": "RCVPRC00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "BCHCTL"
+    },
+    {
+      "from": "RCVPRC00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "PRCSEQ"
+    },
+    {
+      "from": "RCVPRC00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "BCHCON"
+    },
+    {
+      "from": "RCVPRC00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHAND"
+    },
+    {
+      "file": "BATCH-CONTROL-FILE",
+      "from": "RCVPRC00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "BCHCTL"
+    },
+    {
+      "file": "PROCESS-SEQ-FILE",
+      "from": "RCVPRC00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "PRCSEQ"
+    },
+    {
+      "from": "RPTAUD00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "AUDITLOG"
+    },
+    {
+      "from": "RPTAUD00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHAND"
+    },
+    {
+      "from": "RPTAUD00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "RTNCODE"
+    },
+    {
+      "file": "AUDIT-FILE",
+      "from": "RPTAUD00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "AUDITLOG"
+    },
+    {
+      "file": "ERROR-FILE",
+      "from": "RPTAUD00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "ERRLOG"
+    },
+    {
+      "file": "REPORT-FILE",
+      "from": "RPTAUD00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "RPTFILE"
+    },
+    {
+      "from": "RPTPOS00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "POSREC"
+    },
+    {
+      "from": "RPTPOS00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "TRNREC"
+    },
+    {
+      "from": "RPTPOS00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "RTNCODE"
+    },
+    {
+      "from": "RPTPOS00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHAND"
+    },
+    {
+      "file": "POSITION-MASTER",
+      "from": "RPTPOS00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "POSMSTRE"
+    },
+    {
+      "file": "TRANSACTION-HISTORY",
+      "from": "RPTPOS00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "TRANHIST"
+    },
+    {
+      "file": "REPORT-FILE",
+      "from": "RPTPOS00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "RPTFILE"
+    },
+    {
+      "from": "RPTSTA00",
+      "kind": "COPY",
+      "resolved": false,
+      "to": "DB2STAT"
+    },
+    {
+      "from": "RPTSTA00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "BCHCTL"
+    },
+    {
+      "from": "RPTSTA00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "RTNCODE"
+    },
+    {
+      "from": "RPTSTA00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHAND"
+    },
+    {
+      "file": "DB2-STATS",
+      "from": "RPTSTA00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "DB2STATS"
+    },
+    {
+      "file": "BATCH-STATS",
+      "from": "RPTSTA00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "BCHSTATS"
+    },
+    {
+      "file": "REPORT-FILE",
+      "from": "RPTSTA00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "RPTFILE"
+    },
+    {
+      "from": "RTNANA00",
+      "kind": "SQL-INCLUDE",
+      "resolved": true,
+      "to": "SQLCA"
+    },
+    {
+      "from": "RTNANA00",
+      "kind": "SQL",
+      "resolved": true,
+      "to": "RTNCODES"
+    },
+    {
+      "file": "REPORT-FILE",
+      "from": "RTNANA00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "RPTFILE"
+    },
+    {
+      "from": "RTNCDE00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "RTNCODE"
+    },
+    {
+      "from": "RTNCDE00",
+      "kind": "SQL-INCLUDE",
+      "resolved": true,
+      "to": "SQLCA"
+    },
+    {
+      "from": "RTNCDE00",
+      "kind": "SQL",
+      "resolved": true,
+      "to": "RTNCODES"
+    },
+    {
+      "from": "AUDPROC",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "AUDITLOG"
+    },
+    {
+      "file": "AUDIT-FILE",
+      "from": "AUDPROC",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "AUDFILE"
+    },
+    {
+      "from": "DB2CMT",
+      "kind": "CALL",
+      "resolved": true,
+      "to": "ERRPROC"
+    },
+    {
+      "from": "DB2CMT",
+      "kind": "CALL",
+      "resolved": true,
+      "to": "DB2ERR"
+    },
+    {
+      "from": "DB2CMT",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "SQLCA"
+    },
+    {
+      "from": "DB2CMT",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "DBPROC"
+    },
+    {
+      "from": "DB2CMT",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHAND"
+    },
+    {
+      "from": "DB2CONN",
+      "kind": "CALL",
+      "resolved": false,
+      "to": "DELAY"
+    },
+    {
+      "from": "DB2CONN",
+      "kind": "CALL",
+      "resolved": true,
+      "to": "ERRPROC"
+    },
+    {
+      "from": "DB2CONN",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "SQLCA"
+    },
+    {
+      "from": "DB2CONN",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "DBPROC"
+    },
+    {
+      "from": "DB2CONN",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHAND"
+    },
+    {
+      "from": "DB2ERR",
+      "kind": "CALL",
+      "resolved": true,
+      "to": "ERRPROC"
+    },
+    {
+      "from": "DB2ERR",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "DBTBLS"
+    },
+    {
+      "from": "DB2ERR",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "SQLCA"
+    },
+    {
+      "from": "DB2ERR",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "DBPROC"
+    },
+    {
+      "from": "DB2ERR",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHAND"
+    },
+    {
+      "from": "DB2ERR",
+      "kind": "SQL",
+      "resolved": true,
+      "to": "ERRLOG"
+    },
+    {
+      "from": "DB2STAT",
+      "kind": "CALL",
+      "resolved": true,
+      "to": "ERRPROC"
+    },
+    {
+      "from": "DB2STAT",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "SQLCA"
+    },
+    {
+      "from": "DB2STAT",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "DBPROC"
+    },
+    {
+      "from": "DB2STAT",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHAND"
+    },
+    {
+      "from": "DB2STAT",
+      "kind": "SQL",
+      "resolved": true,
+      "to": "SESSION"
+    },
+    {
+      "from": "ERRPROC",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHAND"
+    },
+    {
+      "file": "ERROR-LOG",
+      "from": "ERRPROC",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "ERRLOG"
+    },
+    {
+      "from": "CURSMGR",
+      "kind": "SQL-INCLUDE",
+      "resolved": true,
+      "to": "SQLCA"
+    },
+    {
+      "from": "DB2ONLN",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHND"
+    },
+    {
+      "from": "DB2ONLN",
+      "kind": "SQL-INCLUDE",
+      "resolved": true,
+      "to": "SQLCA"
+    },
+    {
+      "from": "DB2RECV",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHND"
+    },
+    {
+      "from": "DB2RECV",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "DB2REQ"
+    },
+    {
+      "from": "DB2RECV",
+      "kind": "LINK",
+      "resolved": true,
+      "to": "DB2ONLN"
+    },
+    {
+      "from": "DB2RECV",
+      "kind": "LINK",
+      "resolved": true,
+      "to": "ERRHNDL"
+    },
+    {
+      "from": "DB2RECV",
+      "kind": "SQL-INCLUDE",
+      "resolved": true,
+      "to": "SQLCA"
+    },
+    {
+      "from": "ERRHNDL",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHND"
+    },
+    {
+      "from": "ERRHNDL",
+      "kind": "SQL-INCLUDE",
+      "resolved": true,
+      "to": "SQLCA"
+    },
+    {
+      "from": "ERRHNDL",
+      "kind": "SQL",
+      "resolved": true,
+      "to": "ERRLOG"
+    },
+    {
+      "from": "INQHIST",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "INQCOM"
+    },
+    {
+      "from": "INQHIST",
+      "kind": "LINK",
+      "resolved": true,
+      "to": "DB2ONLN"
+    },
+    {
+      "from": "INQHIST",
+      "kind": "LINK",
+      "resolved": true,
+      "to": "DB2RECV"
+    },
+    {
+      "from": "INQHIST",
+      "kind": "LINK",
+      "resolved": true,
+      "to": "CURSMGR"
+    },
+    {
+      "from": "INQHIST",
+      "kind": "SQL-INCLUDE",
+      "resolved": true,
+      "to": "SQLCA"
+    },
+    {
+      "from": "INQONLN",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "INQCOM"
+    },
+    {
+      "from": "INQONLN",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHND"
+    },
+    {
+      "from": "INQONLN",
+      "kind": "LINK",
+      "resolved": true,
+      "to": "INQPORT"
+    },
+    {
+      "from": "INQONLN",
+      "kind": "LINK",
+      "resolved": true,
+      "to": "INQHIST"
+    },
+    {
+      "from": "INQONLN",
+      "kind": "LINK",
+      "resolved": true,
+      "to": "ERRHNDL"
+    },
+    {
+      "from": "INQONLN",
+      "kind": "LINK",
+      "resolved": true,
+      "to": "SECMGR"
+    },
+    {
+      "from": "INQPORT",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "INQCOM"
+    },
+    {
+      "from": "INQPORT",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "POSREC"
+    },
+    {
+      "from": "INQPORT",
+      "kind": "SQL-INCLUDE",
+      "resolved": false,
+      "to": "SQLPOS"
+    },
+    {
+      "from": "SECMGR",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHND"
+    },
+    {
+      "from": "SECMGR",
+      "kind": "SQL-INCLUDE",
+      "resolved": true,
+      "to": "SQLCA"
+    },
+    {
+      "from": "SECMGR",
+      "kind": "SQL",
+      "resolved": true,
+      "to": "AUTHFILE"
+    },
+    {
+      "from": "SECMGR",
+      "kind": "SQL",
+      "resolved": true,
+      "to": "AUDITLOG"
+    },
+    {
+      "from": "PORTADD",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "PORTFLIO"
+    },
+    {
+      "file": "PORTFOLIO-FILE",
+      "from": "PORTADD",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "PORTFILE"
+    },
+    {
+      "file": "INPUT-FILE",
+      "from": "PORTADD",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "INPTFILE"
+    },
+    {
+      "from": "PORTDEL",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "PORTFLIO"
+    },
+    {
+      "file": "PORTFOLIO-FILE",
+      "from": "PORTDEL",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "PORTFILE"
+    },
+    {
+      "file": "DELETE-FILE",
+      "from": "PORTDEL",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "DELEFILE"
+    },
+    {
+      "file": "AUDIT-FILE",
+      "from": "PORTDEL",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "AUDFILE"
+    },
+    {
+      "from": "PORTMSTR",
+      "kind": "CALL",
+      "resolved": true,
+      "to": "ERRPROC"
+    },
+    {
+      "from": "PORTMSTR",
+      "kind": "CALL",
+      "resolved": true,
+      "to": "AUDPROC"
+    },
+    {
+      "file": "PORTFOLIO-FILE",
+      "from": "PORTMSTR",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "PORTFILE"
+    },
+    {
+      "from": "PORTREAD",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "PORTFLIO"
+    },
+    {
+      "file": "PORTFOLIO-FILE",
+      "from": "PORTREAD",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "PORTFILE"
+    },
+    {
+      "from": "PORTTEST",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "PORTFLIO"
+    },
+    {
+      "from": "PORTTEST",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHAND"
+    },
+    {
+      "file": "TEST-FILE",
+      "from": "PORTTEST",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "TESTFILE"
+    },
+    {
+      "from": "PORTTRAN",
+      "kind": "CALL",
+      "resolved": true,
+      "to": "AUDPROC"
+    },
+    {
+      "from": "PORTTRAN",
+      "kind": "CALL",
+      "resolved": true,
+      "to": "ERRPROC"
+    },
+    {
+      "from": "PORTTRAN",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "TRNREC"
+    },
+    {
+      "from": "PORTTRAN",
+      "kind": "COPY",
+      "resolved": false,
+      "to": "PORTREC"
+    },
+    {
+      "from": "PORTTRAN",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHAND"
+    },
+    {
+      "from": "PORTTRAN",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "AUDITLOG"
+    },
+    {
+      "file": "TRANSACTION-FILE",
+      "from": "PORTTRAN",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "TRANFILE"
+    },
+    {
+      "file": "PORTFOLIO-FILE",
+      "from": "PORTTRAN",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "PORTFILE"
+    },
+    {
+      "from": "PORTUPDT",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "PORTFLIO"
+    },
+    {
+      "file": "PORTFOLIO-FILE",
+      "from": "PORTUPDT",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "PORTFILE"
+    },
+    {
+      "file": "UPDATE-FILE",
+      "from": "PORTUPDT",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "UPDTFILE"
+    },
+    {
+      "from": "PORTVALD",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "PORTVAL"
+    },
+    {
+      "from": "TSTGEN00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "PORTFLIO"
+    },
+    {
+      "from": "TSTGEN00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "TRNREC"
+    },
+    {
+      "from": "TSTGEN00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "RTNCODE"
+    },
+    {
+      "from": "TSTGEN00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHAND"
+    },
+    {
+      "file": "TEST-CONFIG",
+      "from": "TSTGEN00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "TSTCFG"
+    },
+    {
+      "file": "PORTFOLIO-OUT",
+      "from": "TSTGEN00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "PORTOUT"
+    },
+    {
+      "file": "TRANSACTION-OUT",
+      "from": "TSTGEN00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "TRANOUT"
+    },
+    {
+      "file": "RANDOM-SEED",
+      "from": "TSTGEN00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "RANDSEED"
+    },
+    {
+      "from": "TSTVAL00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "RTNCODE"
+    },
+    {
+      "from": "TSTVAL00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHAND"
+    },
+    {
+      "file": "TEST-CASES",
+      "from": "TSTVAL00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "TESTCASE"
+    },
+    {
+      "file": "EXPECTED-RESULTS",
+      "from": "TSTVAL00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "EXPECTED"
+    },
+    {
+      "file": "ACTUAL-RESULTS",
+      "from": "TSTVAL00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "ACTUAL"
+    },
+    {
+      "file": "TEST-REPORT",
+      "from": "TSTVAL00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "TESTRPT"
+    },
+    {
+      "from": "UTLMNT00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "RTNCODE"
+    },
+    {
+      "from": "UTLMNT00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHAND"
+    },
+    {
+      "file": "CONTROL-FILE",
+      "from": "UTLMNT00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "CTLFILE"
+    },
+    {
+      "file": "ARCHIVE-FILE",
+      "from": "UTLMNT00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "ARCHFILE"
+    },
+    {
+      "file": "REPORT-FILE",
+      "from": "UTLMNT00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "RPTFILE"
+    },
+    {
+      "from": "UTLMON00",
+      "kind": "CALL",
+      "resolved": false,
+      "to": "ILBOABN0"
+    },
+    {
+      "from": "UTLMON00",
+      "kind": "COPY",
+      "resolved": false,
+      "to": "DB2STAT"
+    },
+    {
+      "from": "UTLMON00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "RTNCODE"
+    },
+    {
+      "from": "UTLMON00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHAND"
+    },
+    {
+      "file": "MONITOR-CONFIG",
+      "from": "UTLMON00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "MONCFG"
+    },
+    {
+      "file": "MONITOR-LOG",
+      "from": "UTLMON00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "MONLOG"
+    },
+    {
+      "file": "ALERT-FILE",
+      "from": "UTLMON00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "ALERTS"
+    },
+    {
+      "file": "DB2-STATS",
+      "from": "UTLMON00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "DB2STATS"
+    },
+    {
+      "from": "UTLVAL00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "POSREC"
+    },
+    {
+      "from": "UTLVAL00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "TRNREC"
+    },
+    {
+      "from": "UTLVAL00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "RTNCODE"
+    },
+    {
+      "from": "UTLVAL00",
+      "kind": "COPY",
+      "resolved": true,
+      "to": "ERRHAND"
+    },
+    {
+      "file": "VALIDATION-CONTROL",
+      "from": "UTLVAL00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "VALCTL"
+    },
+    {
+      "file": "POSITION-MASTER",
+      "from": "UTLVAL00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "POSMSTRE"
+    },
+    {
+      "file": "TRANSACTION-HISTORY",
+      "from": "UTLVAL00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "TRANHIST"
+    },
+    {
+      "file": "ERROR-REPORT",
+      "from": "UTLVAL00",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "ERRRPT"
+    },
+    {
+      "from": "RTNANA",
+      "kind": "EXECPGM",
+      "resolved": true,
+      "to": "RTNANA00"
+    },
+    {
+      "from": "PORTADD",
+      "kind": "EXECPGM",
+      "resolved": true,
+      "to": "PORTADD"
+    },
+    {
+      "from": "PORTDEF",
+      "kind": "EXECPGM",
+      "resolved": false,
+      "to": "IDCAMS"
+    },
+    {
+      "from": "PORTDEL",
+      "kind": "EXECPGM",
+      "resolved": true,
+      "to": "PORTDEL"
+    },
+    {
+      "from": "PORTREAD",
+      "kind": "EXECPGM",
+      "resolved": true,
+      "to": "PORTREAD"
+    },
+    {
+      "from": "PORTTEST",
+      "kind": "EXECPGM",
+      "resolved": true,
+      "to": "PORTTEST"
+    },
+    {
+      "from": "PORTUPDT",
+      "kind": "EXECPGM",
+      "resolved": true,
+      "to": "PORTUPDT"
+    },
+    {
+      "from": "TSTGEN",
+      "kind": "EXECPGM",
+      "resolved": true,
+      "to": "TSTGEN00"
+    },
+    {
+      "from": "TSTVAL",
+      "kind": "EXECPGM",
+      "resolved": true,
+      "to": "TSTVAL00"
+    },
+    {
+      "from": "RPTAUD",
+      "kind": "EXECPGM",
+      "resolved": true,
+      "to": "RPTAUD00"
+    },
+    {
+      "from": "RPTPOS",
+      "kind": "EXECPGM",
+      "resolved": true,
+      "to": "RPTPOS00"
+    },
+    {
+      "from": "RPTSTA",
+      "kind": "EXECPGM",
+      "resolved": true,
+      "to": "RPTSTA00"
+    },
+    {
+      "from": "UTLMNT",
+      "kind": "EXECPGM",
+      "resolved": true,
+      "to": "UTLMNT00"
+    },
+    {
+      "from": "UTLMON",
+      "kind": "EXECPGM",
+      "resolved": true,
+      "to": "UTLMON00"
+    },
+    {
+      "from": "UTLVAL",
+      "kind": "EXECPGM",
+      "resolved": true,
+      "to": "UTLVAL00"
+    }
+  ],
+  "jcl": {
+    "PORTADD": {
+      "path": "src/jcl/portfolio/PORTADD.jcl"
+    },
+    "PORTDEF": {
+      "path": "src/jcl/portfolio/PORTDEF.jcl"
+    },
+    "PORTDEL": {
+      "path": "src/jcl/portfolio/PORTDEL.jcl"
+    },
+    "PORTREAD": {
+      "path": "src/jcl/portfolio/PORTREAD.jcl"
+    },
+    "PORTTEST": {
+      "path": "src/jcl/portfolio/PORTTEST.jcl"
+    },
+    "PORTUPDT": {
+      "path": "src/jcl/portfolio/PORTUPDT.jcl"
+    },
+    "RPTAUD": {
+      "path": "src/jcl/batch/RPTAUD.jcl"
+    },
+    "RPTPOS": {
+      "path": "src/jcl/batch/RPTPOS.jcl"
+    },
+    "RPTSTA": {
+      "path": "src/jcl/batch/RPTSTA.jcl"
+    },
+    "RTNANA": {
+      "path": "src/jcl/RTNANA.jcl"
+    },
+    "TSTGEN": {
+      "path": "src/jcl/test/TSTGEN.jcl"
+    },
+    "TSTVAL": {
+      "path": "src/jcl/test/TSTVAL.jcl"
+    },
+    "UTLMNT": {
+      "path": "src/jcl/utility/UTLMNT.jcl"
+    },
+    "UTLMON": {
+      "path": "src/jcl/utility/UTLMON.jcl"
+    },
+    "UTLVAL": {
+      "path": "src/jcl/utility/UTLVAL.jcl"
+    }
+  },
+  "programs": {
+    "AUDPROC": {
+      "group": "common",
+      "path": "src/programs/common/AUDPROC.cbl"
+    },
+    "BCHCTL00": {
+      "group": "batch",
+      "path": "src/programs/batch/BCHCTL00.cbl"
+    },
+    "CKPRST": {
+      "group": "batch",
+      "path": "src/programs/batch/CKPRST.cbl"
+    },
+    "CURSMGR": {
+      "group": "online",
+      "path": "src/programs/online/CURSMGR.cbl"
+    },
+    "DB2CMT": {
+      "group": "common",
+      "path": "src/programs/common/DB2CMT.cbl"
+    },
+    "DB2CONN": {
+      "group": "common",
+      "path": "src/programs/common/DB2CONN.cbl"
+    },
+    "DB2ERR": {
+      "group": "common",
+      "path": "src/programs/common/DB2ERR.cbl"
+    },
+    "DB2ONLN": {
+      "group": "online",
+      "path": "src/programs/online/DB2ONLN.cbl"
+    },
+    "DB2RECV": {
+      "group": "online",
+      "path": "src/programs/online/DB2RECV.cbl"
+    },
+    "DB2STAT": {
+      "group": "common",
+      "path": "src/programs/common/DB2STAT.cbl"
+    },
+    "ERRHNDL": {
+      "group": "online",
+      "path": "src/programs/online/ERRHNDL.cbl"
+    },
+    "ERRPROC": {
+      "group": "common",
+      "path": "src/programs/common/ERRPROC.cbl"
+    },
+    "HISTLD00": {
+      "group": "batch",
+      "path": "src/programs/batch/HISTLD00.cbl"
+    },
+    "INQHIST": {
+      "group": "online",
+      "path": "src/programs/online/INQHIST.cbl"
+    },
+    "INQONLN": {
+      "group": "online",
+      "path": "src/programs/online/INQONLN.cbl"
+    },
+    "INQPORT": {
+      "group": "online",
+      "path": "src/programs/online/INQPORT.cbl"
+    },
+    "PORTADD": {
+      "group": "portfolio",
+      "path": "src/programs/portfolio/PORTADD.cbl"
+    },
+    "PORTDEL": {
+      "group": "portfolio",
+      "path": "src/programs/portfolio/PORTDEL.cbl"
+    },
+    "PORTMSTR": {
+      "group": "portfolio",
+      "path": "src/programs/portfolio/PORTMSTR.cbl"
+    },
+    "PORTREAD": {
+      "group": "portfolio",
+      "path": "src/programs/portfolio/PORTREAD.cbl"
+    },
+    "PORTTEST": {
+      "group": "portfolio",
+      "path": "src/programs/portfolio/PORTTEST.cbl"
+    },
+    "PORTTRAN": {
+      "group": "portfolio",
+      "path": "src/programs/portfolio/PORTTRAN.cbl"
+    },
+    "PORTUPDT": {
+      "group": "portfolio",
+      "path": "src/programs/portfolio/PORTUPDT.cbl"
+    },
+    "PORTVALD": {
+      "group": "portfolio",
+      "path": "src/programs/portfolio/PORTVALD.cbl"
+    },
+    "POSUPDT": {
+      "group": "batch",
+      "path": "src/programs/batch/POSUPDT.cbl"
+    },
+    "PRCSEQ00": {
+      "group": "batch",
+      "path": "src/programs/batch/PRCSEQ00.cbl"
+    },
+    "RCVPRC00": {
+      "group": "batch",
+      "path": "src/programs/batch/RCVPRC00.cbl"
+    },
+    "RPTAUD00": {
+      "group": "batch",
+      "path": "src/programs/batch/RPTAUD00.cbl"
+    },
+    "RPTPOS00": {
+      "group": "batch",
+      "path": "src/programs/batch/RPTPOS00.cbl"
+    },
+    "RPTSTA00": {
+      "group": "batch",
+      "path": "src/programs/batch/RPTSTA00.cbl"
+    },
+    "RTNANA00": {
+      "group": "batch",
+      "path": "src/programs/batch/RTNANA00.cbl"
+    },
+    "RTNCDE00": {
+      "group": "batch",
+      "path": "src/programs/batch/RTNCDE00.cbl"
+    },
+    "SECMGR": {
+      "group": "online",
+      "path": "src/programs/online/SECMGR.cbl"
+    },
+    "TSTGEN00": {
+      "group": "test",
+      "path": "src/programs/test/TSTGEN00.cbl"
+    },
+    "TSTVAL00": {
+      "group": "test",
+      "path": "src/programs/test/TSTVAL00.cbl"
+    },
+    "UTLMNT00": {
+      "group": "utility",
+      "path": "src/programs/utility/UTLMNT00.cbl"
+    },
+    "UTLMON00": {
+      "group": "utility",
+      "path": "src/programs/utility/UTLMON00.cbl"
+    },
+    "UTLVAL00": {
+      "group": "utility",
+      "path": "src/programs/utility/UTLVAL00.cbl"
+    }
+  }
+}
