@@ -55,11 +55,11 @@ RE_CALL = re.compile(r"\bCALL\s+'?\"?([A-Z0-9][A-Z0-9-]{0,7})'?\"?", re.I)
 RE_COPY = re.compile(r"\bCOPY\s+([A-Z0-9][A-Z0-9-]*)", re.I)
 RE_LINK = re.compile(r"EXEC\s+CICS\s+(LINK|XCTL)\b.*?PROGRAM\s*\(\s*'?([A-Z0-9-]+)'?\s*\)", re.I | re.S)
 RE_SQL = re.compile(r"EXEC\s+SQL(.*?)END-EXEC", re.I | re.S)
-RE_TABLE = re.compile(r"\b(?:FROM|INTO|UPDATE|JOIN|TABLE)\s+([A-Z][A-Z0-9_]+)", re.I)
+RE_TABLE = re.compile(r"\b(?:FROM|INTO|UPDATE|JOIN|TABLE)\s+([A-Z][A-Z0-9_]*(?:\.[A-Z][A-Z0-9_]*)?)", re.I)
 RE_SELECT = re.compile(r"\bSELECT\s+([A-Z0-9-]+)\s+ASSIGN\s+TO\s+([A-Z0-9-]+)", re.I)
 RE_EXECPGM = re.compile(r"EXEC\s+PGM=([A-Z0-9]+)", re.I)
 
-SQL_NOISE = {"DUAL", "SYSIBM", "CURRENT", "NULL", "WS", "SQLCA", "DCLGEN"}
+SQL_NOISE = {"DUAL", "CURRENT", "NULL", "WS", "SQLCA", "DCLGEN"}
 
 edges = []
 for name, meta in programs.items():
@@ -89,6 +89,16 @@ for name, meta in programs.items():
             edges.append({"from": name, "to": tbl, "kind": "SQL", "resolved": True})
     for m in RE_SELECT.finditer(text):
         edges.append({"from": name, "to": m.group(2).upper(), "kind": "FILE", "resolved": True, "file": m.group(1).upper()})
+
+# copybooks may embed procedural code (e.g. DBPROC contains CALL 'ERRPROC'):
+# record those as edges from the copybook so the indirect dependency is visible
+for name, meta in copybooks.items():
+    with open(os.path.join(os.path.dirname(ROOT), meta["path"]), errors="replace") as fh:
+        text = strip_comments(fh.read())
+    for m in RE_CALL.finditer(text):
+        t = m.group(1).upper()
+        if t in programs:
+            edges.append({"from": name, "to": t, "kind": "CALL", "resolved": True, "via_copybook": True})
 
 jcl = {}
 for dirpath, _, files in os.walk(os.path.join(ROOT, "jcl")):

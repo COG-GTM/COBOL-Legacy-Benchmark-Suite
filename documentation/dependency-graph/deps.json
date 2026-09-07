@@ -528,6 +528,12 @@
       "to": "ERRHAND"
     },
     {
+      "from": "DB2CONN",
+      "kind": "SQL",
+      "resolved": true,
+      "to": "SYSIBM.SYSDUMMY1"
+    },
+    {
       "from": "DB2ERR",
       "kind": "CALL",
       "resolved": true,
@@ -591,7 +597,7 @@
       "from": "DB2STAT",
       "kind": "SQL",
       "resolved": true,
-      "to": "SESSION"
+      "to": "SESSION.DBSTATS"
     },
     {
       "from": "ERRPROC",
@@ -1182,6 +1188,13 @@
       "kind": "FILE",
       "resolved": true,
       "to": "ERRRPT"
+    },
+    {
+      "from": "DBPROC",
+      "kind": "CALL",
+      "resolved": true,
+      "to": "ERRPROC",
+      "via_copybook": true
     },
     {
       "from": "RTNANA",

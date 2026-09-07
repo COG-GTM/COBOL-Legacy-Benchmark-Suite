@@ -31,22 +31,27 @@ KIND_ARROW = {
 PREFIX = {"program": "P_", "copybook": "C_", "table": "T_", "file": "F_", "jcl": "J_"}
 
 
-def kind_of(name, sel):
-    if name in programs:
-        return "program"
-    if name in jcl:
+def src_kind(e):
+    if e["kind"] == "EXECPGM":
         return "jcl"
-    if name in copybooks or any(e["kind"] in ("COPY", "SQL-INCLUDE") and e["to"] == name for e in sel):
+    if e.get("via_copybook"):
         return "copybook"
-    if any(e["kind"] == "SQL" and e["to"] == name for e in sel):
+    return "program"
+
+
+def dst_kind(e):
+    k = e["kind"]
+    if k in ("COPY", "SQL-INCLUDE"):
+        return "copybook"
+    if k == "SQL":
         return "table"
-    if any(e["kind"] == "FILE" and e["to"] == name for e in sel):
+    if k == "FILE":
         return "file"
     return "program"
 
 
 def nid(name, kind):
-    return PREFIX[kind] + name.replace("-", "_")
+    return PREFIX[kind] + name.replace("-", "_").replace(".", "_")
 
 
 def node(name, kind):
@@ -66,28 +71,21 @@ def node(name, kind):
 
 def mermaid(edge_kinds, include_nodes=None, direction="LR"):
     lines = [f"flowchart {direction}"]
-    used = set()
     sel = [e for e in edges if e["kind"] in edge_kinds]
     if include_nodes is not None:
         sel = [e for e in sel if e["from"] in include_nodes or e["to"] in include_nodes]
+    used = set()
     for e in sel:
-        used.add(e["from"])
-        used.add(e["to"])
+        used.add((src_kind(e), e["from"]))
+        used.add((dst_kind(e), e["to"]))
     by_group = defaultdict(list)
-    kinds = {}
-    for n in sorted(used):
-        # a JCL job and a program may share a name (e.g. PORTADD); edge direction disambiguates
-        k = "jcl" if (n in jcl and any(e["from"] == n and e["kind"] == "EXECPGM" for e in sel) and n not in programs) else kind_of(n, sel)
-        kinds[n] = k
+    for k, n in sorted(used, key=lambda x: (x[0], x[1])):
         if k == "program" and n in programs:
             by_group[programs[n]["group"]].append(node(n, k))
         elif k == "program":
             by_group["external"].append(node(n, k))
         else:
             by_group[{"jcl": "jcl", "copybook": "copybooks", "table": "db2", "file": "files"}[k]].append(node(n, k))
-    for n in sorted(used):
-        if n in jcl and n in programs and any(e["from"] == n and e["kind"] == "EXECPGM" for e in sel):
-            by_group["jcl"].append(node(n, "jcl"))
     titles = {
         "jcl": "JCL", "copybooks": "Copybooks", "db2": "Tablas DB2",
         "files": "Ficheros (DDNAME)", "external": "Externos / no resueltos",
@@ -98,10 +96,10 @@ def mermaid(edge_kinds, include_nodes=None, direction="LR"):
             lines += [f"    {x}" for x in by_group[g]]
             lines.append("  end")
     def src(e):
-        return nid(e["from"], "jcl" if e["kind"] == "EXECPGM" else "program")
+        return nid(e["from"], src_kind(e))
 
     def dst(e):
-        return nid(e["to"], kind_of(e["to"], sel))
+        return nid(e["to"], dst_kind(e))
 
     for e in sel:
         lines.append(f"  {src(e)} {KIND_ARROW[e['kind']]}|{e['kind']}| {dst(e)}")
@@ -140,6 +138,7 @@ Inventario: **{len(programs)} programas**, **{len(copybooks)} copybooks**, **{le
 
 Leyenda de aristas: `-->|CALL|` llamada COBOL estática · `-.->|LINK|` EXEC CICS LINK/XCTL · `==>|EXECPGM|` paso JCL
 · `-.->|COPY|` copybook · `-->|SQL|` tabla DB2 · `-->|FILE|` fichero VSAM/QSAM (DDNAME).
+Una arista `CALL` cuyo origen es un copybook (p. ej. `DBPROC → ERRPROC`) indica código procedimental incluido: todo programa que copie ese copybook hereda la dependencia.
 Nodos con borde rojo discontinuo = destino no resuelto en el repositorio (rutinas del sistema como IDCAMS, ILBOABN0).
 
 La documentación funcional de cada programa está en [`documentation/programs/<grupo>/`](../programs/).
@@ -181,15 +180,14 @@ La documentación funcional de cada programa está en [`documentation/programs/<
     shape = {"program": "box", "copybook": "note", "table": "cylinder", "file": "parallelogram", "jcl": "hexagon"}
     nodes = {}
     for e in edges:
-        nodes[("jcl" if e["kind"] == "EXECPGM" else "program", e["from"])] = True
-        nodes[(kind_of(e["to"], edges), e["to"])] = True
+        nodes[(src_kind(e), e["from"])] = True
+        nodes[(dst_kind(e), e["to"])] = True
     for k, n in sorted(nodes):
         extra = ' style=dashed color=red' if k == "program" and n not in programs else ''
         dot.append(f'  "{PREFIX[k]}{n}" [label="{n}" shape={shape[k]}{extra}];')
     for e in edges:
         style = "dashed" if e["kind"] in ("COPY", "SQL-INCLUDE", "LINK", "XCTL") else "solid"
-        fk = "jcl" if e["kind"] == "EXECPGM" else "program"
-        dot.append(f'  "{PREFIX[fk]}{e["from"]}" -> "{nid(e["to"], kind_of(e["to"], edges))}" [label="{e["kind"]}" style={style}];')
+        dot.append(f'  "{nid(e["from"], src_kind(e))}" -> "{nid(e["to"], dst_kind(e))}" [label="{e["kind"]}" style={style}];')
     dot.append("}")
     open(os.path.join(HERE, "graph.dot"), "w").write("\n".join(dot) + "\n")
 

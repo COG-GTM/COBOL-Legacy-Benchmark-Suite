@@ -3,11 +3,12 @@
 Generado automáticamente por `extract_deps.py` (extracción estática) y `render_graph.py` (render).
 Regenerar: `python3 documentation/dependency-graph/extract_deps.py && python3 documentation/dependency-graph/render_graph.py`.
 
-Inventario: **38 programas**, **20 copybooks**, **15 JCL**, **190 aristas**
-(CALL: 15, COPY: 83, EXECPGM: 15, FILE: 51, LINK: 9, SQL: 8, SQL-INCLUDE: 9).
+Inventario: **38 programas**, **20 copybooks**, **15 JCL**, **192 aristas**
+(CALL: 16, COPY: 83, EXECPGM: 15, FILE: 51, LINK: 9, SQL: 9, SQL-INCLUDE: 9).
 
 Leyenda de aristas: `-->|CALL|` llamada COBOL estática · `-.->|LINK|` EXEC CICS LINK/XCTL · `==>|EXECPGM|` paso JCL
 · `-.->|COPY|` copybook · `-->|SQL|` tabla DB2 · `-->|FILE|` fichero VSAM/QSAM (DDNAME).
+Una arista `CALL` cuyo origen es un copybook (p. ej. `DBPROC → ERRPROC`) indica código procedimental incluido: todo programa que copie ese copybook hereda la dependencia.
 Nodos con borde rojo discontinuo = destino no resuelto en el repositorio (rutinas del sistema como IDCAMS, ILBOABN0).
 
 La documentación funcional de cada programa está en [`documentation/programs/<grupo>/`](../programs/).
@@ -63,7 +64,12 @@ flowchart LR
     P_UTLVAL00["UTLVAL00"]
   end
   subgraph sg_jcl["JCL"]
+    J_PORTADD{{"PORTADD"}}
     J_PORTDEF{{"PORTDEF"}}
+    J_PORTDEL{{"PORTDEL"}}
+    J_PORTREAD{{"PORTREAD"}}
+    J_PORTTEST{{"PORTTEST"}}
+    J_PORTUPDT{{"PORTUPDT"}}
     J_RPTAUD{{"RPTAUD"}}
     J_RPTPOS{{"RPTPOS"}}
     J_RPTSTA{{"RPTSTA"}}
@@ -73,11 +79,9 @@ flowchart LR
     J_UTLMNT{{"UTLMNT"}}
     J_UTLMON{{"UTLMON"}}
     J_UTLVAL{{"UTLVAL"}}
-    J_PORTADD{{"PORTADD"}}
-    J_PORTDEL{{"PORTDEL"}}
-    J_PORTREAD{{"PORTREAD"}}
-    J_PORTTEST{{"PORTTEST"}}
-    J_PORTUPDT{{"PORTUPDT"}}
+  end
+  subgraph sg_copybooks["Copybooks"]
+    C_DBPROC[["DBPROC"]]
   end
   subgraph sg_external["Externos / no resueltos"]
     P_DELAY["DELAY"]
@@ -108,6 +112,7 @@ flowchart LR
   P_PORTTRAN -->|CALL| P_AUDPROC
   P_PORTTRAN -->|CALL| P_ERRPROC
   P_UTLMON00 -->|CALL| P_ILBOABN0
+  C_DBPROC -->|CALL| P_ERRPROC
   J_RTNANA ==>|EXECPGM| P_RTNANA00
   J_PORTADD ==>|EXECPGM| P_PORTADD
   J_PORTDEF ==>|EXECPGM| P_IDCAMS
@@ -145,6 +150,7 @@ flowchart LR
   end
   subgraph sg_common["Common (subrutinas)"]
     P_AUDPROC["AUDPROC"]
+    P_DB2CONN["DB2CONN"]
     P_DB2ERR["DB2ERR"]
     P_DB2STAT["DB2STAT"]
     P_ERRPROC["ERRPROC"]
@@ -171,28 +177,28 @@ flowchart LR
     P_UTLMON00["UTLMON00"]
     P_UTLVAL00["UTLVAL00"]
   end
-  subgraph sg_copybooks["Copybooks"]
-    C_AUDITLOG[["AUDITLOG"]]
-    C_BCHCTL[["BCHCTL"]]
-    C_PRCSEQ[["PRCSEQ"]]
-  end
   subgraph sg_db2["Tablas DB2"]
+    T_AUDITLOG[("AUDITLOG")]
     T_AUTHFILE[("AUTHFILE")]
     T_ERRLOG[("ERRLOG")]
     T_POSHIST[("POSHIST")]
     T_RTNCODES[("RTNCODES")]
-    T_SESSION[("SESSION")]
+    T_SESSION_DBSTATS[("SESSION.DBSTATS")]
+    T_SYSIBM_SYSDUMMY1[("SYSIBM.SYSDUMMY1")]
   end
   subgraph sg_files["Ficheros (DDNAME)"]
     F_ACTUAL[/"ACTUAL"/]
     F_ALERTS[/"ALERTS"/]
     F_ARCHFILE[/"ARCHFILE"/]
     F_AUDFILE[/"AUDFILE"/]
+    F_AUDITLOG[/"AUDITLOG"/]
+    F_BCHCTL[/"BCHCTL"/]
     F_BCHSTATS[/"BCHSTATS"/]
     F_CKPTFILE[/"CKPTFILE"/]
     F_CTLFILE[/"CTLFILE"/]
     F_DB2STATS[/"DB2STATS"/]
     F_DELEFILE[/"DELEFILE"/]
+    F_ERRLOG[/"ERRLOG"/]
     F_ERRRPT[/"ERRRPT"/]
     F_EXPECTED[/"EXPECTED"/]
     F_INPTFILE[/"INPTFILE"/]
@@ -201,6 +207,7 @@ flowchart LR
     F_PORTFILE[/"PORTFILE"/]
     F_PORTOUT[/"PORTOUT"/]
     F_POSMSTRE[/"POSMSTRE"/]
+    F_PRCSEQ[/"PRCSEQ"/]
     F_RANDSEED[/"RANDSEED"/]
     F_RPTFILE[/"RPTFILE"/]
     F_TESTCASE[/"TESTCASE"/]
@@ -213,17 +220,17 @@ flowchart LR
     F_UPDTFILE[/"UPDTFILE"/]
     F_VALCTL[/"VALCTL"/]
   end
-  P_BCHCTL00 -->|FILE| C_BCHCTL
+  P_BCHCTL00 -->|FILE| F_BCHCTL
   P_CKPRST -->|FILE| F_CKPTFILE
   P_HISTLD00 -->|SQL| T_POSHIST
   P_HISTLD00 -->|FILE| F_TRANHIST
-  P_HISTLD00 -->|FILE| C_BCHCTL
-  P_PRCSEQ00 -->|FILE| C_PRCSEQ
-  P_PRCSEQ00 -->|FILE| C_BCHCTL
-  P_RCVPRC00 -->|FILE| C_BCHCTL
-  P_RCVPRC00 -->|FILE| C_PRCSEQ
-  P_RPTAUD00 -->|FILE| C_AUDITLOG
-  P_RPTAUD00 -->|FILE| T_ERRLOG
+  P_HISTLD00 -->|FILE| F_BCHCTL
+  P_PRCSEQ00 -->|FILE| F_PRCSEQ
+  P_PRCSEQ00 -->|FILE| F_BCHCTL
+  P_RCVPRC00 -->|FILE| F_BCHCTL
+  P_RCVPRC00 -->|FILE| F_PRCSEQ
+  P_RPTAUD00 -->|FILE| F_AUDITLOG
+  P_RPTAUD00 -->|FILE| F_ERRLOG
   P_RPTAUD00 -->|FILE| F_RPTFILE
   P_RPTPOS00 -->|FILE| F_POSMSTRE
   P_RPTPOS00 -->|FILE| F_TRANHIST
@@ -235,12 +242,13 @@ flowchart LR
   P_RTNANA00 -->|FILE| F_RPTFILE
   P_RTNCDE00 -->|SQL| T_RTNCODES
   P_AUDPROC -->|FILE| F_AUDFILE
+  P_DB2CONN -->|SQL| T_SYSIBM_SYSDUMMY1
   P_DB2ERR -->|SQL| T_ERRLOG
-  P_DB2STAT -->|SQL| T_SESSION
-  P_ERRPROC -->|FILE| T_ERRLOG
+  P_DB2STAT -->|SQL| T_SESSION_DBSTATS
+  P_ERRPROC -->|FILE| F_ERRLOG
   P_ERRHNDL -->|SQL| T_ERRLOG
   P_SECMGR -->|SQL| T_AUTHFILE
-  P_SECMGR -->|SQL| C_AUDITLOG
+  P_SECMGR -->|SQL| T_AUDITLOG
   P_PORTADD -->|FILE| F_PORTFILE
   P_PORTADD -->|FILE| F_INPTFILE
   P_PORTDEL -->|FILE| F_PORTFILE
@@ -331,7 +339,9 @@ flowchart LR
     C_AUDITLOG[["AUDITLOG"]]
     C_BCHCON[["BCHCON"]]
     C_BCHCTL[["BCHCTL"]]
+    C_CKPRST[["CKPRST"]]
     C_DB2REQ[["DB2REQ"]]
+    C_DB2STAT[["DB2STAT"]]
     C_DBPROC[["DBPROC"]]
     C_DBTBLS[["DBTBLS"]]
     C_ERRHAND[["ERRHAND"]]
@@ -352,7 +362,7 @@ flowchart LR
   P_BCHCTL00 -.->|COPY| C_BCHCTL
   P_BCHCTL00 -.->|COPY| C_BCHCON
   P_BCHCTL00 -.->|COPY| C_ERRHAND
-  P_CKPRST -.->|COPY| P_CKPRST
+  P_CKPRST -.->|COPY| C_CKPRST
   P_CKPRST -.->|COPY| C_RETHND
   P_HISTLD00 -.->|COPY| C_HISTREC
   P_HISTLD00 -.->|COPY| C_BCHCTL
@@ -376,7 +386,7 @@ flowchart LR
   P_RPTPOS00 -.->|COPY| C_TRNREC
   P_RPTPOS00 -.->|COPY| C_RTNCODE
   P_RPTPOS00 -.->|COPY| C_ERRHAND
-  P_RPTSTA00 -.->|COPY| P_DB2STAT
+  P_RPTSTA00 -.->|COPY| C_DB2STAT
   P_RPTSTA00 -.->|COPY| C_BCHCTL
   P_RPTSTA00 -.->|COPY| C_RTNCODE
   P_RPTSTA00 -.->|COPY| C_ERRHAND
@@ -434,7 +444,7 @@ flowchart LR
   P_TSTVAL00 -.->|COPY| C_ERRHAND
   P_UTLMNT00 -.->|COPY| C_RTNCODE
   P_UTLMNT00 -.->|COPY| C_ERRHAND
-  P_UTLMON00 -.->|COPY| P_DB2STAT
+  P_UTLMON00 -.->|COPY| C_DB2STAT
   P_UTLMON00 -.->|COPY| C_RTNCODE
   P_UTLMON00 -.->|COPY| C_ERRHAND
   P_UTLVAL00 -.->|COPY| C_POSREC
@@ -442,7 +452,7 @@ flowchart LR
   P_UTLVAL00 -.->|COPY| C_RTNCODE
   P_UTLVAL00 -.->|COPY| C_ERRHAND
   classDef unresolved stroke-dasharray: 5 5,stroke:#c00;
-  class C_PORTREC,C_SQLPOS,P_DB2STAT unresolved;
+  class C_DB2STAT,C_PORTREC,C_SQLPOS unresolved;
 ```
 
 ## 4. Índice de programas
@@ -465,7 +475,7 @@ flowchart LR
 | common | `DB2CONN` | [DB2CONN.cbl](../../src/programs/common/DB2CONN.cbl) | DELAY, ERRPROC | — | [DB2CONN.md](../programs/common/DB2CONN.md) |
 | common | `DB2ERR` | [DB2ERR.cbl](../../src/programs/common/DB2ERR.cbl) | ERRPROC | DB2CMT | [DB2ERR.md](../programs/common/DB2ERR.md) |
 | common | `DB2STAT` | [DB2STAT.cbl](../../src/programs/common/DB2STAT.cbl) | ERRPROC | — | [DB2STAT.md](../programs/common/DB2STAT.md) |
-| common | `ERRPROC` | [ERRPROC.cbl](../../src/programs/common/ERRPROC.cbl) | — | BCHCTL00, DB2CMT, DB2CONN, DB2ERR, DB2STAT, HISTLD00, PORTMSTR, PORTTRAN, PRCSEQ00, RCVPRC00 | [ERRPROC.md](../programs/common/ERRPROC.md) |
+| common | `ERRPROC` | [ERRPROC.cbl](../../src/programs/common/ERRPROC.cbl) | — | BCHCTL00, DB2CMT, DB2CONN, DB2ERR, DB2STAT, DBPROC, HISTLD00, PORTMSTR, PORTTRAN, PRCSEQ00, RCVPRC00 | [ERRPROC.md](../programs/common/ERRPROC.md) |
 | online | `CURSMGR` | [CURSMGR.cbl](../../src/programs/online/CURSMGR.cbl) | — | INQHIST | [CURSMGR.md](../programs/online/CURSMGR.md) |
 | online | `DB2ONLN` | [DB2ONLN.cbl](../../src/programs/online/DB2ONLN.cbl) | — | DB2RECV, INQHIST | [DB2ONLN.md](../programs/online/DB2ONLN.md) |
 | online | `DB2RECV` | [DB2RECV.cbl](../../src/programs/online/DB2RECV.cbl) | DB2ONLN, ERRHNDL | INQHIST | [DB2RECV.md](../programs/online/DB2RECV.md) |
