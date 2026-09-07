@@ -3,8 +3,8 @@
 Generado automáticamente por `extract_deps.py` (extracción estática) y `render_graph.py` (render).
 Regenerar: `python3 documentation/dependency-graph/extract_deps.py && python3 documentation/dependency-graph/render_graph.py`.
 
-Inventario: **38 programas**, **20 copybooks**, **15 JCL**, **192 aristas**
-(CALL: 16, COPY: 83, EXECPGM: 15, FILE: 51, LINK: 9, SQL: 9, SQL-INCLUDE: 9).
+Inventario: **38 programas**, **20 copybooks**, **15 JCL**, **194 aristas**
+(CALL: 16, COPY: 83, EXECPGM: 15, FILE: 52, LINK: 9, SQL: 10, SQL-INCLUDE: 9).
 
 Leyenda de aristas: `-->|CALL|` llamada COBOL estática · `-.->|LINK|` EXEC CICS LINK/XCTL · `==>|EXECPGM|` paso JCL
 · `-.->|COPY|` copybook · `-->|SQL|` tabla DB2 · `-->|FILE|` fichero VSAM/QSAM (DDNAME).
@@ -157,6 +157,8 @@ flowchart LR
   end
   subgraph sg_online["Online (CICS)"]
     P_ERRHNDL["ERRHNDL"]
+    P_INQHIST["INQHIST"]
+    P_INQPORT["INQPORT"]
     P_SECMGR["SECMGR"]
   end
   subgraph sg_portfolio["Portfolio"]
@@ -206,6 +208,7 @@ flowchart LR
     F_MONLOG[/"MONLOG"/]
     F_PORTFILE[/"PORTFILE"/]
     F_PORTOUT[/"PORTOUT"/]
+    F_POSFILE[/"POSFILE"/]
     F_POSMSTRE[/"POSMSTRE"/]
     F_PRCSEQ[/"PRCSEQ"/]
     F_RANDSEED[/"RANDSEED"/]
@@ -247,6 +250,8 @@ flowchart LR
   P_DB2STAT -->|SQL| T_SESSION_DBSTATS
   P_ERRPROC -->|FILE| F_ERRLOG
   P_ERRHNDL -->|SQL| T_ERRLOG
+  P_INQHIST -->|SQL| T_POSHIST
+  P_INQPORT -->|FILE| F_POSFILE
   P_SECMGR -->|SQL| T_AUTHFILE
   P_SECMGR -->|SQL| T_AUDITLOG
   P_PORTADD -->|FILE| F_PORTFILE

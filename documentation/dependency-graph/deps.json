@@ -709,6 +709,13 @@
       "to": "SQLCA"
     },
     {
+      "dynamic": true,
+      "from": "INQHIST",
+      "kind": "SQL",
+      "resolved": true,
+      "to": "POSHIST"
+    },
+    {
       "from": "INQONLN",
       "kind": "COPY",
       "resolved": true,
@@ -761,6 +768,13 @@
       "kind": "SQL-INCLUDE",
       "resolved": false,
       "to": "SQLPOS"
+    },
+    {
+      "cics": true,
+      "from": "INQPORT",
+      "kind": "FILE",
+      "resolved": true,
+      "to": "POSFILE"
     },
     {
       "from": "SECMGR",

@@ -41,6 +41,7 @@ digraph CLBS {
   "F_MONLOG" [label="MONLOG" shape=parallelogram];
   "F_PORTFILE" [label="PORTFILE" shape=parallelogram];
   "F_PORTOUT" [label="PORTOUT" shape=parallelogram];
+  "F_POSFILE" [label="POSFILE" shape=parallelogram];
   "F_POSMSTRE" [label="POSMSTRE" shape=parallelogram];
   "F_PRCSEQ" [label="PRCSEQ" shape=parallelogram];
   "F_RANDSEED" [label="RANDSEED" shape=parallelogram];
@@ -217,6 +218,7 @@ digraph CLBS {
   "P_INQHIST" -> "P_DB2RECV" [label="LINK" style=dashed];
   "P_INQHIST" -> "P_CURSMGR" [label="LINK" style=dashed];
   "P_INQHIST" -> "C_SQLCA" [label="SQL-INCLUDE" style=dashed];
+  "P_INQHIST" -> "T_POSHIST" [label="SQL" style=solid];
   "P_INQONLN" -> "C_INQCOM" [label="COPY" style=dashed];
   "P_INQONLN" -> "C_ERRHND" [label="COPY" style=dashed];
   "P_INQONLN" -> "P_INQPORT" [label="LINK" style=dashed];
@@ -226,6 +228,7 @@ digraph CLBS {
   "P_INQPORT" -> "C_INQCOM" [label="COPY" style=dashed];
   "P_INQPORT" -> "C_POSREC" [label="COPY" style=dashed];
   "P_INQPORT" -> "C_SQLPOS" [label="SQL-INCLUDE" style=dashed];
+  "P_INQPORT" -> "F_POSFILE" [label="FILE" style=solid];
   "P_SECMGR" -> "C_ERRHND" [label="COPY" style=dashed];
   "P_SECMGR" -> "C_SQLCA" [label="SQL-INCLUDE" style=dashed];
   "P_SECMGR" -> "T_AUTHFILE" [label="SQL" style=solid];

@@ -58,6 +58,9 @@ RE_SQL = re.compile(r"EXEC\s+SQL(.*?)END-EXEC", re.I | re.S)
 RE_TABLE = re.compile(r"\b(?:FROM|INTO|UPDATE|JOIN|TABLE)\s+([A-Z][A-Z0-9_]*(?:\.[A-Z][A-Z0-9_]*)?)", re.I)
 RE_SELECT = re.compile(r"\bSELECT\s+([A-Z0-9-]+)\s+ASSIGN\s+TO\s+([A-Z0-9-]+)", re.I)
 RE_EXECPGM = re.compile(r"EXEC\s+PGM=([A-Z0-9]+)", re.I)
+RE_CICS_FILE = re.compile(r"EXEC\s+CICS\s+(?:READ|WRITE|REWRITE|DELETE|STARTBR|READNEXT|READPREV|ENDBR|UNLOCK)\b.*?\bFILE\s*\(\s*'([A-Z0-9-]+)'\s*\)", re.I | re.S)
+# dynamic SQL built as string literals, e.g. MOVE 'SELECT ... FROM POSHIST' TO WS-SQL
+RE_DYN_SQL = re.compile(r"'\s*(?:SELECT|INSERT|UPDATE|DELETE)\b[^']*?\b(?:FROM|INTO|UPDATE|JOIN)\s+([A-Z][A-Z0-9_]*(?:\.[A-Z][A-Z0-9_]*)?)\b[^']*'", re.I)
 
 SQL_NOISE = {"DUAL", "CURRENT", "NULL", "WS", "SQLCA", "DCLGEN"}
 
@@ -89,6 +92,14 @@ for name, meta in programs.items():
             edges.append({"from": name, "to": tbl, "kind": "SQL", "resolved": True})
     for m in RE_SELECT.finditer(text):
         edges.append({"from": name, "to": m.group(2).upper(), "kind": "FILE", "resolved": True, "file": m.group(1).upper()})
+    for m in RE_CICS_FILE.finditer(text):
+        edges.append({"from": name, "to": m.group(1).upper(), "kind": "FILE", "resolved": True, "cics": True})
+    text_no_sql = re.sub(r"'\s*&\s*'", "", RE_SQL.sub("", text))  # join 'a' & 'b' literals
+    for m in RE_DYN_SQL.finditer(text_no_sql):
+        tbl = m.group(1).upper()
+        if tbl in SQL_NOISE or tbl.startswith("WS"):
+            continue
+        edges.append({"from": name, "to": tbl, "kind": "SQL", "resolved": True, "dynamic": True})
 
 # copybooks may embed procedural code (e.g. DBPROC contains CALL 'ERRPROC'):
 # record those as edges from the copybook so the indirect dependency is visible
