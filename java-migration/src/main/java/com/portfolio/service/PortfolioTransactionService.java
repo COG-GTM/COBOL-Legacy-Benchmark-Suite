@@ -47,7 +47,7 @@ public class PortfolioTransactionService {
     this.errorLoggingService = errorLoggingService;
   }
 
-  @Transactional(noRollbackFor = BusinessException.class)
+  @Transactional(noRollbackFor = {BusinessException.class, UnsupportedOperationException.class})
   @Retryable(
       retryFor = {TransientDataAccessException.class, CannotAcquireLockException.class},
       maxAttempts = 3,
