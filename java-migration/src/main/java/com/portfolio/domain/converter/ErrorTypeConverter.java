@@ -1,5 +1,15 @@
 package com.portfolio.domain.converter;
-import com.portfolio.domain.ErrorType; import jakarta.persistence.*;
-@Converter(autoApply=false) public class ErrorTypeConverter implements AttributeConverter<ErrorType,String>{
- public String convertToDatabaseColumn(ErrorType v){return v==null?null:v.getCode();} public ErrorType convertToEntityAttribute(String v){return v==null?null:ErrorType.fromCode(v.trim());}
+
+import com.portfolio.domain.ErrorType;
+import jakarta.persistence.*;
+
+@Converter(autoApply = false)
+public class ErrorTypeConverter implements AttributeConverter<ErrorType, String> {
+  public String convertToDatabaseColumn(ErrorType errorType) {
+    return errorType == null ? null : errorType.getCode();
+  }
+
+  public ErrorType convertToEntityAttribute(String databaseValue) {
+    return databaseValue == null ? null : ErrorType.fromCode(databaseValue.trim());
+  }
 }

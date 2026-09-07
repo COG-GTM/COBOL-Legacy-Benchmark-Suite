@@ -1,14 +1,127 @@
 package com.portfolio.service;
-import com.portfolio.config.ErrorLoggingService; import com.portfolio.domain.*; import com.portfolio.dto.PortfolioDto; import com.portfolio.repository.*; import org.springframework.stereotype.Service; import org.springframework.transaction.annotation.Transactional; import java.math.BigDecimal; import java.time.LocalDate; import java.util.*;
-@Service public class PortfolioService {
- public enum UpdateType { S,V,N } private final PortfolioRepository portfolios; private final InvestmentPositionRepository positions; private final AuditLogRepository audits; private final PortfolioValidationService validation;
- public PortfolioService(PortfolioRepository p,InvestmentPositionRepository i,AuditLogRepository a,PortfolioValidationService v){portfolios=p;positions=i;audits=a;validation=v;}
- @Transactional public Portfolio create(PortfolioDto dto){validation.requirePortfolioId(dto.getPortfolioId()); if(dto.getClientName()==null||dto.getClientName().isBlank())throw new BusinessException("E001","Client name is required"); if(portfolios.existsById(dto.getPortfolioId()))throw new BusinessException("E003","Portfolio ID already exists"); Portfolio p=new Portfolio();p.setPortfolioId(dto.getPortfolioId());p.setAccountNo(dto.getAccountNo());p.setClientName(dto.getClientName());p.setClientType(ClientType.fromCode(dto.getClientType()));p.setCreateDate(dto.getCreateDate()==null?LocalDate.now():dto.getCreateDate());p.setLastMaintDate(LocalDate.now());p.setStatus(dto.getStatus()==null?PortfolioStatus.ACTIVE:PortfolioStatus.fromCode(dto.getStatus()));p.setTotalValue(n(dto.getTotalValue()));p.setCashBalance(n(dto.getCashBalance()));p.setAccountType(dto.getAccountType());p.setBranchId(dto.getBranchId());p.setCurrencyCode(dto.getCurrencyCode()==null?"USD":dto.getCurrencyCode());p.setRiskLevel(dto.getRiskLevel());return portfolios.save(p);}
- private BigDecimal n(BigDecimal v){return v==null?BigDecimal.ZERO:v;}
- public Portfolio read(String id){return portfolios.findById(id).orElseThrow(()->new ResourceNotFoundException("Portfolio not found"));}
- @Transactional public void delete(String id){Portfolio p=portfolios.findById(id).orElseThrow(()->new ResourceNotFoundException("Portfolio not found for deletion"));portfolios.delete(p);audit(AuditAction.DELETE,p,"PORTDEL");}
- @Transactional public Portfolio applyUpdate(String id,UpdateType type,String value){Portfolio p=portfolios.findById(id).orElseThrow(()->new ResourceNotFoundException("Record not found"));switch(type){case S->p.setStatus(PortfolioStatus.fromCode(value));case V->p.setTotalValue(new BigDecimal(value).setScale(2));case N->p.setClientName(value);}p.setLastMaintDate(LocalDate.now());return portfolios.save(p);}
- public List<Portfolio> findAll(){return portfolios.findAll();} public Optional<Portfolio> findByAccountNo(String a){return portfolios.findByAccountNo(a);}
- public InvestmentPosition savePosition(InvestmentPosition p){return positions.save(p);} public List<InvestmentPosition> positionsForAccount(String a){return positions.findByAccountNo(a);}
- private void audit(AuditAction action,Portfolio p,String program){AuditLog a=new AuditLog();a.setAudTimestamp(java.time.LocalDateTime.now());a.setProgram(program);a.setAudType(AuditType.TRAN);a.setAction(action);a.setStatus(AuditStatus.SUCCESS);a.setPortfolioId(p.getPortfolioId());a.setAccountNo(p.getAccountNo());audits.save(a);}
+
+import com.portfolio.domain.*;
+import com.portfolio.dto.PortfolioDto;
+import com.portfolio.repository.*;
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.util.*;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+@Service
+public class PortfolioService {
+  public enum UpdateType {
+    S,
+    V,
+    N
+  }
+
+  private final PortfolioRepository portfolioRepository;
+  private final InvestmentPositionRepository positionRepository;
+  private final AuditLogRepository auditLogRepository;
+  private final PortfolioValidationService validationService;
+
+  public PortfolioService(
+      PortfolioRepository portfolioRepository,
+      InvestmentPositionRepository positionRepository,
+      AuditLogRepository auditLogRepository,
+      PortfolioValidationService validationService) {
+    this.portfolioRepository = portfolioRepository;
+    this.positionRepository = positionRepository;
+    this.auditLogRepository = auditLogRepository;
+    this.validationService = validationService;
+  }
+
+  @Transactional
+  public Portfolio create(PortfolioDto portfolioDto) {
+    validationService.requirePortfolioId(portfolioDto.getPortfolioId());
+    if (portfolioDto.getClientName() == null || portfolioDto.getClientName().isBlank())
+      throw new BusinessException("E001", "Client name is required");
+    if (portfolioRepository.existsById(portfolioDto.getPortfolioId()))
+      throw new BusinessException("E003", "Portfolio ID already exists");
+    Portfolio portfolio = new Portfolio();
+    portfolio.setPortfolioId(portfolioDto.getPortfolioId());
+    portfolio.setAccountNo(portfolioDto.getAccountNo());
+    portfolio.setClientName(portfolioDto.getClientName());
+    portfolio.setClientType(ClientType.fromCode(portfolioDto.getClientType()));
+    portfolio.setCreateDate(
+        portfolioDto.getCreateDate() == null ? LocalDate.now() : portfolioDto.getCreateDate());
+    portfolio.setLastMaintDate(LocalDate.now());
+    portfolio.setStatus(
+        portfolioDto.getStatus() == null
+            ? PortfolioStatus.ACTIVE
+            : PortfolioStatus.fromCode(portfolioDto.getStatus()));
+    portfolio.setTotalValue(zeroIfNull(portfolioDto.getTotalValue()));
+    portfolio.setCashBalance(zeroIfNull(portfolioDto.getCashBalance()));
+    portfolio.setAccountType(portfolioDto.getAccountType());
+    portfolio.setBranchId(portfolioDto.getBranchId());
+    portfolio.setCurrencyCode(
+        portfolioDto.getCurrencyCode() == null ? "USD" : portfolioDto.getCurrencyCode());
+    portfolio.setRiskLevel(portfolioDto.getRiskLevel());
+    return portfolioRepository.save(portfolio);
+  }
+
+  private BigDecimal zeroIfNull(BigDecimal amount) {
+    return amount == null ? BigDecimal.ZERO : amount;
+  }
+
+  public Portfolio read(String portfolioId) {
+    return portfolioRepository
+        .findById(portfolioId)
+        .orElseThrow(() -> new ResourceNotFoundException("Portfolio not found"));
+  }
+
+  @Transactional
+  public void delete(String portfolioId) {
+    Portfolio portfolio =
+        portfolioRepository
+            .findById(portfolioId)
+            .orElseThrow(() -> new ResourceNotFoundException("Portfolio not found for deletion"));
+    portfolioRepository.delete(portfolio);
+    writeAudit(AuditAction.DELETE, portfolio, "PORTDEL");
+  }
+
+  @Transactional
+  public Portfolio applyUpdate(String portfolioId, UpdateType updateType, String newValue) {
+    Portfolio portfolio =
+        portfolioRepository
+            .findById(portfolioId)
+            .orElseThrow(() -> new ResourceNotFoundException("Record not found"));
+    switch (updateType) {
+      case S -> portfolio.setStatus(PortfolioStatus.fromCode(newValue));
+      case V -> portfolio.setTotalValue(new BigDecimal(newValue).setScale(2));
+      case N -> portfolio.setClientName(newValue);
+    }
+    portfolio.setLastMaintDate(LocalDate.now());
+    return portfolioRepository.save(portfolio);
+  }
+
+  public List<Portfolio> findAll() {
+    return portfolioRepository.findAll();
+  }
+
+  public Optional<Portfolio> findByAccountNo(String accountNo) {
+    return portfolioRepository.findByAccountNo(accountNo);
+  }
+
+  public InvestmentPosition savePosition(InvestmentPosition position) {
+    return positionRepository.save(position);
+  }
+
+  public List<InvestmentPosition> positionsForAccount(String accountNo) {
+    return positionRepository.findByAccountNo(accountNo);
+  }
+
+  private void writeAudit(AuditAction action, Portfolio portfolio, String program) {
+    AuditLog auditLog = new AuditLog();
+    auditLog.setAudTimestamp(java.time.LocalDateTime.now());
+    auditLog.setProgram(program);
+    auditLog.setAudType(AuditType.TRAN);
+    auditLog.setAction(action);
+    auditLog.setStatus(AuditStatus.SUCCESS);
+    auditLog.setPortfolioId(portfolio.getPortfolioId());
+    auditLog.setAccountNo(portfolio.getAccountNo());
+    auditLogRepository.save(auditLog);
+  }
 }
