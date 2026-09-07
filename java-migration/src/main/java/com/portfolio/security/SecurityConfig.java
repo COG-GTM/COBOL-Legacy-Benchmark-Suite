@@ -2,9 +2,13 @@ package com.portfolio.security;
 
 import com.portfolio.domain.AppUser;
 import com.portfolio.repository.AppUserRepository;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.core.userdetails.*;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -20,7 +24,7 @@ public class SecurityConfig {
                     .permitAll()
                     .anyRequest()
                     .authenticated())
-        .formLogin(formLogin -> formLogin.permitAll())
+        .formLogin(formLogin -> formLogin.defaultSuccessUrl("/inquiry/menu", true).permitAll())
         .httpBasic(httpBasic -> {})
         .logout(logout -> logout.logoutSuccessUrl("/login?logout"))
         .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**", "/api/**"))

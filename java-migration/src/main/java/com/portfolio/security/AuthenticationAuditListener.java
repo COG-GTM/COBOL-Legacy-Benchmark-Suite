@@ -1,10 +1,14 @@
 package com.portfolio.security;
 
-import com.portfolio.domain.*;
+import com.portfolio.domain.AuditAction;
+import com.portfolio.domain.AuditLog;
+import com.portfolio.domain.AuditStatus;
+import com.portfolio.domain.AuditType;
 import com.portfolio.repository.AuditLogRepository;
 import java.time.LocalDateTime;
 import org.springframework.context.event.EventListener;
-import org.springframework.security.authentication.event.*;
+import org.springframework.security.authentication.event.AbstractAuthenticationFailureEvent;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.stereotype.Component;
 
 @Component

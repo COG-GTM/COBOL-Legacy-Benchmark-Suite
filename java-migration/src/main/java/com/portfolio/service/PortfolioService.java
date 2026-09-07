@@ -1,11 +1,22 @@
 package com.portfolio.service;
 
-import com.portfolio.domain.*;
+import com.portfolio.domain.AuditAction;
+import com.portfolio.domain.AuditLog;
+import com.portfolio.domain.AuditStatus;
+import com.portfolio.domain.AuditType;
+import com.portfolio.domain.ClientType;
+import com.portfolio.domain.InvestmentPosition;
+import com.portfolio.domain.Portfolio;
+import com.portfolio.domain.PortfolioStatus;
 import com.portfolio.dto.PortfolioDto;
-import com.portfolio.repository.*;
+import com.portfolio.repository.AuditLogRepository;
+import com.portfolio.repository.InvestmentPositionRepository;
+import com.portfolio.repository.PortfolioRepository;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +47,7 @@ public class PortfolioService {
   @Transactional
   public Portfolio create(PortfolioDto portfolioDto) {
     validationService.requirePortfolioId(portfolioDto.getPortfolioId());
+    validationService.requireAccountNo(portfolioDto.getAccountNo());
     if (portfolioDto.getClientName() == null || portfolioDto.getClientName().isBlank())
       throw new BusinessException("E001", "Client name is required");
     if (portfolioRepository.existsById(portfolioDto.getPortfolioId()))
@@ -44,14 +56,11 @@ public class PortfolioService {
     portfolio.setPortfolioId(portfolioDto.getPortfolioId());
     portfolio.setAccountNo(portfolioDto.getAccountNo());
     portfolio.setClientName(portfolioDto.getClientName());
-    portfolio.setClientType(ClientType.fromCode(portfolioDto.getClientType()));
+    portfolio.setClientType(clientTypeFromCode(portfolioDto.getClientType()));
     portfolio.setCreateDate(
         portfolioDto.getCreateDate() == null ? LocalDate.now() : portfolioDto.getCreateDate());
     portfolio.setLastMaintDate(LocalDate.now());
-    portfolio.setStatus(
-        portfolioDto.getStatus() == null
-            ? PortfolioStatus.ACTIVE
-            : PortfolioStatus.fromCode(portfolioDto.getStatus()));
+    portfolio.setStatus(statusFromCode(portfolioDto.getStatus()));
     portfolio.setTotalValue(zeroIfNull(portfolioDto.getTotalValue()));
     portfolio.setCashBalance(zeroIfNull(portfolioDto.getCashBalance()));
     portfolio.setAccountType(portfolioDto.getAccountType());
@@ -64,6 +73,25 @@ public class PortfolioService {
 
   private BigDecimal zeroIfNull(BigDecimal amount) {
     return amount == null ? BigDecimal.ZERO : amount;
+  }
+
+  private ClientType clientTypeFromCode(String code) {
+    try {
+      return ClientType.fromCode(code);
+    } catch (IllegalArgumentException exception) {
+      throw new BusinessException("E008", "Invalid Client Type");
+    }
+  }
+
+  private PortfolioStatus statusFromCode(String code) {
+    if (code == null) {
+      return PortfolioStatus.ACTIVE;
+    }
+    try {
+      return PortfolioStatus.fromCode(code);
+    } catch (IllegalArgumentException exception) {
+      throw new BusinessException("E008", "Invalid Status");
+    }
   }
 
   public Portfolio read(String portfolioId) {
@@ -89,12 +117,20 @@ public class PortfolioService {
             .findById(portfolioId)
             .orElseThrow(() -> new ResourceNotFoundException("Record not found"));
     switch (updateType) {
-      case S -> portfolio.setStatus(PortfolioStatus.fromCode(newValue));
-      case V -> portfolio.setTotalValue(new BigDecimal(newValue).setScale(2));
+      case S -> portfolio.setStatus(statusFromCode(newValue));
+      case V -> portfolio.setTotalValue(parseAmount(newValue));
       case N -> portfolio.setClientName(newValue);
     }
     portfolio.setLastMaintDate(LocalDate.now());
     return portfolioRepository.save(portfolio);
+  }
+
+  private BigDecimal parseAmount(String newValue) {
+    try {
+      return new BigDecimal(newValue).setScale(2, RoundingMode.HALF_UP);
+    } catch (NumberFormatException exception) {
+      throw new BusinessException("E008", "Invalid amount");
+    }
   }
 
   public List<Portfolio> findAll() {
@@ -111,6 +147,10 @@ public class PortfolioService {
 
   public List<InvestmentPosition> positionsForAccount(String accountNo) {
     return positionRepository.findByAccountNo(accountNo);
+  }
+
+  public List<InvestmentPosition> positionsForPortfolio(String portfolioId) {
+    return positionRepository.findByIdPortfolioIdOrderByIdInvestmentId(portfolioId);
   }
 
   private void writeAudit(AuditAction action, Portfolio portfolio, String program) {

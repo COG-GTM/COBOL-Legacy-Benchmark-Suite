@@ -30,6 +30,9 @@ spring:
     cache: false
 server:
   port: 8080
+portfolio:
+  reports:
+    dir: target/reports
 management:
   endpoints:
     web:

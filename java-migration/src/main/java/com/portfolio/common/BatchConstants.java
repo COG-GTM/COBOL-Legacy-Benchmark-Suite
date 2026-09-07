@@ -11,7 +11,9 @@ public final class BatchConstants {
   public static final int MAX_PREREQ = 10,
       MAX_RESTARTS = 3,
       WAIT_INTERVAL = 300,
-      MAX_WAIT_TIME = 3600;
+      MAX_WAIT_TIME = 3600,
+      MAX_DEP_RC = 4,
+      HISTLD_COMMIT_THRESHOLD = 1000;
   public static final String DEP_REQUIRED = "R",
       DEP_OPTIONAL = "O",
       DEP_EXCLUSIVE = "X",

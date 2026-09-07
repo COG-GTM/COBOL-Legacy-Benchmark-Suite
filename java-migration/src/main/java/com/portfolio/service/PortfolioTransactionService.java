@@ -1,14 +1,29 @@
 package com.portfolio.service;
 
 import com.portfolio.config.ErrorLoggingService;
-import com.portfolio.domain.*;
+import com.portfolio.domain.AuditAction;
+import com.portfolio.domain.AuditLog;
+import com.portfolio.domain.AuditStatus;
+import com.portfolio.domain.AuditType;
+import com.portfolio.domain.ErrorSeverity;
+import com.portfolio.domain.ErrorType;
+import com.portfolio.domain.Portfolio;
+import com.portfolio.domain.Transaction;
+import com.portfolio.domain.TransactionStatus;
+import com.portfolio.domain.TransactionType;
 import com.portfolio.dto.TransactionDto;
-import com.portfolio.repository.*;
+import com.portfolio.repository.AuditLogRepository;
+import com.portfolio.repository.PortfolioRepository;
+import com.portfolio.repository.TransactionRepository;
 import java.math.BigDecimal;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import org.springframework.dao.*;
-import org.springframework.retry.annotation.*;
+import org.springframework.dao.CannotAcquireLockException;
+import org.springframework.dao.TransientDataAccessException;
+import org.springframework.retry.annotation.Backoff;
+import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,7 +47,7 @@ public class PortfolioTransactionService {
     this.errorLoggingService = errorLoggingService;
   }
 
-  @Transactional
+  @Transactional(noRollbackFor = BusinessException.class)
   @Retryable(
       retryFor = {TransientDataAccessException.class, CannotAcquireLockException.class},
       maxAttempts = 3,
@@ -42,8 +57,6 @@ public class PortfolioTransactionService {
     String beforeImage = "";
     try {
       validatePortfolio(transaction);
-      validateTransactionType(transaction);
-      validateAmounts(transaction);
       portfolio =
           portfolioRepository
               .findById(transaction.getPortfolioId())
@@ -51,6 +64,8 @@ public class PortfolioTransactionService {
                   () ->
                       new BusinessException(
                           "E008", "Invalid Portfolio ID: " + transaction.getPortfolioId()));
+      validateTransactionType(transaction);
+      validateAmounts(transaction);
       beforeImage = state(portfolio);
       updatePositions(portfolio, transaction);
       portfolio.setLastTransDate(

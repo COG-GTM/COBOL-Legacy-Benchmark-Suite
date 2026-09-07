@@ -1,8 +1,16 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head><title>Error</title></head>
+<head>
+  <meta charset="UTF-8">
+  <title>Error</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
 <body>
-<h1 th:text="${errorCode}">Error</h1>
-<p th:text="${errorDetails}">An error occurred</p>
+<main class="screen">
+  <header>ERRMAP — SYSTEM ERROR</header>
+  <h1>Error code: <span th:text="${errorCode}">E007</span></h1>
+  <p th:text="${errorDetails}">An error occurred</p>
+  <a href="/inquiry/menu">Back to menu</a>
+</main>
 </body>
 </html>

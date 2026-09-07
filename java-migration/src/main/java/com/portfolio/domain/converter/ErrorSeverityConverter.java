@@ -1,7 +1,8 @@
 package com.portfolio.domain.converter;
 
 import com.portfolio.domain.ErrorSeverity;
-import jakarta.persistence.*;
+import jakarta.persistence.AttributeConverter;
+import jakarta.persistence.Converter;
 
 @Converter(autoApply = false)
 public class ErrorSeverityConverter implements AttributeConverter<ErrorSeverity, Integer> {

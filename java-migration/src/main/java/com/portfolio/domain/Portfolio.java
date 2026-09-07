@@ -1,7 +1,12 @@
 package com.portfolio.domain;
 
-import com.portfolio.domain.converter.*;
-import jakarta.persistence.*;
+import com.portfolio.domain.converter.ClientTypeConverter;
+import com.portfolio.domain.converter.PortfolioStatusConverter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 

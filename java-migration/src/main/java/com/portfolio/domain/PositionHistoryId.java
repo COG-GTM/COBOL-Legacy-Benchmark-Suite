@@ -1,8 +1,10 @@
 package com.portfolio.domain;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import java.io.Serializable;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.Objects;
 
 @Embeddable

@@ -1,7 +1,8 @@
 package com.portfolio.repository;
 
-import com.portfolio.domain.*;
-import java.util.*;
+import com.portfolio.domain.PositionHistory;
+import com.portfolio.domain.PositionHistoryId;
+import java.util.List;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 

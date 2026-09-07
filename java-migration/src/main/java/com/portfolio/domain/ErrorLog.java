@@ -1,8 +1,17 @@
 package com.portfolio.domain;
 
-import com.portfolio.domain.converter.*;
-import jakarta.persistence.*;
-import java.time.*;
+import com.portfolio.domain.converter.ErrorSeverityConverter;
+import com.portfolio.domain.converter.ErrorTypeConverter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "ERRLOG")

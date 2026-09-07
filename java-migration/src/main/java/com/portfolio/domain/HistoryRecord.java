@@ -1,7 +1,13 @@
 package com.portfolio.domain;
 
-import com.portfolio.domain.converter.*;
-import jakarta.persistence.*;
+import com.portfolio.domain.converter.HistoryActionConverter;
+import com.portfolio.domain.converter.HistoryRecordTypeConverter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.EmbeddedId;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Lob;
+import jakarta.persistence.Table;
 import java.time.LocalDateTime;
 
 @Entity

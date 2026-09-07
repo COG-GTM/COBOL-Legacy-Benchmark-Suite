@@ -1,9 +1,16 @@
 package com.portfolio.domain;
 
-import com.portfolio.domain.converter.*;
-import jakarta.persistence.*;
+import com.portfolio.domain.converter.TransactionStatusConverter;
+import com.portfolio.domain.converter.TransactionTypeConverter;
+import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import java.math.BigDecimal;
-import java.time.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "TRANSACTION_HISTORY")
