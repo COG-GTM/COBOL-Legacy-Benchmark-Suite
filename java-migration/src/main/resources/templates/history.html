@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Transaction History</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<main class="screen">
+  <header>HISMAP — TRANSACTION HISTORY INQUIRY</header>
+  <p>Account: <strong th:text="${accountNo}">1000000001</strong></p>
+  <table>
+    <thead><tr><th>Date</th><th>Type</th><th>Units</th><th>Price</th><th>Amount</th></tr></thead>
+    <tbody>
+      <tr th:each="entry : ${history}">
+        <td th:text="${entry.id.transDate}">2024-01-01</td>
+        <td th:text="${entry.transType}">BU</td>
+        <td th:text="${#numbers.formatDecimal(entry.quantity, 1, 'COMMA', 4, 'POINT')}">10.0000</td>
+        <td th:text="${#numbers.formatDecimal(entry.price, 1, 'COMMA', 2, 'POINT')}">125.50</td>
+        <td th:text="${#numbers.formatDecimal(entry.amount, 1, 'COMMA', 2, 'POINT')}">1,255.00</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="message" th:if="${message}" th:text="${message}">No history found for account</p>
+  <a href="/inquiry/menu">F3=Return</a>
+</main>
+</body>
+</html>
