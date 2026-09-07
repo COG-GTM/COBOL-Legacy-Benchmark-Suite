@@ -1,0 +1,2816 @@
+{
+  "cics": {
+    "files": [
+      "POSFILE"
+    ],
+    "mapsets": [
+      "INQSET"
+    ],
+    "path": "src/cics/PORTDFN.csd",
+    "programs": [
+      "INQONLN",
+      "INQPORT",
+      "INQHIST",
+      "DB2ONLN",
+      "CURSMGR",
+      "DB2RECV",
+      "SECMGR"
+    ],
+    "transactions": [
+      {
+        "program": "INQONLN",
+        "transaction": "PINQ"
+      }
+    ]
+  },
+  "copybooks": [
+    {
+      "category": "batch",
+      "copybook": "BCHCON",
+      "has_procedure_code": false,
+      "includes": [],
+      "level01": [
+        "BATCH-CONTROL-CONSTANTS"
+      ],
+      "lines": 65,
+      "path": "src/copybook/batch/BCHCON.cpy",
+      "used_by": [
+        "BCHCTL00",
+        "HISTLD00",
+        "PRCSEQ00",
+        "RCVPRC00"
+      ]
+    },
+    {
+      "category": "batch",
+      "copybook": "BCHCTL",
+      "has_procedure_code": false,
+      "includes": [],
+      "level01": [
+        "BATCH-CONTROL-RECORD"
+      ],
+      "lines": 49,
+      "path": "src/copybook/batch/BCHCTL.cpy",
+      "used_by": [
+        "BCHCTL00",
+        "HISTLD00",
+        "PRCSEQ00",
+        "RCVPRC00",
+        "RPTSTA00"
+      ]
+    },
+    {
+      "category": "batch",
+      "copybook": "CKPRST",
+      "has_procedure_code": false,
+      "includes": [],
+      "level01": [
+        "CHECKPOINT-CONTROL",
+        "CHECKPOINT-RECORD"
+      ],
+      "lines": 76,
+      "path": "src/copybook/batch/CKPRST.cpy",
+      "used_by": [
+        "CKPRST"
+      ]
+    },
+    {
+      "category": "batch",
+      "copybook": "PRCSEQ",
+      "has_procedure_code": false,
+      "includes": [],
+      "level01": [
+        "PROCESS-SEQUENCE-RECORD",
+        "STANDARD-SEQUENCES"
+      ],
+      "lines": 75,
+      "path": "src/copybook/batch/PRCSEQ.cpy",
+      "used_by": [
+        "PRCSEQ00",
+        "RCVPRC00"
+      ]
+    },
+    {
+      "category": "common",
+      "copybook": "AUDITLOG",
+      "has_procedure_code": false,
+      "includes": [],
+      "level01": [
+        "AUDIT-RECORD"
+      ],
+      "lines": 36,
+      "path": "src/copybook/common/AUDITLOG.cpy",
+      "used_by": [
+        "AUDPROC",
+        "PORTTRAN",
+        "RPTAUD00"
+      ]
+    },
+    {
+      "category": "common",
+      "copybook": "COMMON",
+      "has_procedure_code": false,
+      "includes": [],
+      "level01": [
+        "AUDIT-FIELDS",
+        "COMMON-DATETIME",
+        "CURRENCY-CODES",
+        "ERROR-HANDLING",
+        "RETURN-CODES",
+        "STATUS-CODES",
+        "TRANSACTION-TYPES"
+      ],
+      "lines": 64,
+      "path": "src/copybook/common/COMMON.cpy",
+      "used_by": []
+    },
+    {
+      "category": "common",
+      "copybook": "ERRHAND",
+      "has_procedure_code": false,
+      "includes": [],
+      "level01": [
+        "ERR-CATEGORIES",
+        "ERR-MESSAGE",
+        "ERR-RETURN-CODES",
+        "ERR-VSAM-MSGS",
+        "ERR-VSAM-STATUSES"
+      ],
+      "lines": 56,
+      "path": "src/copybook/common/ERRHAND.cpy",
+      "used_by": [
+        "BCHCTL00",
+        "DB2CMT",
+        "DB2CONN",
+        "DB2ERR",
+        "DB2STAT",
+        "ERRPROC",
+        "HISTLD00",
+        "PORTTEST",
+        "PORTTRAN",
+        "PRCSEQ00",
+        "RCVPRC00",
+        "RPTAUD00",
+        "RPTPOS00",
+        "RPTSTA00",
+        "TSTGEN00",
+        "TSTVAL00",
+        "UTLMNT00",
+        "UTLMON00",
+        "UTLVAL00"
+      ]
+    },
+    {
+      "category": "common",
+      "copybook": "HISTREC",
+      "has_procedure_code": false,
+      "includes": [],
+      "level01": [
+        "HISTORY-RECORD"
+      ],
+      "lines": 39,
+      "path": "src/copybook/common/HISTREC.cpy",
+      "used_by": [
+        "HISTLD00"
+      ]
+    },
+    {
+      "category": "common",
+      "copybook": "PORTFLIO",
+      "has_procedure_code": false,
+      "includes": [],
+      "level01": [
+        "PORT-RECORD"
+      ],
+      "lines": 34,
+      "path": "src/copybook/common/PORTFLIO.cpy",
+      "used_by": [
+        "PORTADD",
+        "PORTDEL",
+        "PORTREAD",
+        "PORTTEST",
+        "PORTUPDT",
+        "TSTGEN00"
+      ]
+    },
+    {
+      "category": "common",
+      "copybook": "PORTVAL",
+      "has_procedure_code": false,
+      "includes": [],
+      "level01": [
+        "VAL-CONSTANTS",
+        "VAL-ERROR-MESSAGES",
+        "VAL-RETURN-CODES",
+        "VAL-WORK-AREAS"
+      ],
+      "lines": 46,
+      "path": "src/copybook/common/PORTVAL.cpy",
+      "used_by": [
+        "PORTVALD"
+      ]
+    },
+    {
+      "category": "common",
+      "copybook": "POSREC",
+      "has_procedure_code": false,
+      "includes": [],
+      "level01": [
+        "POSITION-RECORD"
+      ],
+      "lines": 33,
+      "path": "src/copybook/common/POSREC.cpy",
+      "used_by": [
+        "INQPORT",
+        "RPTPOS00",
+        "UTLVAL00"
+      ]
+    },
+    {
+      "category": "common",
+      "copybook": "RETHND",
+      "has_procedure_code": false,
+      "includes": [],
+      "level01": [
+        "RETURN-HANDLING",
+        "STD-ERROR-CODES"
+      ],
+      "lines": 66,
+      "path": "src/copybook/common/RETHND.cpy",
+      "used_by": [
+        "CKPRST"
+      ]
+    },
+    {
+      "category": "common",
+      "copybook": "RTNCODE",
+      "has_procedure_code": false,
+      "includes": [],
+      "level01": [
+        "RETURN-CODE-AREA"
+      ],
+      "lines": 32,
+      "path": "src/copybook/common/RTNCODE.cpy",
+      "used_by": [
+        "RPTAUD00",
+        "RPTPOS00",
+        "RPTSTA00",
+        "RTNCDE00",
+        "TSTGEN00",
+        "TSTVAL00",
+        "UTLMNT00",
+        "UTLMON00",
+        "UTLVAL00"
+      ]
+    },
+    {
+      "category": "common",
+      "copybook": "TRNREC",
+      "has_procedure_code": false,
+      "includes": [],
+      "level01": [
+        "TRANSACTION-RECORD"
+      ],
+      "lines": 40,
+      "path": "src/copybook/common/TRNREC.cpy",
+      "used_by": [
+        "PORTTRAN",
+        "RPTPOS00",
+        "TSTGEN00",
+        "UTLVAL00"
+      ]
+    },
+    {
+      "category": "db2",
+      "copybook": "DBPROC",
+      "has_procedure_code": true,
+      "includes": [],
+      "level01": [
+        "DB2-ERROR-HANDLING"
+      ],
+      "lines": 63,
+      "path": "src/copybook/db2/DBPROC.cpy",
+      "used_by": [
+        "DB2CMT",
+        "DB2CONN",
+        "DB2ERR",
+        "DB2STAT",
+        "HISTLD00"
+      ]
+    },
+    {
+      "category": "db2",
+      "copybook": "DBTBLS",
+      "has_procedure_code": false,
+      "includes": [],
+      "level01": [
+        "ERRLOG-RECORD",
+        "POSHIST-RECORD"
+      ],
+      "lines": 50,
+      "path": "src/copybook/db2/DBTBLS.cpy",
+      "used_by": [
+        "DB2ERR",
+        "HISTLD00"
+      ]
+    },
+    {
+      "category": "db2",
+      "copybook": "SQLCA",
+      "has_procedure_code": true,
+      "includes": [],
+      "level01": [
+        "SQL-STATUS-CODES"
+      ],
+      "lines": 15,
+      "path": "src/copybook/db2/SQLCA.cpy",
+      "used_by": [
+        "DB2CMT",
+        "DB2CONN",
+        "DB2ERR",
+        "DB2STAT",
+        "HISTLD00"
+      ]
+    },
+    {
+      "category": "online",
+      "copybook": "DB2REQ",
+      "has_procedure_code": false,
+      "includes": [],
+      "level01": [
+        "DB2-REQUEST-AREA"
+      ],
+      "lines": 13,
+      "path": "src/copybook/online/DB2REQ.cpy",
+      "used_by": [
+        "DB2RECV"
+      ]
+    },
+    {
+      "category": "online",
+      "copybook": "ERRHND",
+      "has_procedure_code": false,
+      "includes": [],
+      "level01": [
+        "ERROR-HANDLING"
+      ],
+      "lines": 21,
+      "path": "src/copybook/online/ERRHND.cpy",
+      "used_by": [
+        "DB2ONLN",
+        "DB2RECV",
+        "ERRHNDL",
+        "INQONLN",
+        "SECMGR"
+      ]
+    },
+    {
+      "category": "online",
+      "copybook": "INQCOM",
+      "has_procedure_code": false,
+      "includes": [],
+      "level01": [
+        "INQCOM-AREA"
+      ],
+      "lines": 12,
+      "path": "src/copybook/online/INQCOM.cpy",
+      "used_by": [
+        "INQHIST",
+        "INQONLN",
+        "INQPORT"
+      ]
+    }
+  ],
+  "db2_tables": [
+    {
+      "path": "src/database/db2/ERRLOG.sql",
+      "table": "ERRLOG"
+    },
+    {
+      "path": "src/database/db2/POSHIST.sql",
+      "table": "POSHIST"
+    },
+    {
+      "path": "src/database/db2/RTNCODES.sql",
+      "table": "RTNCODES"
+    },
+    {
+      "path": "src/database/db2/db2-definitions.sql",
+      "table": "PORTFOLIO_MASTER"
+    },
+    {
+      "path": "src/database/db2/db2-definitions.sql",
+      "table": "INVESTMENT_POSITIONS"
+    },
+    {
+      "path": "src/database/db2/db2-definitions.sql",
+      "table": "TRANSACTION_HISTORY"
+    }
+  ],
+  "generated_by": "tools/depgraph/build_dependency_graph.py",
+  "jcl": [
+    {
+      "category": "jcl",
+      "datasets": [
+        {
+          "ddname": "RPTFILE",
+          "dsn": null
+        }
+      ],
+      "jcl": "RTNANA",
+      "path": "src/jcl/RTNANA.jcl",
+      "steps": [
+        {
+          "program": "RTNANA00",
+          "step": "RTNANA"
+        }
+      ]
+    },
+    {
+      "category": "batch",
+      "datasets": [
+        {
+          "ddname": "AUDITLOG",
+          "dsn": "PROD.AUDIT.LOG"
+        },
+        {
+          "ddname": "ERRLOG",
+          "dsn": "PROD.ERROR.LOG"
+        },
+        {
+          "ddname": "RPTFILE",
+          "dsn": "PROD.AUDIT.REPORT"
+        }
+      ],
+      "jcl": "RPTAUD",
+      "path": "src/jcl/batch/RPTAUD.jcl",
+      "steps": [
+        {
+          "program": "RPTAUD00",
+          "step": "STEP01"
+        }
+      ]
+    },
+    {
+      "category": "batch",
+      "datasets": [
+        {
+          "ddname": "POSMSTRE",
+          "dsn": "PROD.POSITION.MASTER"
+        },
+        {
+          "ddname": "TRANHIST",
+          "dsn": "PROD.TRANSACTION.HISTORY"
+        },
+        {
+          "ddname": "RPTFILE",
+          "dsn": "PROD.DAILY.POSITION.REPORT"
+        }
+      ],
+      "jcl": "RPTPOS",
+      "path": "src/jcl/batch/RPTPOS.jcl",
+      "steps": [
+        {
+          "program": "RPTPOS00",
+          "step": "STEP01"
+        }
+      ]
+    },
+    {
+      "category": "batch",
+      "datasets": [
+        {
+          "ddname": "DB2STATS",
+          "dsn": "PROD.DB2.STATISTICS"
+        },
+        {
+          "ddname": "BCHSTATS",
+          "dsn": "PROD.BATCH.STATISTICS"
+        },
+        {
+          "ddname": "RPTFILE",
+          "dsn": "PROD.SYSTEM.STATS.REPORT"
+        }
+      ],
+      "jcl": "RPTSTA",
+      "path": "src/jcl/batch/RPTSTA.jcl",
+      "steps": [
+        {
+          "program": "RPTSTA00",
+          "step": "STEP01"
+        }
+      ]
+    },
+    {
+      "category": "portfolio",
+      "datasets": [
+        {
+          "ddname": "PORTFILE",
+          "dsn": "PORTFOLIO.MASTER.FILE"
+        },
+        {
+          "ddname": "INPTFILE",
+          "dsn": "PORTFOLIO.INPUT.FILE"
+        }
+      ],
+      "jcl": "PORTADD",
+      "path": "src/jcl/portfolio/PORTADD.jcl",
+      "steps": [
+        {
+          "program": "PORTADD",
+          "step": "STEP1"
+        }
+      ]
+    },
+    {
+      "category": "portfolio",
+      "datasets": [],
+      "jcl": "PORTDEF",
+      "path": "src/jcl/portfolio/PORTDEF.jcl",
+      "steps": [
+        {
+          "program": "IDCAMS",
+          "step": "DEFVSAM"
+        }
+      ]
+    },
+    {
+      "category": "portfolio",
+      "datasets": [
+        {
+          "ddname": "PORTFILE",
+          "dsn": "PORTFOLIO.MASTER.FILE"
+        },
+        {
+          "ddname": "DELEFILE",
+          "dsn": "PORTFOLIO.DELETE.FILE"
+        },
+        {
+          "ddname": "AUDFILE",
+          "dsn": "PORTFOLIO.AUDIT.FILE"
+        }
+      ],
+      "jcl": "PORTDEL",
+      "path": "src/jcl/portfolio/PORTDEL.jcl",
+      "steps": [
+        {
+          "program": "PORTDEL",
+          "step": "STEP1"
+        }
+      ]
+    },
+    {
+      "category": "portfolio",
+      "datasets": [
+        {
+          "ddname": "PORTFILE",
+          "dsn": "PORTFOLIO.MASTER.FILE"
+        }
+      ],
+      "jcl": "PORTREAD",
+      "path": "src/jcl/portfolio/PORTREAD.jcl",
+      "steps": [
+        {
+          "program": "PORTREAD",
+          "step": "STEP1"
+        }
+      ]
+    },
+    {
+      "category": "portfolio",
+      "datasets": [
+        {
+          "ddname": "TESTFILE",
+          "dsn": "PORTFOLIO.TEST.FILE"
+        }
+      ],
+      "jcl": "PORTTEST",
+      "path": "src/jcl/portfolio/PORTTEST.jcl",
+      "steps": [
+        {
+          "program": "PORTTEST",
+          "step": "STEP1"
+        }
+      ]
+    },
+    {
+      "category": "portfolio",
+      "datasets": [
+        {
+          "ddname": "PORTFILE",
+          "dsn": "PORTFOLIO.MASTER.FILE"
+        },
+        {
+          "ddname": "UPDTFILE",
+          "dsn": "PORTFOLIO.UPDATE.FILE"
+        }
+      ],
+      "jcl": "PORTUPDT",
+      "path": "src/jcl/portfolio/PORTUPDT.jcl",
+      "steps": [
+        {
+          "program": "PORTUPDT",
+          "step": "STEP1"
+        }
+      ]
+    },
+    {
+      "category": "test",
+      "datasets": [
+        {
+          "ddname": "TSTCFG",
+          "dsn": "TEST.CONFIG.FILE"
+        },
+        {
+          "ddname": "PORTOUT",
+          "dsn": "TEST.PORTFOLIO.DATA"
+        },
+        {
+          "ddname": "TRANOUT",
+          "dsn": "TEST.TRANSACTION.DATA"
+        },
+        {
+          "ddname": "RANDSEED",
+          "dsn": "TEST.RANDOM.SEED"
+        }
+      ],
+      "jcl": "TSTGEN",
+      "path": "src/jcl/test/TSTGEN.jcl",
+      "steps": [
+        {
+          "program": "TSTGEN00",
+          "step": "STEP01"
+        }
+      ]
+    },
+    {
+      "category": "test",
+      "datasets": [
+        {
+          "ddname": "TESTCASE",
+          "dsn": "TEST.CASE.FILE"
+        },
+        {
+          "ddname": "EXPECTED",
+          "dsn": "TEST.EXPECTED.RESULTS"
+        },
+        {
+          "ddname": "ACTUAL",
+          "dsn": "TEST.ACTUAL.RESULTS"
+        },
+        {
+          "ddname": "TESTRPT",
+          "dsn": "TEST.VALIDATION.REPORT"
+        }
+      ],
+      "jcl": "TSTVAL",
+      "path": "src/jcl/test/TSTVAL.jcl",
+      "steps": [
+        {
+          "program": "TSTVAL00",
+          "step": "STEP01"
+        }
+      ]
+    },
+    {
+      "category": "utility",
+      "datasets": [
+        {
+          "ddname": "CTLFILE",
+          "dsn": "PROD.CONTROL.FILE"
+        },
+        {
+          "ddname": "ARCHFILE",
+          "dsn": "PROD.ARCHIVE.FILE"
+        },
+        {
+          "ddname": "RPTFILE",
+          "dsn": "PROD.MAINTENANCE.REPORT"
+        }
+      ],
+      "jcl": "UTLMNT",
+      "path": "src/jcl/utility/UTLMNT.jcl",
+      "steps": [
+        {
+          "program": "UTLMNT00",
+          "step": "STEP01"
+        }
+      ]
+    },
+    {
+      "category": "utility",
+      "datasets": [
+        {
+          "ddname": "MONCFG",
+          "dsn": "PROD.MONITOR.CONFIG"
+        },
+        {
+          "ddname": "MONLOG",
+          "dsn": "PROD.MONITOR.LOG"
+        },
+        {
+          "ddname": "ALERTS",
+          "dsn": "PROD.MONITOR.ALERTS"
+        },
+        {
+          "ddname": "DB2STATS",
+          "dsn": "PROD.DB2.STATISTICS"
+        }
+      ],
+      "jcl": "UTLMON",
+      "path": "src/jcl/utility/UTLMON.jcl",
+      "steps": [
+        {
+          "program": "UTLMON00",
+          "step": "STEP01"
+        }
+      ]
+    },
+    {
+      "category": "utility",
+      "datasets": [
+        {
+          "ddname": "VALCTL",
+          "dsn": "PROD.VALIDATION.CONTROL"
+        },
+        {
+          "ddname": "POSMSTRE",
+          "dsn": "PROD.POSITION.MASTER"
+        },
+        {
+          "ddname": "TRANHIST",
+          "dsn": "PROD.TRANSACTION.HISTORY"
+        },
+        {
+          "ddname": "ERRRPT",
+          "dsn": "PROD.VALIDATION.REPORT"
+        }
+      ],
+      "jcl": "UTLVAL",
+      "path": "src/jcl/utility/UTLVAL.jcl",
+      "steps": [
+        {
+          "program": "UTLVAL00",
+          "step": "STEP01"
+        }
+      ]
+    }
+  ],
+  "programs": [
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [],
+      "calls": [
+        "ERRPROC"
+      ],
+      "category": "batch",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "BCHCON",
+        "BCHCTL",
+        "ERRHAND"
+      ],
+      "db2_tables": [],
+      "description": "Program Name: BCHCTL00 Description: Batch Control Processor Version: 1.0",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "BCHCTL",
+          "file": "BATCH-CONTROL-FILE",
+          "organization": "INDEXED"
+        }
+      ],
+      "kind": "batch",
+      "lines": 127,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-PROCESS-INITIALIZE",
+        "2000-CHECK-PREREQUISITES",
+        "3000-UPDATE-STATUS",
+        "4000-PROCESS-TERMINATE",
+        "9000-ERROR-ROUTINE"
+      ],
+      "path": "src/programs/batch/BCHCTL00.cbl",
+      "program": "BCHCTL00",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [],
+      "calls": [],
+      "category": "batch",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "CKPRST",
+        "RETHND"
+      ],
+      "db2_tables": [],
+      "description": "",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "CKPTFILE",
+          "file": "CHECKPOINT-FILE",
+          "organization": "INDEXED"
+        }
+      ],
+      "kind": "batch",
+      "lines": 57,
+      "paragraphs": [
+        "PROC-INIT",
+        "PROC-TAKE-CHECKPOINT",
+        "PROC-COMMIT-CHECKPOINT",
+        "PROC-RESTART"
+      ],
+      "path": "src/programs/batch/CKPRST.cbl",
+      "program": "CKPRST",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [],
+      "calls": [
+        "ERRPROC"
+      ],
+      "category": "batch",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "BCHCON",
+        "BCHCTL",
+        "DBPROC",
+        "DBTBLS",
+        "ERRHAND",
+        "HISTREC",
+        "SQLCA"
+      ],
+      "db2_tables": [
+        {
+          "access": "WRITE",
+          "table": "POSHIST"
+        }
+      ],
+      "description": "Program Name: HISTLD00 Description: Position History DB2 Load Program Version: 1.0",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "TRANHIST",
+          "file": "TRANSACTION-HISTORY",
+          "organization": "INDEXED"
+        },
+        {
+          "ddname": "BCHCTL",
+          "file": "BATCH-CONTROL-FILE",
+          "organization": "INDEXED"
+        }
+      ],
+      "kind": "db2",
+      "lines": 233,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "2000-PROCESS",
+        "3000-TERMINATE",
+        "1100-OPEN-FILES",
+        "1200-CONNECT-DB2",
+        "1300-INIT-CHECKPOINTS",
+        "2100-READ-HISTORY",
+        "2200-LOAD-TO-DB2",
+        "2300-CHECK-COMMIT",
+        "2310-UPDATE-CHECKPOINT",
+        "3100-FINAL-COMMIT",
+        "3200-CLOSE-FILES",
+        "3300-DISCONNECT-DB2",
+        "3400-DISPLAY-STATS",
+        "9000-ERROR-ROUTINE"
+      ],
+      "path": "src/programs/batch/HISTLD00.cbl",
+      "program": "HISTLD00",
+      "sql_statements": [
+        "BEGIN",
+        "COMMIT",
+        "END",
+        "INSERT",
+        "ROLLBACK"
+      ],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": false
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [],
+      "calls": [],
+      "category": "batch",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [],
+      "db2_tables": [],
+      "description": "",
+      "dynamic_calls": [],
+      "empty": true,
+      "files": [],
+      "kind": "batch",
+      "lines": 1,
+      "paragraphs": [],
+      "path": "src/programs/batch/POSUPDT.cbl",
+      "program": "POSUPDT",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": false
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [],
+      "calls": [
+        "ERRPROC"
+      ],
+      "category": "batch",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "BCHCON",
+        "BCHCTL",
+        "ERRHAND",
+        "PRCSEQ"
+      ],
+      "db2_tables": [],
+      "description": "Program Name: PRCSEQ00 Description: Process Sequence Manager Version: 1.0",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "PRCSEQ",
+          "file": "PROCESS-SEQ-FILE",
+          "organization": "INDEXED"
+        },
+        {
+          "ddname": "BCHCTL",
+          "file": "BATCH-CONTROL-FILE",
+          "organization": "INDEXED"
+        }
+      ],
+      "kind": "batch",
+      "lines": 345,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-INITIALIZE-SEQUENCE",
+        "2000-GET-NEXT-PROCESS",
+        "3000-CHECK-STATUS",
+        "4000-TERMINATE-SEQUENCE",
+        "9000-ERROR-ROUTINE",
+        "1100-OPEN-FILES",
+        "1200-BUILD-SEQUENCE",
+        "1210-ADD-TO-SEQUENCE",
+        "1300-CREATE-CONTROL-RECORDS",
+        "2100-FIND-NEXT-READY",
+        "2200-CHECK-DEPENDENCIES",
+        "2210-CHECK-DEP-STATUS",
+        "2300-UPDATE-PROCESS-STATUS",
+        "3100-READ-CONTROL-STATUS",
+        "3200-UPDATE-SEQUENCE-TABLE",
+        "3300-CHECK-COMPLETION",
+        "4100-CHECK-FINAL-STATUS",
+        "4200-CLOSE-FILES"
+      ],
+      "path": "src/programs/batch/PRCSEQ00.cbl",
+      "program": "PRCSEQ00",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [],
+      "calls": [
+        "ERRPROC"
+      ],
+      "category": "batch",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "BCHCON",
+        "BCHCTL",
+        "ERRHAND",
+        "PRCSEQ"
+      ],
+      "db2_tables": [],
+      "description": "Program Name: RCVPRC00 Description: Process Recovery Handler Version: 1.0",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "BCHCTL",
+          "file": "BATCH-CONTROL-FILE",
+          "organization": "INDEXED"
+        },
+        {
+          "ddname": "PRCSEQ",
+          "file": "PROCESS-SEQ-FILE",
+          "organization": "INDEXED"
+        }
+      ],
+      "kind": "batch",
+      "lines": 302,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-INITIALIZE-RECOVERY",
+        "2000-PROCESS-RECOVERY",
+        "3000-TERMINATE-RECOVERY",
+        "9000-ERROR-ROUTINE",
+        "1100-OPEN-FILES",
+        "1200-VALIDATE-REQUEST",
+        "1300-SET-RECOVERY-MODE",
+        "2100-RECOVER-PROCESS",
+        "2110-DETERMINE-ACTION",
+        "2120-EXECUTE-RECOVERY",
+        "2121-RESTART-PROCESS",
+        "2122-BYPASS-PROCESS",
+        "2123-TERMINATE-PROCESS",
+        "2200-RECOVER-SEQUENCE",
+        "2300-RECOVER-ALL",
+        "3100-UPDATE-FINAL-STATUS",
+        "3200-CLOSE-FILES"
+      ],
+      "path": "src/programs/batch/RCVPRC00.cbl",
+      "program": "RCVPRC00",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "JCL:RPTAUD"
+      ],
+      "calls": [],
+      "category": "batch",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "AUDITLOG",
+        "ERRHAND",
+        "RTNCODE"
+      ],
+      "db2_tables": [],
+      "description": "Audit Report Generator Generates comprehensive audit report including: Security audit trails",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "AUDITLOG",
+          "file": "AUDIT-FILE",
+          "organization": "INDEXED"
+        },
+        {
+          "ddname": "ERRLOG",
+          "file": "ERROR-FILE",
+          "organization": "INDEXED"
+        },
+        {
+          "ddname": "RPTFILE",
+          "file": "REPORT-FILE",
+          "organization": "SEQUENTIAL"
+        }
+      ],
+      "kind": "batch",
+      "lines": 147,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "1100-OPEN-FILES",
+        "1200-WRITE-HEADERS",
+        "2000-PROCESS-REPORT",
+        "2100-PROCESS-AUDIT-TRAIL",
+        "2200-PROCESS-ERROR-LOG",
+        "2300-WRITE-SUMMARY",
+        "3000-CLEANUP",
+        "9999-ERROR-HANDLER"
+      ],
+      "path": "src/programs/batch/RPTAUD00.cbl",
+      "program": "RPTAUD00",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": false
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "JCL:RPTPOS"
+      ],
+      "calls": [],
+      "category": "batch",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "ERRHAND",
+        "POSREC",
+        "RTNCODE",
+        "TRNREC"
+      ],
+      "db2_tables": [],
+      "description": "Daily Position Report Generator This program generates the daily position report including: Portfolio position summary",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "POSMSTRE",
+          "file": "POSITION-MASTER",
+          "organization": "INDEXED"
+        },
+        {
+          "ddname": "TRANHIST",
+          "file": "TRANSACTION-HISTORY",
+          "organization": "INDEXED"
+        },
+        {
+          "ddname": "RPTFILE",
+          "file": "REPORT-FILE",
+          "organization": "SEQUENTIAL"
+        }
+      ],
+      "kind": "batch",
+      "lines": 160,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "1100-OPEN-FILES",
+        "1200-WRITE-HEADERS",
+        "2000-PROCESS-REPORT",
+        "2100-READ-POSITIONS",
+        "2110-FORMAT-POSITION",
+        "2200-PROCESS-TRANSACTIONS",
+        "2300-WRITE-SUMMARY",
+        "3000-CLEANUP",
+        "9999-ERROR-HANDLER"
+      ],
+      "path": "src/programs/batch/RPTPOS00.cbl",
+      "program": "RPTPOS00",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": false
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "JCL:RPTSTA"
+      ],
+      "calls": [],
+      "category": "batch",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "BCHCTL",
+        "DB2STAT",
+        "ERRHAND",
+        "RTNCODE"
+      ],
+      "db2_tables": [],
+      "description": "System Statistics Report Generator Generates system performance and statistics report including: Processing statistics",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "DB2STATS",
+          "file": "DB2-STATS",
+          "organization": "INDEXED"
+        },
+        {
+          "ddname": "BCHSTATS",
+          "file": "BATCH-STATS",
+          "organization": "INDEXED"
+        },
+        {
+          "ddname": "RPTFILE",
+          "file": "REPORT-FILE",
+          "organization": "SEQUENTIAL"
+        }
+      ],
+      "kind": "batch",
+      "lines": 185,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "1100-OPEN-FILES",
+        "1200-WRITE-HEADERS",
+        "1300-INIT-ACCUMULATORS",
+        "2000-PROCESS-REPORT",
+        "2100-PROCESS-DB2-STATS",
+        "2200-PROCESS-BATCH-STATS",
+        "2300-CALCULATE-METRICS",
+        "2400-WRITE-REPORT",
+        "3000-CLEANUP",
+        "9999-ERROR-HANDLER"
+      ],
+      "path": "src/programs/batch/RPTSTA00.cbl",
+      "program": "RPTSTA00",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [
+        "DB2STAT"
+      ],
+      "unresolved_tables": [],
+      "uses_linkage": false
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "JCL:RTNANA"
+      ],
+      "calls": [],
+      "category": "batch",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [],
+      "db2_tables": [
+        {
+          "access": "READ",
+          "table": "RTNCODES"
+        }
+      ],
+      "description": "Return Code Analysis Utility Analyzes return codes across system Generates trend analysis",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "RPTFILE",
+          "file": "REPORT-FILE",
+          "organization": "SEQUENTIAL"
+        }
+      ],
+      "kind": "db2",
+      "lines": 210,
+      "paragraphs": [
+        "P100-INIT-PROGRAM",
+        "P100-EXIT",
+        "P200-PROCESS-ANALYSIS",
+        "P200-EXIT",
+        "P210-WRITE-HEADERS",
+        "P210-EXIT",
+        "P220-PROCESS-DETAIL",
+        "P220-EXIT",
+        "P300-GENERATE-REPORT",
+        "P300-EXIT",
+        "P900-CLOSE-FILES",
+        "P900-EXIT"
+      ],
+      "path": "src/programs/batch/RTNANA00.cbl",
+      "program": "RTNANA00",
+      "sql_statements": [
+        "CLOSE",
+        "DECLARE",
+        "FETCH",
+        "INCLUDE",
+        "OPEN"
+      ],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": false
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [],
+      "calls": [],
+      "category": "batch",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "RTNCODE"
+      ],
+      "db2_tables": [
+        {
+          "access": "READ/WRITE",
+          "table": "RTNCODES"
+        }
+      ],
+      "description": "Standard Return Code Handler Manages standardized return codes across system Provides return code analysis and reporting",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [],
+      "kind": "db2",
+      "lines": 141,
+      "paragraphs": [
+        "P100-INIT-RETURN-CODES",
+        "P100-EXIT",
+        "P200-SET-RETURN-CODE",
+        "P200-EXIT",
+        "P300-GET-RETURN-CODE",
+        "P300-EXIT",
+        "P400-LOG-RETURN-CODE",
+        "P400-EXIT",
+        "P500-ANALYZE-CODES",
+        "P500-EXIT"
+      ],
+      "path": "src/programs/batch/RTNCDE00.cbl",
+      "program": "RTNCDE00",
+      "sql_statements": [
+        "INCLUDE",
+        "INSERT",
+        "SELECT"
+      ],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "PORTMSTR",
+        "PORTTRAN"
+      ],
+      "calls": [],
+      "category": "common",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "AUDITLOG"
+      ],
+      "db2_tables": [],
+      "description": "Program Name: AUDPROC Description: Audit Trail Processing Subroutine Author: [Author name]",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "AUDFILE",
+          "file": "AUDIT-FILE",
+          "organization": "SEQUENTIAL"
+        }
+      ],
+      "kind": "batch",
+      "lines": 96,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "2000-PROCESS-AUDIT",
+        "3000-TERMINATE"
+      ],
+      "path": "src/programs/common/AUDPROC.cbl",
+      "program": "AUDPROC",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [],
+      "calls": [
+        "DB2ERR",
+        "ERRPROC"
+      ],
+      "category": "common",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "DBPROC",
+        "ERRHAND",
+        "SQLCA"
+      ],
+      "db2_tables": [],
+      "description": "Program Name: DB2CMT Description: DB2 Commit Controller Version: 1.0",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [],
+      "kind": "db2",
+      "lines": 170,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "2000-COMMIT",
+        "2100-ISSUE-COMMIT",
+        "3000-ROLLBACK",
+        "4000-SAVEPOINT",
+        "5000-RESTORE",
+        "6000-STATISTICS",
+        "9000-ERROR-ROUTINE",
+        "9100-LOG-ERROR"
+      ],
+      "path": "src/programs/common/DB2CMT.cbl",
+      "program": "DB2CMT",
+      "sql_statements": [
+        "BEGIN",
+        "COMMIT",
+        "END",
+        "ROLLBACK",
+        "SAVEPOINT"
+      ],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [],
+      "calls": [
+        "ERRPROC"
+      ],
+      "category": "common",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "DBPROC",
+        "ERRHAND",
+        "SQLCA"
+      ],
+      "db2_tables": [],
+      "description": "Program Name: DB2CONN Description: DB2 Connection Manager Version: 1.0",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [],
+      "kind": "db2",
+      "lines": 154,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-CONNECT",
+        "1100-HANDLE-CONN-ERROR",
+        "2000-DISCONNECT",
+        "3000-CHECK-STATUS",
+        "9000-ERROR-ROUTINE"
+      ],
+      "path": "src/programs/common/DB2CONN.cbl",
+      "program": "DB2CONN",
+      "sql_statements": [
+        "BEGIN",
+        "COMMIT",
+        "CONNECT",
+        "END",
+        "SELECT"
+      ],
+      "system_calls": [
+        "DELAY"
+      ],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "DB2CMT"
+      ],
+      "calls": [
+        "ERRPROC"
+      ],
+      "category": "common",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "DBPROC",
+        "DBTBLS",
+        "ERRHAND",
+        "SQLCA"
+      ],
+      "db2_tables": [
+        {
+          "access": "READ/WRITE",
+          "table": "ERRLOG"
+        }
+      ],
+      "description": "Program Name: DB2ERR Description: DB2 SQL Error Handler Version: 1.0",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [],
+      "kind": "db2",
+      "lines": 200,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-LOG-ERROR",
+        "1100-SET-SEVERITY",
+        "1200-INSERT-ERROR",
+        "2000-DIAGNOSE-ERROR",
+        "3000-RETRIEVE-ERROR",
+        "9000-ERROR-ROUTINE"
+      ],
+      "path": "src/programs/common/DB2ERR.cbl",
+      "program": "DB2ERR",
+      "sql_statements": [
+        "BEGIN",
+        "END",
+        "INSERT",
+        "SELECT"
+      ],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [],
+      "calls": [
+        "ERRPROC"
+      ],
+      "category": "common",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "DBPROC",
+        "ERRHAND",
+        "SQLCA"
+      ],
+      "db2_tables": [],
+      "description": "Program Name: DB2STAT Description: DB2 Statistics Collector Version: 1.0",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [],
+      "kind": "db2",
+      "lines": 228,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "1100-CREATE-STATS-TABLE",
+        "1200-INSERT-INITIAL",
+        "2000-UPDATE-STATS",
+        "3000-TERMINATE",
+        "3100-CALC-TIMES",
+        "4000-DISPLAY-STATS",
+        "9000-ERROR-ROUTINE"
+      ],
+      "path": "src/programs/common/DB2STAT.cbl",
+      "program": "DB2STAT",
+      "sql_statements": [
+        "BEGIN",
+        "DECLARE",
+        "END",
+        "INSERT",
+        "SELECT",
+        "UPDATE"
+      ],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "BCHCTL00",
+        "DB2CMT",
+        "DB2CONN",
+        "DB2ERR",
+        "DB2STAT",
+        "HISTLD00",
+        "PORTMSTR",
+        "PORTTRAN",
+        "PRCSEQ00",
+        "RCVPRC00"
+      ],
+      "calls": [],
+      "category": "common",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "ERRHAND"
+      ],
+      "db2_tables": [],
+      "description": "Program Name: ERRPROC Description: Standard Error Processing Subroutine Author: [Author name]",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "ERRLOG",
+          "file": "ERROR-LOG",
+          "organization": "SEQUENTIAL"
+        }
+      ],
+      "kind": "batch",
+      "lines": 107,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "2000-PROCESS-ERROR",
+        "2100-WRITE-LOG",
+        "2200-DISPLAY-ERROR",
+        "3000-TERMINATE"
+      ],
+      "path": "src/programs/common/ERRPROC.cbl",
+      "program": "ERRPROC",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "INQHIST"
+      ],
+      "calls": [],
+      "category": "online",
+      "cics_commands": [
+        "RETURN"
+      ],
+      "cics_links": [],
+      "copybooks": [],
+      "db2_tables": [],
+      "description": "Cursor Management for Online Programs Manages cursor declarations and lifecycle Implements cursor optimization techniques",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [],
+      "kind": "cics",
+      "lines": 91,
+      "paragraphs": [
+        "P100-DECLARE-CURSOR",
+        "P100-EXIT",
+        "P200-OPEN-CURSOR"
+      ],
+      "path": "src/programs/online/CURSMGR.cbl",
+      "program": "CURSMGR",
+      "sql_statements": [
+        "DECLARE",
+        "INCLUDE",
+        "OPEN"
+      ],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "DB2RECV",
+        "INQHIST"
+      ],
+      "calls": [],
+      "category": "online",
+      "cics_commands": [
+        "RETURN"
+      ],
+      "cics_links": [],
+      "copybooks": [
+        "ERRHND"
+      ],
+      "db2_tables": [],
+      "description": "Online DB2 Connection Manager Manages DB2 connection pool Optimizes connection reuse",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [],
+      "kind": "cics",
+      "lines": 120,
+      "paragraphs": [
+        "P100-PROCESS-CONNECT",
+        "P100-EXIT",
+        "P110-ESTABLISH-CONNECTION",
+        "P110-EXIT",
+        "P120-GENERATE-TOKEN",
+        "P120-EXIT",
+        "P200-PROCESS-DISCONNECT",
+        "P200-EXIT",
+        "P300-CHECK-STATUS",
+        "P300-EXIT"
+      ],
+      "path": "src/programs/online/DB2ONLN.cbl",
+      "program": "DB2ONLN",
+      "sql_statements": [
+        "CONNECT",
+        "DISCONNECT",
+        "INCLUDE",
+        "SELECT"
+      ],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "INQHIST"
+      ],
+      "calls": [],
+      "category": "online",
+      "cics_commands": [
+        "DELAY",
+        "LINK",
+        "RETURN"
+      ],
+      "cics_links": [
+        "DB2ONLN",
+        "ERRHNDL"
+      ],
+      "copybooks": [
+        "DB2REQ",
+        "ERRHND"
+      ],
+      "db2_tables": [],
+      "description": "DB2 Recovery Manager for Online Programs Handles DB2 connection failures Implements retry logic",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [],
+      "kind": "cics",
+      "lines": 145,
+      "paragraphs": [
+        "P100-RECOVER-CONNECTION",
+        "P100-EXIT",
+        "P110-ATTEMPT-RECONNECT",
+        "P110-EXIT",
+        "P120-WAIT-INTERVAL",
+        "P120-EXIT",
+        "P200-RECOVER-TRANSACTION",
+        "P200-EXIT",
+        "P300-RECOVER-CURSOR",
+        "P300-EXIT"
+      ],
+      "path": "src/programs/online/DB2RECV.cbl",
+      "program": "DB2RECV",
+      "sql_statements": [
+        "INCLUDE",
+        "ROLLBACK"
+      ],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "DB2RECV",
+        "INQONLN"
+      ],
+      "calls": [],
+      "category": "online",
+      "cics_commands": [
+        "RETURN"
+      ],
+      "cics_links": [],
+      "copybooks": [
+        "ERRHND"
+      ],
+      "db2_tables": [
+        {
+          "access": "WRITE",
+          "table": "ERRLOG"
+        }
+      ],
+      "description": "",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [],
+      "kind": "cics",
+      "lines": 118,
+      "paragraphs": [],
+      "path": "src/programs/online/ERRHNDL.cbl",
+      "program": "ERRHNDL",
+      "sql_statements": [
+        "BEGIN",
+        "END",
+        "INCLUDE",
+        "INSERT"
+      ],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [
+        "HISMAP"
+      ],
+      "bms_mapsets": [
+        "INQSET"
+      ],
+      "called_by": [
+        "INQONLN"
+      ],
+      "calls": [],
+      "category": "online",
+      "cics_commands": [
+        "HANDLE CONDITION",
+        "LINK",
+        "RETURN",
+        "SEND MAP"
+      ],
+      "cics_links": [
+        "CURSMGR",
+        "DB2ONLN",
+        "DB2RECV"
+      ],
+      "copybooks": [
+        "INQCOM"
+      ],
+      "db2_tables": [],
+      "description": "Transaction History Inquiry Handler Retrieves transaction history from DB2 Formats history data for display",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [],
+      "kind": "cics",
+      "lines": 193,
+      "paragraphs": [
+        "P100-INIT-PROGRAM",
+        "P100-EXIT",
+        "P150-DB2-CONNECT",
+        "P150-EXIT",
+        "P200-GET-HISTORY",
+        "P200-EXIT",
+        "P250-FETCH-HISTORY",
+        "P250-EXIT",
+        "P300-FORMAT-DISPLAY",
+        "P300-EXIT",
+        "P999-ERROR-ROUTINE",
+        "P999-EXIT"
+      ],
+      "path": "src/programs/online/INQHIST.cbl",
+      "program": "INQHIST",
+      "sql_statements": [
+        "INCLUDE"
+      ],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [
+        "INQMAP",
+        "INQMNU"
+      ],
+      "bms_mapsets": [
+        "INQSET"
+      ],
+      "called_by": [
+        "CICS:PINQ"
+      ],
+      "calls": [],
+      "category": "online",
+      "cics_commands": [
+        "ABEND",
+        "ASSIGN",
+        "HANDLE CONDITION",
+        "LINK",
+        "RECEIVE MAP",
+        "RETURN",
+        "SEND MAP"
+      ],
+      "cics_links": [
+        "ERRHNDL",
+        "INQHIST",
+        "INQPORT",
+        "SECMGR"
+      ],
+      "copybooks": [
+        "ERRHND",
+        "INQCOM"
+      ],
+      "db2_tables": [],
+      "description": "Portfolio Online Inquiry Main Handler Handles CICS portfolio inquiry transactions Manages screen interactions",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [],
+      "kind": "cics",
+      "lines": 171,
+      "paragraphs": [
+        "P100-PROCESS-REQUEST",
+        "P100-EXIT",
+        "P200-DISPLAY-MENU",
+        "P200-EXIT",
+        "P300-PORTFOLIO-INQUIRY",
+        "P300-EXIT",
+        "P400-HISTORY-INQUIRY",
+        "P400-EXIT",
+        "P900-ERROR-ROUTINE",
+        "P900-EXIT",
+        "P050-SECURITY-CHECK",
+        "P050-EXIT"
+      ],
+      "path": "src/programs/online/INQONLN.cbl",
+      "program": "INQONLN",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [
+        "POSMAP"
+      ],
+      "bms_mapsets": [
+        "INQSET"
+      ],
+      "called_by": [
+        "INQONLN"
+      ],
+      "calls": [],
+      "category": "online",
+      "cics_commands": [
+        "HANDLE CONDITION",
+        "READ",
+        "RETURN",
+        "SEND MAP"
+      ],
+      "cics_links": [],
+      "copybooks": [
+        "INQCOM",
+        "POSREC"
+      ],
+      "db2_tables": [],
+      "description": "Portfolio Position Inquiry Handler Retrieves current portfolio positions Formats position data for display",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [],
+      "kind": "cics",
+      "lines": 110,
+      "paragraphs": [
+        "P100-INIT-PROGRAM",
+        "P100-EXIT",
+        "P200-GET-POSITION",
+        "P200-EXIT",
+        "P300-FORMAT-DISPLAY",
+        "P300-EXIT",
+        "P900-NOT-FOUND",
+        "P900-EXIT",
+        "P999-ERROR-ROUTINE",
+        "P999-EXIT"
+      ],
+      "path": "src/programs/online/INQPORT.cbl",
+      "program": "INQPORT",
+      "sql_statements": [
+        "INCLUDE"
+      ],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "INQONLN"
+      ],
+      "calls": [],
+      "category": "online",
+      "cics_commands": [
+        "ASSIGN",
+        "RETURN"
+      ],
+      "cics_links": [],
+      "copybooks": [
+        "ERRHND"
+      ],
+      "db2_tables": [
+        {
+          "access": "WRITE",
+          "table": "AUDITLOG"
+        },
+        {
+          "access": "READ",
+          "table": "AUTHFILE"
+        }
+      ],
+      "description": "Security Manager for Online Programs Validates CICS user credentials Manages DB2 authorization",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [],
+      "kind": "cics",
+      "lines": 135,
+      "paragraphs": [
+        "P100-VALIDATE-USER",
+        "P100-EXIT",
+        "P200-CHECK-AUTH",
+        "P200-EXIT",
+        "P300-LOG-ACCESS",
+        "P300-EXIT"
+      ],
+      "path": "src/programs/online/SECMGR.cbl",
+      "program": "SECMGR",
+      "sql_statements": [
+        "INCLUDE",
+        "INSERT",
+        "SELECT"
+      ],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [
+        "AUDITLOG",
+        "AUTHFILE"
+      ],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "JCL:PORTADD"
+      ],
+      "calls": [],
+      "category": "portfolio",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "PORTFLIO"
+      ],
+      "db2_tables": [],
+      "description": "Program Name: PORTADD Description: Portfolio Addition Program Creates new portfolio records from input file",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "PORTFILE",
+          "file": "PORTFOLIO-FILE",
+          "organization": "INDEXED"
+        },
+        {
+          "ddname": "INPTFILE",
+          "file": "INPUT-FILE",
+          "organization": "SEQUENTIAL"
+        }
+      ],
+      "kind": "batch",
+      "lines": 148,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "2000-PROCESS",
+        "2100-VALIDATE-AND-ADD",
+        "3000-TERMINATE"
+      ],
+      "path": "src/programs/portfolio/PORTADD.cbl",
+      "program": "PORTADD",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": false
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "JCL:PORTDEL"
+      ],
+      "calls": [],
+      "category": "portfolio",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "PORTFLIO"
+      ],
+      "db2_tables": [],
+      "description": "Program Name: PORTDEL Description: Portfolio Deletion Program Processes portfolio deletion requests",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "PORTFILE",
+          "file": "PORTFOLIO-FILE",
+          "organization": "INDEXED"
+        },
+        {
+          "ddname": "DELEFILE",
+          "file": "DELETE-FILE",
+          "organization": "SEQUENTIAL"
+        },
+        {
+          "ddname": "AUDFILE",
+          "file": "AUDIT-FILE",
+          "organization": "SEQUENTIAL"
+        }
+      ],
+      "kind": "batch",
+      "lines": 194,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "2000-PROCESS",
+        "2100-PROCESS-DELETE",
+        "2200-DELETE-RECORD",
+        "2300-WRITE-AUDIT",
+        "3000-TERMINATE"
+      ],
+      "path": "src/programs/portfolio/PORTDEL.cbl",
+      "program": "PORTDEL",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": false
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [],
+      "calls": [
+        "AUDPROC",
+        "ERRPROC"
+      ],
+      "category": "portfolio",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [],
+      "db2_tables": [],
+      "description": "Program Name: PORTMSTR Description: Portfolio Master File Maintenance Program Handles CRUD operations for Portfolio records",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "PORTFILE",
+          "file": "PORTFOLIO-FILE",
+          "organization": "INDEXED"
+        }
+      ],
+      "kind": "batch",
+      "lines": 288,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "2000-CREATE-PORTFOLIO",
+        "2100-VALIDATE-PORTFOLIO",
+        "3000-READ-PORTFOLIO",
+        "4000-UPDATE-PORTFOLIO",
+        "5000-DELETE-PORTFOLIO",
+        "6000-TERMINATE",
+        "9000-ERROR",
+        "2100-HANDLE-VSAM-ERROR",
+        "2100-LOG-PORTFOLIO-UPDATE"
+      ],
+      "path": "src/programs/portfolio/PORTMSTR.cbl",
+      "program": "PORTMSTR",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "JCL:PORTREAD"
+      ],
+      "calls": [],
+      "category": "portfolio",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "PORTFLIO"
+      ],
+      "db2_tables": [],
+      "description": "Program Name: PORTREAD Description: Portfolio Record Reading Program Demonstrates reading capabilities of Portfolio file",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "PORTFILE",
+          "file": "PORTFOLIO-FILE",
+          "organization": "INDEXED"
+        }
+      ],
+      "kind": "batch",
+      "lines": 111,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "2000-PROCESS",
+        "2100-DISPLAY-RECORD",
+        "3000-TERMINATE"
+      ],
+      "path": "src/programs/portfolio/PORTREAD.cbl",
+      "program": "PORTREAD",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": false
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "JCL:PORTTEST"
+      ],
+      "calls": [],
+      "category": "portfolio",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "ERRHAND",
+        "PORTFLIO"
+      ],
+      "db2_tables": [],
+      "description": "Program Name: PORTTEST Description: Portfolio Test Data Generator Author: [Author name]",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "TESTFILE",
+          "file": "TEST-FILE",
+          "organization": "SEQUENTIAL"
+        }
+      ],
+      "kind": "batch",
+      "lines": 119,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "2000-GENERATE-RECORDS",
+        "2100-GENERATE-KEY",
+        "2200-GENERATE-CLIENT-INFO",
+        "2300-GENERATE-PORTFOLIO-INFO",
+        "2400-GENERATE-FINANCIAL-INFO",
+        "3000-TERMINATE"
+      ],
+      "path": "src/programs/portfolio/PORTTEST.cbl",
+      "program": "PORTTEST",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": false
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [],
+      "calls": [
+        "AUDPROC",
+        "ERRPROC"
+      ],
+      "category": "portfolio",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "AUDITLOG",
+        "ERRHAND",
+        "PORTREC",
+        "TRNREC"
+      ],
+      "db2_tables": [],
+      "description": "Program Name: PORTTRAN Description: Portfolio Transaction Processing Author: [Author name]",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "TRANFILE",
+          "file": "TRANSACTION-FILE",
+          "organization": "SEQUENTIAL"
+        },
+        {
+          "ddname": "PORTFILE",
+          "file": "PORTFOLIO-FILE",
+          "organization": "INDEXED"
+        }
+      ],
+      "kind": "batch",
+      "lines": 317,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "2000-PROCESS-TRANSACTIONS",
+        "2100-VALIDATE-TRANSACTION",
+        "2110-CHECK-PORTFOLIO",
+        "2120-CHECK-TRANSACTION-TYPE",
+        "2130-CHECK-AMOUNTS",
+        "2200-UPDATE-POSITIONS",
+        "2210-PROCESS-BUY",
+        "2220-PROCESS-SELL",
+        "2230-PROCESS-TRANSFER",
+        "2240-PROCESS-FEE",
+        "2300-UPDATE-AUDIT-TRAIL",
+        "2310-WRITE-AUDIT-RECORD",
+        "3000-TERMINATE",
+        "9000-ERROR-ROUTINE"
+      ],
+      "path": "src/programs/portfolio/PORTTRAN.cbl",
+      "program": "PORTTRAN",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [
+        "PORTREC"
+      ],
+      "unresolved_tables": [],
+      "uses_linkage": false
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "JCL:PORTUPDT"
+      ],
+      "calls": [],
+      "category": "portfolio",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "PORTFLIO"
+      ],
+      "db2_tables": [],
+      "description": "Program Name: PORTUPDT Description: Portfolio Update Program Updates existing portfolio records",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "PORTFILE",
+          "file": "PORTFOLIO-FILE",
+          "organization": "INDEXED"
+        },
+        {
+          "ddname": "UPDTFILE",
+          "file": "UPDATE-FILE",
+          "organization": "SEQUENTIAL"
+        }
+      ],
+      "kind": "batch",
+      "lines": 160,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "2000-PROCESS",
+        "2100-PROCESS-UPDATE",
+        "2200-APPLY-UPDATE",
+        "3000-TERMINATE"
+      ],
+      "path": "src/programs/portfolio/PORTUPDT.cbl",
+      "program": "PORTUPDT",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": false
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [],
+      "calls": [],
+      "category": "portfolio",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "PORTVAL"
+      ],
+      "db2_tables": [],
+      "description": "Program Name: PORTVALD Description: Portfolio Validation Subroutine Validates portfolio data elements",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [],
+      "kind": "batch",
+      "lines": 120,
+      "paragraphs": [
+        "0000-MAIN",
+        "1000-VALIDATE-ID",
+        "2000-VALIDATE-ACCOUNT",
+        "3000-VALIDATE-TYPE",
+        "4000-VALIDATE-AMOUNT"
+      ],
+      "path": "src/programs/portfolio/PORTVALD.cbl",
+      "program": "PORTVALD",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": true
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "JCL:TSTGEN"
+      ],
+      "calls": [],
+      "category": "test",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "ERRHAND",
+        "PORTFLIO",
+        "RTNCODE",
+        "TRNREC"
+      ],
+      "db2_tables": [],
+      "description": "Test Data Generator Generates test data for system testing: Portfolio test data",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "TSTCFG",
+          "file": "TEST-CONFIG",
+          "organization": "SEQUENTIAL"
+        },
+        {
+          "ddname": "PORTOUT",
+          "file": "PORTFOLIO-OUT",
+          "organization": "SEQUENTIAL"
+        },
+        {
+          "ddname": "TRANOUT",
+          "file": "TRANSACTION-OUT",
+          "organization": "SEQUENTIAL"
+        },
+        {
+          "ddname": "RANDSEED",
+          "file": "RANDOM-SEED",
+          "organization": "SEQUENTIAL"
+        }
+      ],
+      "kind": "batch",
+      "lines": 216,
+      "paragraphs": [
+        "SPECIAL-NAMES",
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "1100-OPEN-FILES",
+        "1200-INIT-RANDOM",
+        "1300-INIT-COUNTERS",
+        "2000-PROCESS",
+        "2100-GENERATE-TEST-DATA",
+        "2200-GEN-PORTFOLIO",
+        "2300-GEN-TRANSACTION",
+        "2400-GEN-ERROR-DATA",
+        "2500-GEN-VOLUME-DATA",
+        "3000-CLEANUP",
+        "9999-ERROR-HANDLER"
+      ],
+      "path": "src/programs/test/TSTGEN00.cbl",
+      "program": "TSTGEN00",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": false
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "JCL:TSTVAL"
+      ],
+      "calls": [],
+      "category": "test",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "ERRHAND",
+        "RTNCODE"
+      ],
+      "db2_tables": [],
+      "description": "Test Validation Suite Validates test results and system behavior: Test case execution",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "TESTCASE",
+          "file": "TEST-CASES",
+          "organization": "SEQUENTIAL"
+        },
+        {
+          "ddname": "EXPECTED",
+          "file": "EXPECTED-RESULTS",
+          "organization": "SEQUENTIAL"
+        },
+        {
+          "ddname": "ACTUAL",
+          "file": "ACTUAL-RESULTS",
+          "organization": "SEQUENTIAL"
+        },
+        {
+          "ddname": "TESTRPT",
+          "file": "TEST-REPORT",
+          "organization": "SEQUENTIAL"
+        }
+      ],
+      "kind": "batch",
+      "lines": 225,
+      "paragraphs": [
+        "SPECIAL-NAMES",
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "1100-OPEN-FILES",
+        "1200-WRITE-HEADERS",
+        "1300-INIT-METRICS",
+        "2000-PROCESS",
+        "2100-EXECUTE-TEST",
+        "2900-WRITE-SUMMARY",
+        "3000-CLEANUP",
+        "9999-ERROR-HANDLER"
+      ],
+      "path": "src/programs/test/TSTVAL00.cbl",
+      "program": "TSTVAL00",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": false
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "JCL:UTLMNT"
+      ],
+      "calls": [],
+      "category": "utility",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "ERRHAND",
+        "RTNCODE"
+      ],
+      "db2_tables": [],
+      "description": "File Maintenance Utility Performs maintenance operations on system files: Archive processing",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "CTLFILE",
+          "file": "CONTROL-FILE",
+          "organization": "SEQUENTIAL"
+        },
+        {
+          "ddname": "ARCHFILE",
+          "file": "ARCHIVE-FILE",
+          "organization": "SEQUENTIAL"
+        },
+        {
+          "ddname": "RPTFILE",
+          "file": "REPORT-FILE",
+          "organization": "SEQUENTIAL"
+        }
+      ],
+      "kind": "batch",
+      "lines": 182,
+      "paragraphs": [
+        "SPECIAL-NAMES",
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "1100-OPEN-FILES",
+        "1200-INIT-PROCESSING",
+        "2000-PROCESS",
+        "2100-PROCESS-FUNCTION",
+        "2200-ARCHIVE-PROCESS",
+        "2300-CLEANUP-PROCESS",
+        "2400-REORG-PROCESS",
+        "2500-ANALYZE-PROCESS",
+        "3000-CLEANUP",
+        "9999-ERROR-HANDLER"
+      ],
+      "path": "src/programs/utility/UTLMNT00.cbl",
+      "program": "UTLMNT00",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": false
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "JCL:UTLMON"
+      ],
+      "calls": [],
+      "category": "utility",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "DB2STAT",
+        "ERRHAND",
+        "RTNCODE"
+      ],
+      "db2_tables": [],
+      "description": "System Monitoring Utility Monitors system health and performance: Resource utilization tracking",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "MONCFG",
+          "file": "MONITOR-CONFIG",
+          "organization": "SEQUENTIAL"
+        },
+        {
+          "ddname": "MONLOG",
+          "file": "MONITOR-LOG",
+          "organization": "SEQUENTIAL"
+        },
+        {
+          "ddname": "ALERTS",
+          "file": "ALERT-FILE",
+          "organization": "SEQUENTIAL"
+        },
+        {
+          "ddname": "DB2STATS",
+          "file": "DB2-STATS",
+          "organization": "INDEXED"
+        }
+      ],
+      "kind": "batch",
+      "lines": 221,
+      "paragraphs": [
+        "SPECIAL-NAMES",
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "1100-OPEN-FILES",
+        "1200-INIT-PROCESSING",
+        "1300-READ-CONFIG",
+        "2000-PROCESS",
+        "2100-COLLECT-METRICS",
+        "2200-CHECK-THRESHOLDS",
+        "2300-LOG-STATUS",
+        "2400-GENERATE-ALERTS",
+        "3000-CLEANUP",
+        "9999-ERROR-HANDLER"
+      ],
+      "path": "src/programs/utility/UTLMON00.cbl",
+      "program": "UTLMON00",
+      "sql_statements": [],
+      "system_calls": [
+        "ILBOABN0"
+      ],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [
+        "DB2STAT"
+      ],
+      "unresolved_tables": [],
+      "uses_linkage": false
+    },
+    {
+      "bms_maps": [],
+      "bms_mapsets": [],
+      "called_by": [
+        "JCL:UTLVAL"
+      ],
+      "calls": [],
+      "category": "utility",
+      "cics_commands": [],
+      "cics_links": [],
+      "copybooks": [
+        "ERRHAND",
+        "POSREC",
+        "RTNCODE",
+        "TRNREC"
+      ],
+      "db2_tables": [],
+      "description": "Data Validation Utility Performs comprehensive data validation: Data integrity checks",
+      "dynamic_calls": [],
+      "empty": false,
+      "files": [
+        {
+          "ddname": "VALCTL",
+          "file": "VALIDATION-CONTROL",
+          "organization": "SEQUENTIAL"
+        },
+        {
+          "ddname": "POSMSTRE",
+          "file": "POSITION-MASTER",
+          "organization": "INDEXED"
+        },
+        {
+          "ddname": "TRANHIST",
+          "file": "TRANSACTION-HISTORY",
+          "organization": "INDEXED"
+        },
+        {
+          "ddname": "ERRRPT",
+          "file": "ERROR-REPORT",
+          "organization": "SEQUENTIAL"
+        }
+      ],
+      "kind": "batch",
+      "lines": 190,
+      "paragraphs": [
+        "SPECIAL-NAMES",
+        "0000-MAIN",
+        "1000-INITIALIZE",
+        "1100-OPEN-FILES",
+        "1200-INIT-PROCESSING",
+        "2000-PROCESS",
+        "2100-PROCESS-VALIDATION",
+        "2200-CHECK-INTEGRITY",
+        "2300-CHECK-XREF",
+        "2400-CHECK-FORMAT",
+        "2500-CHECK-BALANCE",
+        "3000-CLEANUP",
+        "9999-ERROR-HANDLER"
+      ],
+      "path": "src/programs/utility/UTLVAL00.cbl",
+      "program": "UTLVAL00",
+      "sql_statements": [],
+      "system_calls": [],
+      "unresolved_calls": [],
+      "unresolved_copybooks": [],
+      "unresolved_tables": [],
+      "uses_linkage": false
+    }
+  ],
+  "summary": {
+    "copybooks": 20,
+    "db2_tables": 6,
+    "empty_programs": [
+      "POSUPDT"
+    ],
+    "jcl_jobs": 15,
+    "orphan_programs": [
+      "BCHCTL00",
+      "CKPRST",
+      "DB2CMT",
+      "DB2CONN",
+      "DB2STAT",
+      "HISTLD00",
+      "PORTMSTR",
+      "PORTTRAN",
+      "PORTVALD",
+      "POSUPDT",
+      "PRCSEQ00",
+      "RCVPRC00",
+      "RTNCDE00"
+    ],
+    "programs": 38,
+    "unresolved_calls": [],
+    "unresolved_copybooks": [
+      "DB2STAT",
+      "PORTREC"
+    ],
+    "unresolved_tables": [
+      "AUDITLOG",
+      "AUTHFILE"
+    ]
+  }
+}
