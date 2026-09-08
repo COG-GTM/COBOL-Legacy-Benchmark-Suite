@@ -61,13 +61,18 @@ public class SystemMonitorUtility {
         List<Metric> collected = Inputs.records(metrics);
 
         for (Metric metric : collected) {
+            // Absent CONFIG-RECORD or metric fields are spaces / zero, so they simply never match a
+            // threshold rather than aborting the cycle.
             MonitorConfig config = configured.stream()
-                    .filter(candidate -> candidate.resourceType().equals(metric.resourceType())
-                            && candidate.thresholdType().equals(metric.thresholdType()))
+                    .filter(candidate -> Inputs.text(candidate.resourceType())
+                            .equals(Inputs.text(metric.resourceType()))
+                            && Inputs.text(candidate.thresholdType())
+                                    .equals(Inputs.text(metric.thresholdType())))
                     .findFirst()
                     .orElse(null);
 
-            boolean breached = config != null
+            boolean breached = config != null && config.thresholdValue() != null
+                    && metric.value() != null
                     && metric.value().compareTo(config.thresholdValue()) > 0;
             result.display(String.format("%-10s %-20s %12s %-10s", metric.resourceType(),
                     metric.thresholdType(), metric.value(), breached ? "BREACH" : "OK"));

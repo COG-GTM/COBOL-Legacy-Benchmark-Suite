@@ -144,7 +144,8 @@ public class PortfolioMasterService {
      */
     public String validate(PortfolioRecord record) {
         String id = record.getPortId() == null ? "" : record.getPortId();
-        if (id.length() < 9 || !id.startsWith("PORT") || !isNumeric(id.substring(4, 9))) {
+        if (id.length() < 9 || id.length() > 10 || !id.startsWith("PORT")
+                || !isNumeric(id.substring(4, 9))) {
             return ERR_INVALID_ID;
         }
         if (record.getClientName() == null || record.getClientName().isBlank()) {

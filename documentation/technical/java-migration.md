@@ -135,7 +135,7 @@ inventing behaviour, and each is flagged in the javadoc of the class concerned.
 
 ## 7. Validation
 
-* `mvn -B test` — 59 tests: portfolio validation and CRUD, buy/sell/fee/transfer behaviour,
+* `mvn -B test` — 61 tests: portfolio validation and CRUD, buy/sell/fee/transfer behaviour,
   BigDecimal scale, batch control and prerequisites, return-code classification and logging,
   position report arithmetic, security manager, test-data generation and validation, plus a
   `@SpringBootTest` that boots the application and exercises the REST adapters end to end.

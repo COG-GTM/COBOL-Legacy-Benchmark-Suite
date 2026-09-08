@@ -111,6 +111,40 @@ class RestApiIntegrationTest {
         rest.delete("/api/portfolios/PORT09101?accountNo=ACCT091010");
     }
 
+    /** PORT-ID is PIC X(10): longer ids are rejected and never alias on read. */
+    @Test
+    void overlengthPortfolioIdsAreRejectedAndNeverAlias() {
+        rest.postForEntity("/api/portfolios", Map.of("portId", "PORT09501A", "accountNo",
+                "0000000910", "clientName", "FIRST", "status", "A"), Map.class);
+
+        ResponseEntity<Map> tooLong = rest.postForEntity("/api/portfolios", Map.of("portId",
+                "PORT09501AA", "accountNo", "0000000910", "clientName", "SECOND", "status", "A"),
+                Map.class);
+        assertThat(tooLong.getStatusCode()).isEqualTo(HttpStatus.BAD_REQUEST);
+
+        assertThat(rest.getForEntity("/api/portfolios/PORT09501AB?accountNo=0000000910", Map.class)
+                .getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+
+        rest.delete("/api/portfolios/PORT09501A?accountNo=0000000910");
+    }
+
+    /** Absent or malformed nested fields are update errors, not server errors. */
+    @Test
+    void malformedNestedFieldsAreReportedAsErrors() {
+        ResponseEntity<Map> update = rest.postForEntity("/api/portfolios/batch-update",
+                List.of(Map.of("portId", "PORT00001", "accountNo", "ACCT000001", "action", "V",
+                        "newValue", "garbage")), Map.class);
+        assertThat(update.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat(asMap(update.getBody().get("counters")).get("errors")).isEqualTo(1);
+
+        Map<String, Object> payload = Map.of("configs", List.of(Map.of("resourceType", "CPU",
+                "thresholdType", "UTIL")), "metrics", List.of(Map.of("resourceType", "CPU",
+                "thresholdType", "UTIL")));
+        ResponseEntity<Map> monitor = rest.postForEntity("/api/utility/monitor", payload, Map.class);
+        assertThat(monitor.getStatusCode()).isEqualTo(HttpStatus.OK);
+        assertThat((List<?>) monitor.getBody().get("alerts")).isEmpty();
+    }
+
     /** An unparsable BALANCE control total is reported instead of counting as valid. */
     @Test
     void utilityValidationReportsAnInvalidControlTotal() {

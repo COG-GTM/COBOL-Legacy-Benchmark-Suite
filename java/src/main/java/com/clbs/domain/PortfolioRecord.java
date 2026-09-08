@@ -33,7 +33,7 @@ public class PortfolioRecord {
      * rather than the PIC X(8) of PORTFLIO.cpy — the master file is the keyed dataset.
      */
     public String key() {
-        return pad(portId, 10) + pad(accountNo, 10);
+        return field(portId, 10) + field(accountNo, 10);
     }
 
     /** Fixed-format PORT-RECORD image as moved into AUD-BEFORE-IMAGE / AUD-AFTER-IMAGE. */
@@ -42,6 +42,15 @@ public class PortfolioRecord {
                 + String.format("%08d%08d", createDate, lastMaint) + status
                 + String.format("%016.2f%016.2f", totalValue, cashBalance);
         return pad(text, 100);
+    }
+
+    /**
+     * A key component padded to its field width. Longer values keep their extra characters so that
+     * two over-long ids can never collapse onto the same key.
+     */
+    private static String field(String value, int length) {
+        String v = value == null ? "" : value;
+        return v.length() >= length ? v : v + " ".repeat(length - v.length());
     }
 
     private static String pad(String value, int length) {

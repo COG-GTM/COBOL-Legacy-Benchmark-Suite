@@ -45,11 +45,28 @@ public class PortfolioUpdateProgram {
                 continue;
             }
 
-            // 2200-APPLY-UPDATE
+            // 2200-APPLY-UPDATE. UPDT-NEW-VALUE is PIC X(30); an absent or non-numeric value is an
+            // update error rather than a failure of the run.
+            String newValue = Inputs.text(request.newValue()).trim();
             switch (request.action()) {
-                case 'S' -> record.setStatus(request.newValue().charAt(0));
-                case 'N' -> record.setClientName(request.newValue());
-                case 'V' -> record.setTotalValue(new BigDecimal(request.newValue().trim()));
+                case 'S' -> {
+                    if (newValue.isEmpty()) {
+                        errors++;
+                        result.display("Invalid new value for: " + key);
+                        continue;
+                    }
+                    record.setStatus(newValue.charAt(0));
+                }
+                case 'N' -> record.setClientName(newValue);
+                case 'V' -> {
+                    BigDecimal value = parseAmount(newValue);
+                    if (value == null) {
+                        errors++;
+                        result.display("Invalid new value for: " + key);
+                        continue;
+                    }
+                    record.setTotalValue(value);
+                }
                 default -> {
                     // COBOL EVALUATE falls through without changing the record.
                 }
@@ -68,6 +85,14 @@ public class PortfolioUpdateProgram {
         result.display("Errors occurred:  " + errors);
         result.count("updated", updated).count("errors", errors);
         return result;
+    }
+
+    private static BigDecimal parseAmount(String value) {
+        try {
+            return new BigDecimal(value);
+        } catch (NumberFormatException ex) {
+            return null;
+        }
     }
 
     private static String keyOf(String portId, String accountNo) {
