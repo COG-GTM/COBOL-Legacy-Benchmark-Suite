@@ -3,6 +3,7 @@ package com.clbs.portfolio;
 import com.clbs.common.AuditProcessor;
 import com.clbs.common.ErrorMessage;
 import com.clbs.common.ErrorProcessor;
+import com.clbs.common.Inputs;
 import com.clbs.common.ProgramResult;
 import com.clbs.domain.AuditRecord;
 import com.clbs.domain.ErrorCodes;
@@ -61,7 +62,7 @@ public class PortfolioTransactionProgram {
         long processed = 0;
         long errors = 0;
 
-        for (TransactionRecord transaction : transactions) {
+        for (TransactionRecord transaction : Inputs.records(transactions)) {
             if (errors > ERROR_LIMIT) {
                 break;
             }
@@ -80,6 +81,42 @@ public class PortfolioTransactionProgram {
         result.display("Transactions Process: " + processed);
         result.display("Errors Encountered:   " + errors);
         result.count("read", read).count("processed", processed).count("errors", errors);
+        result.setReturnCode(errors == 0 ? ReturnCode.SUCCESS : ReturnCode.ERROR);
+        return result;
+    }
+
+    /**
+     * The 0000-MAIN driver with 2200-UPDATE-POSITIONS wired in, i.e. what PORTTRAN describes but
+     * never PERFORMs. Each validated record is applied; transfers still fail with 2230's message.
+     */
+    public ProgramResult runAndApply(List<TransactionRecord> transactions) {
+        ProgramResult result = new ProgramResult(PROGRAM);
+        long read = 0;
+        long applied = 0;
+        long errors = 0;
+
+        for (TransactionRecord transaction : Inputs.records(transactions)) {
+            if (errors > ERROR_LIMIT) {
+                break;
+            }
+            read++;
+            String error = validate(transaction);
+            if (error == null) {
+                error = apply(transaction);
+            }
+            if (error == null) {
+                applied++;
+            } else {
+                errors++;
+                reportError(error);
+                result.display(error);
+            }
+        }
+
+        result.display("Transactions Read:    " + read);
+        result.display("Transactions Applied: " + applied);
+        result.display("Errors Encountered:   " + errors);
+        result.count("read", read).count("applied", applied).count("errors", errors);
         result.setReturnCode(errors == 0 ? ReturnCode.SUCCESS : ReturnCode.ERROR);
         return result;
     }

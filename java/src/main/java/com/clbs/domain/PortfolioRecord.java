@@ -28,14 +28,17 @@ public class PortfolioRecord {
     private String lastUser = "";
     private int lastTrans;
 
-    /** PORT-KEY = PORT-ID + PORT-ACCOUNT-NO. */
+    /**
+     * PORT-KEY. The record key follows the PORTMSTR FD, whose RECORD KEY IS PORT-ID PIC X(10),
+     * rather than the PIC X(8) of PORTFLIO.cpy — the master file is the keyed dataset.
+     */
     public String key() {
-        return pad(portId, 8) + pad(accountNo, 10);
+        return pad(portId, 10) + pad(accountNo, 10);
     }
 
     /** Fixed-format PORT-RECORD image as moved into AUD-BEFORE-IMAGE / AUD-AFTER-IMAGE. */
     public String image() {
-        String text = key() + pad(clientName, 30) + clientType
+        String text = pad(portId, 8) + pad(accountNo, 10) + pad(clientName, 30) + clientType
                 + String.format("%08d%08d", createDate, lastMaint) + status
                 + String.format("%016.2f%016.2f", totalValue, cashBalance);
         return pad(text, 100);

@@ -1,5 +1,6 @@
 package com.clbs.testdata;
 
+import com.clbs.common.Inputs;
 import com.clbs.common.ProgramResult;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -38,7 +39,7 @@ public class TestValidationProgram {
         long passed = 0;
         long failed = 0;
 
-        for (TestCase testCase : cases) {
+        for (TestCase testCase : Inputs.records(cases)) {
             String type = testCase.type() == null ? "" : testCase.type().trim();
             if (!List.of(FUNCTIONAL, INTEGRATION, PERFORMANCE, ERROR).contains(type)) {
                 result.display(ERR_INVALID_TYPE);

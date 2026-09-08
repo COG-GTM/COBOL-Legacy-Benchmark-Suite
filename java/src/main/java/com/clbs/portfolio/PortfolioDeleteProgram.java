@@ -1,6 +1,7 @@
 package com.clbs.portfolio;
 
 import com.clbs.common.AuditProcessor;
+import com.clbs.common.Inputs;
 import com.clbs.common.ProgramResult;
 import com.clbs.domain.AuditRecord;
 import com.clbs.domain.PortfolioRecord;
@@ -41,7 +42,7 @@ public class PortfolioDeleteProgram {
         long notFound = 0;
         long errors = 0;
 
-        for (DeleteRequest request : requests) {
+        for (DeleteRequest request : Inputs.records(requests)) {
             String key = keyOf(request.portId(), request.accountNo());
             PortfolioRecord record = datasets.portfolioFile().read(key);
 

@@ -1,5 +1,6 @@
 package com.clbs.utility;
 
+import com.clbs.common.Inputs;
 import com.clbs.common.ProgramResult;
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -56,9 +57,11 @@ public class SystemMonitorUtility {
     public MonitorCycle cycle(List<MonitorConfig> configs, List<Metric> metrics) {
         ProgramResult result = new ProgramResult(PROGRAM);
         List<Alert> alerts = new ArrayList<>();
+        List<MonitorConfig> configured = Inputs.records(configs);
+        List<Metric> collected = Inputs.records(metrics);
 
-        for (Metric metric : metrics) {
-            MonitorConfig config = configs.stream()
+        for (Metric metric : collected) {
+            MonitorConfig config = configured.stream()
                     .filter(candidate -> candidate.resourceType().equals(metric.resourceType())
                             && candidate.thresholdType().equals(metric.thresholdType()))
                     .findFirst()
@@ -75,7 +78,7 @@ public class SystemMonitorUtility {
             }
         }
 
-        result.count("metrics", metrics.size()).count("alerts", alerts.size());
+        result.count("metrics", collected.size()).count("alerts", alerts.size());
         return new MonitorCycle(result, alerts);
     }
 }

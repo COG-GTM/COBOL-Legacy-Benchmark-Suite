@@ -1,5 +1,6 @@
 package com.clbs.portfolio;
 
+import com.clbs.common.Inputs;
 import com.clbs.common.ProgramResult;
 import com.clbs.domain.PortfolioRecord;
 import com.clbs.store.DatasetCatalog;
@@ -32,7 +33,7 @@ public class PortfolioAddProgram {
         long duplicates = 0;
         long errors = 0;
 
-        for (PortfolioRecord source : input) {
+        for (PortfolioRecord source : Inputs.records(input)) {
             PortfolioRecord record = source.copy();
 
             // 2100-VALIDATE-AND-ADD

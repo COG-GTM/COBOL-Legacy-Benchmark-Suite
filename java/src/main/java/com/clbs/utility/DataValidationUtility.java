@@ -1,9 +1,11 @@
 package com.clbs.utility;
 
+import com.clbs.common.Inputs;
 import com.clbs.common.ProgramResult;
 import com.clbs.domain.PositionRecord;
 import com.clbs.store.DatasetCatalog;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +28,7 @@ public class DataValidationUtility {
     public static final String FORMAT = "FORMAT";
     public static final String BALANCE = "BALANCE";
     public static final String ERR_INVALID_TYPE = "INVALID VALIDATION TYPE";
+    public static final String ERR_CONTROL_TOTAL = "INVALID CONTROL TOTAL";
 
     /** VALIDATION-RECORD. */
     public record ValidationRequest(String type, String parameters) {
@@ -44,7 +47,7 @@ public class DataValidationUtility {
         long valid = 0;
         long errors = 0;
 
-        for (ValidationRequest request : requests) {
+        for (ValidationRequest request : Inputs.records(requests)) {
             read++;
             List<String> failures = switch (request.type() == null ? "" : request.type().trim()) {
                 case INTEGRITY -> checkIntegrity();
@@ -101,9 +104,12 @@ public class DataValidationUtility {
 
     /** 2500-CHECK-BALANCE: accumulated market value against the supplied control total. */
     List<String> checkBalance(String parameters) {
+        if (parameters == null || parameters.isBlank()) {
+            return List.of();
+        }
         BigDecimal control = parseControlTotal(parameters);
         if (control == null) {
-            return List.of();
+            return List.of(ERR_CONTROL_TOTAL);
         }
         BigDecimal total = datasets.positionFile().all().stream()
                 .map(PositionRecord::getMarketValue)
@@ -122,7 +128,8 @@ public class DataValidationUtility {
             return null;
         }
         try {
-            return new BigDecimal(parameters.trim()).setScale(2);
+            // MOVE to a S9(13)V99 control total truncates rather than rounding.
+            return new BigDecimal(parameters.trim()).setScale(2, RoundingMode.DOWN);
         } catch (NumberFormatException ex) {
             return null;
         }

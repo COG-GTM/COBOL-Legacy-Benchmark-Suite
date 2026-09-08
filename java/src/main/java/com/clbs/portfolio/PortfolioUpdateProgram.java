@@ -1,5 +1,6 @@
 package com.clbs.portfolio;
 
+import com.clbs.common.Inputs;
 import com.clbs.common.ProgramResult;
 import com.clbs.domain.PortfolioRecord;
 import com.clbs.store.DatasetCatalog;
@@ -33,7 +34,7 @@ public class PortfolioUpdateProgram {
         long updated = 0;
         long errors = 0;
 
-        for (UpdateRequest request : updates) {
+        for (UpdateRequest request : Inputs.records(updates)) {
             String key = keyOf(request.portId(), request.accountNo());
             PortfolioRecord record = datasets.portfolioFile().read(key);
 

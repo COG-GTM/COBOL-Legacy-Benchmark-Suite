@@ -137,10 +137,14 @@ public class PortfolioMasterService {
         return new Response(ReturnCode.SUCCESS, "", existing);
     }
 
-    /** 2100-VALIDATE-PORTFOLIO; returns the WS-ERROR-TEXT or null when valid. */
+    /**
+     * 2100-VALIDATE-PORTFOLIO; returns the WS-ERROR-TEXT or null when valid. PORTMSTR checks
+     * PORT-ID(1:4) = 'PORT' and PORT-ID(5:5) NUMERIC, i.e. five digits over its PIC X(10) key,
+     * where PORTVALD checks only four.
+     */
     public String validate(PortfolioRecord record) {
         String id = record.getPortId() == null ? "" : record.getPortId();
-        if (id.length() < 8 || !id.startsWith("PORT") || !isNumeric(id.substring(4, 8))) {
+        if (id.length() < 9 || !id.startsWith("PORT") || !isNumeric(id.substring(4, 9))) {
             return ERR_INVALID_ID;
         }
         if (record.getClientName() == null || record.getClientName().isBlank()) {

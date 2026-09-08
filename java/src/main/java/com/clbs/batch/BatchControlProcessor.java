@@ -2,6 +2,7 @@ package com.clbs.batch;
 
 import com.clbs.common.ErrorMessage;
 import com.clbs.common.ErrorProcessor;
+import com.clbs.common.Inputs;
 import com.clbs.domain.ErrorCodes;
 import com.clbs.store.DatasetCatalog;
 import java.time.LocalDateTime;
@@ -41,7 +42,7 @@ public class BatchControlProcessor {
 
     /** 0000-MAIN. */
     public int execute(ControlRequest request) {
-        return switch (request.function()) {
+        return switch (Inputs.text(request.function())) {
             case "INIT" -> initialize(request);
             case "CHEK" -> checkPrerequisites(request);
             case "UPDT" -> updateStatus(request, BatchControlRecord.ACTIVE, BatchConstants.RC_SUCCESS);
@@ -112,8 +113,8 @@ public class BatchControlProcessor {
     }
 
     private BatchControlRecord read(ControlRequest request) {
-        return datasets.batchControlFile()
-                .read(keyOf(request.jobName(), request.processDate(), request.sequenceNo()));
+        return datasets.batchControlFile().read(keyOf(Inputs.text(request.jobName()),
+                Inputs.text(request.processDate()), Inputs.text(request.sequenceNo())));
     }
 
     private int rewrite(BatchControlRecord record) {

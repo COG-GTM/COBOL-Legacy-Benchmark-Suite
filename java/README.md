@@ -30,7 +30,8 @@ records from `documentation/operations/test-data-specs.md` unless `clbs.sample-d
 | GET | `/api/portfolios` | PORTREAD |
 | GET/POST/PUT/DELETE | `/api/portfolios[/{portId}]` | PORTMSTR |
 | POST | `/api/portfolios/batch-{add,update,delete}` | PORTADD / PORTUPDT / PORTDEL |
-| POST | `/api/transactions` | PORTTRAN |
+| POST | `/api/transactions` | PORTTRAN (validate and count, as the COBOL driver runs) |
+| POST | `/api/transactions/apply` | PORTTRAN including 2200-UPDATE-POSITIONS |
 | POST | `/api/inquiry` (`X-User-Id` header) | INQONLN → INQPORT / INQHIST / SECMGR |
 | POST | `/api/batch/{control,sequence,recovery,history-load}` | BCHCTL00 / PRCSEQ00 / RCVPRC00 / HISTLD00 |
 | GET | `/api/batch/reports/{positions,audit,statistics,return-codes}` | RPTPOS00 / RPTAUD00 / RPTSTA00 / RTNANA00 |

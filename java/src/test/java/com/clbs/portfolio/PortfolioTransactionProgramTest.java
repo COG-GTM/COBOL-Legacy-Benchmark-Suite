@@ -11,6 +11,7 @@ import com.clbs.domain.ReturnCode;
 import com.clbs.domain.TransactionRecord;
 import com.clbs.store.DatasetCatalog;
 import java.math.BigDecimal;
+import java.util.Collections;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -118,5 +119,26 @@ class PortfolioTransactionProgramTest {
         assertThat(result.counter("processed")).isEqualTo(1);
         assertThat(result.counter("errors")).isEqualTo(1);
         assertThat(result.getReturnCode()).isEqualTo(ReturnCode.ERROR);
+    }
+
+    @Test
+    void runAndApplyMutatesPositionsAndStillRejectsTransfers() {
+        ProgramResult result = program.runAndApply(
+                List.of(transaction("BU", "10.0000", "50.00", "500.00"),
+                        transaction("TR", "10.0000", "50.00", "500.00")));
+
+        assertThat(result.counter("read")).isEqualTo(2);
+        assertThat(result.counter("applied")).isEqualTo(1);
+        assertThat(result.counter("errors")).isEqualTo(1);
+        assertThat(result.getReturnCode()).isEqualTo(ReturnCode.ERROR);
+        assertThat(reload().getTotalUnits()).isEqualByComparingTo("110.0000");
+    }
+
+    @Test
+    void missingRecordsAreDroppedRatherThanFailing() {
+        ProgramResult result = program.runAndApply(Collections.singletonList(null));
+
+        assertThat(result.counter("read")).isZero();
+        assertThat(result.getReturnCode()).isEqualTo(ReturnCode.SUCCESS);
     }
 }

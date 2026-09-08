@@ -80,6 +80,47 @@ class RestApiIntegrationTest {
         assertThat(counters.get("errors")).isEqualTo(1);
     }
 
+    /** /apply reaches 2200-UPDATE-POSITIONS; transfers keep the 2230 rejection. */
+    @Test
+    void transactionApplyMutatesPortfolioAndRejectsTransfers() {
+        ResponseEntity<Map> applied = rest.postForEntity("/api/transactions/apply",
+                List.of(transaction("BU")), Map.class);
+        assertThat(asMap(applied.getBody().get("counters")).get("applied")).isEqualTo(1);
+
+        ResponseEntity<Map> read = rest.getForEntity(
+                "/api/portfolios/PORT00001?accountNo=ACCT000001", Map.class);
+        assertThat(asMap(read.getBody().get("record")).get("totalUnits")).isEqualTo(1.0);
+
+        ResponseEntity<Map> transfer = rest.postForEntity("/api/transactions/apply",
+                List.of(transaction("TR")), Map.class);
+        assertThat(asMap(transfer.getBody().get("counters")).get("errors")).isEqualTo(1);
+        assertThat(transfer.getBody().get("returnCode")).isEqualTo(8);
+        assertThat((List<String>) transfer.getBody().get("display"))
+                .anyMatch(line -> line.contains("Transfer processing not implemented"));
+    }
+
+    /** PORT-ID is the PIC X(10) master key: two nine-character ids must not alias. */
+    @Test
+    void portfolioIdsLongerThanEightCharactersAreDistinct() {
+        rest.postForEntity("/api/portfolios", Map.of("portId", "PORT09101", "accountNo",
+                "ACCT091010", "clientName", "FIRST", "status", "A"), Map.class);
+
+        assertThat(rest.getForEntity("/api/portfolios/PORT09102?accountNo=ACCT091010", Map.class)
+                .getStatusCode()).isEqualTo(HttpStatus.NOT_FOUND);
+
+        rest.delete("/api/portfolios/PORT09101?accountNo=ACCT091010");
+    }
+
+    /** An unparsable BALANCE control total is reported instead of counting as valid. */
+    @Test
+    void utilityValidationReportsAnInvalidControlTotal() {
+        ResponseEntity<Map> response = rest.postForEntity("/api/utility/validate",
+                List.of(Map.of("type", "BALANCE", "parameters", "garbage")), Map.class);
+
+        assertThat(asMap(response.getBody().get("counters")).get("errors")).isEqualTo(1);
+        assertThat(response.getBody().get("returnCode")).isEqualTo(4);
+    }
+
     private static Map<String, Object> transaction(String type) {
         return Map.of("portfolioId", "PORT00001", "accountNo", "ACCT000001", "sequenceNo",
                 "00000001", "type", type, "investmentId", "IBM0000001", "quantity", "1.0000",

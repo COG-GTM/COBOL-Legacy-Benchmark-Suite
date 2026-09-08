@@ -1,5 +1,6 @@
 package com.clbs.utility;
 
+import com.clbs.common.Inputs;
 import com.clbs.common.ProgramResult;
 import java.util.List;
 import org.springframework.stereotype.Service;
@@ -34,7 +35,7 @@ public class FileMaintenanceUtility {
         long read = 0;
         long errors = 0;
 
-        for (ControlRecord control : controls) {
+        for (ControlRecord control : Inputs.records(controls)) {
             read++;
             String function = control.function() == null ? "" : control.function().trim();
             switch (function) {

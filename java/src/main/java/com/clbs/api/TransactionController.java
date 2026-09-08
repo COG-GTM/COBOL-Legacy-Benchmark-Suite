@@ -20,8 +20,15 @@ public class TransactionController {
         this.program = program;
     }
 
+    /** PORTTRAN as written: validate and count only. */
     @PostMapping
     public ProgramResult process(@RequestBody List<TransactionRecord> transactions) {
         return program.run(transactions);
+    }
+
+    /** PORTTRAN including 2200-UPDATE-POSITIONS, which its own driver never reaches. */
+    @PostMapping("/apply")
+    public ProgramResult apply(@RequestBody List<TransactionRecord> transactions) {
+        return program.runAndApply(transactions);
     }
 }

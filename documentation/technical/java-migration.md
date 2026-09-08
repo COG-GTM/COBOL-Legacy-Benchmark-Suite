@@ -112,8 +112,9 @@ inventing behaviour, and each is flagged in the javadoc of the class concerned.
 * **PORTTRAN transfers** — `2230-PROCESS-TRANSFER` displays *"Transfer processing not implemented"*.
   `PortfolioTransactionProgram.apply` returns the same error.
 * **PORTTRAN main loop** — `2000-PROCESS-TRANSACTIONS` validates records but never performs
-  `2200-UPDATE-POSITIONS`, so `run(...)` validates and counts only; applying a transaction is the
-  separate `apply(...)` call.
+  `2200-UPDATE-POSITIONS`, so `run(...)` (`POST /api/transactions`) validates and counts only.
+  `runAndApply(...)` (`POST /api/transactions/apply`) is the same driver with the update step wired
+  in, and `apply(...)` applies a single record.
 * **Portfolio status values** — `PORTFLIO.cpy` defines `A`/`C`/`S`; `PORTMSTR` validates `A`/`I`/`C`.
   The master service follows `PORTMSTR`.
 * **Transaction type codes** — the programs use two-character codes (`BU`, `SL`, `TR`, `FE`) while
@@ -125,12 +126,16 @@ inventing behaviour, and each is flagged in the javadoc of the class concerned.
   defined. The Java code keeps those steps empty, or derives them from the documented layouts and
   says so, rather than inventing report content or validation rules.
 * **POSUPDT** contains only comments.
+* **Portfolio key width** — `PORTFLIO.cpy` declares `PORT-ID PIC X(8)` while the `PORTMSTR` FD keys
+  the master file on `PORT-ID PIC X(10)` and validates `PORT-ID(5:5)` as numeric, i.e. five digits.
+  `PortfolioRecord.key()` uses the ten-character key so nine-character ids do not alias, and the
+  fixed-format audit image keeps the eight-character copybook field.
 * **HISTLD00** checkpoints into `BCT-RECORDS-READ`/`BCT-RECORDS-WRITTEN`, which `BCHCTL.cpy` does not
   define; the counters are carried on `BatchControlRecord`.
 
 ## 7. Validation
 
-* `mvn -B test` — 54 tests: portfolio validation and CRUD, buy/sell/fee/transfer behaviour,
+* `mvn -B test` — 59 tests: portfolio validation and CRUD, buy/sell/fee/transfer behaviour,
   BigDecimal scale, batch control and prerequisites, return-code classification and logging,
   position report arithmetic, security manager, test-data generation and validation, plus a
   `@SpringBootTest` that boots the application and exercises the REST adapters end to end.

@@ -1,5 +1,6 @@
 package com.clbs.testdata;
 
+import com.clbs.common.Inputs;
 import com.clbs.common.ProgramResult;
 import com.clbs.domain.PortfolioRecord;
 import com.clbs.domain.TransactionRecord;
@@ -51,7 +52,7 @@ public class TestDataGenerator {
         List<TransactionRecord> transactions = new ArrayList<>();
         long errors = 0;
 
-        for (GeneratorConfig config : configs) {
+        for (GeneratorConfig config : Inputs.records(configs)) {
             switch (config.testType() == null ? "" : config.testType().trim()) {
                 case PORTFOLIO -> generatePortfolios(config.volume(), random, portfolios);
                 case TRANSACTION -> generateTransactions(config.volume(), random, transactions);

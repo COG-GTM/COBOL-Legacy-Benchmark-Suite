@@ -49,6 +49,11 @@ public class HistoryLoadProgram {
         long errors = 0;
         int sinceCommit = 0;
 
+        if (control == null) {
+            errors++;
+            result.display(ERR_CONTROL_NOT_FOUND);
+        }
+
         for (TransactionHistoryRecord history : datasets.transactionHistory().all()) {
             if (errors > ERROR_LIMIT) {
                 break;
