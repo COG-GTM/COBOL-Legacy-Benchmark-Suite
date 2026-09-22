@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: clbs
+  batch:
+    job:
+      # Jobs are launched explicitly (by name) to mirror JCL step control; never on startup.
+      enabled: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
