@@ -52,6 +52,8 @@ project-root/
 │   ├── user/              # User documentation and guides
 │   └── assets/            # Shared documentation assets
 │
+├── java/                  # Java 21 / Spring Boot migration target (see java/README.md)
+│
 └── src/                   # Source code root
     ├── programs/         # COBOL source programs
     │   ├── batch/       # Batch processing programs
@@ -133,6 +135,10 @@ Comprehensive documentation is provided to facilitate understanding and translat
 - **Error Handling**: Includes comprehensive error handling and recovery procedures.
 - **Documentation**: Provides detailed documentation for all components.
 - **Testing**: Contains test programs and data for validation purposes.
+
+## Java Migration
+
+A Java 21 / Spring Boot port of the suite is being built under [`java/`](java/), with one Maven module per COBOL domain (`common`, `portfolio`, `batch`, `online`, `reporting`, `utility`) and a golden-file test harness for output parity. See [java/README.md](java/README.md) for local setup, build commands, and quality gates.
 
 ## Future Plans
 

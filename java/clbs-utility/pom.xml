@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.cognition.clbs</groupId>
+    <artifactId>clbs-parent</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>clbs-utility</artifactId>
+  <name>CLBS :: Utility</name>
+  <description>Maintenance, monitoring and validation utilities mirroring src/programs/utility (UTLMNT00, UTLMON00, UTLVAL00).</description>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.cognition.clbs</groupId>
+      <artifactId>clbs-common</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.cognition.clbs</groupId>
+      <artifactId>clbs-test-harness</artifactId>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
+</project>

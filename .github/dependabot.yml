@@ -1,0 +1,20 @@
+version: 2
+updates:
+  - package-ecosystem: maven
+    directory: /java
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 5
+    groups:
+      spring:
+        patterns:
+          - "org.springframework*"
+      build-plugins:
+        patterns:
+          - "*maven-plugin"
+          - "com.puppycrawl.tools:checkstyle"
+          - "com.google.googlejavaformat:*"
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
