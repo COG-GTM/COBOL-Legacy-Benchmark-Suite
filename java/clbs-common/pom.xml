@@ -12,7 +12,7 @@
 
   <artifactId>clbs-common</artifactId>
   <name>CLBS :: Common</name>
-  <description>Shared services mirroring src/programs/common (ERRPROC, AUDPROC, DB2CONN/DB2CMT/DB2ERR/DB2STAT) and the return-code contract (RTNCODE copybook).</description>
+  <description>Shared services mirroring src/programs/common (ERRPROC, AUDPROC, DB2CONN/DB2CMT/DB2ERR/DB2STAT), the copybook-derived record layer, and the relational data layer (Flyway migrations from src/database, JPA entities for the DB2 tables and VSAM files).</description>
 
   <dependencies>
     <dependency>
@@ -24,8 +24,31 @@
       <artifactId>spring-boot-starter-validation</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-flyway</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.cognition.clbs</groupId>
       <artifactId>clbs-test-harness</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-flyway-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
   </dependencies>
