@@ -5,6 +5,16 @@ spring:
     job:
       # Jobs are launched explicitly (by name) to mirror JCL step control; never on startup.
       enabled: false
+  datasource:
+    # Embedded default for local runs; override with SPRING_DATASOURCE_URL for a real database.
+    url: jdbc:h2:mem:clbs;DB_CLOSE_DELAY=-1
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Flyway owns the schema (clbs-common/src/main/resources/db/migration); Hibernate only checks it.
+      ddl-auto: validate
+  flyway:
+    enabled: true
 
 management:
   endpoints:

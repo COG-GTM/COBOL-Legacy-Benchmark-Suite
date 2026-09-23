@@ -1,0 +1,19 @@
+-- Source: src/database/db2/ERRLOG.sql (host variables: src/copybook/db2/DBTBLS.cpy ERRLOG-RECORD)
+-- Omitted: CREATE TABLESPACE, CLUSTER, COMMENT ON, GRANT. The ERRLOG_CLEANUP stored procedure is
+-- implemented as ErrorLogRepository.deleteProcessedBefore(LocalDate).
+
+CREATE TABLE ERRLOG (
+    ERROR_TIMESTAMP   TIMESTAMP(6)    NOT NULL,
+    PROGRAM_ID        VARCHAR(8)      NOT NULL,
+    ERROR_TYPE        VARCHAR(1)      NOT NULL,
+    ERROR_SEVERITY    INTEGER         NOT NULL,
+    ERROR_CODE        VARCHAR(8)      NOT NULL,
+    ERROR_MESSAGE     VARCHAR(200)    NOT NULL,
+    PROCESS_DATE      DATE            NOT NULL,
+    PROCESS_TIME      TIME            NOT NULL,
+    USER_ID           VARCHAR(8)      NOT NULL,
+    ADDITIONAL_INFO   VARCHAR(500),
+    CONSTRAINT ERRLOG_PK PRIMARY KEY (ERROR_TIMESTAMP, PROGRAM_ID)
+);
+
+CREATE INDEX ERRLOG_IX1 ON ERRLOG (PROCESS_DATE, ERROR_SEVERITY DESC);

@@ -52,7 +52,7 @@ module. Every module shares the `com.cognition.clbs` base package.
 
 | Module              | Package                        | Mirrors                                        | Depends on              |
 | ------------------- | ------------------------------ | ---------------------------------------------- | ----------------------- |
-| `clbs-common`       | `com.cognition.clbs.common`    | `src/programs/common`, `src/copybook`          | –                       |
+| `clbs-common`       | `com.cognition.clbs.common`    | `src/programs/common`, `src/copybook`, `src/database` | Spring Data JPA, Flyway |
 | `clbs-portfolio`    | `com.cognition.clbs.portfolio` | `src/programs/portfolio`                       | common                  |
 | `clbs-batch`        | `com.cognition.clbs.batch`     | `src/programs/batch`, `src/jcl` (Spring Batch) | common, portfolio       |
 | `clbs-online`       | `com.cognition.clbs.online`    | `src/programs/online`, `src/maps` (Spring MVC) | common, portfolio       |
@@ -64,6 +64,20 @@ module. Every module shares the `com.cognition.clbs` base package.
 
 Dependency direction is enforced by Maven: a module can only see what it declares, so e.g.
 `clbs-portfolio` cannot reach into `clbs-batch`.
+
+### Data layer (`clbs-common`)
+
+| Package / path                                   | Contents                                                                                          |
+| ------------------------------------------------ | ------------------------------------------------------------------------------------------------- |
+| `common.cobol`                                   | Fixed-width codec: `PackedDecimal` (COMP-3), `BinaryField` (COMP), `RecordReader`/`RecordWriter`, ASCII + IBM-1047 |
+| `common.copybook.{common,batch,db2,online}`      | One Java `record`/enum per copybook with its exact `LENGTH`; `BigDecimal` for every COMP-3 field |
+| `src/main/resources/db/migration`                | Flyway `V1..V6`: DB2 DDL translated to portable SQL, VSAM files and the audit log as tables        |
+| `common.persistence.{entity,repository,mapper}`  | JPA entities with composite keys mirroring VSAM keys, Spring Data repositories, record<->entity mappers |
+
+Hibernate runs with `ddl-auto=validate`, so the entities are checked against the Flyway schema at
+start-up and in `EntityRoundTripTest`. The embedded H2 datasource in `clbs-app/application.yml` is
+a local default; set `SPRING_DATASOURCE_URL` (and credentials) for a real database. See
+[ADR 0002](../docs/adr/0002-relational-data-layer-jpa-flyway.md).
 
 ## Quality gates
 
