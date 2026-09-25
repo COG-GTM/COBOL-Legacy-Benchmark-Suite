@@ -1,0 +1,5 @@
+# GnuCOBOL output of parity/run-parity.sh
+/build/
+
+# Maven output of the java/ module
+/java/target/
