@@ -87,8 +87,12 @@ neither is `COPY`d by PORTVALD, and neither influences its behaviour:
 
 Signalling is by these two output fields only: there is no `RETURN-CODE` special register
 use, no abend, no exception, no logging, no state carried between calls. `INITIALIZE
-VAL-WORK-AREAS` at entry means the program is re-entrant with respect to its own working
-storage, so repeated calls are independent.
+VAL-WORK-AREAS` at entry means each call starts from a clean working storage, so
+*sequential* calls are independent. That is not re-entrancy: working storage is still a
+single static area shared by every caller, and the program is not declared `RECURSIVE`, so
+concurrent calls would interfere. The Java port has no shared mutable state and is
+therefore thread safe where the COBOL is not — a difference in favour of the port, and one
+to keep in mind if the two are ever run side by side under load.
 
 Return codes and messages (all from `PORTVAL.cpy`, message fields are `PIC X(50)`):
 
@@ -323,13 +327,36 @@ Result distribution over the 82 cases, from the evidence file: code 0 — 42 cas
    truth for production behaviour, and for an alphanumeric-to-numeric `MOVE` of data that is
    not a valid number the two differ: IBM Enterprise COBOL treats the sending field as
    unsigned digits and does not recognise `+`, `-`, `.` or `,`, and non-digit bytes give an
-   undefined result rather than a defined zero. Cases AM-03, AM-05, AM-10, AM-11, AM-13,
-   AM-16…AM-23, AM-25, AM-26, AM-28…AM-33 are therefore parity-verified against GnuCOBOL
-   only. This cannot be closed on Linux; it needs one run of `PVDRIVER` against the same
-   case table on z/OS, after which `parity/expected/` gains a second recorded column and the
-   port takes a runtime flag. **No case that is reachable through a documented input is
-   affected** — all of the affected cases are malformed amounts, and every one of them
-   returns code 0 under both runtimes because R9 is dead.
+   undefined result rather than a defined zero. Any amount case whose 50-byte field is not
+   purely digits followed by spaces is therefore parity-verified against GnuCOBOL only —
+   which is most of the amount table, because a decimal point is itself a non-digit byte.
+   Only AM-02, AM-09, AM-15, AM-33 and the digits-only prefix of AM-27 are digits-and-spaces
+   throughout. This cannot be closed on Linux; it needs one run of `PVDRIVER` against the
+   same case table on z/OS, after which `parity/expected/` gains a second recorded column
+   and the port takes a runtime flag.
+
+   The affected cases split into two groups, and the distinction matters more than the list:
+
+   * **Malformed input** — `ABC` (AM-08), `$100` (AM-16), `1E3` (AM-17), `AB12345X` (AM-26),
+     a trailing sign (AM-11), a second decimal point (AM-31). GnuCOBOL defines a result;
+     IBM does not define one at all. Nothing here can be verified except on z/OS.
+   * **Ordinary money amounts that merely carry a sign or a decimal point** — `1000.00`
+     (AM-01), `-500.25` (AM-03), the `±9999999999999.99` boundaries (AM-04, AM-05),
+     `1000.999` (AM-07), `1,000.00` (AM-10), `.75` (AM-13). These are *not* malformed; they
+     are what a business reader would call a normal amount, and they are unverified on the
+     mainframe just the same, and they are where divergence is most likely. IBM treats the
+     sending field as an *unsigned integer*: the `.` and `-` are not separators or a sign,
+     they are simply non-digit bytes, and where a result is produced at all the digits land
+     in the integer positions with an assumed point at the right-hand end. On that reading
+     `1000.00` becomes `100000.00` rather than `1000.00`, and the sign of `-500.25` is lost.
+     **This is the single most important item to confirm on z/OS**, and it should be read as
+     "conversion of normal amounts is unverified on the mainframe", not "only junk input is
+     unverified".
+
+   What is *not* at risk is the observable contract: `LS-RETURN-CODE` is 0 for every amount
+   input under either runtime, because the range test (R9) is dead. The divergence is in the
+   converted value, which PORTVALD discards — so it affects any future rule written against
+   that value, not today's callers.
 2. **`LS-RETURN-CODE` overflow is not modelled.** It is `PIC S9(4) COMP`, a signed halfword;
    only values 0–4 are ever stored, so no overflow or truncation behaviour is exercised or
    ported.
@@ -337,10 +364,17 @@ Result distribution over the 82 cases, from the evidence file: code 0 — 42 cas
    `CALL` it. Whether any of them depends on the defects in §4.1 — for instance by treating
    code 1 as "always" and skipping the call — is unknown and must be established before the
    defects are fixed.
-4. **The amount conversion is observable only through the harness.** PORTVALD discards
-   `VAL-TEMP-NUM`, so the third output column is driver-visible state, not part of the
-   subroutine's contract. A caller cannot see it, and the port exposes it
-   (`PortfolioValidator.amountAsMoved`) purely so the semantics stay under test.
+4. **The amount column is a replica, not an observation of the module.** PORTVALD discards
+   `VAL-TEMP-NUM` before returning, and the legacy source may not be modified, so the driver
+   cannot read it. It instead repeats the same statement,
+   `MOVE WS-INPUT-VALUE TO WS-TEMP-NUM`, against an identically declared `S9(13)V99` item in
+   its own storage. The two are compiled by the same compiler with the same picture clause,
+   so they convert identically today — but a change *inside* `4000-VALIDATE-AMOUNT` (a
+   different receiving picture, an intermediate edit, a `FUNCTION NUMVAL`) would not be
+   caught by this column. The columns that *are* true observations of the module are the
+   return code and the error message, and those cover its entire contract. Closing this
+   properly means exposing `VAL-TEMP-NUM` through the linkage section, which is a change to
+   legacy source and out of scope here.
 5. **EBCDIC vs ASCII collation is not exercised.** Every comparison in PORTVALD is an
    equality test against digits and upper-case Latin letters, which collate identically in
    both, so no difference is expected — but this has not been demonstrated on z/OS.

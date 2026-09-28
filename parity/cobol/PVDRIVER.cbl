@@ -134,6 +134,15 @@
 
            CALL 'PORTVALD' USING WS-VALIDATION-REQUEST
 
+      *    The amount column is a REPLICA of what 4000-VALIDATE-AMOUNT
+      *    does, not an observation of it.  PORTVALD discards
+      *    VAL-TEMP-NUM before returning and its source may not be
+      *    modified, so the statement below repeats the same MOVE into
+      *    an identically declared S9(13)V99 item held here.  Same
+      *    compiler, same picture, so the conversions agree today - but
+      *    a change inside the module would not be caught by this
+      *    column.  The return code and message columns ARE observed
+      *    from the module and cover its whole linkage contract.
            MOVE ZERO                TO WS-TEMP-NUM
            MOVE WS-INPUT-VALUE      TO WS-TEMP-NUM
            MOVE WS-TEMP-NUM         TO WS-TEMP-EDIT
