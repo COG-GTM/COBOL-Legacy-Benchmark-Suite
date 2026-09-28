@@ -1,0 +1,110 @@
+# PORTVALD parity case table - input side of the parity harness.
+# One row per CALL 'PORTVALD'. Expected results are NOT written here: they are captured from the
+# compiled COBOL program (see portvald-cobol-golden.tsv and java/run-parity.sh).
+#
+# Columns (TAB-separated): case_id, validate_type (LS-VALIDATE-TYPE), input_value (LS-INPUT-VALUE),
+#   category, description
+# Encoding of validate_type / input_value: \t \n \r \\ and \xHH (one byte, 0x00-0xFF).
+#   Values are right-padded with spaces to the COBOL field length (1 and 50); trailing spaces are implicit.
+# Categories: VALID, BOUNDARY, FAILURE = expected shapes; QUIRK = executed legacy behaviour that is
+#   surprising or contradicts the paragraph's own comment (preserved on purpose, see migration doc).
+case_id	validate_type	input_value	category	description
+DISPATCH-01	X	PORT1234	FAILURE	Unknown validation type 'X' -> WHEN OTHER (rc 1, own message)
+DISPATCH-02	i	PORT1234	FAILURE	Validation type is case-sensitive: lowercase 'i' is not 'I'
+DISPATCH-03	a	12345678901234567890123456789012345678901234567890	FAILURE	Lowercase 'a' is not 'A'
+DISPATCH-04	t	STK	FAILURE	Lowercase 't' is not 'T'
+DISPATCH-05	m	100	FAILURE	Lowercase 'm' is not 'M'
+DISPATCH-06	\x20	STK	FAILURE	Blank validation type
+DISPATCH-07	\x00	STK	FAILURE	LOW-VALUE validation type
+DISPATCH-08	1	STK	FAILURE	Numeric validation type
+DISPATCH-09	X		FAILURE	Unknown type with blank input
+ID-01	I	PORT1234	QUIRK	Documented-valid format PORT+4 digits is REJECTED: 4 digits moved to PIC X(10) are padded with 6 spaces, which fail IS NUMERIC
+ID-02	I	PORT0000	QUIRK	PORT+0000 rejected (same padding defect)
+ID-03	I	PORT9999	QUIRK	PORT+9999 rejected (same padding defect)
+ID-04	I	PORT1234567890123456789012345678901234567890123456	QUIRK	PORT followed by 46 digits (field completely full) is still rejected
+ID-05	I	PORT1234ABCDEFGH	QUIRK	Trailing bytes after position 8 are never inspected; rejected only by the padding defect
+ID-06	I	port1234	FAILURE	Prefix comparison is case-sensitive
+ID-07	I	\x20PORT1234	FAILURE	Leading space shifts the prefix out of positions 1-4
+ID-08	I	PORX1234	FAILURE	Wrong prefix
+ID-09	I	PORT	FAILURE	Prefix only; positions 5-8 blank
+ID-10	I	PORT12A4	FAILURE	Non-digit in positions 5-8
+ID-11	I		FAILURE	Blank input
+ID-12	I	\x00\x00\x00\x00\x00\x00\x00\x00	FAILURE	LOW-VALUES input
+ID-13	I	POR	FAILURE	Truncated prefix
+ACCT-01	A	1234567890	QUIRK	Documented-valid 10-digit account is REJECTED: IS NUMERIC tests all 50 bytes and the 40 trailing spaces are not digits
+ACCT-02	A	0000000000	QUIRK	10 zeros rejected by the NUMERIC test (not the ZEROS test)
+ACCT-03	A	12345678901234567890123456789012345678901234567890	VALID	Exactly 50 digits, not all zero -> accepted (only shape that passes)
+ACCT-04	A	00000000000000000000000000000000000000000000000000	FAILURE	50 zeros -> rejected by '= ZEROS'
+ACCT-05	A	00000000000000000000000000000000000000000000000001	BOUNDARY	49 zeros then 1 -> accepted (smallest non-zero value)
+ACCT-06	A	10000000000000000000000000000000000000000000000000	BOUNDARY	1 then 49 zeros -> accepted
+ACCT-07	A	99999999999999999999999999999999999999999999999999	BOUNDARY	50 nines -> accepted
+ACCT-08	A	1234567890123456789012345678901234567890123456789	BOUNDARY	49 digits (one trailing space) -> rejected
+ACCT-09	A	\x201234567890123456789012345678901234567890123456789	FAILURE	Leading space + 49 digits -> rejected
+ACCT-10	A		FAILURE	Blank input -> rejected
+ACCT-11	A	1234567890123456789012345A789012345678901234567890	FAILURE	Letter in position 26 -> rejected
+ACCT-12	A	-1234567890123456789012345678901234567890123456789	FAILURE	Leading minus sign -> rejected
+ACCT-13	A	+1234567890123456789012345678901234567890123456789	FAILURE	Leading plus sign -> rejected
+ACCT-14	A	12345678901234567890123456789012345678901234567.00	FAILURE	Decimal point -> rejected
+ACCT-15	A	1234567890123456789012345678901234567890123456789\x00	FAILURE	Trailing LOW-VALUE -> rejected
+ACCT-16	A	12345\t67890	FAILURE	Embedded TAB -> rejected
+TYPE-01	T	STK	VALID	STK accepted
+TYPE-02	T	BND	VALID	BND accepted
+TYPE-03	T	MMF	VALID	MMF accepted
+TYPE-04	T	ETF	VALID	ETF accepted
+TYPE-05	T	stk	FAILURE	Comparison is case-sensitive
+TYPE-06	T	Etf	FAILURE	Mixed case rejected
+TYPE-07	T	\x20STK	FAILURE	Leading space rejected (no left-trim)
+TYPE-08	T	STKX	FAILURE	Extra character rejected
+TYPE-09	T	ST	FAILURE	Short code rejected
+TYPE-10	T		FAILURE	Blank rejected
+TYPE-11	T	STK\t	FAILURE	Trailing TAB is not a space -> rejected
+TYPE-12	T	STK\x00	FAILURE	Trailing LOW-VALUE is not a space -> rejected
+TYPE-13	T	STK                                              X	FAILURE	Non-space in position 50 -> rejected (all 50 bytes compared)
+TYPE-14	T	EQU	FAILURE	Unknown code rejected
+TYPE-15	T	BOND	FAILURE	Long form rejected
+TYPE-16	T	STK BND	FAILURE	Two codes rejected
+TYPE-17	T	\x00STK	FAILURE	Leading LOW-VALUE rejected
+AMT-01	M	0	VALID	Zero
+AMT-02	M	100	VALID	Integer
+AMT-03	M	123.45	VALID	Two decimals
+AMT-04	M	-123.45	VALID	Leading minus
+AMT-05	M	+123.45	VALID	Leading plus
+AMT-06	M	\x20\x20\x2042	VALID	Leading spaces skipped
+AMT-07	M	9999999999999.99	BOUNDARY	VAL-MAX-AMOUNT exactly
+AMT-08	M	-9999999999999.99	BOUNDARY	VAL-MIN-AMOUNT exactly
+AMT-09	M	0.01	BOUNDARY	Smallest positive
+AMT-10	M	-0.01	BOUNDARY	Smallest negative
+AMT-11	M	10000000000000	QUIRK	14 digits: high-order digit truncated -> 0.00, accepted (range check can never fire)
+AMT-12	M	12345678901234.56	QUIRK	14 integer digits: leading '1' dropped -> 2345678901234.56
+AMT-13	M	99999999999999999999999999999999999999999999999999	QUIRK	50 nines: truncated to 9999999999999.00, accepted
+AMT-14	M	123.456	QUIRK	Third decimal truncated (not rounded) -> 123.45
+AMT-15	M	123.999	QUIRK	Third decimal truncated (not rounded) -> 123.99
+AMT-16	M	1,234.56	QUIRK	Comma ignored -> 1234.56
+AMT-17	M	1,2,3	QUIRK	Commas anywhere ignored -> 123.00
+AMT-18	M	1 000	QUIRK	Embedded space ignored -> 1000.00
+AMT-19	M	- 5	QUIRK	Space between sign and digits ignored -> -5.00
+AMT-20	M	1 . 5	QUIRK	Spaces around decimal point ignored -> 1.50
+AMT-21	M	.5	BOUNDARY	No integer digits -> 0.50
+AMT-22	M	5.	BOUNDARY	No decimal digits -> 5.00
+AMT-23	M		QUIRK	Blank input -> 0.00, accepted (blank treated as zero)
+AMT-24	M	-	QUIRK	Sign only -> negative zero in GnuCOBOL, accepted
+AMT-25	M	-0	QUIRK	Minus zero -> negative zero in GnuCOBOL, accepted
+AMT-26	M	1.2.3	QUIRK	Second decimal point -> whole value zeroed, accepted
+AMT-27	M	12A34	QUIRK	Letter -> whole value zeroed, accepted
+AMT-28	M	ABC	QUIRK	Non-numeric text -> 0.00, accepted
+AMT-29	M	123-	QUIRK	Trailing minus is invalid -> 0.00, accepted
+AMT-30	M	$100	QUIRK	Currency symbol -> 0.00, accepted
+AMT-31	M	1e5	QUIRK	Exponent notation -> 0.00, accepted
+AMT-32	M	+-5	QUIRK	Double sign -> 0.00, accepted
+AMT-33	M	\t\n\x0b\x0c\r7	QUIRK	All C whitespace (TAB LF VT FF CR) skipped -> 7.00
+AMT-34	M	\xa05	QUIRK	NO-BREAK SPACE (0xA0) is not whitespace in the C locale -> 0.00
+AMT-35	M	\x005	QUIRK	Leading LOW-VALUE -> 0.00
+AMT-36	M	5\x00	QUIRK	Trailing LOW-VALUE is examined before the receiver is full -> 0.00
+AMT-37	M	1.234X	QUIRK	Receiver full after 2 decimals; trailing 'X' never examined -> 1.23
+AMT-38	M	1.2X	QUIRK	'X' examined before receiver full -> 0.00
+AMT-39	M	PORT12341234567890	QUIRK	14 digits: truncation skips 'PORT' and first digit without validating them -> 2341234567890.00
+AMT-40	M	A11111111111111	QUIRK	Letter skipped by high-order truncation -> 1111111111111.00
+AMT-41	M	1234567890123.4X	QUIRK	'X' examined while one decimal position remains -> 0.00
+AMT-42	M	1234567890123.45X	QUIRK	Receiver full before 'X' -> 1234567890123.45
+AMT-43	M	,5	QUIRK	Leading comma ignored -> 5.00
+AMT-44	M	100\t	QUIRK	Trailing TAB is whitespace -> 100.00

@@ -1,0 +1,104 @@
+# PORTVALD outputs recorded from the compiled COBOL program (GnuCOBOL 3.1.2) by java/run-parity.sh.
+# Generated file - regenerate with: java/run-parity.sh --update-golden
+# error_message uses the case-table encoding; trailing spaces of the PIC X(50) field are implicit.
+# move_probe: PIC S9(13)V99 value after PORTVALD's amount MOVE (signed; '-' kept on negative zero).
+case_id	return_code	error_message	call_return_code	move_probe
+DISPATCH-01	1	Invalid validation type	0	0.00
+DISPATCH-02	1	Invalid validation type	0	0.00
+DISPATCH-03	1	Invalid validation type	0	8901234567890.00
+DISPATCH-04	1	Invalid validation type	0	0.00
+DISPATCH-05	1	Invalid validation type	0	100.00
+DISPATCH-06	1	Invalid validation type	0	0.00
+DISPATCH-07	1	Invalid validation type	0	0.00
+DISPATCH-08	1	Invalid validation type	0	0.00
+DISPATCH-09	1	Invalid validation type	0	0.00
+ID-01	1	Invalid Portfolio ID format	0	0.00
+ID-02	1	Invalid Portfolio ID format	0	0.00
+ID-03	1	Invalid Portfolio ID format	0	0.00
+ID-04	1	Invalid Portfolio ID format	0	4567890123456.00
+ID-05	1	Invalid Portfolio ID format	0	0.00
+ID-06	1	Invalid Portfolio ID format	0	0.00
+ID-07	1	Invalid Portfolio ID format	0	0.00
+ID-08	1	Invalid Portfolio ID format	0	0.00
+ID-09	1	Invalid Portfolio ID format	0	0.00
+ID-10	1	Invalid Portfolio ID format	0	0.00
+ID-11	1	Invalid Portfolio ID format	0	0.00
+ID-12	1	Invalid Portfolio ID format	0	0.00
+ID-13	1	Invalid Portfolio ID format	0	0.00
+ACCT-01	2	Invalid Account Number format	0	1234567890.00
+ACCT-02	2	Invalid Account Number format	0	0.00
+ACCT-03	0		0	8901234567890.00
+ACCT-04	2	Invalid Account Number format	0	0.00
+ACCT-05	0		0	1.00
+ACCT-06	0		0	0.00
+ACCT-07	0		0	9999999999999.00
+ACCT-08	2	Invalid Account Number format	0	7890123456789.00
+ACCT-09	2	Invalid Account Number format	0	7890123456789.00
+ACCT-10	2	Invalid Account Number format	0	0.00
+ACCT-11	2	Invalid Account Number format	0	8901234567890.00
+ACCT-12	2	Invalid Account Number format	0	-7890123456789.00
+ACCT-13	2	Invalid Account Number format	0	7890123456789.00
+ACCT-14	2	Invalid Account Number format	0	5678901234567.00
+ACCT-15	2	Invalid Account Number format	0	0.00
+ACCT-16	2	Invalid Account Number format	0	1234567890.00
+TYPE-01	0		0	0.00
+TYPE-02	0		0	0.00
+TYPE-03	0		0	0.00
+TYPE-04	0		0	0.00
+TYPE-05	3	Invalid Investment Type	0	0.00
+TYPE-06	3	Invalid Investment Type	0	0.00
+TYPE-07	3	Invalid Investment Type	0	0.00
+TYPE-08	3	Invalid Investment Type	0	0.00
+TYPE-09	3	Invalid Investment Type	0	0.00
+TYPE-10	3	Invalid Investment Type	0	0.00
+TYPE-11	3	Invalid Investment Type	0	0.00
+TYPE-12	3	Invalid Investment Type	0	0.00
+TYPE-13	3	Invalid Investment Type	0	0.00
+TYPE-14	3	Invalid Investment Type	0	0.00
+TYPE-15	3	Invalid Investment Type	0	0.00
+TYPE-16	3	Invalid Investment Type	0	0.00
+TYPE-17	3	Invalid Investment Type	0	0.00
+AMT-01	0		0	0.00
+AMT-02	0		0	100.00
+AMT-03	0		0	123.45
+AMT-04	0		0	-123.45
+AMT-05	0		0	123.45
+AMT-06	0		0	42.00
+AMT-07	0		0	9999999999999.99
+AMT-08	0		0	-9999999999999.99
+AMT-09	0		0	0.01
+AMT-10	0		0	-0.01
+AMT-11	0		0	0.00
+AMT-12	0		0	2345678901234.56
+AMT-13	0		0	9999999999999.00
+AMT-14	0		0	123.45
+AMT-15	0		0	123.99
+AMT-16	0		0	1234.56
+AMT-17	0		0	123.00
+AMT-18	0		0	1000.00
+AMT-19	0		0	-5.00
+AMT-20	0		0	1.50
+AMT-21	0		0	0.50
+AMT-22	0		0	5.00
+AMT-23	0		0	0.00
+AMT-24	0		0	-0.00
+AMT-25	0		0	-0.00
+AMT-26	0		0	0.00
+AMT-27	0		0	0.00
+AMT-28	0		0	0.00
+AMT-29	0		0	0.00
+AMT-30	0		0	0.00
+AMT-31	0		0	0.00
+AMT-32	0		0	0.00
+AMT-33	0		0	7.00
+AMT-34	0		0	0.00
+AMT-35	0		0	0.00
+AMT-36	0		0	0.00
+AMT-37	0		0	1.23
+AMT-38	0		0	0.00
+AMT-39	0		0	2341234567890.00
+AMT-40	0		0	1111111111111.00
+AMT-41	0		0	0.00
+AMT-42	0		0	1234567890123.45
+AMT-43	0		0	5.00
+AMT-44	0		0	100.00
