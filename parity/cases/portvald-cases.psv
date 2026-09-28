@@ -1,0 +1,98 @@
+# PORTVALD parity case table.
+# Format: case_id|validate_type|input_value|description
+# input_value is used verbatim and is moved into LS-INPUT-VALUE PIC X(50):
+#   left justified, space filled on the right, truncated beyond 50 bytes.
+# Leading and embedded spaces are therefore significant; trailing spaces are not.
+# An empty input_value field means LS-INPUT-VALUE is all spaces.
+#
+# -- dispatch: values of LS-VALIDATE-TYPE outside I A T M -----------------
+DSP-01|X|PORT1234|unknown validation type letter
+DSP-02|i|PORT1234|lowercase i is not the I condition name
+DSP-03| |PORT1234|blank validation type
+DSP-04|1|1234567890|numeric validation type
+DSP-05|a|1234567890|lowercase a is not the A condition name
+DSP-06|m|1000.00|lowercase m is not the M condition name
+#
+# -- 1000-VALIDATE-ID ------------------------------------------------------
+ID-01|I|PORT1234|documented happy path: PORT prefix plus 4 digits
+ID-02|I|PORT0000|prefix plus four zeros
+ID-03|I|PORT9999|prefix plus four nines
+ID-04|I|PORTABCD|prefix plus alphabetic suffix
+ID-05|I|XXXX1234|wrong prefix
+ID-06|I|PORT|prefix only, suffix is spaces
+ID-07|I|port1234|lowercase prefix
+ID-08|I|PORT 123|embedded space inside the four digit suffix
+ID-09|I|PORT12345|five digit suffix
+ID-10|I|PORT123|three digit suffix
+ID-11|I||all spaces
+ID-12|I| PORT1234|leading space shifts the prefix
+ID-13|I|PORT1234EXTRA|trailing junk after a valid looking id
+ID-14|I|PORT+123|signed suffix
+ID-15|I|PORT-123|negative looking suffix
+ID-16|I|PORT111111111111111111111111111111111111111111111111111|input longer than 50 bytes, truncated on the move
+#
+# -- 2000-VALIDATE-ACCOUNT -------------------------------------------------
+AC-01|A|1234567890|documented happy path: 10 digit account number
+AC-02|A|11111111111111111111111111111111111111111111111111|50 digits, fills LS-INPUT-VALUE completely
+AC-03|A|00000000000000000000000000000000000000000000000000|50 zeros, numeric but equal to ZEROS
+AC-04|A|0000000000|10 zeros
+AC-05|A|ABCDEFGHIJ|alphabetic account number
+AC-06|A||all spaces
+AC-07|A|9999999999999999999999999999999999999999999999999A|49 digits with one alphabetic byte in position 50
+AC-08|A| 123456789|leading space
+AC-09|A|12345678901234567890123456789012345678901234567890|50 mixed digits
+AC-10|A|1111111111111111111111111111111111111111111111111|49 digits, byte 50 is a pad space
+AC-11|A|999999999999999999999999999999999999999999999999999|51 digits, truncated to 50 digits on the move
+AC-12|A|1234567890-|trailing sign character
+AC-13|A|+1234567890|leading sign character
+AC-14|A|00000000000000000000000000000000000000000000000001|50 digits, differs from ZEROS in the last byte
+#
+# -- 3000-VALIDATE-TYPE ----------------------------------------------------
+TY-01|T|STK|valid: stock
+TY-02|T|BND|valid: bond
+TY-03|T|MMF|valid: money market fund
+TY-04|T|ETF|valid: exchange traded fund
+TY-05|T|stk|lowercase
+TY-06|T| STK|leading space
+TY-07|T|STKX|valid code with trailing junk
+TY-08|T||all spaces
+TY-09|T|OPT|three letter code that is not in the list
+TY-10|T|Stk|mixed case
+TY-11|T|BNDBND|code repeated
+TY-12|T|ETF                                        X|valid code with junk beyond the compare length
+#
+# -- 4000-VALIDATE-AMOUNT --------------------------------------------------
+AM-01|M|1000.00|typical amount
+AM-02|M|0|zero
+AM-03|M|-500.25|negative amount
+AM-04|M|9999999999999.99|VAL-MAX-AMOUNT exactly
+AM-05|M|-9999999999999.99|VAL-MIN-AMOUNT exactly
+AM-06|M|99999999999999.99|14 integer digits, one more than the field holds
+AM-07|M|1000.999|third decimal digit
+AM-08|M|ABC|non numeric text
+AM-09|M||all spaces
+AM-10|M|1,000.00|thousands separator
+AM-11|M|12.3-|trailing sign
+AM-12|M| 42|leading space
+AM-13|M|.75|leading decimal point
+AM-14|M|0.001|third decimal digit on a sub cent amount
+AM-15|M|1234567890123456789012|22 digits
+AM-16|M|$100|currency symbol
+AM-17|M|1E3|exponent notation
+AM-18|M|+ 250.50|sign separated from the digits by a space
+AM-19|M|5 +|sign after the digits
+AM-20|M|1.|decimal point with no fraction digits
+AM-21|M|-.5|signed leading decimal point
+AM-22|M|0000000012.34|leading zeros ahead of the significant digits
+AM-23|M|,5|leading thousands separator
+AM-24|M|1111111111111.99|13 integer digits and two decimals, inside the range
+AM-25|M|AB123456789012345|letters ahead of surplus integer digits are skipped with them
+AM-26|M|AB12345X|letter reached because there are no surplus integer digits to skip
+AM-27|M|1234567890123.99XX|bytes beyond a full receiving field are never examined
+AM-28|M|123456789012345X67|letter reached after the surplus integer digits are skipped
+AM-29|M|1.23X|letter after the fraction is already full
+AM-30|M|1.2X|letter while the fraction still has room
+AM-31|M|1.2.3|second decimal point
+AM-32|M|4 2|space embedded between digits
+AM-33|M|00000000000000000000042|21 leading zeros ahead of the significant digits
+AM-34|M|1234567890123456.78|16 integer digits and two decimals
