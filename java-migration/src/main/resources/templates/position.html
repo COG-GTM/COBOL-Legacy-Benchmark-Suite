@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Position Inquiry</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<main class="screen">
+  <header>POSMAP — PORTFOLIO POSITION INQUIRY</header>
+  <p>Account: <strong th:text="${accountNo}">1000000001</strong>
+     | Client: <strong th:text="${clientName}">Demo Client 01</strong></p>
+  <table>
+    <thead><tr><th>Account</th><th>Fund ID</th><th>Fund Name</th><th>Units</th><th>Cost Basis</th><th>Market Value</th></tr></thead>
+    <tbody>
+      <tr th:each="position : ${positions}">
+        <td th:text="${accountNo}">1000000001</td>
+        <td th:text="${position.id.investmentId}">STK000001</td>
+        <td th:text="${position.id.investmentId}">STK000001</td>
+        <td th:text="${#numbers.formatDecimal(position.quantity, 1, 'COMMA', 4, 'POINT')}">100.0000</td>
+        <td th:text="${#numbers.formatDecimal(position.costBasis, 1, 'COMMA', 2, 'POINT')}">12,550.00</td>
+        <td th:text="${#numbers.formatDecimal(position.marketValue, 1, 'COMMA', 2, 'POINT')}">13,177.50</td>
+      </tr>
+    </tbody>
+  </table>
+  <p>Total cost: <strong th:text="${#numbers.formatDecimal(totalCost, 1, 'COMMA', 2, 'POINT')}">0.00</strong>
+     | Total value: <strong th:text="${#numbers.formatDecimal(totalValue, 1, 'COMMA', 2, 'POINT')}">0.00</strong></p>
+  <a href="/inquiry/menu">F3=Return</a>
+</main>
+</body>
+</html>

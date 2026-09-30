@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Portfolio Inquiry Menu</title>
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<main class="screen">
+  <header>MENMAP — PORTFOLIO INQUIRY MENU</header>
+  <p>Logged in as <strong sec:authentication="name">user</strong></p>
+  <form method="post" th:action="@{/inquiry}">
+    <fieldset>
+      <legend>Select Option</legend>
+      <label><input type="radio" name="option" value="1" checked> 1. Position Inquiry</label>
+      <label><input type="radio" name="option" value="2"> 2. Transaction History</label>
+      <label><input type="radio" name="option" value="3"> 3. Exit</label>
+    </fieldset>
+    <label for="accountNo">Account number</label>
+    <input id="accountNo" name="accountNo" maxlength="10" placeholder="1000000001">
+    <button type="submit">Enter</button>
+  </form>
+  <form method="post" th:action="@{/logout}">
+    <button type="submit">Logout</button>
+  </form>
+  <section>
+    <h2>Demo accounts</h2>
+    <ul>
+      <li th:each="portfolio : ${portfolios}"
+          th:text="${portfolio.portfolioId + ' → ' + portfolio.accountNo}">PORT0001 → 1000000001</li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>
