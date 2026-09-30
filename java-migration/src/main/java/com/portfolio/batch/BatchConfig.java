@@ -7,7 +7,6 @@ import com.portfolio.batch.report.StatsReportService;
 import com.portfolio.common.BatchConstants;
 import com.portfolio.domain.Transaction;
 import com.portfolio.domain.TransactionStatus;
-import com.portfolio.repository.PositionHistoryRepository;
 import com.portfolio.repository.TransactionRepository;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -37,8 +36,6 @@ public class BatchConfig {
   private final JobRepository jobRepository;
   private final PlatformTransactionManager transactionManager;
   private final TransactionRepository transactionRepository;
-  private final PositionHistoryRepository historyRepository;
-  private final DuplicateSkippingHistoryWriter historyWriter;
   private final TransactionToPositionHistoryProcessor historyProcessor;
   private final TransactionValidationTasklet validationTasklet;
   private final PositionUpdateTasklet positionUpdateTasklet;
@@ -53,7 +50,6 @@ public class BatchConfig {
       JobRepository jobRepository,
       PlatformTransactionManager transactionManager,
       TransactionRepository transactionRepository,
-      PositionHistoryRepository historyRepository,
       TransactionToPositionHistoryProcessor historyProcessor,
       TransactionValidationTasklet validationTasklet,
       PositionUpdateTasklet positionUpdateTasklet,
@@ -66,8 +62,6 @@ public class BatchConfig {
     this.jobRepository = jobRepository;
     this.transactionManager = transactionManager;
     this.transactionRepository = transactionRepository;
-    this.historyRepository = historyRepository;
-    this.historyWriter = new DuplicateSkippingHistoryWriter(historyRepository);
     this.historyProcessor = historyProcessor;
     this.validationTasklet = validationTasklet;
     this.positionUpdateTasklet = positionUpdateTasklet;
@@ -97,7 +91,9 @@ public class BatchConfig {
   }
 
   @Bean
-  Step histLoadStep(RepositoryItemReader<Transaction> historyReader) {
+  Step histLoadStep(
+      RepositoryItemReader<Transaction> historyReader,
+      DuplicateSkippingHistoryWriter historyWriter) {
     return new StepBuilder("histLoadStep", jobRepository)
         .<Transaction, com.portfolio.domain.PositionHistory>chunk(
             BatchConstants.HISTLD_COMMIT_THRESHOLD, transactionManager)

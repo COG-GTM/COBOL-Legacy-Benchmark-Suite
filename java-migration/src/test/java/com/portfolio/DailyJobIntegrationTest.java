@@ -1,8 +1,11 @@
 package com.portfolio;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import com.portfolio.batch.DuplicateSkippingHistoryWriter;
 import org.junit.jupiter.api.Test;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
@@ -19,6 +22,8 @@ import org.springframework.test.context.ActiveProfiles;
 class DailyJobIntegrationTest {
   @Autowired private JobLauncherTestUtils jobLauncherTestUtils;
 
+  @Autowired private DuplicateSkippingHistoryWriter historyWriter;
+
   @Autowired
   @Qualifier("dailyJob")
   private Job dailyJob;
@@ -29,6 +34,8 @@ class DailyJobIntegrationTest {
 
   @Test
   void dailyJobCompletesAndHistoryLoadIsIdempotent() throws Exception {
+    assertTrue(AopUtils.isAopProxy(historyWriter));
+
     jobLauncherTestUtils.setJob(dailyJob);
     JobExecution dailyExecution =
         jobLauncherTestUtils.launchJob(
@@ -50,6 +57,8 @@ class DailyJobIntegrationTest {
                 .toJobParameters());
     assertEquals(BatchStatus.COMPLETED, firstHistory.getStatus());
     assertEquals(BatchStatus.COMPLETED, secondHistory.getStatus());
-    assertEquals(0, secondHistory.getStepExecutions().iterator().next().getWriteCount());
+    var secondHistoryStep = secondHistory.getStepExecutions().iterator().next();
+    assertEquals(0, secondHistoryStep.getWriteCount());
+    assertEquals("RC=4", secondHistoryStep.getExitStatus().getExitDescription());
   }
 }
