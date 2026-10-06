@@ -1,0 +1,5 @@
+************************************************************************************************************************************
+                                   SYSTEM STATISTICS AND PERFORMANCE REPORT                                                         
+REPORT DATE:   240409                                                                                                               
+DB2 CALLS:               70,227                    AVG RESPONSE:            0.001                                                   
+BATCH JOBS:               7          SUCCESS RATE:        42.85%                                                                    

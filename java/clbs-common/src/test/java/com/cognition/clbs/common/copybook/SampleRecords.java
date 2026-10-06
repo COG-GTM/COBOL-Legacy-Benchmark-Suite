@@ -5,6 +5,7 @@ import com.cognition.clbs.common.copybook.common.HistoryRecord;
 import com.cognition.clbs.common.copybook.common.PortfolioRecord;
 import com.cognition.clbs.common.copybook.common.PositionRecord;
 import com.cognition.clbs.common.copybook.common.TransactionRecord;
+import com.cognition.clbs.common.copybook.db2.Db2StatisticsRecord;
 import com.cognition.clbs.common.copybook.db2.ErrorLogRecord;
 import com.cognition.clbs.common.copybook.db2.PositionHistoryRecord;
 import java.math.BigDecimal;
@@ -128,5 +129,20 @@ public final class SampleRecords {
         "14.30.45",
         "BATCH",
         "record 42");
+  }
+
+  public static Db2StatisticsRecord db2Statistics() {
+    return new Db2StatisticsRecord(
+        "PORTUPDT",
+        TIMESTAMP,
+        "2024-03-15-14.31.00.000000",
+        12500,
+        300,
+        1200,
+        15,
+        120,
+        2,
+        new BigDecimal("12.75"),
+        new BigDecimal("43.00"));
   }
 }

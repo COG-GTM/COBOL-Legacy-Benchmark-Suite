@@ -1,0 +1,8 @@
+section,timestamp,program,type_or_code,message
+AUDIT,2024-04-09-06.00.01.000000,PORTUPDT,PROC,Daily position update started
+AUDIT,2024-04-09-06.00.45.250000,TRNVAL00,SEC,Operator BATCHUSR authenticated
+AUDIT,2024-04-09-06.01.10.500000,POSUPDT,DATA,"Position PORTTEST/GOOGL quantity exceeds 9,999,999 and will be truncated on the daily report; verify holding"
+AUDIT,2024-04-09-06.02.00.000000,PORTUPDT,PROC,"Daily position update completed, RC=0"
+ERROR,2024-04-09-06.00.30.000000,TRNVAL00,VL0001,Invalid transaction type 'XX' on PORTTST2 sequence 000042
+ERROR,2024-04-09-06.01.05.000000,POSUPDT,SQL-811,SQLCODE -811: more than one row returned for PORTTEST/AAPL in POSITION_HISTORY
+ERROR,2024-04-09-06.01.59.000000,RPTPOS00,PR01,"Position report: 8 positions printed, 1 with zero cost basis"

@@ -3,6 +3,7 @@ package com.cognition.clbs.common.copybook;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.cognition.clbs.common.copybook.db2.Db2ErrorHandling;
+import com.cognition.clbs.common.copybook.db2.Db2StatisticsRecord;
 import com.cognition.clbs.common.copybook.db2.ErrorLogRecord;
 import com.cognition.clbs.common.copybook.db2.PositionHistoryRecord;
 import com.cognition.clbs.common.copybook.online.Db2RequestArea;
@@ -29,6 +30,15 @@ class Db2AndOnlineCopybookRoundTripTest {
     assertThat(ErrorLogRecord.parse(bytes)).isEqualTo(record);
     assertThat(ErrorLogRecord.ErrorType.fromCode("D")).isEqualTo(ErrorLogRecord.ErrorType.DATA);
     assertThat(ErrorLogRecord.Severity.fromValue(4)).isEqualTo(ErrorLogRecord.Severity.SEVERE);
+  }
+
+  @Test
+  void db2StatisticsRecordMatchesDb2statWorkingStorage() {
+    Db2StatisticsRecord record = SampleRecords.db2Statistics();
+    byte[] bytes = record.toBytes();
+    assertThat(bytes).hasSize(Db2StatisticsRecord.LENGTH);
+    assertThat(Db2StatisticsRecord.parse(bytes)).isEqualTo(record);
+    assertThat(record.totalCalls()).isEqualTo(12500 + 300 + 1200 + 15 + 120 + 2);
   }
 
   @Test
