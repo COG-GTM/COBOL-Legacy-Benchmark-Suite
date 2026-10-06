@@ -79,6 +79,46 @@ start-up and in `EntityRoundTripTest`. The embedded H2 datasource in `clbs-app/a
 a local default; set `SPRING_DATASOURCE_URL` (and credentials) for a real database. See
 [ADR 0002](../docs/adr/0002-relational-data-layer-jpa-flyway.md).
 
+### Reporting (`clbs-reporting`)
+
+The three `RPT*` batch programs are ported as pure report generators: each takes the parsed input
+records and a report date and produces a `ReportDocument` of 132-character lines (the COBOL
+`RPTFILE` LRECL), plus optional CSV and JSON renderings.
+
+| COBOL      | Java                            | Inputs (fixed-record files)                                 |
+| ---------- | ------------------------------- | ----------------------------------------------------------- |
+| `RPTPOS00` | `reporting.PositionReport`      | `POSMSTRE` (`PositionRecord`)                               |
+| `RPTAUD00` | `reporting.AuditReport`         | `AUDITLOG` (`AuditRecord`), `ERRLOG` (`ErrorLogRecord`)     |
+| `RPTSTA00` | `reporting.StatisticsReport`    | `DB2STATS` (`Db2StatisticsRecord`), `BCHSTATS` (`BatchControlRecord`) |
+
+`reporting.format.NumericPicture` edits numbers exactly like a COBOL `MOVE` to a numeric-edited
+field (`ZZZ,ZZZ,ZZ9.99`, `$$$$,$$$,$$9.99`, `+ZZ9.99`, …: zero suppression, floating `$`, truncation
+not rounding), and `ReportLine` assembles the fixed-width columns. `ReportingCli` is the `RPT*.jcl`
+equivalent:
+
+```bash
+java -cp clbs-reporting/target/classes:clbs-common/target/classes \
+  com.cognition.clbs.reporting.ReportingCli rptpos \
+  --posmstre POSMSTRE.dat --rptfile RPTFILE [--date 2024-04-09] [--text out.txt] [--csv out.csv] [--json out.json]
+```
+
+(`rptaud --auditlog F --errlog F`, `rptsta --db2stats F --bchstats F`). `--rptfile` receives the
+raw 132-byte records; the other outputs are optional. Errors exit with return code 12 like the COBOL
+error handler.
+
+**COBOL parity.** `clbs-reporting/src/test/cobol/RPT*R.cbl` are GnuCOBOL builds of the original
+report programs (sequential files instead of VSAM, `RPTDATE` env var instead of `ACCEPT FROM
+DATE`). `clbs-reporting/cobol-parity.sh` compiles them, runs them over the committed `PORTTEST`
+data set (`src/test/resources/porttest`, pinned by `PortTestFixturesTest`) and `cmp`s the output
+with the golden `.dat` files the Java tests assert against, so Java == golden == COBOL byte for
+byte. Run it after changing a report layout; `--update` rewrites the goldens from the COBOL output.
+
+Known deviations from the COBOL source are documented in the generators: `RPTPOS00` references
+`POS-DESCRIPTION`/`POS-CURRENT-VALUE`/`POS-PREVIOUS-VALUE` which `POSREC.cpy` does not define
+(mapped to investment id / market value / cost basis), `RPTAUD00` uses `ERRHAND` as a file record
+(`ErrorLogRecord` is used), and `RPTSTA00` copies a `DB2STAT` copybook that does not exist (the
+`WS-STATS-RECORD` layout from `DB2STAT.cbl` is used).
+
 ## Quality gates
 
 All gates run in `./mvnw verify` and fail the build:

@@ -1,0 +1,1 @@
+{"report":"RPTSTA00","title":"SYSTEM STATISTICS AND PERFORMANCE REPORT","reportDate":"2024-04-09","db2":{"calls":70227,"elapsedSeconds":117.25,"cpuSeconds":44.05,"avgResponseSeconds":0.001},"batch":{"jobs":7,"successful":3,"failed":1,"successRatePct":42.85}}

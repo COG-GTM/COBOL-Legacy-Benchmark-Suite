@@ -1,0 +1,9 @@
+metric,value
+db2_calls,70227
+db2_elapsed_seconds,117.25
+db2_cpu_seconds,44.05
+db2_avg_response_seconds,0.001
+batch_jobs,7
+batch_successful,3
+batch_failed,1
+batch_success_rate_pct,42.85
