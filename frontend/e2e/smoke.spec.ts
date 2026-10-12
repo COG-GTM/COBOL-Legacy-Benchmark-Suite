@@ -44,6 +44,14 @@ test('main flow: menu -> positions -> history paging -> back -> exit', async ({ 
   await expect(page.getByRole('heading', { name: 'Session ended' })).toBeVisible();
 });
 
+test('history at 360px only scrolls the table, not the page', async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 740 });
+  await page.goto('/history/1000000001?page=1');
+  await expect(page.getByTestId('history-row')).toHaveCount(10);
+  const widths = await page.evaluate(() => ({ doc: document.documentElement.scrollWidth, vw: window.innerWidth }));
+  expect(widths.doc).toBeLessThanOrEqual(widths.vw);
+});
+
 test('invalid account is rejected inline', async ({ page }) => {
   await page.goto('/positions');
   await page.getByLabel('Account:').fill('0000000000');

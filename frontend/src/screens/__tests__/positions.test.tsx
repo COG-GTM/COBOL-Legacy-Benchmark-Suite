@@ -74,6 +74,12 @@ describe('S2 Portfolio Position Inquiry', () => {
     expect(await screen.findByText('Page 2 of 2')).toBeInTheDocument();
   });
 
+  it('FR-014: an out-of-range ?page is clamped to the last page', async () => {
+    renderApp('/positions/1000000005?page=9');
+    await waitFor(() => expect(currentPath()).toBe('/positions/1000000005?page=2'));
+    expect(await screen.findByText('Page 2 of 2')).toBeInTheDocument();
+  });
+
   it('FR-013: not found shows the legacy message inline, keeps the account and focus', async () => {
     renderApp('/positions/1000000004');
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Position not found for account'));

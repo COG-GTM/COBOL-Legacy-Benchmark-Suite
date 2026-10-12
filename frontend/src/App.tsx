@@ -14,6 +14,7 @@ function RequireInquiryAccess() {
   if (status === 'loading') return <Loading delayMs={0} />;
   if (status === 'unauthenticated') return <Navigate to="/signin" replace />;
   if (status === 'signedOut') return <Navigate to="/signed-out" replace />;
+  if (status === 'denied') return <Navigate to="/access-denied" replace />;
   if (status === 'error')
     return (
       <SystemErrorView

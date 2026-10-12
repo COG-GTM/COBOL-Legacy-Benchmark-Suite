@@ -46,6 +46,13 @@ describe('S3 Transaction History Inquiry', () => {
     expect(await screen.findByText('Page 1 of 2')).toBeInTheDocument();
   });
 
+  it('FR-020: an out-of-range ?page is clamped to the last page', async () => {
+    renderApp('/history/1000000001?page=3');
+    await waitFor(() => expect(currentPath()).toBe('/history/1000000001?page=2'));
+    expect(await screen.findByText('Page 2 of 2')).toBeInTheDocument();
+    expect(screen.queryByText('No transactions found for account')).not.toBeInTheDocument();
+  });
+
   it('FR-025: a new search resets to page 1', async () => {
     const { user } = renderApp('/history/1000000001?page=2');
     expect(await screen.findByText('Page 2 of 2')).toBeInTheDocument();

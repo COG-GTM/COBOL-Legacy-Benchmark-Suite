@@ -21,10 +21,6 @@ import { normaliseAccountNo, parsePageParam, validateAccountNo } from '../state/
 const M = messages.history;
 const COLUMN_COUNT = 6;
 
-function rowKey(t: Transaction) {
-  return `${t.portfolioId}-${t.tradeDate}-${t.tradeTime}-${t.securityId}`;
-}
-
 function TransactionDetails({ t, id }: { t: Transaction; id: string }) {
   const items: Array<[string, string, boolean?]> = [
     [M.time, formatTime(t.tradeTime)],
@@ -48,8 +44,9 @@ function TransactionDetails({ t, id }: { t: Transaction; id: string }) {
 }
 
 function HistoryTable({ accountNo, items }: { accountNo: string; items: Transaction[] }) {
-  const [expanded, setExpanded] = useState<Set<string>>(new Set());
-  const toggle = (key: string) =>
+  // Transactions have no unique ID, so expansion is keyed by row index (the table remounts per page).
+  const [expanded, setExpanded] = useState<Set<number>>(new Set());
+  const toggle = (key: number) =>
     setExpanded((prev) => {
       const next = new Set(prev);
       if (next.has(key)) next.delete(key);
@@ -73,7 +70,7 @@ function HistoryTable({ accountNo, items }: { accountNo: string; items: Transact
         </thead>
         <tbody>
           {items.map((t, index) => {
-            const key = rowKey(t);
+            const key = index;
             const isOpen = expanded.has(key);
             const detailId = `txn-detail-${index}`;
             const typeLabel = transactionTypeLabel(t.type);
@@ -163,6 +160,13 @@ export function HistoryScreen() {
     else navigate(`/history/${acct}?page=1`);
   }
 
+  const outOfRange = state.status === 'success' && state.data.items.length === 0 && state.data.totalCount > 0;
+  const lastPage = state.status === 'success' ? totalPagesFor(state.data.totalCount, state.data.pageSize) : 1;
+  useEffect(() => {
+    // A stale or mistyped ?page beyond the end is clamped to the last page instead of stranding the user.
+    if (outOfRange) setSearchParams({ page: String(lastPage) }, { replace: true });
+  }, [outOfRange, lastPage, setSearchParams]);
+
   // FR-008: arriving without an account re-runs the inquiry for the last valid account.
   if (routeAccount === undefined && selectedAccountNo) {
     return <Navigate to={`/history/${selectedAccountNo}?page=1`} replace />;
@@ -188,7 +192,7 @@ export function HistoryScreen() {
         </button>
       );
     }
-  } else if (data && data.items.length === 0) message = { text: messages.errors.noTransactions, severity: 'INFO' };
+  } else if (data && data.totalCount === 0) message = { text: messages.errors.noTransactions, severity: 'INFO' };
 
   return (
     <div className="screen">

@@ -11,7 +11,7 @@ import { useSession } from './SessionContext';
  */
 export function useApiErrorRouting() {
   const navigate = useNavigate();
-  const { markUnauthenticated, setFlash } = useSession();
+  const { markUnauthenticated, setFlash, setSelectedAccountNo } = useSession();
 
   return useCallback(
     (err: unknown): ApiError | null => {
@@ -22,6 +22,10 @@ export function useApiErrorRouting() {
         markUnauthenticated();
         navigate('/signin', { replace: true });
         return null;
+      }
+      if (status === 403 || apiError.action === 'ABEND' || apiError.action === 'RETURN') {
+        // The failing account is not carried forward, so the next inquiry starts from a blank form.
+        setSelectedAccountNo(null);
       }
       if (status === 403) {
         navigate('/access-denied', { replace: true });
@@ -38,6 +42,6 @@ export function useApiErrorRouting() {
       }
       return apiError;
     },
-    [navigate, markUnauthenticated, setFlash],
+    [navigate, markUnauthenticated, setFlash, setSelectedAccountNo],
   );
 }

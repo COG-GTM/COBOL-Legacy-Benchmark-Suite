@@ -45,6 +45,21 @@ describe('FR-002 INQONLN:READ authorization', () => {
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Authorization check failed'));
   });
 
+  it('routes a 403 from the session endpoint to Access denied (no reload loop)', async () => {
+    server.use(http.get('*/api/v1/session', () => HttpResponse.json({ code: 'ACCESS_DENIED' }, { status: 403 })));
+    renderApp('/positions/1000000001');
+    expect(await screen.findByRole('heading', { name: 'Access denied' })).toBeInTheDocument();
+    expect(currentPath()).toBe('/access-denied');
+  });
+
+  it('FR-029: after a RETURN the failing account is not re-run when the user picks an inquiry again', async () => {
+    const { user } = renderApp('/positions/9999999996');
+    await waitFor(() => expect(currentPath()).toBe('/'));
+    await user.type(screen.getByLabelText('Select Option:'), '1{Enter}');
+    expect(await screen.findByLabelText('Account:')).toHaveValue('');
+    expect(currentPath()).toBe('/positions');
+  });
+
   it('shows the System Error screen when the session endpoint fails', async () => {
     server.use(http.get('*/api/v1/session', () => HttpResponse.json({ code: 'SYSTEM_ERROR' }, { status: 500 })));
     renderApp('/');

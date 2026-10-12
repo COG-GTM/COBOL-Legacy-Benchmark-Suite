@@ -15,6 +15,9 @@ export function formatTime(value: string | null | undefined): string {
 /** RFC 3339 timestamp shown as "YYYY-MM-DD HH:MM:SS UTC" without locale/timezone drift. */
 export function formatTimestamp(value: string | null | undefined): string {
   if (!value) return '';
-  const match = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2})/.exec(value);
-  return match ? `${match[1]} ${match[2]} UTC` : value;
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/i.test(value)) return value;
+  const instant = new Date(value);
+  if (Number.isNaN(instant.getTime())) return value;
+  const iso = instant.toISOString();
+  return `${iso.slice(0, 10)} ${iso.slice(11, 19)} UTC`;
 }

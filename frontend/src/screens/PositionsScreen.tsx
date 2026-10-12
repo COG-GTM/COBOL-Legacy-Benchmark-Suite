@@ -144,6 +144,13 @@ export function PositionsScreen() {
     else navigate(`/positions/${acct}`);
   }
 
+  const outOfRange = state.status === 'success' && state.data.items.length === 0 && state.data.totalCount > 0;
+  const lastPage = state.status === 'success' ? totalPagesFor(state.data.totalCount, state.data.pageSize) : 1;
+  useEffect(() => {
+    // A stale or mistyped ?page beyond the end is clamped to the last page instead of stranding the user.
+    if (outOfRange) setSearchParams(lastPage > 1 ? { page: String(lastPage) } : {}, { replace: true });
+  }, [outOfRange, lastPage, setSearchParams]);
+
   // FR-008: arriving without an account re-runs the inquiry for the last valid account.
   if (routeAccount === undefined && selectedAccountNo) {
     return <Navigate to={`/positions/${selectedAccountNo}`} replace />;

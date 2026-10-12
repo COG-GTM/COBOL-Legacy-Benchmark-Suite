@@ -19,6 +19,14 @@ describe('S4 System Error and messages', () => {
     expect(currentPath()).toBe('/');
   });
 
+  it('FR-027: after Continue, picking history again starts from a blank form instead of re-raising the error', async () => {
+    const { user } = renderApp('/history/9999999999?page=1');
+    await user.click(await screen.findByRole('button', { name: 'Continue' }));
+    await user.click(screen.getByRole('link', { name: '2. Transaction History' }));
+    expect(await screen.findByLabelText('Account:')).toHaveValue('');
+    expect(currentPath()).toBe('/history');
+  });
+
   it('FR-027: renders an arbitrary ApiError', () => {
     const onContinue = vi.fn();
     render(

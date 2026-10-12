@@ -4,7 +4,7 @@ import { ApiRequestError } from '../api/errors';
 import type { ApiError, ErrorSeverity, SessionInfo } from '../api/types';
 import { INQUIRY_PERMISSION } from '../api/types';
 
-export type SessionStatus = 'loading' | 'ready' | 'unauthenticated' | 'signedOut' | 'error';
+export type SessionStatus = 'loading' | 'ready' | 'unauthenticated' | 'denied' | 'signedOut' | 'error';
 
 export interface FlashMessage {
   text: string;
@@ -55,6 +55,10 @@ export function SessionProvider({ children, api = defaultApi }: { children: Reac
         if (controller.signal.aborted) return;
         if (err instanceof ApiRequestError && err.status === 401) {
           setStatus('unauthenticated');
+          return;
+        }
+        if (err instanceof ApiRequestError && err.status === 403) {
+          setStatus('denied');
           return;
         }
         if (err instanceof ApiRequestError) setSessionError(err.body);

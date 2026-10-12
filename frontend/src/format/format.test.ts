@@ -53,6 +53,8 @@ describe('date formatting (FR-010, FR-019)', () => {
 
   it('formats RFC 3339 timestamps in UTC', () => {
     expect(formatTimestamp('2024-03-20T15:31:12Z')).toBe('2024-03-20 15:31:12 UTC');
+    expect(formatTimestamp('2024-03-20T15:31:12+02:00')).toBe('2024-03-20 13:31:12 UTC');
+    expect(formatTimestamp('2024-03-20T23:30:00-01:00')).toBe('2024-03-21 00:30:00 UTC');
   });
 });
 
