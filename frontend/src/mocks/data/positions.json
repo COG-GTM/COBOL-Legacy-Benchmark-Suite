@@ -1,0 +1,64 @@
+{
+  "1000000001": [
+    {
+      "accountNo": "1000000001",
+      "portfolioId": "PORT00001",
+      "positionDate": "2024-03-20",
+      "investmentId": "IBM0000001",
+      "fundName": null,
+      "units": "65.7895",
+      "costBasis": "12500.00",
+      "marketValue": "12796.05",
+      "currency": "USD",
+      "status": "A",
+      "lastMaintainedAt": "2024-03-20T15:30:45.123456Z",
+      "lastMaintainedBy": "BATCH01"
+    },
+    {
+      "accountNo": "1000000001",
+      "portfolioId": "PORT00001",
+      "positionDate": "2024-03-20",
+      "investmentId": "VFIAX00001",
+      "fundName": null,
+      "units": "250.1234",
+      "costBasis": "100000.00",
+      "marketValue": "118765.43",
+      "currency": "USD",
+      "status": "P",
+      "lastMaintainedAt": "2024-03-20T15:30:46.000000Z",
+      "lastMaintainedBy": "BATCH01"
+    }
+  ],
+  "1000000002": [
+    {
+      "accountNo": "1000000002",
+      "portfolioId": "PORT00002",
+      "positionDate": "2024-03-20",
+      "investmentId": "MSFT000001",
+      "fundName": null,
+      "units": "120.0000",
+      "costBasis": "45600.00",
+      "marketValue": "49680.00",
+      "currency": "USD",
+      "status": "A",
+      "lastMaintainedAt": "2024-03-20T15:31:12.789012Z",
+      "lastMaintainedBy": "BATCH01"
+    }
+  ],
+  "1000000003": [
+    {
+      "accountNo": "1000000003",
+      "portfolioId": "PORT00003",
+      "positionDate": "2024-03-20",
+      "investmentId": "AAPL000001",
+      "fundName": null,
+      "units": "42.8571",
+      "costBasis": "7500.00",
+      "marketValue": "7371.42",
+      "currency": "USD",
+      "status": "C",
+      "lastMaintainedAt": "2024-03-20T15:32:01.456789Z",
+      "lastMaintainedBy": "BATCH01"
+    }
+  ]
+}
