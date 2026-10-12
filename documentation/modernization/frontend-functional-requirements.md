@@ -76,8 +76,8 @@ Written as an honest trace, not as the documented intent:
 | # | Legacy map | Title (BMS `INITIAL`) | Sent by (code) | Purpose | Proposed React route |
 |---|---|---|---|---|---|
 | S1 | `MENMAP` (`INQSET.bms:7-19`) | "Portfolio Management System" | Nobody: `INQONLN` sends non-existent `INQMNU` (`INQONLN.cbl:93`) | Main menu: choose inquiry or exit | `/` |
-| S2 | `POSMAP` (`INQSET.bms:23-49`) | "Portfolio Position Inquiry" | `INQPORT.cbl:87` | Enter an account, view its position(s) | `/positions` and `/positions/:accountNo` |
-| S3 | `HISMAP` (`INQSET.bms:53-85`) | "Transaction History Inquiry" | `INQHIST.cbl:178` | Enter an account, view transaction history, 10 rows per page | `/history` and `/history/:accountNo?page=n` |
+| S2 | `POSMAP` (`INQSET.bms:23-49`) | "Portfolio Position Inquiry" | `INQPORT.cbl:87` | Enter an account, view its position(s) | `/positions` |
+| S3 | `HISMAP` (`INQSET.bms:53-85`) | "Transaction History Inquiry" | `INQHIST.cbl:178` | Enter an account, view transaction history, 10 rows per page | `/history?page=n` |
 | S4 | `ERRMAP` (`INQSET.bms:89-99`) | "System Error" | Nobody (GAP-14) | Show error code and details, then continue | Error page/boundary (`/error`) plus inline banners |
 
 ```mermaid
@@ -180,7 +180,7 @@ Note: unlike S2/S3/S4, `MENMAP` has **no PF-key legend line**.
 | Price | 28-37 | `WS-TRANS-PRICE PIC S9(9)V99 COMP-3` | `PRICE DECIMAL(15,3)` (SQL selects non-existent `TRANS_PRICE`, `INQHIST.cbl:131`) | Column name wrong. 2 vs 3 decimals. | 3 decimals (do not drop precision), currency symbol optional |
 | Amount | 39-50 | `WS-TRANS-AMOUNT PIC S9(9)V99 COMP-3` | `AMOUNT DECIMAL(15,2)` (SQL selects non-existent `TRANS_AMOUNT`, `INQHIST.cbl:131`) | Column name wrong. The program's integer part (9 digits) is shorter than the column's (13 digits). | Currency, 2 decimals, signed |
 
-Sort order: `ORDER BY TRANS_DATE DESC` (`INQHIST.cbl:134`). There is no secondary sort key. Recommend `TRANS_DATE DESC, TRANS_TIME DESC` so the order is stable (FR-022). Primary key is `(ACCOUNT_NO, PORTFOLIO_ID, TRANS_DATE, TRANS_TIME)` (`POSHIST.sql:47-57`).
+Sort order: `ORDER BY TRANS_DATE DESC` (`INQHIST.cbl:134`). There is no secondary sort key. Primary key is `(ACCOUNT_NO, PORTFOLIO_ID, TRANS_DATE, TRANS_TIME)` (`POSHIST.sql:47-57`), so date+time alone is not unique within an account (two portfolios can trade at the same instant). The API must use the total order `TRANS_DATE DESC, TRANS_TIME DESC, PORTFOLIO_ID DESC` (unique per account given the PK) for every page, so rows are never repeated or skipped across page boundaries (FR-022).
 
 **Columns available in `POSHIST` but not on screen** (optional extra columns or a row-detail drawer): `PORTFOLIO_ID`, `TRANS_TIME`, `SECURITY_ID`, `FEES`, `TOTAL_AMOUNT`, `COST_BASIS`, `GAIN_LOSS`, `PROCESS_DATE`, `PROCESS_TIME`, `PROGRAM_ID`, `USER_ID`, `AUDIT_TIMESTAMP` (`POSHIST.sql:27-43`; copybook `DBTBLS.cpy:10-28`).
 
@@ -244,7 +244,7 @@ Legacy COMMAREA `INQCOM-AREA` (`INQCOM.cpy:4-12`), 98 bytes:
 | Field | PIC | Meaning | Legacy reality | React state |
 |---|---|---|---|---|
 | `INQCOM-FUNCTION` | X(4) | `MENU` / `INQP` / `INQH` / `EXIT` | Cleared to LOW-VALUES on every loop (`INQONLN.cbl:54`) | Current route |
-| `INQCOM-ACCOUNT-NO` | X(10) | Account being inquired on | Never moved from a map field into the COMMAREA (GAP-02, GAP-05) | `selectedAccountNo` in the URL path param (shareable, survives refresh) plus app context. **Carry it between S2 and S3** so switching inquiry keeps the account (FR-008). |
+| `INQCOM-ACCOUNT-NO` | X(10) | Account being inquired on | Never moved from a map field into the COMMAREA (GAP-02, GAP-05) | `selectedAccountNo` in in-memory app context only, **not** in the URL (account numbers in URLs leak into browser history, proxy/server logs and `Referer` headers; Q-07). **Carry it between S2 and S3** so switching inquiry keeps the account (FR-008). |
 | `INQCOM-RESPONSE-CODE` | S9(8) COMP | Last response code | Set by `INQPORT`/`INQHIST` error paths (`INQPORT.cbl:106-107`, `INQHIST.cbl:189-190`). Never read by `INQONLN`. | Part of the API error object (`ApiError.legacyCode`) |
 | `INQCOM-ERROR-MSG` | X(80) | Message for the user | Set by `INQPORT` (`INQPORT.cbl:97-98, 104-105`) and `INQHIST` (`INQHIST.cbl:117-118`). Never displayed. | Message banner text |
 
@@ -263,7 +263,7 @@ Other state the React app needs that the legacy code keeps implicitly:
 | BR-02 | **Position lookup is by account.** | `READ FILE('POSFILE') RIDFLD(POSITION-ACCOUNT)` (`INQPORT.cbl:72-76`) | Key field does not exist. The real `POSREC` key is portfolio ID + date + investment ID (`POSREC.cpy:7-10`) (GAP-05). | The API resolves account to portfolio(s) to positions. Return all positions for the account (latest `POS-DATE` per investment). |
 | BR-03 | **Position not found.** | `RESP NOT NORMAL` sets `NO-POSITION` and the message "Position not found for account" (`INQPORT.cbl:78-82, 96-99`) | Message set but never shown (GAP-14) | Show an empty state with the text "Position not found for account" (keep the legacy wording). HTTP 404 `POSITION_NOT_FOUND`. |
 | BR-04 | **Position read error.** | `HANDLE CONDITION ERROR` sends control to "Error accessing position data" plus the response code (`INQPORT.cbl:61-64, 103-108`) | Because `READ` uses `RESP`, `HANDLE CONDITION` is suppressed for that command. The error path is effectively unreachable. Any non-NORMAL response is treated as not-found (`INQPORT.cbl:78-82`). | Distinguish not found (404) from errors (5xx). On 5xx show "Error accessing position data" with the trace ID. |
-| BR-05 | **History ordering.** | `ORDER BY TRANS_DATE DESC` (`INQHIST.cbl:134`) | Statement never runs successfully (GAP-07/08) | Newest first. Tie-break by `TRANS_TIME DESC`. |
+| BR-05 | **History ordering.** | `ORDER BY TRANS_DATE DESC` (`INQHIST.cbl:134`) | Statement never runs successfully (GAP-07/08) | Newest first. Total order `TRANS_DATE DESC, TRANS_TIME DESC, PORTFOLIO_ID DESC` (unique per account, `POSHIST.sql:47-57`). |
 | BR-06 | **History page size 10.** | `OCCURS 10` (`INQHIST.cbl:21`), `ROW1-10` (`INQSET.bms:72-81`) | Only the first fetch is shown | 10 rows per page |
 | BR-07 | **Empty history.** | No branch for SQLCODE +100 or zero rows. `CURS-RESPONSE-CODE >= 0` copies the data area whatever its content (`INQHIST.cbl:171-173`). | Not handled. Would show garbage or blank rows. | Empty state "No transactions found for account" (new text, GAP-13). HTTP 200 with `items: []`, not 404. |
 | BR-08 | **Transaction type codes.** | `BU`/`SL`/`TR`/`FE` (`TRNREC.cpy:14-18`, `COMMON.cpy:25-29`, `db2-definitions.sql:102-103`). `POSHIST` comment lists only BU/SL/TR (`POSHIST.sql:80-81`). Test data uses `B`/`S` (`test-data-specs.md:31, 107-112`). Data dictionary uses `BY` (`data-dictionary.md:57`). | Inconsistent across sources | Display labels: BU Buy, SL Sell, TR Transfer, FE Fee. Show any unknown code as-is (raw). |
@@ -349,7 +349,7 @@ Call order in `INQONLN.P050` (`INQONLN.cbl:139-171`): V, then A only if V succee
 3. Every data endpoint enforces authorization server-side **before** reading data. The UI hides nothing as a security measure. It only reflects 401/403.
 4. Auditing (the SECMGR `L` request) is server-side. Each successful inquiry, and (new) each denied attempt, is logged by the API. The UI sends no audit calls.
 5. 401 means redirect to sign-in. 403 means the "Access denied" page (legacy text). The session expiry message is new (Q-06).
-6. Do not keep account data in `localStorage`. URL path params with account numbers are acceptable for an internal tool (Q-07).
+6. Do not keep account data in `localStorage`/`sessionStorage` or in the URL (path or query). The account number is sent to the API only in the request path of `fetch` calls (TLS-protected) and held in memory. If Q-07 is answered "URLs allowed", it can move to the route later.
 
 ---
 
@@ -416,7 +416,7 @@ export interface Position {
 
 /** One row of S3. Source: POSHIST (POSHIST.sql:25-43, DBTBLS.cpy:10-28) */
 export interface Transaction {
-  accountNo: AccountNo;                // ACCOUNT_NO CHAR(8) (Q-01)
+  accountNo: AccountNo;                // canonical account no. as entered (BR-01). POSHIST.ACCOUNT_NO is CHAR(8): backend owns the lossless mapping (GAP-22, Q-01)
   portfolioId: string;                 // PORTFOLIO_ID CHAR(10)
   tradeDate: IsoDate;                  // TRANS_DATE DATE        -> screen "Date"
   tradeTime: IsoTime;                  // TRANS_TIME TIME
@@ -429,6 +429,7 @@ export interface Transaction {
   totalAmount: DecimalString;          // TOTAL_AMOUNT DECIMAL(15,2)
   costBasis: DecimalString;            // COST_BASIS DECIMAL(15,2)
   gainLoss: DecimalString;             // GAIN_LOSS DECIMAL(15,2)
+  currency: CurrencyCode;              // NOT in POSHIST (GAP-23); backend source TRN-CURRENCY X(03) (TRNREC.cpy:22) / TRANSACTION_HISTORY.CURRENCY_CODE (db2-definitions.sql:56)
 }
 
 export interface Page<T> {
@@ -525,24 +526,24 @@ Notes: security IDs `IBM0000001`/`MSFT000001`/`AAPL000001` and timestamps come f
 ```json
 {
   "1000000001": [
-    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-03-20", "tradeTime": "15:30:45", "type": "BU", "securityId": "IBM0000001",  "units": "65.790",  "price": "190.000", "amount": "12500.00", "fees": "0.00",  "totalAmount": "12500.00", "costBasis": "12500.00", "gainLoss": "0.00" },
-    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-03-18", "tradeTime": "10:02:11", "type": "FE", "securityId": "CASH0000001", "units": "0.000",   "price": "0.000",   "amount": "-25.00",   "fees": "25.00", "totalAmount": "-25.00",   "costBasis": "0.00",     "gainLoss": "0.00" },
-    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-03-15", "tradeTime": "14:45:00", "type": "SL", "securityId": "IBM0000001",  "units": "-10.000", "price": "193.250", "amount": "1932.50",  "fees": "4.95",  "totalAmount": "1927.55",  "costBasis": "1880.00",  "gainLoss": "47.55" },
-    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-03-12", "tradeTime": "09:31:27", "type": "BU", "securityId": "IBM0000001",  "units": "10.000",  "price": "188.000", "amount": "1880.00",  "fees": "4.95",  "totalAmount": "1884.95",  "costBasis": "1880.00",  "gainLoss": "0.00" },
-    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-03-08", "tradeTime": "11:15:42", "type": "TR", "securityId": "IBM0000001",  "units": "5.000",   "price": "185.500", "amount": "927.50",   "fees": "0.00",  "totalAmount": "927.50",   "costBasis": "927.50",   "gainLoss": "0.00" },
-    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-03-05", "tradeTime": "13:20:09", "type": "BU", "securityId": "IBM0000001",  "units": "20.000",  "price": "184.100", "amount": "3682.00",  "fees": "4.95",  "totalAmount": "3686.95",  "costBasis": "3682.00",  "gainLoss": "0.00" },
-    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-03-01", "tradeTime": "10:00:00", "type": "FE", "securityId": "CASH0000001", "units": "0.000",   "price": "0.000",   "amount": "-25.00",   "fees": "25.00", "totalAmount": "-25.00",   "costBasis": "0.00",     "gainLoss": "0.00" },
-    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-02-27", "tradeTime": "15:55:31", "type": "SL", "securityId": "IBM0000001",  "units": "-8.000",  "price": "182.750", "amount": "1462.00",  "fees": "4.95",  "totalAmount": "1457.05",  "costBasis": "1440.00",  "gainLoss": "17.05" },
-    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-02-22", "tradeTime": "09:45:18", "type": "BU", "securityId": "IBM0000001",  "units": "8.000",   "price": "180.000", "amount": "1440.00",  "fees": "4.95",  "totalAmount": "1444.95",  "costBasis": "1440.00",  "gainLoss": "0.00" },
-    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-02-16", "tradeTime": "12:10:05", "type": "BU", "securityId": "IBM0000001",  "units": "15.000",  "price": "178.300", "amount": "2674.50",  "fees": "4.95",  "totalAmount": "2679.45",  "costBasis": "2674.50",  "gainLoss": "0.00" },
-    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-02-09", "tradeTime": "14:00:59", "type": "SL", "securityId": "IBM0000001",  "units": "-3.000",  "price": "176.900", "amount": "530.70",   "fees": "4.95",  "totalAmount": "525.75",   "costBasis": "510.00",   "gainLoss": "15.75" },
-    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-02-01", "tradeTime": "10:30:00", "type": "BU", "securityId": "IBM0000001",  "units": "3.000",   "price": "170.000", "amount": "510.00",   "fees": "4.95",  "totalAmount": "514.95",   "costBasis": "510.00",   "gainLoss": "0.00" }
+    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-03-20", "tradeTime": "15:30:45", "type": "BU", "securityId": "IBM0000001",  "units": "65.790",  "price": "190.000", "amount": "12500.00", "fees": "0.00",  "totalAmount": "12500.00", "costBasis": "12500.00", "gainLoss": "0.00", "currency": "USD" },
+    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-03-18", "tradeTime": "10:02:11", "type": "FE", "securityId": "CASH0000001", "units": "0.000",   "price": "0.000",   "amount": "-25.00",   "fees": "25.00", "totalAmount": "-25.00",   "costBasis": "0.00",     "gainLoss": "0.00", "currency": "USD" },
+    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-03-15", "tradeTime": "14:45:00", "type": "SL", "securityId": "IBM0000001",  "units": "-10.000", "price": "193.250", "amount": "1932.50",  "fees": "4.95",  "totalAmount": "1927.55",  "costBasis": "1880.00",  "gainLoss": "47.55", "currency": "USD" },
+    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-03-12", "tradeTime": "09:31:27", "type": "BU", "securityId": "IBM0000001",  "units": "10.000",  "price": "188.000", "amount": "1880.00",  "fees": "4.95",  "totalAmount": "1884.95",  "costBasis": "1880.00",  "gainLoss": "0.00", "currency": "USD" },
+    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-03-08", "tradeTime": "11:15:42", "type": "TR", "securityId": "IBM0000001",  "units": "5.000",   "price": "185.500", "amount": "927.50",   "fees": "0.00",  "totalAmount": "927.50",   "costBasis": "927.50",   "gainLoss": "0.00", "currency": "USD" },
+    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-03-05", "tradeTime": "13:20:09", "type": "BU", "securityId": "IBM0000001",  "units": "20.000",  "price": "184.100", "amount": "3682.00",  "fees": "4.95",  "totalAmount": "3686.95",  "costBasis": "3682.00",  "gainLoss": "0.00", "currency": "USD" },
+    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-03-01", "tradeTime": "10:00:00", "type": "FE", "securityId": "CASH0000001", "units": "0.000",   "price": "0.000",   "amount": "-25.00",   "fees": "25.00", "totalAmount": "-25.00",   "costBasis": "0.00",     "gainLoss": "0.00", "currency": "USD" },
+    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-02-27", "tradeTime": "15:55:31", "type": "SL", "securityId": "IBM0000001",  "units": "-8.000",  "price": "182.750", "amount": "1462.00",  "fees": "4.95",  "totalAmount": "1457.05",  "costBasis": "1440.00",  "gainLoss": "17.05", "currency": "USD" },
+    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-02-22", "tradeTime": "09:45:18", "type": "BU", "securityId": "IBM0000001",  "units": "8.000",   "price": "180.000", "amount": "1440.00",  "fees": "4.95",  "totalAmount": "1444.95",  "costBasis": "1440.00",  "gainLoss": "0.00", "currency": "USD" },
+    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-02-16", "tradeTime": "12:10:05", "type": "BU", "securityId": "IBM0000001",  "units": "15.000",  "price": "178.300", "amount": "2674.50",  "fees": "4.95",  "totalAmount": "2679.45",  "costBasis": "2674.50",  "gainLoss": "0.00", "currency": "USD" },
+    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-02-09", "tradeTime": "14:00:59", "type": "SL", "securityId": "IBM0000001",  "units": "-3.000",  "price": "176.900", "amount": "530.70",   "fees": "4.95",  "totalAmount": "525.75",   "costBasis": "510.00",   "gainLoss": "15.75", "currency": "USD" },
+    { "accountNo": "1000000001", "portfolioId": "PORT00001", "tradeDate": "2024-02-01", "tradeTime": "10:30:00", "type": "BU", "securityId": "IBM0000001",  "units": "3.000",   "price": "170.000", "amount": "510.00",   "fees": "4.95",  "totalAmount": "514.95",   "costBasis": "510.00",   "gainLoss": "0.00", "currency": "USD" }
   ],
   "1000000002": [
-    { "accountNo": "1000000002", "portfolioId": "PORT00002", "tradeDate": "2024-03-20", "tradeTime": "15:31:12", "type": "SL", "securityId": "MSFT000001", "units": "-11.905", "price": "420.000", "amount": "5000.00", "fees": "0.00", "totalAmount": "5000.00", "costBasis": "4520.00", "gainLoss": "480.00" }
+    { "accountNo": "1000000002", "portfolioId": "PORT00002", "tradeDate": "2024-03-20", "tradeTime": "15:31:12", "type": "SL", "securityId": "MSFT000001", "units": "-11.905", "price": "420.000", "amount": "5000.00", "fees": "0.00", "totalAmount": "5000.00", "costBasis": "4520.00", "gainLoss": "480.00", "currency": "USD" }
   ],
   "1000000003": [
-    { "accountNo": "1000000003", "portfolioId": "PORT00003", "tradeDate": "2024-03-20", "tradeTime": "15:32:01", "type": "BU", "securityId": "AAPL000001", "units": "42.857", "price": "175.000", "amount": "7500.00", "fees": "0.00", "totalAmount": "7500.00", "costBasis": "7500.00", "gainLoss": "0.00" }
+    { "accountNo": "1000000003", "portfolioId": "PORT00003", "tradeDate": "2024-03-20", "tradeTime": "15:32:01", "type": "BU", "securityId": "AAPL000001", "units": "42.857", "price": "175.000", "amount": "7500.00", "fees": "0.00", "totalAmount": "7500.00", "costBasis": "7500.00", "gainLoss": "0.00", "currency": "USD" }
   ],
   "1000000004": []
 }
@@ -592,7 +593,7 @@ Example error body:
 **Account entry (S2, S3)**
 
 - **FR-007 Account input and validation.** S2 and S3 each have an "Account" input (max 10 characters, autofocused). Validation: required, trimmed, digits only, not all zeros (BR-01). *Acceptance:* (a) `ABC`, an empty value, `0000000000` and an 11-digit value are each rejected client-side with "Invalid Account Number format" and no API call is made; (b) `1000000001` is accepted; (c) a server 400 is shown the same way.
-- **FR-008 Account carried across inquiries.** The last valid account number is kept in the URL (`/positions/:accountNo`, `/history/:accountNo`) and in app state. Moving between S2 and S3 pre-fills and runs the inquiry for that account. *Acceptance:* search `1000000001` on S2, go to S3, and history for `1000000001` loads without retyping. A page refresh keeps the result.
+- **FR-008 Account carried across inquiries.** The last valid account number is kept in in-memory app state (React context), never in the URL. Moving between S2 and S3 pre-fills and runs the inquiry for that account. *Acceptance:* search `1000000001` on S2, go to S3, and history for `1000000001` loads without retyping. The address bar never contains the account number. A full page refresh clears the account (the user re-enters it).
 
 **Position inquiry (S2)**
 
@@ -609,10 +610,10 @@ Example error body:
 
 - **FR-017 History retrieval.** Submitting a valid account calls `GET /accounts/{accountNo}/transactions?page=1&pageSize=10`. *Acceptance:* the network request carries `page=1&pageSize=10`.
 - **FR-018 History columns.** The table has columns Date, Type, Units, Price, Amount, in that order (legacy headers, `INQSET.bms:61-70`). *Acceptance:* the header text and order match.
-- **FR-019 History formatting.** Date as `YYYY-MM-DD`. Type as code plus label (for example "BU – Buy"). Units and Price with 3 decimals. Amount as currency with 2 decimals, signed. *Acceptance:* the first `1000000001` row shows `2024-03-20 | BU – Buy | 65.790 | 190.000 | $12,500.00`.
+- **FR-019 History formatting.** Date as `YYYY-MM-DD`. Type as code plus label (for example "BU – Buy"). Units and Price with 3 decimals. Amount (and the money fields in FR-021) as currency with 2 decimals, signed, using the row's `currency` field (never a hard-coded `$`). *Acceptance:* the first `1000000001` row shows `2024-03-20 | BU – Buy | 65.790 | 190.000 | $12,500.00`, and a component test with `currency: "EUR"` renders `€12,500.00`.
 - **FR-020 Paging (PF7/PF8).** Ten rows per page. "Previous" (PF7) and "Next" (PF8) buttons. Previous is disabled on page 1. Next is disabled when `hasNext` is false. The page number is reflected in `?page=`. *Acceptance:* `1000000001` page 1 shows 10 rows and Next is enabled; Next shows 2 rows and Next is disabled; Previous returns to the first 10 rows. "Page 2 of 2" is displayed.
 - **FR-021 Row detail.** Each row can be expanded (or opened in a drawer) to show Time, Security ID, Portfolio ID, Fees, Total Amount, Cost Basis and Gain/Loss. *Acceptance:* expanding the 2024-03-15 SL row shows Gain/Loss `$47.55`.
-- **FR-022 Ordering.** Rows are displayed newest first (date then time descending), as returned by the API. The UI does not re-sort. *Acceptance:* the mock page 1 dates are in strictly descending order.
+- **FR-022 Ordering.** Rows are displayed newest first, in the API's total order `tradeDate DESC, tradeTime DESC, portfolioId DESC`. The UI does not re-sort. *Acceptance:* the mock page 1 rows are in descending order by that key, and the mock API applies the same key when slicing pages, so concatenating page 1 and page 2 gives every row exactly once.
 - **FR-023 Empty history.** When `items` is empty, show "No transactions found for account" and no pager. *Acceptance:* account `1000000004`.
 - **FR-024 History unavailable.** On 503 `DB_UNAVAILABLE` show "Transaction history is temporarily unavailable" with a Retry button that repeats the same request once per click. On 500 show "Error accessing transaction history" plus the trace ID. *Acceptance:* accounts `9999999997` and `9999999998`. The UI never auto-retries more than once.
 - **FR-025 New search resets paging.** Submitting a different account resets to page 1. *Acceptance:* go to page 2 for `1000000001`, then search `1000000002`: the URL has `page=1`.
@@ -654,7 +655,7 @@ Example error body:
 | FR-018 | `INQSET.bms:60-70` | none |
 | FR-019 | `INQHIST.cbl:22-26`; `POSHIST.sql:28-34`; `TRNREC.cpy:14-18` | GAP-08 |
 | FR-020 | `INQHIST.cbl:20-21`; `INQSET.bms:71-84`; `CURSMGR.cbl:24` | GAP-09 |
-| FR-021 | `POSHIST.sql:27-43`; `DBTBLS.cpy:10-28` | none |
+| FR-021 | `POSHIST.sql:27-43`; `DBTBLS.cpy:10-28`; `TRNREC.cpy:22` | GAP-23 |
 | FR-022 | `INQHIST.cbl:134`; `POSHIST.sql:47-53` | none |
 | FR-023 | `INQHIST.cbl:164-175` | GAP-13 |
 | FR-024 | `INQHIST.cbl:95-127, 188-191`; `DB2ONLN.cbl:54-81`; `DB2RECV.cbl:62-109` | GAP-13 |
@@ -704,7 +705,7 @@ Example error body:
 | Row 23 red `ERRMSG`/`POSMSG`/`HISMSG` | Inline alert region under the form (`role="alert"`) |
 | `ERRMAP` | Full-page error view / React error boundary |
 | "Press ENTER to continue" | Focused "Continue" button |
-| COMMAREA | URL params + React context (no server session needed for UI state) |
+| COMMAREA | React context (account, in memory) + `?page=` query param (no server session needed for UI state) |
 | `ABEND IERR` | Fatal error view. The app does not crash. |
 | `EXEC CICS ASSIGN USERID` | OIDC/SSO identity via `/session` |
 
@@ -770,18 +771,20 @@ Example error body:
 | GAP-19 | `DB2ONLN` pool counters live in WORKING-STORAGE of a non-resident program (`RESIDENT(NO)`), so they reset on every `LINK` and the 100-connection limit never triggers. Status (`S`) overwrites the response code with the connection count. `INQHIST` never disconnects. | `DB2ONLN.cbl:18-22, 117-118`; `PORTDFN.csd:35-40`; `INQHIST.cbl:95-127` | Backend concern. UI reacts to 503 only. |
 | GAP-20 | Docs vs code: the architecture doc says CURSMGR handles "screen navigation / PF key processing" (it is a DB2 cursor manager). It says INQPORT uses DB2/ERRHNDL (it uses VSAM only, and no ERRHNDL). It says INQHIST supports date-range queries (it does not). It shows security before dispatch (the code is after). The backlog marks Sprint 4 complete. `documentation/user/README.md` is empty (0 bytes). | `system-architecture.md:196-251, 349-385, 523-534`; `development-backlog.md:301-348`; `documentation/user/README.md` | The code is treated as the source of truth for what exists, and the docs for intent only |
 | GAP-21 | Test-data formats disagree with the code: `PORT-ID` X(10) `PORT`+5 digits vs `PORTFLIO` X(8) and `PORTVALD` `PORT`+4. Status `I` (Inactive) vs `S` (Suspended). Transaction type `B`/`S` vs `BU`/`SL`. | `test-data-specs.md:9, 87-90, 101-112`; `PORTFLIO.cpy:13, 24-27`; `PORTVALD.cbl:52-67`; `TRNREC.cpy:14-18` | Mock uses spec values. The UI enforces no portfolio-ID format. |
+| GAP-22 | Account key length conflict breaks the history lookup: the API/UI accept up to 10 digits (`INQCOM.cpy:10`, `PORTFLIO.cpy:14`), but `POSHIST.ACCOUNT_NO` is `CHAR(8)` (`POSHIST.sql:26`) and `PH-ACCOUNT-NO X(8)` (`DBTBLS.cpy:11`). A 10-digit account cannot be stored or matched directly, and truncating it could match another account. | `POSHIST.sql:26`; `DBTBLS.cpy:11`; `INQCOM.cpy:10` | Contract uses the canonical (≤10-digit) account everywhere. The backend must either widen `ACCOUNT_NO`/`HISTLD00` to the canonical length or define an explicit, lossless account→`ACCOUNT_NO` mapping (e.g. via `PORTFLIO` `PORT-ACCOUNT-NO`→`PORT-ID`→`PORTFOLIO_ID`), and test it with a 10-digit account. Mock data uses 10-digit accounts and does not model this. Blocking for the real API (Q-01). |
+| GAP-23 | `POSHIST` has no currency column (`POSHIST.sql:25-43`), but history amounts must be formatted as currency. `TRN-CURRENCY X(03)` exists in `TRNREC.cpy:22` and `TRANSACTION_HISTORY.CURRENCY_CODE` in `db2-definitions.sql:56`. | `POSHIST.sql:25-43`; `TRNREC.cpy:22`; `db2-definitions.sql:56` | `Transaction.currency` added. The backend must source it (join or new column), or document and enforce USD-only. The UI never assumes `$`. |
 
 ### 10.2 Open questions for the product owner
 
 | ID | Question | Default assumed in this doc |
 |---|---|---|
-| Q-01 | What is the canonical account number format: 10 characters (`INQCOM`, `PORTFLIO`, `PORTVALD` comment), 9 numeric digits 100000000-999999999 (data dictionary), or `CHAR(8)` (`POSHIST`)? | 1-10 digits, not all zeros |
+| Q-01 | What is the canonical account number format: 10 characters (`INQCOM`, `PORTFLIO`, `PORTVALD` comment), 9 numeric digits 100000000-999999999 (data dictionary), or `CHAR(8)` (`POSHIST`)? | 1-10 digits, not all zeros. **Must be resolved before the real history API** because `POSHIST.ACCOUNT_NO` is `CHAR(8)` (GAP-22). |
 | Q-02 | Where does "Fund Name" come from (a security master that doesn't exist yet)? | Nullable. Shown as a dash. |
 | Q-03 | Portfolio ID format: `PORT`+4 digits (8 characters) or `PORT`+5 digits (9-10 characters)? | Display only, no validation |
 | Q-04 | Should closed (`C`) and pending (`P`) positions appear in the inquiry? | Show all, with a status badge |
 | Q-05 | Is history date-range filtering wanted (the docs promise it, the code lacks it)? | Out of scope for v1 |
 | Q-06 | What does "Exit" mean on the web: sign out, or return to a portal? | Sign out and clear state |
-| Q-07 | May account numbers appear in URLs (bookmarking/sharing vs privacy)? | Yes, for an internal tool |
+| Q-07 | May account numbers appear in URLs (bookmarking/sharing vs privacy: browser history, logs, `Referer`)? | No. Kept in memory only (FR-008, 6.3). |
 | Q-08 | Will the real API return decimals as strings (as proposed), or must the UI adapt to numbers? | Strings |
 | Q-09 | Is per-account (data-level) authorization required? Legacy has only transaction-level authorization. | Enforced server-side when available. The UI only handles 403. |
 | Q-10 | Should a position-level "previous/next" (PF7/PF8 on `POSMAP`) step through one position at a time like a 3270 detail screen, or is a table acceptable? | Table (FR-014) |
