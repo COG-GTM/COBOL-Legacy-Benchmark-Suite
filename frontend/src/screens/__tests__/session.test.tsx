@@ -39,7 +39,7 @@ describe('FR-002 INQONLN:READ authorization', () => {
     expect(await screen.findByRole('heading', { name: 'Access denied' })).toBeInTheDocument();
   });
 
-  it('returns to the menu with "Authorization check failed" when the check itself fails (RETURN)', async () => {
+  it('FR-029: returns to the menu with "Authorization check failed" when the check itself fails (RETURN)', async () => {
     renderApp('/positions/9999999996');
     await waitFor(() => expect(currentPath()).toBe('/'));
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Authorization check failed'));

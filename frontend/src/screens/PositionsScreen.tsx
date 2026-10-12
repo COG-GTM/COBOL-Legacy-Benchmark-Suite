@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import type { Position, PositionPage } from '../api/types';
 import { AccountSearchForm } from '../components/AccountSearchForm';
 import { Loading } from '../components/Loading';
@@ -142,6 +142,11 @@ export function PositionsScreen() {
     setSelectedAccountNo(acct);
     if (acct === activeAccount && page === 1) setNonce((n) => n + 1);
     else navigate(`/positions/${acct}`);
+  }
+
+  // FR-008: arriving without an account re-runs the inquiry for the last valid account.
+  if (routeAccount === undefined && selectedAccountNo) {
+    return <Navigate to={`/positions/${selectedAccountNo}`} replace />;
   }
 
   const data = state.status === 'success' ? state.data : null;

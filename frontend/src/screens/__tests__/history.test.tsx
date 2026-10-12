@@ -7,10 +7,11 @@ import { currentPath, renderApp } from '../../test/renderApp';
 const rows = () => screen.getAllByTestId('history-row');
 
 describe('S3 Transaction History Inquiry', () => {
-  it('FR-017/FR-018/FR-019: shows 10 rows newest first with the doc formats', async () => {
+  it('FR-017/FR-018/FR-019/FR-022: shows 10 rows newest first with the doc columns and formats', async () => {
     renderApp('/history/1000000001?page=1');
     await screen.findByTestId('history-table');
     expect(rows()).toHaveLength(10);
+    expect(screen.getAllByRole('columnheader').map((h) => h.textContent)).toEqual(['Date', 'Type', 'Units', 'Price', 'Amount', 'Details']);
     const first = within(rows()[0]!);
     expect(first.getByText('2024-03-20')).toBeInTheDocument();
     expect(first.getByText('BU – Buy')).toBeInTheDocument();
@@ -55,6 +56,23 @@ describe('S3 Transaction History Inquiry', () => {
     expect(await screen.findByText('Page 1 of 1')).toBeInTheDocument();
   });
 
+  it('FR-021: expanding the 2024-03-15 SL row shows Gain/Loss $47.55', async () => {
+    const { user } = renderApp('/history/1000000001?page=1');
+    await screen.findByTestId('history-table');
+    const row = rows().find((r) => r.textContent?.includes('2024-03-15'))!;
+    await user.click(within(row).getByRole('button', { name: /Show details/ }));
+    const details = screen.getByText('Gain/Loss').closest('dl')!;
+    expect(within(details).getByText('$47.55')).toBeInTheDocument();
+  });
+
+  it('FR-008: arriving at /history after a position search loads that account without retyping', async () => {
+    const { user } = renderApp('/positions/1000000001');
+    await screen.findByTestId('positions-table');
+    await user.click(screen.getByRole('link', { name: 'Transaction History' }));
+    await waitFor(() => expect(currentPath()).toBe('/history/1000000001?page=1'));
+    expect(await screen.findByTestId('history-table')).toBeInTheDocument();
+  });
+
   it('FR-021: row details expose time, security, fees, totals, cost basis and gain/loss', async () => {
     const { user } = renderApp('/history/1000000002?page=1');
     await screen.findByTestId('history-table');
@@ -67,7 +85,7 @@ describe('S3 Transaction History Inquiry', () => {
     }
   });
 
-  it('FR-022: empty history shows an informational message, not an error', async () => {
+  it('FR-023: empty history shows an informational message, not an error', async () => {
     renderApp('/history/1000000004?page=1');
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('No transactions found for account'));
     const alert = screen.getByRole('alert');
@@ -81,7 +99,7 @@ describe('S3 Transaction History Inquiry', () => {
     expect(screen.getByRole('alert')).toHaveTextContent('Invalid Account Number format');
   });
 
-  it('FR-023: a read error shows "Error accessing transaction history" with a trace ID', async () => {
+  it('FR-024: a 500 read error shows "Error accessing transaction history" with a trace ID', async () => {
     renderApp('/history/9999999998?page=1');
     await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent('Error accessing transaction history'));
     const alert = screen.getByRole('alert');

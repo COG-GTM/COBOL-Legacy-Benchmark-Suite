@@ -31,7 +31,7 @@ describe('S1 Main Menu', () => {
     expect(currentPath()).toBe('/history');
   });
 
-  it('FR-006: an invalid option shows "Select option 1, 2 or 3", keeps the menu and refocuses the field', async () => {
+  it('FR-005/FR-006: an invalid option shows "Select option 1, 2 or 3", keeps the menu and refocuses the field', async () => {
     const { user } = renderApp('/');
     const field = await screen.findByLabelText('Select Option:');
     await user.type(field, '9{Enter}');

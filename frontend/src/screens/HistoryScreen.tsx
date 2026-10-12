@@ -1,5 +1,5 @@
 import { Fragment, useCallback, useEffect, useRef, useState } from 'react';
-import { Link, useNavigate, useParams, useSearchParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import type { Transaction, TransactionPage } from '../api/types';
 import { AccountSearchForm } from '../components/AccountSearchForm';
 import { Loading } from '../components/Loading';
@@ -161,6 +161,11 @@ export function HistoryScreen() {
     // FR-025: a new search always resets to page 1.
     if (acct === activeAccount && page === 1) setNonce((n) => n + 1);
     else navigate(`/history/${acct}?page=1`);
+  }
+
+  // FR-008: arriving without an account re-runs the inquiry for the last valid account.
+  if (routeAccount === undefined && selectedAccountNo) {
+    return <Navigate to={`/history/${selectedAccountNo}?page=1`} replace />;
   }
 
   const data = state.status === 'success' ? state.data : null;

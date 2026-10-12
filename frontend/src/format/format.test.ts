@@ -16,6 +16,7 @@ describe('decimal formatting (FR-011, FR-019, FR-032, NFR-04)', () => {
 
   it('formats negative amounts with a sign', () => {
     expect(formatMoney('-25.00')).toBe('-$25.00');
+    expect(formatMoney('-1234.5', 'USD')).toBe('-$1,234.50');
   });
 
   it('formats history units and prices to 3 dp', () => {

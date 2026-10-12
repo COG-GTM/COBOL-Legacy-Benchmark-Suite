@@ -48,7 +48,23 @@ describe('S2 Portfolio Position Inquiry', () => {
     expect(within(summary).getByText('Closed')).toBeInTheDocument();
   });
 
-  it('FR-014 (GAP-09 default): multiple positions render as a table, sorted by fund ID, with paging', async () => {
+  it('FR-014: two positions render as a table sorted by Fund ID with no pager', async () => {
+    renderApp('/positions/1000000001');
+    const table = await screen.findByTestId('positions-table');
+    const ids = within(table).getAllByRole('rowheader').map((c) => c.textContent);
+    expect(ids).toEqual(['IBM0000001', 'VFIAX00001']);
+    expect(screen.queryByRole('navigation', { name: 'Pagination' })).not.toBeInTheDocument();
+  });
+
+  it('FR-010: the summary uses the legacy labels', async () => {
+    renderApp('/positions/1000000002');
+    const summary = await screen.findByTestId('position-summary');
+    for (const label of ['Fund ID:', 'Fund Name:', 'Units:', 'Cost Basis:', 'Market Value:']) {
+      expect(within(summary).getByText(label)).toBeInTheDocument();
+    }
+  });
+
+  it('FR-014 (GAP-09 default): more than 10 positions render as a table, sorted by fund ID, with paging', async () => {
     const { user } = renderApp('/positions/1000000005');
     const table = await screen.findByTestId('positions-table');
     expect(within(table).getAllByRole('row')).toHaveLength(11);
