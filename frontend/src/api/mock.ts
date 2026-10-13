@@ -90,6 +90,8 @@ export function buildAccount(s: Seed): AccountDetail {
       ev.push({ t: bday(-1 - Math.floor(r() * 3)), type: 'Buy', c, amt: pick([2500, 5000, 7500]) });
     }
   }
+  const topUp = s.funds.find(([, p]) => p === 'hold');
+  if (topUp) ev.push({ t: bday(-2), type: 'Buy', c: topUp[0], amt: 2500 });
   const feeFund = (s.funds.find(([c, p]) => p === 'hold' && (FUNDS[c].cls === 'bond' || FUNDS[c].cls === 'cash')) ?? s.funds[0])[0];
   for (let t = O + 91; t < 0; t += 91) ev.push({ t: bday(t), type: 'Fee', c: feeFund, amt: r2(18 + r() * 42) });
   ev.sort((a, b) => a.t - b.t);

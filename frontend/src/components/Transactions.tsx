@@ -55,6 +55,7 @@ export function Transactions({ account, searchRef, active }: { account: AccountD
       });
   }, [account, query, types, status, from, to, sort]);
 
+  const typeCounts = useMemo(() => Object.fromEntries(TYPES.map((t) => [t, account.transactions.filter((x) => x.type === t).length])) as Record<TransactionType, number>, [account]);
   const pages = Math.max(1, Math.ceil(filtered.length / pageSize));
   const current = Math.min(page, pages);
   const rows = filtered.slice((current - 1) * pageSize, current * pageSize);
@@ -90,7 +91,7 @@ export function Transactions({ account, searchRef, active }: { account: AccountD
         <div className="chips" role="group" aria-label="Transaction type">
           {TYPES.map((t) => (
             <button key={t} type="button" className="chip" aria-pressed={types.includes(t)}
-              onClick={() => update(setTypes)(types.includes(t) ? types.filter((x) => x !== t) : [...types, t])}>{t}</button>
+              onClick={() => update(setTypes)(types.includes(t) ? types.filter((x) => x !== t) : [...types, t])}>{t} <span className="num">{typeCounts[t]}</span></button>
           ))}
         </div>
         <select className="ctl" aria-label="Status" value={status} onChange={(e) => update(setStatus)(e.target.value as 'all' | TransactionStatus)}>

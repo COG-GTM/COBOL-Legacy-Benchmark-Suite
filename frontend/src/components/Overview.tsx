@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { ASSET_CLASS_LABELS, type AccountDetail } from '../api/types';
-import { formatDate, GainLoss, GainPct, pct2, signed, units3, usd } from '../lib/format';
+import { formatDate, GainLoss, GainPct, pct2, signed, units3, usd, usd0 } from '../lib/format';
 import { allocation, computeTotals } from '../lib/metrics';
 import { StatusPill, TypeCell } from './shared';
 import { ValueChart } from './ValueChart';
@@ -29,23 +29,23 @@ export function Overview({ account, onViewTransactions }: { account: AccountDeta
       <div className="kpis" data-testid="kpis">
         <div className="kpi">
           <span className="eyebrow">Total market value</span>
-          <span className="v">{usd.format(totals.marketValue)}</span>
-          <span className="d"><GainLoss value={totals.dayChange} /> <GainPct value={totals.dayChangePct} /> today</span>
+          <span className="v">{usd0.format(totals.marketValue)}</span>
+          <span className="d"><GainLoss value={totals.dayChange} format={usd0} /> <GainPct value={totals.dayChangePct} /> today</span>
         </div>
         <div className="kpi">
           <span className="eyebrow">Cost basis</span>
-          <span className="v">{usd.format(totals.costBasis)}</span>
+          <span className="v">{usd0.format(totals.costBasis)}</span>
           <span className="d">{totals.activeCount} active positions</span>
         </div>
         <div className="kpi">
           <span className="eyebrow">Unrealized gain/loss</span>
-          <span className="v"><GainLoss value={totals.unrealized} /></span>
-          <span className="d"><GainPct value={totals.unrealizedPct} /> · Realized <GainLoss value={totals.realized} /></span>
+          <span className="v"><GainLoss value={totals.unrealized} format={usd0} /></span>
+          <span className="d"><GainPct value={totals.unrealizedPct} /> · Realized <GainLoss value={totals.realized} format={usd0} /></span>
         </div>
         <div className="kpi">
           <span className="eyebrow">Pending</span>
           <span className="v">{totals.pendingCount}</span>
-          <span className="d">{totals.pendingCount ? `${signed(totals.pendingNet)} net, settling` : 'Nothing settling'}</span>
+          <span className="d">{totals.pendingCount ? `${signed(totals.pendingNet, usd0)} net, settling` : 'Nothing settling'}</span>
         </div>
       </div>
 

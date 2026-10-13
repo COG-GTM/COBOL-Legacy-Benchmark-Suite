@@ -45,7 +45,7 @@ describe('account lookup', () => {
   it('keeps current account when lookup is not found', async () => {
     const user = await setup();
     await lookup(user, '9999999999');
-    expect(await screen.findByRole('alert')).toHaveTextContent('No account found for 9999-9999-99');
+    expect(await screen.findByRole('alert')).toHaveTextContent('No portfolio found for 9999-9999-99');
     expect(screen.getByRole('heading', { level: 1, name: 'Okafor Family Trust' })).toBeInTheDocument();
   });
 
@@ -125,7 +125,7 @@ describe('transactions', () => {
     expect(rows()[0].querySelector('td.mono')!.textContent).not.toBe(firstId);
     await user.selectOptions(within(panel).getByLabelText('Rows per page'), '25');
     expect(rows().length).toBeGreaterThan(10);
-    await user.click(within(panel).getByRole('button', { name: 'Fee' }));
+    await user.click(within(panel).getByRole('button', { name: /^Fee \d+$/ }));
     rows().forEach((r) => expect(r).toHaveTextContent('Fee'));
     expect(within(panel).getByTestId('tx-summary')).toHaveTextContent(/of \d+ transactions/);
     await user.click(within(panel).getAllByRole('button', { name: 'Clear filters' })[0]);
@@ -154,5 +154,16 @@ describe('review fixes', () => {
     render(<App api={api} />);
     await user.click(await screen.findByRole('button', { name: 'Retry' }));
     expect(await screen.findByRole('heading', { level: 1, name: 'Okafor Family Trust' })).toBeInTheDocument();
+  });
+});
+
+describe('QA fixes', () => {
+  it('shows counts on transaction type chips and settling units on positions', async () => {
+    const user = await setup();
+    await user.click(screen.getByRole('tab', { name: /Positions/ }));
+    expect(within(screen.getByRole('tabpanel', { name: /Positions/ })).getAllByText(/settling/).length).toBeGreaterThan(0);
+    await user.click(screen.getByRole('tab', { name: /Transactions/ }));
+    const panel = screen.getByRole('tabpanel', { name: /Transactions/ });
+    expect(within(panel).getByRole('button', { name: /^Buy \d+$/ })).toBeInTheDocument();
   });
 });

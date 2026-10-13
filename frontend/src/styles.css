@@ -55,7 +55,7 @@ nav.tabs button:hover{color:var(--fg)}
 nav.tabs button[aria-selected="true"]{color:var(--fg);border-bottom-color:var(--accent)}
 kbd{font-family:var(--mono);font-size:10.5px;border:1px solid var(--line);border-bottom-width:2px;border-radius:4px;padding:0 5px;color:var(--faint);background:var(--surface)}
 
-main{padding-block:24px 48px;display:grid;gap:20px}
+main{padding-block:24px 48px;display:grid;grid-template-columns:minmax(0,1fr);gap:20px}
 .acct-head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px 24px}
 .acct-head h1{font-size:24px;font-weight:600;letter-spacing:-.02em;margin:0;text-wrap:balance}
 .acct-meta{display:flex;flex-wrap:wrap;gap:6px 14px;color:var(--muted);font-size:13px;margin-top:4px}

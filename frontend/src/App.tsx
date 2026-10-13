@@ -69,7 +69,7 @@ export default function App({ api = defaultApi }: { api?: PortfolioApi }) {
       if (id !== requestId.current) return;
       const error = e instanceof ApiError ? e : new ApiError('SYSTEM', 'Unexpected error loading account', 'UNKNOWN');
       if (error.kind === 'NOT_FOUND') {
-        setLookupMsg(`No account found for ${formatAccountNo(accountNo)}.`);
+        setLookupMsg(`No portfolio found for ${formatAccountNo(accountNo)}.`);
         const previous = fromLookup ? lastReady.current : null;
         setView(previous ? { status: 'ready', account: previous } : { status: 'error', accountNo, error });
       } else {
