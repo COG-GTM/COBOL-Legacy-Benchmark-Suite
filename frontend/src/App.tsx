@@ -41,6 +41,7 @@ export default function App({ api = defaultApi }: { api?: PortfolioApi }) {
   const [lookupMsg, setLookupMsg] = useState<string | null>(null);
   const [theme, setTheme] = useState<Theme>(initialTheme);
   const requestId = useRef(0);
+  const lastReady = useRef<AccountDetail | null>(null);
   const lookupRef = useRef<HTMLInputElement>(null);
   const posSearch = useRef<HTMLInputElement>(null);
   const txSearch = useRef<HTMLInputElement>(null);
@@ -57,10 +58,11 @@ export default function App({ api = defaultApi }: { api?: PortfolioApi }) {
   const load = useCallback(async (accountNo: string, fromLookup = false) => {
     const id = ++requestId.current;
     setLookupMsg(null);
-    setView((v) => (fromLookup && v.status === 'ready' ? v : { status: 'loading', accountNo }));
+    setView({ status: 'loading', accountNo });
     try {
       const account = await api.getAccount(accountNo);
       if (id !== requestId.current) return;
+      lastReady.current = account;
       setView({ status: 'ready', account });
       setInput('');
     } catch (e) {
@@ -68,26 +70,32 @@ export default function App({ api = defaultApi }: { api?: PortfolioApi }) {
       const error = e instanceof ApiError ? e : new ApiError('SYSTEM', 'Unexpected error loading account', 'UNKNOWN');
       if (error.kind === 'NOT_FOUND') {
         setLookupMsg(`No account found for ${formatAccountNo(accountNo)}.`);
-        setView((v) => (v.status === 'loading' && !fromLookup ? { status: 'error', accountNo, error } : v));
+        const previous = fromLookup ? lastReady.current : null;
+        setView(previous ? { status: 'ready', account: previous } : { status: 'error', accountNo, error });
       } else {
         setView({ status: 'error', accountNo, error });
       }
     }
   }, [api]);
 
-  useEffect(() => {
-    let cancelled = false;
+  const loadAccounts = useCallback((isCancelled: () => boolean = () => false) => {
+    setView({ status: 'loading' });
     api.listAccounts().then(
       (list) => {
-        if (cancelled) return;
+        if (isCancelled()) return;
         setAccounts(list);
         if (list[0]) load(list[0].accountNo);
         else setView({ status: 'error', accountNo: '', error: new ApiError('NOT_FOUND', 'No accounts available') });
       },
-      () => !cancelled && setView({ status: 'error', accountNo: '', error: new ApiError('SYSTEM', 'Unable to load accounts', 'ACCOUNTS') }),
+      () => !isCancelled() && setView({ status: 'error', accountNo: '', error: new ApiError('SYSTEM', 'Unable to load accounts', 'ACCOUNTS') }),
     );
-    return () => { cancelled = true; };
   }, [api, load]);
+
+  useEffect(() => {
+    let cancelled = false;
+    loadAccounts(() => cancelled);
+    return () => { cancelled = true; };
+  }, [loadAccounts]);
 
   useEffect(() => {
     const onHash = () => setTabState(tabFromHash());
@@ -203,7 +211,7 @@ export default function App({ api = defaultApi }: { api?: PortfolioApi }) {
           {view.status === 'loading' && (
             <div className="panel state" role="status"><div className="spinner" aria-hidden="true" />Loading portfolio…</div>
           )}
-          {view.status === 'error' && <ErrorPanel accountNo={view.accountNo} error={view.error} onRetry={() => view.accountNo && load(view.accountNo)} />}
+          {view.status === 'error' && <ErrorPanel accountNo={view.accountNo} error={view.error} onRetry={() => (view.accountNo ? load(view.accountNo) : loadAccounts())} />}
           {account && (
             <div key={account.accountNo} style={{ display: 'contents' }}>
               <section id="view-overview" role="tabpanel" aria-labelledby="tab-overview" hidden={tab !== 'overview'}>

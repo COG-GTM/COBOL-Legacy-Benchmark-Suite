@@ -94,7 +94,7 @@ export function Overview({ account, onViewTransactions }: { account: AccountDeta
               <TypeCell type={t.type} direction={t.direction} />
               <div style={{ minWidth: 0 }}>
                 <div className="fund">{t.fundName}</div>
-                <div className="meta"><span className="mono">{t.fundCode}</span> · {formatDate(t.date)} · {units3.format(t.units)} units</div>
+                <div className="meta"><span className="mono">{t.fundCode}</span> · {formatDate(t.date)} · {units3.format(t.units)} units @ {usd.format(t.price)}</div>
               </div>
               <div className="amt">
                 <span className={`num ${t.status === 'Failed' || t.status === 'Reversed' ? 'struck' : ''}`}>{signed(t.amount * t.direction)}</span>

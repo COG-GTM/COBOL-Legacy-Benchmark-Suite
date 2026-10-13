@@ -135,3 +135,24 @@ describe('transactions', () => {
     expect(within(panel).getByText('No transactions match these filters')).toBeInTheDocument();
   });
 });
+
+describe('review fixes', () => {
+  it('hides the previous account while a lookup is in flight', async () => {
+    const user = userEvent.setup();
+    render(<App api={createMockApi(30)} />);
+    await screen.findByRole('heading', { level: 1, name: 'Okafor Family Trust' });
+    await lookup(user, DENIED_ACCOUNT);
+    expect(screen.queryByTestId('kpis')).not.toBeInTheDocument();
+    expect(await screen.findByRole('heading', { name: 'Access denied' })).toBeInTheDocument();
+  });
+
+  it('retries the account list after a failure', async () => {
+    const user = userEvent.setup();
+    const mock = createMockApi(0);
+    let calls = 0;
+    const api = { ...mock, listAccounts: () => (++calls === 1 ? Promise.reject(new Error('down')) : mock.listAccounts()) };
+    render(<App api={api} />);
+    await user.click(await screen.findByRole('button', { name: 'Retry' }));
+    expect(await screen.findByRole('heading', { level: 1, name: 'Okafor Family Trust' })).toBeInTheDocument();
+  });
+});

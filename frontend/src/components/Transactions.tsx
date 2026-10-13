@@ -59,11 +59,8 @@ export function Transactions({ account, searchRef, active }: { account: AccountD
   const current = Math.min(page, pages);
   const rows = filtered.slice((current - 1) * pageSize, current * pageSize);
   const settled = filtered.filter((t) => t.status === 'Done');
-  const totals = {
-    inflow: sum(settled.filter((t) => t.direction > 0).map((t) => t.amount)),
-    outflow: sum(settled.filter((t) => t.direction < 0 && t.type !== 'Fee').map((t) => t.amount)),
-    fees: sum(settled.filter((t) => t.type === 'Fee').map((t) => t.amount)),
-  };
+  const totalOf = (type: TransactionType) => sum(settled.filter((t) => t.type === type).map((t) => t.amount * (type === 'Transfer' ? t.direction : 1)));
+  const totals = { bought: totalOf('Buy'), sold: totalOf('Sell'), transfers: totalOf('Transfer'), fees: totalOf('Fee') };
   const filtersOn = query || types.length || status !== 'all' || from || to;
 
   const update = <T,>(set: (v: T) => void) => (v: T) => { set(v); setPage(1); };
@@ -110,9 +107,11 @@ export function Transactions({ account, searchRef, active }: { account: AccountD
       </div>
       <div className="summary" data-testid="tx-summary">
         <span><b>{filtered.length}</b> of {account.transactions.length} transactions</span>
-        <span>Settled in <b>{usd.format(totals.inflow)}</b></span>
-        <span>Settled out <b>{usd.format(totals.outflow)}</b></span>
+        <span>Bought <b>{usd.format(totals.bought)}</b></span>
+        <span>Sold <b>{usd.format(totals.sold)}</b></span>
+        <span>Net transfers <b>{signed(totals.transfers)}</b></span>
         <span>Fees <b>{usd.format(totals.fees)}</b></span>
+        <span className="muted">settled only</span>
       </div>
       {rows.length === 0 ? (
         <Empty title="No transactions match these filters">

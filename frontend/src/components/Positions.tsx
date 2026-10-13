@@ -132,7 +132,7 @@ export function Positions({ account, searchRef }: { account: AccountDetail; sear
                 <div className="pcard-h"><div><b>{p.fundName}</b><small>{p.fundCode} · {ASSET_CLASS_LABELS[p.assetClass]}</small></div><StatusPill status={p.status} /></div>
                 <div className="mv">{p.status === 'Closed' ? '—' : usd.format(p.marketValue)}</div>
                 <dl>
-                  <div><dt>Units</dt><dd>{units3.format(p.units)}</dd></div>
+                  <div><dt>Units</dt><dd>{units3.format(p.units)}{p.settlingUnits > 0 && <div className="muted">+{units3.format(p.settlingUnits)} settling</div>}</dd></div>
                   <div><dt>NAV</dt><dd>{usd.format(p.nav)}</dd></div>
                   <div><dt>Cost basis</dt><dd>{p.status === 'Closed' ? '—' : usd.format(p.costBasis)}</dd></div>
                   <div><dt>{p.status === 'Closed' ? 'Realized' : 'Gain/loss'}</dt><dd><GainLoss value={g.gain} /> {p.status !== 'Closed' && <GainPct value={g.pct} />}</dd></div>

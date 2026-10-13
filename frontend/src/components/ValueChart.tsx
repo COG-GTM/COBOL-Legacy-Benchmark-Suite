@@ -1,6 +1,6 @@
 import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import type { ValuePoint } from '../api/types';
-import { formatDate, monthFmt, monthYearFmt, usd0, usdCompact } from '../lib/format';
+import { formatDate, monthFmt, monthYearFmt, signed, usd0, usdCompact } from '../lib/format';
 
 const H = 250;
 const PAD = { l: 56, r: 12, t: 12, b: 26 };
@@ -85,6 +85,7 @@ export function ValueChart({ points }: { points: ValuePoint[] }) {
           <span>{formatDate(hp.date)}</span>
           <span className="mono">{usd0.format(hp.marketValue)}</span>
           <span className="mono" style={{ opacity: 0.7 }}>Cost {usd0.format(hp.costBasis)}</span>
+          <span className="mono" style={{ opacity: 0.85 }}>{hp.marketValue >= hp.costBasis ? 'Gain' : 'Loss'} {signed(hp.marketValue - hp.costBasis, usd0)}</span>
         </div>
       )}
     </div>
