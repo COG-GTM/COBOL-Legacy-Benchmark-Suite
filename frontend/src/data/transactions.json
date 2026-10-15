@@ -1,0 +1,14 @@
+[
+  { "date": "2026-10-14", "time": "15:42:10", "portfolioId": "PORT0005", "sequenceNo": "000412", "investmentId": "US912828Z7", "type": "BU", "quantity": 2500.0000, "price": 99.8125, "amount": 249531.25, "currency": "USD", "status": "P" },
+  { "date": "2026-10-14", "time": "14:05:33", "portfolioId": "PORT0002", "sequenceNo": "000388", "investmentId": "IBM0000001", "type": "SL", "quantity": 1200.0000, "price": 231.4500, "amount": 277740.00, "currency": "USD", "status": "D" },
+  { "date": "2026-10-14", "time": "09:31:02", "portfolioId": "PORT0001", "sequenceNo": "000201", "investmentId": "VTSAX00001", "type": "BU", "quantity": 150.2500, "price": 142.3300, "amount": 21385.08, "currency": "USD", "status": "D" },
+  { "date": "2026-10-13", "time": "16:58:47", "portfolioId": "PORT0003", "sequenceNo": "000177", "investmentId": "FEE0000001", "type": "FE", "quantity": 0.0000, "price": 0.0000, "amount": 1250.00, "currency": "USD", "status": "D" },
+  { "date": "2026-10-13", "time": "11:20:15", "portfolioId": "PORT0001", "sequenceNo": "000200", "investmentId": "AAPL000001", "type": "SL", "quantity": 75.0000, "price": 228.1200, "amount": 17109.00, "currency": "USD", "status": "D" },
+  { "date": "2026-10-12", "time": "10:02:09", "portfolioId": "PORT0004", "sequenceNo": "000096", "investmentId": "MSFT000001", "type": "BU", "quantity": 20.0000, "price": 418.7600, "amount": 8375.20, "currency": "USD", "status": "F" },
+  { "date": "2026-10-11", "time": "13:44:51", "portfolioId": "PORT0007", "sequenceNo": "000054", "investmentId": "CASH000001", "type": "TR", "quantity": 5000.0000, "price": 1.0000, "amount": 5000.00, "currency": "USD", "status": "D" },
+  { "date": "2026-10-09", "time": "15:10:27", "portfolioId": "PORT0005", "sequenceNo": "000411", "investmentId": "GB00B03MLX", "type": "BU", "quantity": 10000.0000, "price": 7.8410, "amount": 78410.00, "currency": "GBP", "status": "D" },
+  { "date": "2026-10-08", "time": "09:55:40", "portfolioId": "PORT0002", "sequenceNo": "000387", "investmentId": "IBM0000001", "type": "SL", "quantity": 300.0000, "price": 229.9000, "amount": 68970.00, "currency": "USD", "status": "R" },
+  { "date": "2026-10-06", "time": "12:12:12", "portfolioId": "PORT0003", "sequenceNo": "000176", "investmentId": "VTIAX00001", "type": "BU", "quantity": 410.0000, "price": 36.0450, "amount": 14778.45, "currency": "USD", "status": "D" },
+  { "date": "2026-10-02", "time": "10:40:00", "portfolioId": "PORT0004", "sequenceNo": "000095", "investmentId": "FEE0000001", "type": "FE", "quantity": 0.0000, "price": 0.0000, "amount": 45.00, "currency": "USD", "status": "D" },
+  { "date": "2026-09-28", "time": "08:30:19", "portfolioId": "PORT0006", "sequenceNo": "000233", "investmentId": "CASH000001", "type": "TR", "quantity": 250000.0000, "price": 1.0000, "amount": 250000.00, "currency": "USD", "status": "D" }
+]
