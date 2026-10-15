@@ -7,8 +7,9 @@ export const RECENT_TRANSACTIONS_LIMIT = 5
 export interface DashboardSummary {
   totalPortfolios: number
   portfoliosByStatus: Record<PortfolioStatus, number>
-  totalValue: number
-  totalCash: number
+  /** Exact integer cents: aggregates of S9(13)V99 values can exceed Number.MAX_SAFE_INTEGER cents. */
+  totalValueCents: bigint
+  totalCashCents: bigint
   recentTransactionCount: number
   pendingTransactionCount: number
   recentTransactions: Transaction[]
@@ -26,9 +27,9 @@ function toIsoDate(ms: number): string {
   return new Date(ms).toISOString().slice(0, 10)
 }
 
-/** Sum in integer cents so COMP-3 style V99 amounts don't drift. */
-function sumCents(values: number[]): number {
-  return values.reduce((total, value) => total + Math.round(value * 100), 0) / 100
+/** Sum V99 amounts as bigint cents so totals neither drift nor lose precision. */
+function sumCents(values: number[]): bigint {
+  return values.reduce((total, value) => total + BigInt(Math.round(value * 100)), 0n)
 }
 
 function compareNewestFirst(a: Transaction, b: Transaction): number {
@@ -59,8 +60,8 @@ export function buildDashboardSummary(
   return {
     totalPortfolios: portfolios.length,
     portfoliosByStatus,
-    totalValue: sumCents(portfolios.map((p) => p.totalValue)),
-    totalCash: sumCents(portfolios.map((p) => p.cashBalance)),
+    totalValueCents: sumCents(portfolios.map((p) => p.totalValue)),
+    totalCashCents: sumCents(portfolios.map((p) => p.cashBalance)),
     recentTransactionCount: recent.length,
     pendingTransactionCount: recent.filter((t) => t.status === 'P').length,
     recentTransactions: recent.slice(0, RECENT_TRANSACTIONS_LIMIT),

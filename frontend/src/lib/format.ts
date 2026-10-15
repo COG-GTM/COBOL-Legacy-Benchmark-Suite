@@ -1,7 +1,6 @@
 const currencyFormatters = new Map<string, Intl.NumberFormat>()
 
-/** Money fields are PIC S9(13)V99 — always two decimal places. */
-export function formatCurrency(amount: number, currency = 'USD'): string {
+function currencyFormatter(currency: string): Intl.NumberFormat {
   let formatter = currencyFormatters.get(currency)
   if (!formatter) {
     formatter = new Intl.NumberFormat('en-US', {
@@ -12,7 +11,20 @@ export function formatCurrency(amount: number, currency = 'USD'): string {
     })
     currencyFormatters.set(currency, formatter)
   }
-  return formatter.format(amount)
+  return formatter
+}
+
+/** Money fields are PIC S9(13)V99 — always two decimal places. */
+export function formatCurrency(amount: number, currency = 'USD'): string {
+  return currencyFormatter(currency).format(amount)
+}
+
+/** Formats an exact integer-cent amount (e.g. an aggregate beyond Number.MAX_SAFE_INTEGER cents). */
+export function formatCents(cents: bigint, currency = 'USD'): string {
+  const sign = cents < 0n ? '-' : ''
+  const abs = cents < 0n ? -cents : cents
+  const fraction = (abs % 100n).toString().padStart(2, '0')
+  return currencyFormatter(currency).format(`${sign}${abs / 100n}.${fraction}` as Intl.StringNumericLiteral)
 }
 
 const quantityFormatter = new Intl.NumberFormat('en-US', {

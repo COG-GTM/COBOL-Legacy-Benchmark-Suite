@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { MOCK_AS_OF_DATE, mockPortfolios, mockTransactions } from '@/data/mockData'
-import { formatCurrency, formatDate, formatQuantity } from '@/lib/format'
+import { formatCents, formatCurrency, formatDate, formatQuantity } from '@/lib/format'
 import { TRANSACTION_STATUS_LABELS, TRANSACTION_TYPE_LABELS } from '@/lib/legacyCodes'
 import { buildDashboardSummary, RECENT_WINDOW_DAYS } from '@/services/dashboardService'
 import type { TransactionStatus } from '@/types/transaction'
@@ -39,13 +39,13 @@ export function DashboardPage() {
         />
         <SummaryCard
           title="Total value"
-          value={formatCurrency(summary.totalValue)}
+          value={formatCents(summary.totalValueCents)}
           detail="Across all portfolios"
           icon={DollarSign}
         />
         <SummaryCard
           title="Cash balance"
-          value={formatCurrency(summary.totalCash)}
+          value={formatCents(summary.totalCashCents)}
           detail="Uninvested cash across all portfolios"
           icon={Wallet}
         />
