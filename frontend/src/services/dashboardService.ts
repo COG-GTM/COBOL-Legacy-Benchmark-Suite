@@ -1,3 +1,4 @@
+import { sumCents } from '@/lib/money'
 import type { Portfolio, PortfolioStatus } from '@/types/portfolio'
 import type { Transaction } from '@/types/transaction'
 
@@ -27,12 +28,7 @@ function toIsoDate(ms: number): string {
   return new Date(ms).toISOString().slice(0, 10)
 }
 
-/** Sum V99 amounts as bigint cents so totals neither drift nor lose precision. */
-function sumCents(values: number[]): bigint {
-  return values.reduce((total, value) => total + BigInt(Math.round(value * 100)), 0n)
-}
-
-function compareNewestFirst(a: Transaction, b: Transaction): number {
+export function compareNewestFirst(a: Transaction, b: Transaction): number {
   return `${b.date}T${b.time}`.localeCompare(`${a.date}T${a.time}`) || b.sequenceNo.localeCompare(a.sequenceNo)
 }
 

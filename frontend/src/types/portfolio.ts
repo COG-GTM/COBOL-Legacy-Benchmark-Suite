@@ -21,4 +21,6 @@ export interface Portfolio {
   cashBalance: number
   /** PORT-LAST-USER PIC X(8) */
   lastUser: string
+  /** PORT-LAST-TRANS PIC 9(8), date of the last posted transaction as ISO yyyy-mm-dd */
+  lastTrans: string
 }

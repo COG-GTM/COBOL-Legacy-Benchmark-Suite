@@ -1,15 +1,34 @@
-import { Construction } from 'lucide-react'
+import { ArrowLeft, Construction, Filter } from 'lucide-react'
+import { Link, useSearchParams } from 'react-router-dom'
 
 import { PageHeader } from '@/components/PageHeader'
 import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { portfolioDetailPath } from '@/lib/links'
 import { PLACEHOLDER_PAGES, type PlaceholderPageId } from '@/nav/navigation'
 
 export function PlaceholderPage({ pageId }: { pageId: PlaceholderPageId }) {
   const page = PLACEHOLDER_PAGES[pageId]
+  const portfolioId = useSearchParams()[0].get('portfolioId')
   return (
     <>
       <PageHeader title={page.title} description={page.description} />
+      {portfolioId && (
+        <div role="status" aria-label="Portfolio filter" className="mb-4 flex flex-wrap items-center gap-3 text-sm">
+          <span className="flex items-center gap-1.5 text-muted-foreground">
+            <Filter className="h-4 w-4" aria-hidden="true" /> Portfolio
+          </span>
+          <Badge variant="outline" className="font-mono">
+            {portfolioId}
+          </Badge>
+          <Button asChild variant="link" size="sm" className="h-auto p-0">
+            <Link to={portfolioDetailPath(portfolioId)}>
+              <ArrowLeft /> Back to portfolio
+            </Link>
+          </Button>
+        </div>
+      )}
       <Card className="max-w-2xl">
         <CardHeader>
           <div className="flex items-center gap-2">
