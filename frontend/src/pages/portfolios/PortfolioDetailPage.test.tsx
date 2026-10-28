@@ -102,6 +102,8 @@ describe('portfolio detail (FR-4)', () => {
   it('shows empty states for a closed portfolio with no activity', () => {
     renderAt('/portfolios/PORT0008')
     expect(screen.getByText('No transactions recorded.')).toBeInTheDocument()
+    expect(screen.getByText('No positions held.')).toBeInTheDocument()
+    expect(screen.getByText(/0 holdings/)).toBeInTheDocument()
   })
 
   it('shows not found for an unknown portfolio ID', () => {

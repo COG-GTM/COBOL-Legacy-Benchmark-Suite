@@ -9,7 +9,7 @@ export const DETAIL_RECENT_TRANSACTIONS_LIMIT = 5
 
 export interface PortfolioDetail {
   portfolio: Portfolio
-  /** Holdings for this portfolio, largest market value first. */
+  /** Current holdings (latest open record per investment), largest market value first. */
   positions: Position[]
   /** PORT-TOTAL-VALUE minus PORT-CASH-BALANCE, in exact cents. */
   investedValueCents: bigint
@@ -23,6 +23,19 @@ export interface PortfolioDetail {
 /** PORT-ID is PIC X(8): IDs compare case-insensitively with trailing blanks ignored. */
 export function normalizePortfolioId(id: string): string {
   return id.trim().toUpperCase()
+}
+
+/**
+ * POSREC is keyed by portfolio + date + investment, so one investment can have
+ * several dated snapshots. Keep the latest per investment and drop closed ones.
+ */
+export function currentHoldings(positions: Position[]): Position[] {
+  const latest = new Map<string, Position>()
+  for (const pos of positions) {
+    const seen = latest.get(pos.investmentId)
+    if (!seen || pos.date > seen.date) latest.set(pos.investmentId, pos)
+  }
+  return [...latest.values()].filter((pos) => pos.status !== 'C')
 }
 
 /**
@@ -41,9 +54,9 @@ export function buildPortfolioDetail(
   const portfolio = portfolios.find((p) => p.portfolioId === id)
   if (!portfolio) return null
 
-  const holdings = positions
-    .filter((pos) => pos.portfolioId === id)
-    .sort((a, b) => b.marketValue - a.marketValue || a.investmentId.localeCompare(b.investmentId))
+  const holdings = currentHoldings(positions.filter((pos) => pos.portfolioId === id)).sort(
+    (a, b) => b.marketValue - a.marketValue || a.investmentId.localeCompare(b.investmentId),
+  )
   const history = transactions.filter((txn) => txn.portfolioId === id).sort(compareNewestFirst)
 
   return {

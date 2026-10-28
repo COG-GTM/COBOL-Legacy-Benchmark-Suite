@@ -94,6 +94,40 @@ describe('buildPortfolioDetail', () => {
   })
 })
 
+describe('currentHoldings', () => {
+  it('keeps only the latest dated snapshot per investment', () => {
+    const detail = buildPortfolioDetail(
+      'PORT9001',
+      [portfolio()],
+      [
+        position('ABC0000001', 100, { date: '2026-10-13' }),
+        position('ABC0000001', 110, { date: '2026-10-14' }),
+        position('XYZ0000001', 50),
+      ],
+      [],
+    )!
+    expect(detail.positions.map((p) => [p.investmentId, p.marketValue])).toEqual([
+      ['ABC0000001', 110],
+      ['XYZ0000001', 50],
+    ])
+    expect(detail.positionsMarketValueCents).toBe(16000n)
+  })
+
+  it('drops investments whose latest snapshot is closed', () => {
+    const detail = buildPortfolioDetail(
+      'PORT9001',
+      [portfolio()],
+      [
+        position('ABC0000001', 100, { date: '2026-10-13' }),
+        position('ABC0000001', 0, { date: '2026-10-14', status: 'C', quantity: 0 }),
+        position('PND0000001', 25, { status: 'P' }),
+      ],
+      [],
+    )!
+    expect(detail.positions.map((p) => p.investmentId)).toEqual(['PND0000001'])
+  })
+})
+
 describe('mock data consistency', () => {
   it.each(mockPortfolios.map((p) => [p.portfolioId, p] as const))(
     '%s: positions market value + cash = PORT-TOTAL-VALUE',
@@ -104,10 +138,13 @@ describe('mock data consistency', () => {
   )
 
   it.each(mockPortfolios.map((p) => [p.portfolioId, p] as const))(
-    '%s: PORT-LAST-TRANS is not earlier than its latest transaction',
+    '%s: PORT-LAST-TRANS is the latest posted (TRN-STATUS D) transaction',
     (id, p) => {
-      const latest = mockTransactions.filter((t) => t.portfolioId === id).reduce((max, t) => (t.date > max ? t.date : max), '')
-      expect(p.lastTrans >= latest).toBe(true)
+      const posted = mockTransactions.filter((t) => t.portfolioId === id && t.status === 'D')
+      const latest = posted.reduce((max, t) => (t.date > max ? t.date : max), '')
+      // Portfolios with no posted rows in the fixture last traded before the fixture window.
+      if (posted.length === 0) expect(p.lastTrans < mockTransactions.map((t) => t.date).sort()[0]).toBe(true)
+      else expect(p.lastTrans).toBe(latest)
     },
   )
 })
