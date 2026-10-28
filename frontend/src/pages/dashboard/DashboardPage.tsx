@@ -10,6 +10,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { MOCK_AS_OF_DATE, mockPortfolios, mockTransactions } from '@/data/mockData'
 import { formatCents, formatCurrency, formatDate, formatQuantity } from '@/lib/format'
 import { TRANSACTION_STATUS_LABELS, TRANSACTION_TYPE_LABELS } from '@/lib/legacyCodes'
+import { portfolioDetailPath } from '@/lib/links'
 import { buildDashboardSummary, RECENT_WINDOW_DAYS } from '@/services/dashboardService'
 import type { TransactionStatus } from '@/types/transaction'
 
@@ -85,7 +86,11 @@ export function DashboardPage() {
                 {summary.recentTransactions.map((txn) => (
                   <TableRow key={`${txn.portfolioId}-${txn.sequenceNo}`}>
                     <TableCell className="whitespace-nowrap">{formatDate(txn.date)}</TableCell>
-                    <TableCell className="font-mono text-xs">{txn.portfolioId}</TableCell>
+                    <TableCell className="font-mono text-xs">
+                      <Link to={portfolioDetailPath(txn.portfolioId)} className="text-primary hover:underline">
+                        {txn.portfolioId}
+                      </Link>
+                    </TableCell>
                     <TableCell>{TRANSACTION_TYPE_LABELS[txn.type]}</TableCell>
                     <TableCell className="hidden font-mono text-xs md:table-cell">{txn.investmentId}</TableCell>
                     <TableCell className="hidden text-right tabular-nums md:table-cell">

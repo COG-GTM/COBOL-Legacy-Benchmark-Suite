@@ -17,6 +17,7 @@ const portfolio = (overrides: Partial<Portfolio>): Portfolio => ({
   totalValue: 0,
   cashBalance: 0,
   lastUser: 'OPER01',
+  lastTrans: '2026-10-01',
   ...overrides,
 })
 
