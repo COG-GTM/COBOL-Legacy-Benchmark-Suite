@@ -52,8 +52,8 @@ ul.message { list-style: none; }
 .cap-full { color: #b42318; font-weight: 700; }
 .day ol { margin: 0; padding-left: 16px; font-size: .78rem; }
 .day li { margin-bottom: 4px; }
-.slot-name { display: block; font-weight: 600; }
-.slot-meta { color: #6b7487; }
+.slot-name { display: block; font-weight: 600; overflow-wrap: anywhere; }
+.slot-meta { color: #6b7487; overflow-wrap: anywhere; }
 .warnings { margin-top: 12px; }
 .warnings h3 { font-size: .95rem; margin: 0 0 4px; }
 .warnings ul { margin: 0; padding-left: 18px; font-size: .85rem; }

@@ -26,9 +26,10 @@ export default function App({ asOf = startOfUtcDay(new Date()) }: { asOf?: Date 
   const [repId, setRepId] = useState(seed.reps[0].id)
   const [rules, setRules] = useState(loadRules)
   const [filters, setFilters] = useState<HcpFilters>(EMPTY_FILTERS)
-  const [plans, setPlans] = useState<Map<string, WeeklyPlan>>(
-    () => new Map(seed.reps.map((r) => [r.id, loadPlan(r.id, weekStart)])),
-  )
+  const loadWeek = (week: string) => new Map(seed.reps.map((r) => [r.id, loadPlan(r.id, week)]))
+  const [planState, setPlanState] = useState(() => ({ weekStart, plans: loadWeek(weekStart) }))
+  if (planState.weekStart !== weekStart) setPlanState({ weekStart, plans: loadWeek(weekStart) })
+  const plans = planState.plans
   const [message, setMessage] = useState<Message>(null)
 
   const rep = seed.reps.find((r) => r.id === repId)!
@@ -58,10 +59,11 @@ export default function App({ asOf = startOfUtcDay(new Date()) }: { asOf?: Date 
   const duplicates = useMemo(() => findDuplicates(plan), [plan])
 
   useEffect(() => {
-    for (const [id, p] of plans) savePlan(id, weekStart, p)
-  }, [plans, weekStart])
+    for (const [id, p] of planState.plans) savePlan(id, planState.weekStart, p)
+  }, [planState])
 
-  const updatePlan = (next: WeeklyPlan) => setPlans((prev) => new Map(prev).set(repId, next))
+  const updatePlan = (next: WeeklyPlan) =>
+    setPlanState((prev) => ({ ...prev, plans: new Map(prev.plans).set(repId, next) }))
 
   const handleAdd = (hcp: ScoredHcp, day: Weekday) => {
     const result = addToPlan(plan, day, hcp.id, hcp.name)

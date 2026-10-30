@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
-import { addDays, toIsoDate } from './dates'
+import { describe, expect, it, vi } from 'vitest'
+import { addDays, startOfIsoWeek, toIsoDate } from './dates'
 import { calculateScore, DEFAULT_RULES, lastVisitDate, scoreHcp, validateRules } from './scoring'
 import type { Hcp, ScoringRules } from './types'
 
@@ -147,7 +147,32 @@ describe('validateRules', () => {
     expect(errs).toEqual([
       'Segment A weight must be a number of 0 or more',
       'Segment B weight must be a number of 0 or more',
-      'Max score must be greater than 0',
+      'Max score must be between 1 and 100',
     ])
+  })
+
+  it('rejects a max score above 100', () => {
+    expect(validateRules({ ...DEFAULT_RULES, maxScore: 150 })).toEqual(['Max score must be between 1 and 100'])
+  })
+})
+
+describe('score ceiling', () => {
+  it('never exceeds 100 even if stored rules raise weights and the cap', () => {
+    const rules = { ...DEFAULT_RULES, segmentWeights: { A: 80, B: 25, C: 10 }, maxScore: 150 }
+    expect(calculateScore({ segment: 'A', daysSinceLastVisit: 45, openFollowUps: 1 }, rules).score).toBe(100)
+  })
+})
+
+describe('startOfIsoWeek', () => {
+  it('keeps a UTC-midnight Monday in its own week in a western time zone', () => {
+    vi.stubEnv('TZ', 'America/Los_Angeles')
+    try {
+      const monday = new Date('2026-11-02T00:00:00Z')
+      expect(monday.getDay()).toBe(0)
+      expect(toIsoDate(startOfIsoWeek(monday))).toBe('2026-11-02')
+      expect(toIsoDate(startOfIsoWeek(new Date('2026-11-08T00:00:00Z')))).toBe('2026-11-02')
+    } finally {
+      vi.unstubAllEnvs()
+    }
   })
 })

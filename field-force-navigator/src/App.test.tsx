@@ -203,6 +203,16 @@ describe('persistence, rules and manager review', () => {
     expect(within(screen.getByTestId('day-Mon')).getAllByRole('listitem')).toHaveLength(1)
   })
 
+  it('loads the new week instead of overwriting it when a mounted app crosses a week boundary', async () => {
+    const user = userEvent.setup()
+    const { rerender } = render(<App asOf={asOf} />)
+    await addVia(user, t1[0].id, 'Mon')
+    rerender(<App asOf={new Date('2026-11-02T00:00:00Z')} />)
+    expect(within(screen.getByTestId('day-Mon')).queryAllByRole('listitem')).toHaveLength(0)
+    expect(JSON.parse(localStorage.getItem('ffn.plan.R1.2026-11-02')!).Mon).toEqual([])
+    expect(JSON.parse(localStorage.getItem('ffn.plan.R1.2026-10-26')!).Mon).toEqual([t1[0].id])
+  })
+
   it('applies an edited total score cap', async () => {
     const user = userEvent.setup()
     render(<App asOf={asOf} />)

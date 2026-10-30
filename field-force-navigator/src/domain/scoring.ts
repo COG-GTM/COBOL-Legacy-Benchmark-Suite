@@ -1,6 +1,8 @@
 import { daysBetween } from './dates'
 import type { Hcp, ScoredHcp, ScoreResult, ScoringRules, Segment } from './types'
 
+export const SCORE_CEILING = 100
+
 export const DEFAULT_RULES: ScoringRules = {
   segmentWeights: { A: 40, B: 25, C: 10 },
   pointsPerDay: 1,
@@ -46,7 +48,7 @@ export function calculateScore(input: ScoreInput, rules: ScoringRules = DEFAULT_
   const segmentPoints = rules.segmentWeights[segment]
   const dayPoints = days === null ? rules.daysCap : Math.min(days * rules.pointsPerDay, rules.daysCap)
   const followUpPoints = openFollowUps > 0 ? rules.openFollowUpPoints : 0
-  const score = Math.max(0, Math.min(segmentPoints + dayPoints + followUpPoints, rules.maxScore))
+  const score = Math.max(0, Math.min(segmentPoints + dayPoints + followUpPoints, rules.maxScore, SCORE_CEILING))
 
   return { score, reason: `${segmentText}, ${daysText}, ${followUpText}` }
 }
@@ -83,6 +85,7 @@ export function validateRules(rules: ScoringRules): string[] {
   for (const [label, value] of nonNegative) {
     if (!Number.isFinite(value) || value < 0) errors.push(`${label} must be a number of 0 or more`)
   }
-  if (!Number.isFinite(rules.maxScore) || rules.maxScore <= 0) errors.push('Max score must be greater than 0')
+  if (!Number.isFinite(rules.maxScore) || rules.maxScore <= 0 || rules.maxScore > SCORE_CEILING)
+    errors.push(`Max score must be between 1 and ${SCORE_CEILING}`)
   return errors
 }

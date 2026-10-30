@@ -18,7 +18,7 @@ export function daysBetween(fromIso: string, asOf: Date): number {
 }
 
 export function startOfIsoWeek(d: Date): Date {
-  const day = startOfUtcDay(d)
+  const day = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate()))
   const offset = (day.getUTCDay() + 6) % 7
   return addDays(day, -offset)
 }
