@@ -2,7 +2,7 @@ import { DEFAULT_RULES } from './scoring'
 import { emptyPlan } from './plan'
 import { WEEKDAYS, type ScoringRules, type WeeklyPlan } from './types'
 
-const PLAN_KEY = (repId: string) => `ffn.plan.${repId}`
+const PLAN_KEY = (repId: string, weekStart: string) => `ffn.plan.${repId}.${weekStart}`
 const RULES_KEY = 'ffn.rules'
 
 function read<T>(key: string): T | null {
@@ -14,16 +14,16 @@ function read<T>(key: string): T | null {
   }
 }
 
-export function loadPlan(repId: string): WeeklyPlan {
-  const stored = read<Partial<WeeklyPlan>>(PLAN_KEY(repId))
+export function loadPlan(repId: string, weekStart: string): WeeklyPlan {
+  const stored = read<Partial<WeeklyPlan>>(PLAN_KEY(repId, weekStart))
   const plan = emptyPlan()
   if (!stored) return plan
   for (const d of WEEKDAYS) if (Array.isArray(stored[d])) plan[d] = stored[d]!.filter((x) => typeof x === 'string')
   return plan
 }
 
-export function savePlan(repId: string, plan: WeeklyPlan): void {
-  localStorage.setItem(PLAN_KEY(repId), JSON.stringify(plan))
+export function savePlan(repId: string, weekStart: string, plan: WeeklyPlan): void {
+  localStorage.setItem(PLAN_KEY(repId, weekStart), JSON.stringify(plan))
 }
 
 export function loadRules(): ScoringRules {

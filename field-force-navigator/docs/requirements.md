@@ -50,7 +50,7 @@ A rep can build a prioritised weekly call plan for their territory in **under 5 
 - FR-3.2 At most 6 visits a day. Adding a 7th is blocked with a message.
 - FR-3.3 Adding the same HCP twice on the same day is blocked; planning the same HCP on two different days is allowed but raises a duplicate warning.
 - FR-3.4 The plan shows a warning naming every Segment A HCP more than 30 days since last visit (or with no visit in 12 months) who is not in the plan.
-- FR-3.5 The rep can remove a visit or clear the plan. The plan is saved per rep in the browser.
+- FR-3.5 The rep can remove a visit or clear the plan. The plan is saved in the browser per rep and per week (Monday start); a new week starts empty.
 - FR-3.6 Export CSV with columns `Day, HCP, Specialty, Score, Reason`, ordered Mon-Fri then slot order.
 
 ### FR-4 District manager review (supports the DM persona)
@@ -91,7 +91,7 @@ Integration with a real CRM (such as Veeva), real HCP data or PII, SSO, mobile a
 3. Open follow-up is a flat +20 if the HCP has one or more open follow-ups (not +20 each).
 4. An HCP with no visit in the last 12 months gets the full days points (40).
 5. "More than 30 days overdue" for Segment A means more than 30 days since last visit (31+), or no visit in 12 months.
-6. Plans are stored in the browser (localStorage) per rep. There is no server persistence (no CRM integration is in scope).
+6. Plans are stored in the browser (localStorage) per rep and per week. There is no server persistence (no CRM integration is in scope).
 7. Role selection is a toggle, not authentication (SSO is out of scope).
 
 ## 10. Jira sub-tasks

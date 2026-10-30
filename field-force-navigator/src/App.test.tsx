@@ -178,7 +178,7 @@ describe('persistence, rules and manager review', () => {
   })
 
   it('ignores corrupt storage', () => {
-    localStorage.setItem('ffn.plan.R1', '{bad json')
+    localStorage.setItem('ffn.plan.R1.2026-10-26', '{bad json')
     localStorage.setItem('ffn.rules', JSON.stringify({ daysCap: 20 }))
     act(() => {
       render(<App asOf={asOf} />)
@@ -186,5 +186,32 @@ describe('persistence, rules and manager review', () => {
     expect(within(screen.getByTestId('day-Mon')).queryAllByRole('listitem')).toHaveLength(0)
     const a = rows().find((r) => r.dataset.hcpId === t1[0].id)!
     expect(within(a).getAllByRole('cell')[3]).toHaveTextContent(/^80$/)
+  })
+
+  it('keeps plans per week so a new week starts empty', async () => {
+    const user = userEvent.setup()
+    const { unmount } = render(<App asOf={asOf} />)
+    await addVia(user, t1[0].id, 'Mon')
+    expect(within(screen.getByTestId('day-Mon')).getAllByRole('listitem')).toHaveLength(1)
+    unmount()
+
+    const nextWeek = render(<App asOf={new Date('2026-11-02T00:00:00Z')} />)
+    expect(within(screen.getByTestId('day-Mon')).queryAllByRole('listitem')).toHaveLength(0)
+    nextWeek.unmount()
+
+    render(<App asOf={new Date('2026-10-26T00:00:00Z')} />)
+    expect(within(screen.getByTestId('day-Mon')).getAllByRole('listitem')).toHaveLength(1)
+  })
+
+  it('applies an edited total score cap', async () => {
+    const user = userEvent.setup()
+    render(<App asOf={asOf} />)
+    const cap = screen.getByRole('spinbutton', { name: 'Total score cap' })
+    await user.clear(cap)
+    await user.type(cap, '80')
+    await user.click(screen.getByRole('button', { name: 'Apply rules' }))
+    const a = rows().find((r) => r.dataset.hcpId === t1[0].id)!
+    expect(within(a).getAllByRole('cell')[3]).toHaveTextContent(/^80$/)
+    expect(JSON.parse(localStorage.getItem('ffn.rules')!).maxScore).toBe(80)
   })
 })

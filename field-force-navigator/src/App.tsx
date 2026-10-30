@@ -6,7 +6,7 @@ import { PlanBuilder } from './components/PlanBuilder'
 import { RulesPanel } from './components/RulesPanel'
 import { planToCsv } from './domain/csv'
 import { downloadCsv } from './domain/download'
-import { startOfUtcDay, toIsoDate } from './domain/dates'
+import { startOfIsoWeek, startOfUtcDay, toIsoDate } from './domain/dates'
 import { applyFilters, EMPTY_FILTERS, sortByPriority, type HcpFilters } from './domain/filters'
 import { addToPlan, emptyPlan, findDuplicates, findMissingOverdueSegmentA, removeFromPlan } from './domain/plan'
 import { scoreHcp } from './domain/scoring'
@@ -19,6 +19,7 @@ type Message = { kind: 'error' | 'info'; text: string } | null
 
 export default function App({ asOf = startOfUtcDay(new Date()) }: { asOf?: Date }) {
   const asOfKey = toIsoDate(asOf)
+  const weekStart = toIsoDate(startOfIsoWeek(asOf))
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const seed = useMemo(() => generateSeed(asOf), [asOfKey])
   const [role, setRole] = useState<Role>('rep')
@@ -26,7 +27,7 @@ export default function App({ asOf = startOfUtcDay(new Date()) }: { asOf?: Date 
   const [rules, setRules] = useState(loadRules)
   const [filters, setFilters] = useState<HcpFilters>(EMPTY_FILTERS)
   const [plans, setPlans] = useState<Map<string, WeeklyPlan>>(
-    () => new Map(seed.reps.map((r) => [r.id, loadPlan(r.id)])),
+    () => new Map(seed.reps.map((r) => [r.id, loadPlan(r.id, weekStart)])),
   )
   const [message, setMessage] = useState<Message>(null)
 
@@ -57,8 +58,8 @@ export default function App({ asOf = startOfUtcDay(new Date()) }: { asOf?: Date 
   const duplicates = useMemo(() => findDuplicates(plan), [plan])
 
   useEffect(() => {
-    for (const [id, p] of plans) savePlan(id, p)
-  }, [plans])
+    for (const [id, p] of plans) savePlan(id, weekStart, p)
+  }, [plans, weekStart])
 
   const updatePlan = (next: WeeklyPlan) => setPlans((prev) => new Map(prev).set(repId, next))
 
@@ -88,7 +89,7 @@ export default function App({ asOf = startOfUtcDay(new Date()) }: { asOf?: Date 
       <header className="app-header">
         <div>
           <h1>Field Force Navigator</h1>
-          <p className="subtitle">Territory Call Planner · synthetic data · as of {asOfKey}</p>
+          <p className="subtitle">Territory Call Planner · synthetic data · as of {asOfKey} · week of {weekStart}</p>
         </div>
         <div className="header-controls">
           <fieldset className="role-toggle">

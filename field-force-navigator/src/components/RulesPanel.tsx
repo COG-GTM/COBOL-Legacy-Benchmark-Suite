@@ -17,6 +17,7 @@ const FIELDS: Field[] = [
   { label: 'Days points cap', get: (r) => r.daysCap, set: (r, v) => ({ ...r, daysCap: v }) },
   { label: 'Open follow-up points', get: (r) => r.openFollowUpPoints, set: (r, v) => ({ ...r, openFollowUpPoints: v }) },
   { label: 'Recently visited window (days, score = 0)', get: (r) => r.recentVisitDays, set: (r, v) => ({ ...r, recentVisitDays: v }) },
+  { label: 'Total score cap', get: (r) => r.maxScore, set: (r, v) => ({ ...r, maxScore: v }) },
 ]
 
 export function RulesPanel({ rules, onChange }: Props) {

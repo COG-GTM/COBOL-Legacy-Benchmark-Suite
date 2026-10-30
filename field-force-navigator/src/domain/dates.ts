@@ -16,3 +16,9 @@ export function daysBetween(fromIso: string, asOf: Date): number {
   const from = Date.parse(`${fromIso}T00:00:00Z`)
   return Math.round((asOf.getTime() - from) / MS_PER_DAY)
 }
+
+export function startOfIsoWeek(d: Date): Date {
+  const day = startOfUtcDay(d)
+  const offset = (day.getUTCDay() + 6) % 7
+  return addDays(day, -offset)
+}

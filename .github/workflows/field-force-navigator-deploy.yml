@@ -20,9 +20,14 @@ env:
   IMAGE: ghcr.io/${{ github.repository_owner }}/field-force-navigator
 
 jobs:
+  ci:
+    name: CI checks
+    uses: ./.github/workflows/field-force-navigator-ci.yml
+
   build-and-push:
     name: Build and push image
     runs-on: ubuntu-latest
+    needs: ci
     outputs:
       image: ${{ steps.meta.outputs.image }}
     steps:

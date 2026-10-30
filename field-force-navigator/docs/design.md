@@ -69,7 +69,7 @@ Rules are a `ScoringRules` object (defaults in `DEFAULT_RULES`). The Scoring rul
 - `addToPlan(plan, day, hcpId, name)` returns `{ ok: true, plan }` or `{ ok: false, error }`. It blocks: same HCP on the same day; a 7th visit (`MAX_VISITS_PER_DAY = 6`). Inputs are never mutated.
 - `findDuplicates(plan)` returns HCPs planned on more than one day.
 - `findMissingOverdueSegmentA(plan, territoryHcps)` returns Segment A HCPs with `daysSinceLastVisit > 30` (or no visit) not in the plan, most overdue first (`OVERDUE_SEGMENT_A_DAYS = 30`).
-- Plans are kept per rep in a `Map<repId, WeeklyPlan>` and saved to localStorage (`ffn.plan.<repId>`).
+- Plans are kept per rep in a `Map<repId, WeeklyPlan>` and saved to localStorage per rep and ISO week (`ffn.plan.<repId>.<weekStartMonday>`), so a new week starts with an empty plan and past weeks stay available.
 
 ## 5. CSV export (`csv.ts`)
 
