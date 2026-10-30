@@ -1,0 +1,65 @@
+name: Field Force Navigator deploy (non-prod)
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'field-force-navigator/**'
+      - '.github/workflows/field-force-navigator-*.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: field-force-navigator-non-prod
+  cancel-in-progress: false
+
+env:
+  IMAGE: ghcr.io/${{ github.repository_owner }}/field-force-navigator
+
+jobs:
+  build-and-push:
+    name: Build and push image
+    runs-on: ubuntu-latest
+    outputs:
+      image: ${{ steps.meta.outputs.image }}
+    steps:
+      - uses: actions/checkout@v4
+      - id: meta
+        run: echo "image=$(echo "$IMAGE" | tr '[:upper:]' '[:lower:]'):${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and push
+        working-directory: field-force-navigator
+        run: |
+          docker build -t "${{ steps.meta.outputs.image }}" .
+          docker push "${{ steps.meta.outputs.image }}"
+
+  deploy-non-prod:
+    name: Deploy to non-prod (Release Manager approval)
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    # The "non-prod" environment must have "Required reviewers" set to the Release Manager
+    # (Settings → Environments → non-prod). The job waits here until they approve.
+    environment:
+      name: non-prod
+      url: ${{ vars.FFN_NON_PROD_URL }}
+    steps:
+      - name: Trigger non-prod rollout
+        env:
+          IMAGE: ${{ needs.build-and-push.outputs.image }}
+          DEPLOY_WEBHOOK: ${{ secrets.FFN_NON_PROD_DEPLOY_WEBHOOK }}
+        run: |
+          echo "Approved image: $IMAGE"
+          if [ -z "$DEPLOY_WEBHOOK" ]; then
+            echo "::warning::FFN_NON_PROD_DEPLOY_WEBHOOK is not set; image is published but no runtime was updated."
+            exit 0
+          fi
+          curl -fsS -X POST -H 'Content-Type: application/json' \
+            -d "{\"image\":\"$IMAGE\",\"environment\":\"non-prod\",\"sha\":\"$GITHUB_SHA\"}" \
+            "$DEPLOY_WEBHOOK"
