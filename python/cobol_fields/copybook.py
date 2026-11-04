@@ -322,29 +322,30 @@ def _size(item: Item, dialect: Dialect) -> int:
     return _elementary(item, dialect).length * item.occurs
 
 
-def _group_extent(item: Item, dialect: Dialect) -> tuple[int, dict[str, int]]:
-    """Size of one occurrence of a group and the relative start of each child.
+def _group_extent(item: Item, dialect: Dialect) -> tuple[int, list[int]]:
+    """Size of one occurrence of a group and the relative start of each child
+    (by position, since FILLER names repeat).
 
     A REDEFINES item may be longer than the item it overlays; COBOL reserves
     the larger extent, so the next sibling starts after the longest view."""
-    starts: dict[str, int] = {}
-    ends: dict[str, int] = {}
+    starts: list[int] = []
+    by_name: dict[str, int] = {}
     cursor = 0
     for c in item.children:
         if c.redefines:
             try:
-                start = starts[c.redefines]
+                start = by_name[c.redefines]
             except KeyError:
                 raise ValueError(
                     f"line {c.line_no}: {c.name} REDEFINES {c.redefines} which is not a sibling") from None
-            starts[c.name] = start
-            ends[c.name] = start + _size(c, dialect)
             # whichever view is longest decides where the next sibling goes
-            cursor = max(cursor, ends[c.name])
-            continue
-        starts[c.name] = cursor
-        ends[c.name] = cursor + _size(c, dialect)
-        cursor = ends[c.name]
+            cursor = max(cursor, start + _size(c, dialect))
+        else:
+            start = cursor
+            cursor = start + _size(c, dialect)
+        starts.append(start)
+        if c.name != "FILLER":
+            by_name[c.name] = start
     return cursor, starts
 
 
@@ -359,8 +360,8 @@ def _place(item: Item, offset: int, prefix: str, dialect: Dialect,
         if item.is_group:
             child_prefix = f"{qname}." if qname else ""
             _, starts = _group_extent(item, dialect)
-            for c in item.children:
-                _place(c, base + starts[c.name], child_prefix, dialect, out,
+            for c, start in zip(item.children, starts):
+                _place(c, base + start, child_prefix, dialect, out,
                        in_redefines or bool(c.redefines))
         else:
             if item.name == "FILLER":

@@ -128,3 +128,20 @@ def test_group_sign_clause_inherited_by_children():
     by = {f.name: f for f in lay.fields}
     assert (by["G.N"].length, by["G.M"].length, by["T"].offset) == (3, 2, 5)
     assert lay.encode({"N": -5, "M": -5}) == b"-05" + b"0u" + b" "
+
+
+def test_repeated_filler_siblings_keep_their_own_offsets():
+    lay = parse_copybook("""
+       01  REC.
+           05  FILLER       PIC X(2).
+           05  N            PIC X.
+           05  FILLER       PIC X(3).
+           05  M            PIC X.
+    """, dialect=GNUCOBOL)[0]
+    assert lay.length == 7
+    assert [(f.name, f.offset) for f in lay.fields] == [("FILLER@0", 0), ("N", 2), ("FILLER@3", 3), ("M", 6)]
+    assert lay.encode({"N": "n", "M": "m"}) == b"  n   m"
+    # the suite's DB2-ERROR-HANDLING.DB2-ERROR-MESSAGE has three FILLER siblings
+    msg = load_layout(COPYBOOKS / "db2" / "DBPROC.cpy", record="DB2-ERROR-HANDLING")
+    offs = [f.offset for f in msg.fields if f.name.startswith("DB2-ERROR-MESSAGE.")]
+    assert len(offs) >= 6 and offs == sorted(offs) and len(set(offs)) == len(offs)
