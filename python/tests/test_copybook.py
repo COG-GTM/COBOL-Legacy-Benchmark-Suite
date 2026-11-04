@@ -90,3 +90,41 @@ def test_diff_classifies_mismatches():
     assert all(d.record_no == 2 for d in rep.diffs)
     assert "MISMATCH" in rep.summary()
     assert diff_bytes(lay, good, good).ok
+
+
+def test_oversized_redefines_reserves_longest_view():
+    lay = parse_copybook("""
+       01  REC.
+           05  A            PIC X.
+           05  B REDEFINES A PIC X(4).
+           05  C            PIC X.
+    """)[0]
+    by = {f.name: f for f in lay.fields}
+    assert lay.length == 5
+    assert (by["A"].offset, by["B"].offset, by["C"].offset) == (0, 0, 4)
+
+
+def test_encode_honours_redefines_view_and_rejects_conflicts():
+    lay = parse_copybook("""
+       01  REC.
+           05  A            PIC X(4).
+           05  B REDEFINES A PIC 9(4).
+           05  C            PIC X.
+    """, dialect=GNUCOBOL)[0]
+    assert lay.encode({"B": 1234, "C": "Z"}) == b"1234Z"
+    assert lay.encode({"A": "TEST"}) == b"TEST "
+    with pytest.raises(ValueError, match="overlap"):
+        lay.encode({"A": "TEST", "B": 1})
+
+
+def test_group_sign_clause_inherited_by_children():
+    lay = parse_copybook("""
+       01  REC.
+           05  G SIGN LEADING SEPARATE.
+               10  N        PIC S9(2).
+               10  M        PIC S9(2) SIGN TRAILING.
+           05  T            PIC X.
+    """, dialect=GNUCOBOL)[0]
+    by = {f.name: f for f in lay.fields}
+    assert (by["G.N"].length, by["G.M"].length, by["T"].offset) == (3, 2, 5)
+    assert lay.encode({"N": -5, "M": -5}) == b"-05" + b"0u" + b" "

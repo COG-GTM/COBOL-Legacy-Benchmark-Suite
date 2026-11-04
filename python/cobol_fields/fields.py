@@ -387,6 +387,10 @@ class CobolField:
             raise CobolFieldError(f"{self.name}: invalid packed sign nibble 0x{sign:X} in {raw.hex()}")
         else:
             neg = False
+        if len(nibbles) > self.pic.digits:          # even digit count: leading pad nibble
+            pad, nibbles = nibbles[0], nibbles[1:]
+            if strict and pad != 0:
+                raise CobolFieldError(f"{self.name}: non-zero pad nibble 0x{pad:X} in {raw.hex()}")
         if strict and any(d > 9 for d in nibbles):
             raise CobolFieldError(f"{self.name}: invalid packed digit in {raw.hex()}")
         n = 0

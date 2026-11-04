@@ -7,6 +7,7 @@
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import json
 import sys
 from decimal import Decimal
@@ -21,7 +22,7 @@ from .fields import DIALECTS, Dialect
 def _dialect(args) -> Dialect:
     d = DIALECTS[args.dialect]
     if args.encoding:
-        d = Dialect(d.name, d.binary_size, args.encoding, d.binary_truncate)
+        d = dataclasses.replace(d, encoding=args.encoding)
     return d
 
 

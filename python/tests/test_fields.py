@@ -193,3 +193,11 @@ def test_usage_aliases():
     assert Usage.parse("PACKED-DECIMAL") is Usage.COMP_3
     assert Usage.parse("BINARY") is Usage.COMP
     assert Usage.parse("COMP-4") is Usage.COMP
+
+
+def test_comp3_strict_rejects_nonzero_pad_nibble():
+    f = F("X", "9(4)", "COMP-3")
+    assert f.decode(bytes.fromhex("01234f")) == 1234
+    with pytest.raises(CobolFieldError, match="pad"):
+        f.decode(bytes.fromhex("91234f"))
+    assert f.decode(bytes.fromhex("91234f"), strict=False) == 1234

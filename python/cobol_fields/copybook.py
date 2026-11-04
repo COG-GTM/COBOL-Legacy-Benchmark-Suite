@@ -31,7 +31,7 @@ class Item:
     name: str
     pic: str | None = None
     usage: str | None = None
-    sign: SignMode = SignMode.TRAILING
+    sign: SignMode | None = None        # None = not specified; inherited from the group
     occurs: int = 1
     redefines: str | None = None
     children: list["Item"] = dc_field(default_factory=list)
@@ -114,13 +114,31 @@ class RecordLayout:
         unknown = set(values) - set(self._by_name)
         if unknown:
             raise KeyError(f"{self.name}: unknown field(s) {sorted(unknown)}")
-        for f in self.data_fields:
+
+        def supplied(f: LayoutField):
             if f.name in values:
-                v = values[f.name]
-            elif f.short_name in values and self._by_name.get(f.short_name) is f:
-                v = values[f.short_name]
-            else:
+                return True, values[f.name]
+            if f.short_name in values and self._by_name.get(f.short_name) is f:
+                return True, values[f.short_name]
+            return False, None
+
+        # storage-owning fields first (defaults = COBOL INITIALIZE) ...
+        for f in self.data_fields:
+            given, v = supplied(f)
+            if not given:
                 v = Decimal(0) if f.field.is_numeric else ""
+            buf[f.offset:f.end] = f.field.encode(v, truncate=truncate, encoding=encoding)
+        # ... then REDEFINES views that were supplied explicitly overwrite their bytes,
+        # unless an owning field covering the same bytes was also supplied.
+        for f in self.fields:
+            if not f.redefines:
+                continue
+            given, v = supplied(f)
+            if not given:
+                continue
+            for g in self.data_fields:
+                if g.offset < f.end and f.offset < g.end and supplied(g)[0]:
+                    raise ValueError(f"{self.name}: {f.name} and {g.name} overlap; supply only one view")
             buf[f.offset:f.end] = f.field.encode(v, truncate=truncate, encoding=encoding)
         return bytes(buf)
 
@@ -285,26 +303,49 @@ def _elementary(item: Item, dialect: Dialect) -> CobolField:
         if u in (Usage.COMP_1, Usage.COMP_2):
             raise NotImplementedError(f"{item.name}: COMP-1/COMP-2 are out of scope")
         raise ValueError(f"line {item.line_no}: elementary item {item.name} has no PICTURE")
-    # a group's USAGE applies to its elementary children
-    return CobolField(item.name, parse_pic(pic), Usage.parse(usage), item.sign, dialect)
+    # a group's USAGE and SIGN apply to its elementary children (see _inherit_usage)
+    return CobolField(item.name, parse_pic(pic), Usage.parse(usage), item.sign or SignMode.TRAILING, dialect)
 
 
-def _inherit_usage(item: Item, usage: str | None) -> None:
+def _inherit_usage(item: Item, usage: str | None, sign: SignMode | None = None) -> None:
     if item.usage is None and usage is not None:
         item.usage = usage
+    if item.sign is None and sign is not None:
+        item.sign = sign
     for c in item.children:
-        _inherit_usage(c, item.usage)
+        _inherit_usage(c, item.usage, item.sign)
 
 
 def _size(item: Item, dialect: Dialect) -> int:
     if item.is_group:
-        one = 0
-        for c in item.children:
-            if c.redefines:
-                continue
-            one += _size(c, dialect)
-        return one * item.occurs
+        return _group_extent(item, dialect)[0] * item.occurs
     return _elementary(item, dialect).length * item.occurs
+
+
+def _group_extent(item: Item, dialect: Dialect) -> tuple[int, dict[str, int]]:
+    """Size of one occurrence of a group and the relative start of each child.
+
+    A REDEFINES item may be longer than the item it overlays; COBOL reserves
+    the larger extent, so the next sibling starts after the longest view."""
+    starts: dict[str, int] = {}
+    ends: dict[str, int] = {}
+    cursor = 0
+    for c in item.children:
+        if c.redefines:
+            try:
+                start = starts[c.redefines]
+            except KeyError:
+                raise ValueError(
+                    f"line {c.line_no}: {c.name} REDEFINES {c.redefines} which is not a sibling") from None
+            starts[c.name] = start
+            ends[c.name] = start + _size(c, dialect)
+            # whichever view is longest decides where the next sibling goes
+            cursor = max(cursor, ends[c.name])
+            continue
+        starts[c.name] = cursor
+        ends[c.name] = cursor + _size(c, dialect)
+        cursor = ends[c.name]
+    return cursor, starts
 
 
 def _place(item: Item, offset: int, prefix: str, dialect: Dialect,
@@ -317,20 +358,10 @@ def _place(item: Item, offset: int, prefix: str, dialect: Dialect,
         qname = f"{prefix}{label}" if item.name != "FILLER" or not item.is_group else prefix.rstrip(".")
         if item.is_group:
             child_prefix = f"{qname}." if qname else ""
-            cursor = base
-            starts: dict[str, int] = {}
+            _, starts = _group_extent(item, dialect)
             for c in item.children:
-                if c.redefines:
-                    try:
-                        target = starts[c.redefines]
-                    except KeyError:
-                        raise ValueError(
-                            f"line {c.line_no}: {c.name} REDEFINES {c.redefines} which is not a sibling") from None
-                    _place(c, target, child_prefix, dialect, out, True)
-                    starts[c.name] = target
-                    continue
-                starts[c.name] = cursor
-                cursor += _place(c, cursor, child_prefix, dialect, out, in_redefines)
+                _place(c, base + starts[c.name], child_prefix, dialect, out,
+                       in_redefines or bool(c.redefines))
         else:
             if item.name == "FILLER":
                 qname = f"{prefix}FILLER@{base}"
