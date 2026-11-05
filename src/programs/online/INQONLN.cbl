@@ -73,6 +73,12 @@
                 TO WS-ERROR-MESSAGE
               PERFORM P900-ERROR-ROUTINE
                  THRU P900-EXIT
+              EXEC CICS SEND TEXT
+                        FROM(SEC-ERROR-INFO)
+                        LENGTH(LENGTH OF SEC-ERROR-INFO)
+                        ERASE
+                        FREEKB
+              END-EXEC
               EXEC CICS RETURN END-EXEC
            END-IF.
            
