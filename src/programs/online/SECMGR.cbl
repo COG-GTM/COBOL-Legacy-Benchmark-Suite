@@ -76,11 +76,37 @@
            EXIT.
            
        P200-CHECK-AUTH.
+      *    Authorization is bound to the CICS signed-on user, never to
+      *    the caller-supplied SEC-USER-ID: a request claiming another
+      *    user is rejected (8) and AUTHFILE is keyed on WS-USER-ID.
+           EXEC CICS ASSIGN
+                     USERID(WS-USER-ID)
+                     RESP(SEC-RESPONSE-CODE)
+           END-EXEC.
+           
+           IF SEC-RESPONSE-CODE NOT = DFHRESP(NORMAL)
+              MOVE 'Unable to obtain user credentials' 
+                TO SEC-ERROR-INFO
+              MOVE 12 TO SEC-RESPONSE-CODE
+           ELSE
+              IF SEC-USER-ID NOT = WS-USER-ID
+                 MOVE 'User validation failed' 
+                   TO SEC-ERROR-INFO
+                 MOVE 8 TO SEC-RESPONSE-CODE
+              ELSE
+                 PERFORM P210-QUERY-AUTHFILE
+                    THRU P210-EXIT
+              END-IF
+           END-IF.
+       P200-EXIT.
+           EXIT.
+           
+       P210-QUERY-AUTHFILE.
            EXEC SQL
                 SELECT COUNT(*)
                 INTO :WS-DB2-AREA
                 FROM AUTHFILE
-                WHERE USER_ID = :SEC-USER-ID
+                WHERE USER_ID = :WS-USER-ID
                   AND RESOURCE = :SEC-RESOURCE-NAME
                   AND ACCESS_TYPE = :SEC-ACCESS-TYPE
            END-EXEC.
@@ -99,7 +125,7 @@
                       TO SEC-ERROR-INFO
                     MOVE 12 TO SEC-RESPONSE-CODE
            END-EVALUATE.
-       P200-EXIT.
+       P210-EXIT.
            EXIT.
            
        P300-LOG-ACCESS.
