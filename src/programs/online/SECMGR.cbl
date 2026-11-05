@@ -76,6 +76,9 @@
            EXIT.
            
        P200-CHECK-AUTH.
+      *    Authorization is bound to the CICS signed-on user, never to
+      *    the caller-supplied SEC-USER-ID: a request claiming another
+      *    user is rejected (8) and AUTHFILE is keyed on WS-USER-ID.
            EXEC CICS ASSIGN
                      USERID(WS-USER-ID)
                      RESP(SEC-RESPONSE-CODE)
