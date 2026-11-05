@@ -50,6 +50,14 @@
            05  WS-PROCESS-COUNT      PIC 9(4) COMP.
            05  WS-ACTIVE-COUNT       PIC 9(4) COMP.
            05  WS-ERROR-COUNT        PIC 9(4) COMP.
+           05  WS-SUB                PIC 9(4) COMP.
+      *    Rule: a sequence may hold at most WS-PROC-MAX processes
+      *    (size of WS-PROCESS-TABLE). A larger sequence is rejected
+      *    as a whole: no BCHCTL control records are created for it.
+           05  WS-PROC-MAX           PIC 9(4) COMP VALUE 100.
+           05  WS-SEQ-OVERFLOW-SW    PIC X(1) VALUE 'N'.
+               88  WS-SEQ-OVERFLOW       VALUE 'Y'.
+               88  WS-SEQ-NO-OVERFLOW    VALUE 'N'.
            
        01  WS-PROCESS-TABLE.
            05  WS-PROC-ENTRY OCCURS 100 TIMES
@@ -94,7 +102,11 @@
        1000-INITIALIZE-SEQUENCE.
            PERFORM 1100-OPEN-FILES
            PERFORM 1200-BUILD-SEQUENCE
-           PERFORM 1300-CREATE-CONTROL-RECORDS
+           IF WS-SEQ-OVERFLOW
+               MOVE ZERO TO WS-PROCESS-COUNT
+           ELSE
+               PERFORM 1300-CREATE-CONTROL-RECORDS
+           END-IF
            .
            
        2000-GET-NEXT-PROCESS.
@@ -155,6 +167,7 @@
        1200-BUILD-SEQUENCE.
            INITIALIZE WS-PROCESS-TABLE
                       WS-PROCESS-COUNT
+           SET WS-SEQ-NO-OVERFLOW TO TRUE
            SET WS-PROC-IX TO 1
            
            MOVE LS-PROCESS-DATE TO PSR-KEY
@@ -166,6 +179,7 @@
            END-START
            
            PERFORM UNTIL WS-PSR-STATUS = '10'
+                      OR WS-SEQ-OVERFLOW
                READ PROCESS-SEQ-FILE NEXT RECORD
                    AT END
                        MOVE '10' TO WS-PSR-STATUS
@@ -178,11 +192,18 @@
            .
            
        1210-ADD-TO-SEQUENCE.
-           ADD 1 TO WS-PROCESS-COUNT
-           MOVE PSR-PROCESS-ID TO WS-PROC-ID(WS-PROC-IX)
-           MOVE WS-PROCESS-COUNT TO WS-PROC-SEQ(WS-PROC-IX)
-           MOVE BCT-STAT-READY TO WS-PROC-STATUS(WS-PROC-IX)
-           SET WS-PROC-IX UP BY 1
+           IF WS-PROCESS-COUNT >= WS-PROC-MAX
+               SET WS-SEQ-OVERFLOW TO TRUE
+               MOVE 'Too many processes in sequence (max 100)'
+                 TO ERR-TEXT
+               PERFORM 9000-ERROR-ROUTINE
+           ELSE
+               ADD 1 TO WS-PROCESS-COUNT
+               MOVE PSR-PROCESS-ID TO WS-PROC-ID(WS-PROC-IX)
+               MOVE WS-PROCESS-COUNT TO WS-PROC-SEQ(WS-PROC-IX)
+               MOVE BCT-STAT-READY TO WS-PROC-STATUS(WS-PROC-IX)
+               SET WS-PROC-IX UP BY 1
+           END-IF
            .
            
        1300-CREATE-CONTROL-RECORDS.
@@ -218,6 +239,9 @@
            END-IF
            .
            
+      *    Rule: a process may declare at most BCT-MAX-PREREQ (10)
+      *    dependencies (size of PSR-DEP-ENTRY). A definition with a
+      *    larger PSR-DEP-COUNT is rejected and the process not started.
        2200-CHECK-DEPENDENCIES.
            MOVE LS-NEXT-PROCESS TO PSR-PROCESS-ID
            
@@ -227,13 +251,19 @@
                    PERFORM 9000-ERROR-ROUTINE
            END-READ
            
-           PERFORM VARYING WS-SUB FROM 1 BY 1
-                   UNTIL WS-SUB > PSR-DEP-COUNT
-               PERFORM 2210-CHECK-DEP-STATUS
-               IF LS-RETURN-CODE NOT = ZERO
-                   EXIT PERFORM
-               END-IF
-           END-PERFORM
+           IF PSR-DEP-COUNT > BCT-MAX-PREREQ
+               MOVE 'Too many dependencies in process definition'
+                 TO ERR-TEXT
+               PERFORM 9000-ERROR-ROUTINE
+           ELSE
+               PERFORM VARYING WS-SUB FROM 1 BY 1
+                       UNTIL WS-SUB > PSR-DEP-COUNT
+                   PERFORM 2210-CHECK-DEP-STATUS
+                   IF LS-RETURN-CODE NOT = ZERO
+                       EXIT PERFORM
+                   END-IF
+               END-PERFORM
+           END-IF
            .
            
        2210-CHECK-DEP-STATUS.
