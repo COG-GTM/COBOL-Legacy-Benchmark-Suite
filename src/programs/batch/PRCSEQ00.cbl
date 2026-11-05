@@ -51,6 +51,9 @@
            05  WS-ACTIVE-COUNT       PIC 9(4) COMP.
            05  WS-ERROR-COUNT        PIC 9(4) COMP.
            05  WS-SUB                PIC 9(4) COMP.
+      *    Rule: a sequence may hold at most WS-PROC-MAX processes
+      *    (size of WS-PROCESS-TABLE). A larger sequence is rejected
+      *    as a whole: no BCHCTL control records are created for it.
            05  WS-PROC-MAX           PIC 9(4) COMP VALUE 100.
            05  WS-SEQ-OVERFLOW-SW    PIC X(1) VALUE 'N'.
                88  WS-SEQ-OVERFLOW       VALUE 'Y'.
@@ -236,6 +239,9 @@
            END-IF
            .
            
+      *    Rule: a process may declare at most BCT-MAX-PREREQ (10)
+      *    dependencies (size of PSR-DEP-ENTRY). A definition with a
+      *    larger PSR-DEP-COUNT is rejected and the process not started.
        2200-CHECK-DEPENDENCIES.
            MOVE LS-NEXT-PROCESS TO PSR-PROCESS-ID
            
