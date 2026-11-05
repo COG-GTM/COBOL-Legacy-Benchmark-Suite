@@ -32,6 +32,10 @@
            05 SEC-RESPONSE-CODE    PIC S9(8) COMP.
            05 SEC-ERROR-INFO       PIC X(80).
            
+       01  WS-SECURITY-RESULT.
+           05 WS-SEC-SAVED-RESPONSE PIC S9(8) COMP.
+           05 WS-SEC-SAVED-ERROR    PIC X(80).
+           
        LINKAGE SECTION.
        01  DFHCOMMAREA.
            COPY INQCOM.
@@ -59,6 +63,25 @@
                      RESP(WS-RESPONSE-CODE)
            END-EXEC.
            
+      *    Authorize before dispatching: INQPORT/INQHIST send account
+      *    data to the terminal and do no authorization of their own.
+           PERFORM P050-SECURITY-CHECK
+              THRU P050-EXIT.
+              
+           IF SEC-RESPONSE-CODE NOT = 0
+              MOVE SEC-ERROR-INFO 
+                TO WS-ERROR-MESSAGE
+              PERFORM P900-ERROR-ROUTINE
+                 THRU P900-EXIT
+              EXEC CICS SEND TEXT
+                        FROM(SEC-ERROR-INFO)
+                        LENGTH(LENGTH OF SEC-ERROR-INFO)
+                        ERASE
+                        FREEKB
+              END-EXEC
+              EXEC CICS RETURN END-EXEC
+           END-IF.
+           
            EVALUATE WS-COMMAREA-FUNCTION
                WHEN 'MENU'
                     PERFORM P200-DISPLAY-MENU
@@ -75,17 +98,6 @@
                     PERFORM P900-ERROR-ROUTINE
                        THRU P900-EXIT
            END-EVALUATE.
-           
-           PERFORM P050-SECURITY-CHECK
-              THRU P050-EXIT.
-              
-           IF SEC-RESPONSE-CODE NOT = 0
-              MOVE SEC-ERROR-INFO 
-                TO WS-ERROR-MESSAGE
-              PERFORM P900-ERROR-ROUTINE
-                 THRU P900-EXIT
-              EXEC CICS RETURN END-EXEC
-           END-IF.
        P100-EXIT.
            EXIT.
            
@@ -137,6 +149,11 @@
            EXIT.
            
        P050-SECURITY-CHECK.
+      *    Fail closed: stays non-zero unless SECMGR grants access.
+           MOVE 12 TO SEC-RESPONSE-CODE.
+           MOVE SPACES TO SEC-ERROR-INFO.
+           MOVE 'INQONLN' TO SEC-RESOURCE-NAME.
+           MOVE 'READ' TO SEC-ACCESS-TYPE.
            MOVE 'V' TO SEC-REQUEST-TYPE.
            
            EXEC CICS ASSIGN
@@ -150,22 +167,33 @@
            
            IF SEC-RESPONSE-CODE = 0
               MOVE 'A' TO SEC-REQUEST-TYPE
-              MOVE 'INQONLN' TO SEC-RESOURCE-NAME
-              MOVE 'READ' TO SEC-ACCESS-TYPE
               
               EXEC CICS LINK PROGRAM('SECMGR')
                         COMMAREA(WS-SECURITY-REQUEST)
                         LENGTH(LENGTH OF WS-SECURITY-REQUEST)
               END-EXEC
-              
-              IF SEC-RESPONSE-CODE = 0
-                 MOVE 'L' TO SEC-REQUEST-TYPE
-                 
-                 EXEC CICS LINK PROGRAM('SECMGR')
-                           COMMAREA(WS-SECURITY-REQUEST)
-                           LENGTH(LENGTH OF WS-SECURITY-REQUEST)
-                 END-EXEC
-              END-IF
+           END-IF.
+           
+      *    Audit every attempt; denied ones are logged as 'DENIED'.
+           MOVE SEC-RESPONSE-CODE TO WS-SEC-SAVED-RESPONSE.
+           MOVE SEC-ERROR-INFO TO WS-SEC-SAVED-ERROR.
+           
+           IF WS-SEC-SAVED-RESPONSE NOT = 0
+              MOVE 'DENIED' TO SEC-ACCESS-TYPE
+           END-IF.
+           
+           MOVE 'L' TO SEC-REQUEST-TYPE.
+           
+           EXEC CICS LINK PROGRAM('SECMGR')
+                     COMMAREA(WS-SECURITY-REQUEST)
+                     LENGTH(LENGTH OF WS-SECURITY-REQUEST)
+           END-EXEC.
+           
+      *    Keep the denial reason; on a granted request an audit
+      *    failure leaves SEC-RESPONSE-CODE non-zero and denies.
+           IF WS-SEC-SAVED-RESPONSE NOT = 0
+              MOVE WS-SEC-SAVED-RESPONSE TO SEC-RESPONSE-CODE
+              MOVE WS-SEC-SAVED-ERROR TO SEC-ERROR-INFO
            END-IF.
        P050-EXIT.
            EXIT. 
