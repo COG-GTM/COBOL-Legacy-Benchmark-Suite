@@ -97,9 +97,11 @@ def test_suite_copybooks_poswrt_parity(tmp_path):
     assert t[1]["TRN-AMOUNT"] == Decimal("-12.50")
     assert t[1]["TRN-TYPE"] == "FE" and t[1]["TRN-STATUS"] == "R"
     # Python port writes the same records -> byte-identical -> diff harness reports MATCH.
-    again = b"".join(pos.encode(r) for r in p)
-    assert again == (tmp_path / "positions.dat").read_bytes()
-    assert diff_bytes(pos, (tmp_path / "positions.dat").read_bytes(), again).ok
+    for lay, recs, name in ((pos, p, "positions.dat"), (trn, t, "transactions.dat")):
+        cobol_bytes = (tmp_path / name).read_bytes()
+        again = b"".join(lay.encode(r) for r in recs)
+        assert again == cobol_bytes, name
+        assert diff_bytes(lay, cobol_bytes, again).ok, name
 
 
 SKIP = {"CKPRST", "RETHND", "DBPROC", "SQLCA"}  # not standalone-compilable (program fragments / COPY SQLCA)
