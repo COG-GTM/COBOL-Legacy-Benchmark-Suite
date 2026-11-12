@@ -1,4 +1,5 @@
 """Byte-level codec tests against known IBM Enterprise COBOL storage patterns."""
+import sys
 from decimal import Decimal
 
 import pytest
@@ -109,8 +110,9 @@ def test_comp5_uses_full_binary_range():
 
 def test_comp5_byteorder_is_native_on_gnucobol_big_on_ibm():
     assert F("B", "S9(4)", "COMP-5", dialect=IBM).encode(1234).hex() == "04d2"
-    gnu = F("B", "S9(4)", "COMP-5", dialect=GNUCOBOL).encode(1234).hex()
-    assert gnu in ("04d2", "d204")
+    native = "d204" if sys.byteorder == "little" else "04d2"
+    assert F("B", "S9(4)", "COMP-5", dialect=GNUCOBOL).encode(1234).hex() == native
+    assert F("B", "S9(4)", "COMP-5", dialect=GNUCOBOL).decode(bytes.fromhex(native)) == 1234
 
 
 def test_compx_is_unsigned_and_sized_from_pic():
