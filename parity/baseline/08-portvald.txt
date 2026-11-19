@@ -1,0 +1,14 @@
+I|PORT1234|0001|Invalid Portfolio ID format
+I|PORX1234|0001|Invalid Portfolio ID format
+I|PORT12A4|0001|Invalid Portfolio ID format
+I||0001|Invalid Portfolio ID format
+A|1234567890|0002|Invalid Account Number format
+A|00000000000000000000000000000000000000000000000000|0002|Invalid Account Number format
+A|11111111111111111111111111111111111111111111111111|0000|
+T|STK|0000|
+T|BND|0000|
+T|MMF|0000|
+T|ETF|0000|
+T|XYZ|0003|Invalid Investment Type
+M|100|0000|
+X|ANY|0001|Invalid validation type
