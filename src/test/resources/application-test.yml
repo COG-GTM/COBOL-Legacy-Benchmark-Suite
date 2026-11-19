@@ -1,0 +1,7 @@
+clbs:
+  security:
+    viewer-password: viewer-pass
+    operator-password: operator-pass
+logging:
+  level:
+    com.clbs.portfolio: WARN

@@ -1,0 +1,10 @@
+# Production: an external database and explicit credentials are required.
+spring:
+  datasource:
+    url: ${SPRING_DATASOURCE_URL}
+    username: ${SPRING_DATASOURCE_USERNAME}
+    password: ${SPRING_DATASOURCE_PASSWORD}
+
+clbs:
+  security:
+    require-passwords: true

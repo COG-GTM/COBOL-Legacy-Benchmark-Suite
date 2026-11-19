@@ -1,0 +1,39 @@
+name: Java CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  build:
+    name: Build and test (Java 21)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+      - name: Build, test, validate OpenAPI contract
+        run: mvn -B verify
+
+  cobol-parity:
+    name: Regenerate COBOL baseline (GnuCOBOL)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install GnuCOBOL
+        run: sudo apt-get update && sudo apt-get install -y gnucobol
+      - name: Run COBOL programs against fixtures
+        run: parity/cobol/run_baseline.sh
+      - name: Baseline must be unchanged
+        run: git diff --exit-code parity/baseline
+
+  docker:
+    name: Docker image builds
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: docker build -t clbs-portfolio-service .
