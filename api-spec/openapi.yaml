@@ -1,0 +1,623 @@
+openapi: 3.0.3
+info:
+  title: CLBS Portfolio Service API
+  version: "1.0.0"
+  description: |
+    REST contract of the Java 21 / Spring Boot port of the COBOL Legacy Benchmark Suite
+    investment portfolio system. Each operation names the COBOL program it replaces.
+
+    Authentication is HTTP Basic. Role VIEWER may call GET operations and `POST /validations`;
+    role OPERATOR may call everything. Errors use the `ErrorResponse` body with the standard
+    error codes from RETHND.cpy (E001 invalid data, E002 not found, E003 duplicate,
+    E006 security, E007 processing, E008 validation).
+servers:
+  - url: /api/v1
+security:
+  - basicAuth: []
+tags:
+  - name: Portfolios
+    description: Portfolio master maintenance (PORTADD, PORTREAD, PORTUPDT, PORTDEL)
+  - name: Transactions
+    description: Transaction processing (PORTTRAN)
+  - name: Inquiry
+    description: Online inquiries replacing the CICS INQONLN menu (INQPORT, INQHIST)
+  - name: Validation
+    description: Field validation rules (PORTVALD)
+  - name: Batch
+    description: Sequential-file batch jobs using the original fixed-width record layouts
+  - name: Audit
+    description: Audit trail (AUDITLOG)
+
+paths:
+  /portfolios:
+    get:
+      tags: [Portfolios]
+      operationId: listPortfolios
+      summary: List all portfolios in key order (PORTREAD)
+      responses:
+        "200":
+          description: Portfolios
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PortfolioResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [Portfolios]
+      operationId: createPortfolio
+      summary: Create a portfolio (PORTADD)
+      description: ID and client name are required and status must be `A`. Create and last-maintenance dates are set to today.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PortfolioRequest"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortfolioResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "409":
+          description: Duplicate record
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /portfolios/{portfolioId}/accounts/{accountNo}:
+    parameters:
+      - $ref: "#/components/parameters/PortfolioId"
+      - $ref: "#/components/parameters/AccountNo"
+    get:
+      tags: [Portfolios]
+      operationId: getPortfolio
+      summary: Read one portfolio by key
+      responses:
+        "200":
+          description: Portfolio found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortfolioResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    patch:
+      tags: [Portfolios]
+      operationId: updatePortfolio
+      summary: Apply a status, name or value update (PORTUPDT)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PortfolioUpdateRequest"
+      responses:
+        "200":
+          description: Updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PortfolioResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Portfolios]
+      operationId: deletePortfolio
+      summary: Delete a portfolio and write an audit record (PORTDEL)
+      parameters:
+        - name: reason
+          in: query
+          required: true
+          description: DEL-REASON-CODE 01 closed, 02 transferred, 03 requested
+          schema:
+            type: string
+            enum: [CLOSED, TRANSFERRED, REQUESTED]
+      responses:
+        "204":
+          description: Deleted
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /portfolios/{portfolioId}/transactions:
+    parameters:
+      - $ref: "#/components/parameters/PortfolioId"
+    get:
+      tags: [Transactions]
+      operationId: listTransactions
+      summary: Transactions of a portfolio, newest first
+      responses:
+        "200":
+          description: Transactions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/TransactionResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /transactions:
+    post:
+      tags: [Transactions]
+      operationId: postTransaction
+      summary: Validate and apply a BU/SL/TR/FE transaction (PORTTRAN)
+      description: |
+        Validation (first failure wins): portfolio ID required, portfolio exists, type is BU/SL/TR/FE,
+        quantity > 0, price > 0 and amount > 0 except for TR, investment ID required.
+        BU adds units and cost to the position, SL subtracts them (rejected if units are insufficient),
+        FE subtracts the amount from the cost, TR is rejected as not implemented.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/TransactionRequest"
+      responses:
+        "201":
+          description: Transaction applied (status D)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TransactionResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+        "422":
+          description: Rejected during processing; stored with status F
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /inquiry/accounts/{accountNo}/positions:
+    parameters:
+      - $ref: "#/components/parameters/AccountNo"
+    get:
+      tags: [Inquiry]
+      operationId: getAccountPositions
+      summary: Positions held under an account (INQPORT)
+      responses:
+        "200":
+          description: Positions
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/PositionResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /inquiry/accounts/{accountNo}/history:
+    parameters:
+      - $ref: "#/components/parameters/AccountNo"
+    get:
+      tags: [Inquiry]
+      operationId: getAccountHistory
+      summary: Last 10 history rows for an account, newest first (INQHIST)
+      responses:
+        "200":
+          description: History rows (at most 10)
+          content:
+            application/json:
+              schema:
+                type: array
+                maxItems: 10
+                items:
+                  $ref: "#/components/schemas/HistoryResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /validations:
+    post:
+      tags: [Validation]
+      operationId: validateField
+      summary: Run a PORTVALD check; always 200 with the return code
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ValidationRequest"
+      responses:
+        "200":
+          description: Validation result
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ValidationResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /batch/portfolios/add:
+    post:
+      tags: [Batch]
+      operationId: batchAdd
+      summary: "PORTADD: 148-byte PORTFLIO records (COMP-3 amounts)"
+      requestBody:
+        $ref: "#/components/requestBodies/FixedWidthFile"
+      responses:
+        "200":
+          $ref: "#/components/responses/BatchReport"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /batch/portfolios/update:
+    post:
+      tags: [Batch]
+      operationId: batchUpdate
+      summary: "PORTUPDT: 69-byte update records"
+      requestBody:
+        $ref: "#/components/requestBodies/FixedWidthFile"
+      responses:
+        "200":
+          $ref: "#/components/responses/BatchReport"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /batch/portfolios/delete:
+    post:
+      tags: [Batch]
+      operationId: batchDelete
+      summary: "PORTDEL: 80-byte delete records"
+      requestBody:
+        $ref: "#/components/requestBodies/FixedWidthFile"
+      responses:
+        "200":
+          $ref: "#/components/responses/BatchReport"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /batch/portfolios/report:
+    get:
+      tags: [Batch]
+      operationId: batchReport
+      summary: "PORTREAD: listing of all portfolios"
+      responses:
+        "200":
+          $ref: "#/components/responses/BatchReport"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+  /audit:
+    get:
+      tags: [Audit]
+      operationId: listAudit
+      summary: Audit records, optionally for one portfolio
+      parameters:
+        - name: portfolioId
+          in: query
+          required: false
+          schema:
+            type: string
+            maxLength: 8
+      responses:
+        "200":
+          description: Audit records
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AuditResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "403":
+          $ref: "#/components/responses/Forbidden"
+
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+
+  parameters:
+    PortfolioId:
+      name: portfolioId
+      in: path
+      required: true
+      schema:
+        type: string
+        maxLength: 8
+        example: PORT0001
+    AccountNo:
+      name: accountNo
+      in: path
+      required: true
+      schema:
+        type: string
+        maxLength: 10
+        example: "1234567890"
+
+  requestBodies:
+    FixedWidthFile:
+      required: true
+      description: Sequential file of fixed-length records in the original COBOL layout
+      content:
+        application/octet-stream:
+          schema:
+            type: string
+            format: binary
+
+  responses:
+    BadRequest:
+      description: Invalid request (E001 / E008)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthorized:
+      description: Authentication required (E006)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Forbidden:
+      description: Access denied (E006)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: Record not found (E002)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    BatchReport:
+      description: Console output, counters and audit trail of the batch run
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BatchReport"
+
+  schemas:
+    PortfolioRequest:
+      type: object
+      required: [portfolioId, accountNo, clientName, status]
+      properties:
+        portfolioId:
+          type: string
+          maxLength: 8
+          example: PORT0001
+        accountNo:
+          type: string
+          maxLength: 10
+          example: "1234567890"
+        clientName:
+          type: string
+          maxLength: 30
+        clientType:
+          type: string
+          description: I=Individual, C=Corporate, T=Trust
+          pattern: "[ICT]"
+        status:
+          type: string
+          maxLength: 1
+          description: Must be A (active) for a new portfolio
+          example: A
+        totalValue:
+          type: number
+          description: PIC S9(13)V99
+        cashBalance:
+          type: number
+          description: PIC S9(13)V99
+
+    PortfolioResponse:
+      type: object
+      properties:
+        portfolioId: { type: string }
+        accountNo: { type: string }
+        clientName: { type: string }
+        clientType: { type: string }
+        status:
+          type: string
+          description: A=Active, C=Closed, S=Suspended
+        createDate: { type: string, format: date }
+        lastMaintDate: { type: string, format: date }
+        totalValue: { type: number }
+        cashBalance: { type: number }
+        lastUser: { type: string }
+
+    PortfolioUpdateRequest:
+      type: object
+      required: [action, newValue]
+      properties:
+        action:
+          type: string
+          enum: [STATUS, VALUE, NAME]
+          description: STATUS stores the first character, NAME the first 30, VALUE a decimal amount
+        newValue:
+          type: string
+          maxLength: 50
+
+    TransactionRequest:
+      type: object
+      properties:
+        portfolioId: { type: string, maxLength: 8 }
+        investmentId: { type: string, maxLength: 10 }
+        type:
+          type: string
+          maxLength: 2
+          description: BU=Buy, SL=Sell, TR=Transfer, FE=Fee
+        quantity: { type: number, description: "PIC S9(11)V9(4)" }
+        price: { type: number, description: "PIC S9(11)V9(4)" }
+        amount: { type: number, description: "PIC S9(13)V99" }
+        currency: { type: string, minLength: 3, maxLength: 3, example: USD }
+
+    TransactionResponse:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        portfolioId: { type: string }
+        investmentId: { type: string }
+        type: { type: string }
+        transactionDate: { type: string, format: date }
+        transactionTime: { type: string, example: "15:30:45" }
+        quantity: { type: number }
+        price: { type: number }
+        amount: { type: number }
+        currency: { type: string }
+        status:
+          type: string
+          description: P=Pending, D=Done, F=Failed, R=Reversed
+        statusMessage: { type: string }
+        processTimestamp: { type: string, format: date-time }
+        processUser: { type: string }
+
+    PositionResponse:
+      type: object
+      properties:
+        portfolioId: { type: string }
+        investmentId: { type: string }
+        positionDate: { type: string, format: date }
+        quantity: { type: number }
+        costBasis: { type: number }
+        marketValue: { type: number }
+        currency: { type: string }
+        status:
+          type: string
+          description: A=Active, C=Closed, P=Pending
+
+    HistoryResponse:
+      type: object
+      properties:
+        accountNo: { type: string }
+        portfolioId: { type: string }
+        transDate: { type: string, format: date }
+        transTime: { type: string, example: "15:30:45" }
+        transType: { type: string }
+        securityId: { type: string }
+        quantity: { type: number }
+        price: { type: number }
+        amount: { type: number }
+        costBasis: { type: number }
+
+    ValidationRequest:
+      type: object
+      required: [type]
+      properties:
+        type:
+          type: string
+          minLength: 1
+          maxLength: 1
+          description: I=portfolio ID, A=account number, T=investment type, M=amount
+        value:
+          type: string
+          maxLength: 50
+
+    ValidationResponse:
+      type: object
+      properties:
+        returnCode:
+          type: integer
+          description: 0 valid, 1 invalid ID or request type, 2 invalid account, 3 invalid type, 4 invalid amount
+        message: { type: string }
+        valid: { type: boolean }
+
+    BatchReport:
+      type: object
+      properties:
+        program: { type: string, example: PORTADD }
+        counts:
+          type: object
+          additionalProperties:
+            type: integer
+        output:
+          type: array
+          description: Lines the COBOL program would DISPLAY
+          items:
+            type: string
+        auditTrail:
+          type: array
+          description: Fixed-width audit records (PORTDEL AUDFILE)
+          items:
+            type: string
+
+    AuditResponse:
+      type: object
+      properties:
+        id: { type: integer, format: int64 }
+        timestamp: { type: string, format: date-time }
+        userId: { type: string }
+        program: { type: string }
+        type: { type: string, description: "TRAN, USER or SYST" }
+        action: { type: string }
+        status: { type: string, description: "SUCC, FAIL or WARN" }
+        portfolioId: { type: string }
+        accountNo: { type: string }
+        reasonCode: { type: string }
+        beforeImage: { type: string }
+        afterImage: { type: string }
+        message: { type: string }
+
+    ErrorResponse:
+      type: object
+      required: [timestamp, status, error, code, message]
+      properties:
+        timestamp: { type: string, format: date-time }
+        status: { type: integer }
+        error: { type: string }
+        code:
+          type: string
+          description: RETHND standard error code
+          enum: [E001, E002, E003, E004, E005, E006, E007, E008, E009, E010]
+        message: { type: string }
+        path: { type: string }
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field: { type: string }
+              message: { type: string }

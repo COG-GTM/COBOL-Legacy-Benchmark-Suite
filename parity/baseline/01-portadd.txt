@@ -1,0 +1,7 @@
+Duplicate record: PORT0001
+Invalid record data: PORT0003
+Invalid record data: PORT0004
+Invalid record data:         
+Records added:    0000003
+Duplicate records:0000001
+Errors occurred:  0000003

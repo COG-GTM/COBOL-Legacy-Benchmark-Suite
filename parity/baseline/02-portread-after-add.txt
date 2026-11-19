@@ -1,0 +1,22 @@
+Portfolio Record: 0000001
+  ID: PORT0001
+  Account: 1234567890
+  Client: GROWTH FUND CLIENT            
+  Status: A
+  Total Value: +0000000012345.67
+ 
+Portfolio Record: 0000002
+  ID: PORT0002
+  Account: 2345678901
+  Client: INCOME TRUST                  
+  Status: A
+  Total Value: +0000000098765.43
+ 
+Portfolio Record: 0000003
+  ID: PORT0005
+  Account: 3456789012
+  Client: ACME CORPORATE                
+  Status: A
+  Total Value: -0000000000042.10
+ 
+Total Records Read: 0000003

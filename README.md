@@ -82,6 +82,72 @@ project-root/
     └── templates/        # Code templates and standards
 ```
 
+## Java 21 / Spring Boot Port
+
+The portfolio system is also available as a Java 21 / Spring Boot 3.3 REST service built from the
+root `pom.xml`. The COBOL sources under `src/programs`, `src/copybook` etc. are unchanged and remain
+the reference implementation; the Java code lives in `src/main/java` and `src/test/java`.
+
+| COBOL program | Java replacement | REST endpoint (`/api/v1`) |
+|---|---|---|
+| PORTADD | `PortfolioService.create`, `PortfolioBatchService.add` | `POST /portfolios`, `POST /batch/portfolios/add` |
+| PORTREAD | `PortfolioService.findAll`, `PortfolioBatchService.report` | `GET /portfolios`, `GET /batch/portfolios/report` |
+| PORTUPDT | `PortfolioService.update`, `PortfolioBatchService.update` | `PATCH /portfolios/{id}/accounts/{acct}`, `POST /batch/portfolios/update` |
+| PORTDEL | `PortfolioService.delete`, `PortfolioBatchService.delete` | `DELETE /portfolios/{id}/accounts/{acct}?reason=`, `POST /batch/portfolios/delete` |
+| PORTVALD | `PortfolioValidator` | `POST /validations` |
+| PORTTRAN | `TransactionService` | `POST /transactions`, `GET /portfolios/{id}/transactions` |
+| INQONLN / INQPORT | `InquiryService.positionsForAccount` | `GET /inquiry/accounts/{acct}/positions` |
+| INQONLN / INQHIST | `InquiryService.historyForAccount` | `GET /inquiry/accounts/{acct}/history` |
+| AUDPROC | `AuditService` | `GET /audit` |
+| ERRPROC / ERRHNDL | `GlobalExceptionHandler` (`@RestControllerAdvice`) | uniform `ErrorResponse` with RETHND codes E001-E010 |
+| SECMGR | Spring Security (HTTP Basic, roles VIEWER / OPERATOR) | all endpoints |
+
+- **API contract:** `api-spec/openapi.yaml` (OpenAPI 3.0). `OpenApiContractTest` fails the build if the
+  spec is invalid or drifts from the controllers. Swagger UI: `/swagger-ui.html`.
+- **Storage:** VSAM/DB2 records map to JPA entities; the schema is managed by Flyway
+  (`src/main/resources/db/migration`). H2 in memory by default; set `SPRING_DATASOURCE_URL` /
+  `_USERNAME` / `_PASSWORD` for an external database (`prod` profile).
+- **Parity:** `parity/` holds a GnuCOBOL harness that runs the original programs on fixed-width
+  fixtures. `CobolParityTest` replays the same files through the Java batch jobs and compares the
+  output line by line. See `parity/README.md`.
+
+### Requirements
+
+JDK 21 and Maven 3.9+. GnuCOBOL 3.x only to regenerate the parity baseline.
+
+### Run locally
+
+```bash
+mvn spring-boot:run -Dspring-boot.run.profiles=dev
+# dev profile: users viewer/viewer and operator/operator, demo data loaded
+curl -u viewer:viewer http://localhost:8080/api/v1/portfolios
+```
+
+Outside `dev`, set the passwords through the environment:
+
+| Variable | Purpose |
+|---|---|
+| `CLBS_VIEWER_USERNAME` / `CLBS_VIEWER_PASSWORD` | Read-only user (default name `viewer`) |
+| `CLBS_OPERATOR_USERNAME` / `CLBS_OPERATOR_PASSWORD` | Read/write and batch user (default name `operator`) |
+| `SPRING_PROFILES_ACTIVE` | `dev`, `prod` (prod requires both passwords and a datasource) |
+| `PORT` | HTTP port (default 8080) |
+
+Health and metrics: `/actuator/health` (liveness/readiness probes), `/actuator/info`, `/actuator/prometheus` (OPERATOR).
+
+### Test
+
+```bash
+mvn verify                       # unit, integration, parity and OpenAPI contract tests
+parity/cobol/run_baseline.sh     # re-run the COBOL programs; baseline must not change
+```
+
+### Docker
+
+```bash
+docker build -t clbs-portfolio-service .
+docker run -p 8080:8080 -e SPRING_PROFILES_ACTIVE=dev clbs-portfolio-service
+```
+
 ## System Architecture Overview
 
 The system comprises several key components:

@@ -1,0 +1,11 @@
+target/
+.git/
+documentation/
+parity/
+src/programs/
+src/copybook/
+src/jcl/
+src/maps/
+src/cics/
+src/database/
+src/templates/
