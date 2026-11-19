@@ -39,7 +39,7 @@ UPDTFILE="$P/fixtures/portupdt.dat" "$BUILD/PORTUPDT" | mask > "$P/baseline/03-p
 "$BUILD/PORTREAD" | mask > "$P/baseline/04-portread-after-update.txt"
 DELEFILE="$P/fixtures/portdel.dat" AUDFILE="$BUILD/audit.dat" "$BUILD/PORTDEL" | mask > "$P/baseline/05-portdel.txt"
 # AUD-FILLER is never initialised by PORTDEL (low-values); show it as spaces.
-tr '\0' ' ' < "$BUILD/audit.dat" | fold -w 62 | sed -E 's/^.{26}/<TIMESTAMP>/' > "$P/baseline/06-portdel-audit.txt"
+tr '\0' ' ' < "$BUILD/audit.dat" | fold -w 80 | sed -E 's/^.{26}/<TIMESTAMP>/' > "$P/baseline/06-portdel-audit.txt"
 "$BUILD/PORTREAD" | mask > "$P/baseline/07-portread-after-delete.txt"
 VALDREQ="$P/fixtures/portvald.txt" "$BUILD/VALDRIVR" > "$P/baseline/08-portvald.txt"
 echo "Baseline written to $P/baseline"
